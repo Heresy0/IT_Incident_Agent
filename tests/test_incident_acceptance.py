@@ -95,6 +95,23 @@ class IncidentAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["run_summary"]["model_calls"], 2)
         self.assertEqual(result["run_summary"]["tool_calls"], 1)
 
+    def test_empty_error_filter_feedback_allows_model_to_choose_warn_observation(self):
+        ex = executor("case_003")
+        broad = {**window(ex), "category": "resource"}
+        observed = ex.execute("get_service_logs", broad)
+        item = next(e for e in observed.evidence if e.payload.get("error_code") == "POOL_ACQUIRE_TIMEOUT")
+        rid = next(o.reference_id for o in item.reference_options if o.field_path == "message")
+        model = Responses([selected("get_service_logs", {**broad, "level": "ERROR"}),
+            selected("get_service_logs", broad, "t2"), AIMessage(content=json.dumps({"findings": [
+                {"statement": "Observed pool acquisition wait", "refs": [{"reference_id": rid}]}]}))])
+        result = investigate(model, ex.provider, P, limits=Limits(model_calls=3, tool_calls=6, reserve_model_calls=0), max_steps=3)
+        self.assertEqual(result["status"], "completed")
+        self.assertIn("excludes WARN and INFO", model.history[1][-1].content)
+        self.assertIn('"level": "ERROR"', model.history[1][-1].content)
+        self.assertEqual(result["run_summary"]["model_calls"], 3)
+        self.assertEqual(result["run_summary"]["tool_calls"], 2)
+        self.assertEqual([e["status"] for e in result["events"] if e["type"] == "tool_result"], ["empty", "ok"])
+
 
 if __name__ == "__main__":
     unittest.main()

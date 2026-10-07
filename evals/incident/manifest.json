@@ -62,6 +62,20 @@
       "code_commit": "34ed7f3",
       "status": "completed",
       "phase": "m2_focused_query_retest"
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "3aec63b9-4eff-476d-ae1c-06aa7c9b319c",
+      "code_commit": "53af35b",
+      "status": "partial",
+      "phase": "m2_targeted_truncation_check"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "2f6e4a15-8549-4b07-ae2d-8ec5f71baf60",
+      "code_commit": "53af35b",
+      "status": "completed",
+      "phase": "m2_targeted_truncation_check"
     }
   ],
   "business_quality_status": "development_partial",

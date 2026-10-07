@@ -47,7 +47,8 @@ Category = Literal["dependency", "configuration", "resource"]
 
 
 class MetricsArgs(Window):
-    metrics: list[Metric] = Field(min_length=1, max_length=7)
+    metrics: list[Metric] = Field(min_length=1, max_length=7,
+        description="Prefer 1-3 relevant metrics per call to avoid truncated samples. When investigating connection waiting, compare pool_wait with pool_usage and db_cpu before attributing a cause.")
     granularity: Literal["1m", "5m"] = "1m"
 
     @field_validator("metrics")
@@ -58,7 +59,8 @@ class MetricsArgs(Window):
 
 class LogsArgs(Window):
     category: Category
-    level: Literal["INFO", "WARN", "ERROR"] | None = None
+    level: Literal["INFO", "WARN", "ERROR"] | None = Field(default=None,
+        description="Exact level filter. Normally omit: ERROR excludes WARN incident records and INFO health controls. Empty with a level does not mean this category has no logs.")
     error_code: str | None = Field(default=None, max_length=64, pattern=r"^[A-Z0-9_]+$")
 
 

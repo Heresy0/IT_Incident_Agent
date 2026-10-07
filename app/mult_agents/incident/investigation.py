@@ -147,6 +147,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     break
                 if calls:
                     step_truncated = False
+                    empty_observations = []
                     for call in calls:
                         selected = call.get("name")
                         name = selected if selected in INVESTIGATION_TOOLS else "denied"
@@ -170,6 +171,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                               sample_order=result.sample_order,
                               truncated=result.truncated, error=result.error.model_dump() if result.error else None)
                         step_truncated = step_truncated or result.truncated
+                        if result.status == "empty" and call["name"] in {"get_service_logs", "get_service_metrics"}:
+                            empty_observations.append({"tool": call["name"], "query_profile": dict(executor.last_query_profile)})
                         messages.append(ToolMessage(content=result.model_dump_json(), tool_call_id=cid))
                         if result.error and result.error.code == "BUDGET_EXCEEDED":
                             stop = "BUDGET_EXCEEDED"
@@ -184,6 +187,13 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             "the returned samples do not cover the full requested window. Use remaining steps for "
                             "a focused query with fewer relevant metrics or a discriminating log check before finalizing. "
                             "Do not infer service health or absence of errors from incomplete observations."))
+                    if empty_observations and step < max_steps - 2:
+                        messages.append(HumanMessage(content="These observation queries returned no matching rows: "
+                            + json.dumps(empty_observations) + ". This is limited to the selected filters. "
+                            "An exact ERROR level excludes WARN and INFO. Use your remaining observation step "
+                            "to reconsider optional level/error_code or choose another useful check within scope. "
+                            "Do not finalize a claim that the service/category has no logs or is healthy. "
+                            "If you cannot obtain evidence, state the specific query gap."))
                     continue
                 try:
                     candidate, output_protocol = resolve_output(response.content, executor)
