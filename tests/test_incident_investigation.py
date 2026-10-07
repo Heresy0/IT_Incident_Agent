@@ -8,8 +8,8 @@ from unittest.mock import patch
 from datetime import timedelta
 from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
 from mult_agents.harness.runtime import Limits, ExecutionError
-from mult_agents.incident.contracts import InvestigationOutput
-from mult_agents.incident.investigation import investigate, validate_output
+from mult_agents.incident.contracts import InvestigationOutput, InvestigationSelection
+from mult_agents.incident.investigation import investigate, validate_output, resolve_output, ReferenceValidationError
 from mult_agents.incident.fake import ScriptedModel
 from tests.test_incident_tools import P, executor, window
 from mult_agents.incident.agents import build_model
@@ -50,6 +50,7 @@ class IncidentInvestigationTests(unittest.TestCase):
             result = self.run_model(model, case)
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["review_status"], "not_performed")
+            self.assertEqual(result["output_protocol"], "reference_selection_v2")
             self.assertEqual(result["run_summary"]["model_calls"], 3)
             self.assertEqual(result["run_summary"]["tool_calls"], 2)
             events = result["events"]
@@ -160,9 +161,9 @@ class IncidentInvestigationTests(unittest.TestCase):
         # Patch at the SDK boundary: real ChatTongyi serialization/parsing, zero network.
         ex = executor()
         item = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
-        final = {"findings": [{"statement": "Registered owner is Checkout on-call", "refs": [{
-            "evidence_id": item.evidence_id, "field_path": "team", "value": "Checkout on-call", "unit": "",
-            "observed_at": item.observed_from.isoformat(), "data_version": item.data_version, "quote": item.excerpt}]}]}
+        option = next(o for o in item.reference_options if o.field_path == "team")
+        final = {"findings": [{"statement": "Registered owner is Checkout on-call",
+                               "refs": [{"reference_id": option.reference_id}]}]}
         def sdk_response(message, reason):
             return {"status_code": 200, "request_id": "offline-sdk-probe", "usage": {"input_tokens": 2, "output_tokens": 3, "total_tokens": 5},
                     "output": {"choices": [{"message": message, "finish_reason": reason}]}}
@@ -172,6 +173,8 @@ class IncidentInvestigationTests(unittest.TestCase):
         with patch("dashscope.Generation.call", side_effect=replies) as sdk:
             result = self.run_model(build_model("test-only"))
         self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["output_protocol"], "reference_selection_v2")
+        self.assertEqual(result["output"]["findings"][0]["refs"][0]["value"], "Checkout on-call")
         self.assertEqual(result["run_summary"]["model_calls"], 2)
         self.assertEqual(result["run_summary"]["tool_calls"], 1)
         self.assertEqual(result["run_summary"]["token_usage"], {"input_tokens": 4, "output_tokens": 6, "known_calls": 2, "status": "known"})
@@ -265,6 +268,92 @@ class IncidentInvestigationTests(unittest.TestCase):
         # An unknown field is still rejected; the program did not silently strip an alias.
         with self.assertRaises(ValueError):
             validate_output(InvestigationOutput.model_validate_json(json.dumps(final)), ex.evidence)
+
+    def test_selector_expansion_preserves_original_value_type_metadata_and_quote(self):
+        ex = executor()
+        items = ex.execute("get_service_metrics", {**window(ex), "metrics": ["pool_usage"]}).evidence
+        item = items[0]
+        option = next(o for o in item.reference_options if o.field_path == "value")
+        selected = {"findings": [{"statement": "Pool usage observation", "refs": [{"reference_id": option.reference_id}]}]}
+        output, protocol = resolve_output(json.dumps(selected), ex)
+        ref = output.findings[0].refs[0]
+        self.assertEqual(protocol, "reference_selection_v2")
+        self.assertEqual(ref.field_path, "value")
+        self.assertIs(type(ref.value), type(item.payload["value"]))
+        self.assertEqual(ref.value, item.payload["value"])
+        self.assertEqual(ref.unit, item.payload["unit"])
+        self.assertEqual(ref.observed_at, item.observed_from)
+        self.assertEqual(ref.data_version, item.data_version)
+        self.assertIn(ref.quote, item.excerpt)
+        validate_output(output, ex.evidence)
+
+    def test_unknown_or_unobserved_selector_rejected_without_fabricated_output(self):
+        ex = executor()
+        item = ex.execute("get_service_metrics", {**window(ex), "metrics": ["db_cpu"]}).evidence[0]
+        option = next(o for o in item.reference_options if o.field_path == "value")
+        for rid in ("REF_" + "0" * 24, option.reference_id):
+            bad = AIMessage(content=json.dumps({"findings": [{"statement": "Not observed in this run", "refs": [{"reference_id": rid}]}]}))
+            # This run only executes owner; even a real same-case metric reference is unobserved.
+            result = self.run_model(Responses([selected(), bad, bad]))
+            self.assertEqual(result["status"], "partial")
+            self.assertEqual(result["output"]["findings"], [])
+            self.assertEqual(result["validation_failures"][0]["details"][0]["type"], "unknown_reference")
+            self.assertEqual(result["run_summary"]["model_calls"], 3)
+            self.assertEqual(result["run_summary"]["tool_calls"], 1)
+
+    def test_selector_cannot_override_server_fields(self):
+        ex = executor()
+        item = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        option = next(o for o in item.reference_options if o.field_path == "team")
+        for key, value in {"field_path": "invented", "value": "fake", "unit": "ms", "quote": "fake",
+                           "observed_at": "2026-01-01T00:00:00Z", "data_version": "fake"}.items():
+            content = json.dumps({"findings": [{"statement": "Owner", "refs": [{"reference_id": option.reference_id, key: value}]}]})
+            with self.assertRaises(ValueError, msg=key):
+                resolve_output(content, ex)
+
+    def test_duplicate_selector_and_historical_source_rejected(self):
+        ex = executor()
+        item = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        option = next(o for o in item.reference_options if o.field_path == "team")
+        content = json.dumps({"findings": [{"statement": "Owner", "refs": [{"reference_id": option.reference_id}] * 2}]})
+        with self.assertRaises(ReferenceValidationError) as caught:
+            resolve_output(content, ex)
+        self.assertEqual(caught.exception.reason, "duplicate_reference")
+        ex = executor("case_003", role="knowledge")
+        item = ex.execute("search_incidents", {"symptoms": "latency"}).evidence[0]
+        option = next(o for o in item.reference_options if o.field_path == "text")
+        content = json.dumps({"findings": [{"statement": "Current cause", "refs": [{"reference_id": option.reference_id}]}]})
+        with self.assertRaises(ReferenceValidationError) as caught:
+            resolve_output(content, ex)
+        self.assertEqual(caught.exception.reason, "non_current_evidence")
+
+    def test_selector_repair_stays_within_original_model_budget(self):
+        ex = executor()
+        item = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        option = next(o for o in item.reference_options if o.field_path == "team")
+        bad = AIMessage(content='{"findings":[{"statement":"Owner","refs":[{"reference_id":"REF_000000000000000000000000"}]}]}')
+        good = AIMessage(content=json.dumps({"findings": [{"statement": "Owner", "refs": [{"reference_id": option.reference_id}]}]}))
+        model = Responses([selected(), bad, good])
+        result = self.run_model(model, limits=Limits(model_calls=3, tool_calls=6, reserve_model_calls=0))
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["repairs"], 1)
+        self.assertEqual(result["run_summary"]["model_calls"], 3)
+        self.assertEqual(result["run_summary"]["tool_calls"], 1)
+        self.assertIn(option.reference_id, model.history[-1][-1].content)
+        self.assertEqual(result["output_protocol"], "reference_selection_v2")
+
+    def test_new_model_schema_contains_only_reference_selectors(self):
+        schema = json.dumps(InvestigationSelection.model_json_schema())
+        self.assertIn("ReferenceSelection", schema)
+        self.assertIn("reference_id", schema)
+        self.assertNotIn("EvidenceRef", schema)
+        self.assertNotIn("field_path", schema)
+
+    def test_invalid_json_failure_is_safe_and_repair_counted(self):
+        result = self.run_model(Responses([AIMessage(content="TEST_SECRET_CANARY"), AIMessage(content="{}")]))
+        self.assertEqual(result["validation_failures"], [{"step": 1, "reason": "invalid_json", "details": []}])
+        self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
+        self.assertEqual(result["run_summary"]["model_calls"], 2)
 
 
 if __name__ == "__main__":

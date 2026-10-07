@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import ValidationError
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, activate, invoke_chat_model
-from .contracts import InvestigationOutput, INVESTIGATION_TOOLS
+from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS
 from .tools import ToolExecutor
 from .prompts import SYSTEM
 
@@ -20,9 +20,11 @@ class ReferenceValidationError(ValueError):
 
 
 def validation_details(exc):
+    if isinstance(exc, json.JSONDecodeError):
+        return {"reason": "invalid_json", "details": []}
     if isinstance(exc, ValidationError):
         fields = {"findings", "statement", "refs", "evidence_id", "field_path", "value", "unit",
-                  "observed_at", "data_version", "quote", "tentative_hypotheses",
+                  "observed_at", "data_version", "quote", "reference_id", "tentative_hypotheses",
                   "missing_information", "escalation_team"}
         errors = exc.errors(include_input=False, include_context=False, include_url=False)[:5]
         return {"reason": "invalid_json" if any(e["type"] == "json_invalid" for e in errors) else "schema_mismatch",
@@ -60,6 +62,38 @@ def validate_output(output, evidence):
         raise ReferenceValidationError("unobserved_team", "escalation_team")
 
 
+def resolve_output(content, executor):
+    data = json.loads(content)
+    # Explicit compatibility for literal refs from old offline fixtures. Still strictly checked.
+    # The schema and prompts supplied to new models contain only reference_id selectors.
+    if isinstance(data, dict) and isinstance(data.get("findings"), list):
+        legacy = any(isinstance(f, dict) and isinstance(f.get("refs"), list)
+                     and any(isinstance(r, dict) and "evidence_id" in r for r in f["refs"])
+                     for f in data["findings"])
+        if legacy:
+            output = InvestigationOutput.model_validate_json(content)
+            validate_output(output, executor.evidence)
+            return output, "literal_refs_v1"
+    selection = InvestigationSelection.model_validate_json(content)
+    findings = []
+    for fi, finding in enumerate(selection.findings):
+        refs, seen = [], set()
+        for ri, selected in enumerate(finding.refs):
+            path = f"findings.{fi}.refs.{ri}.reference_id"
+            ref = executor.references.get(selected.reference_id)
+            if ref is None:
+                raise ReferenceValidationError("unknown_reference", path)
+            if selected.reference_id in seen:
+                raise ReferenceValidationError("duplicate_reference", path)
+            seen.add(selected.reference_id)
+            refs.append(ref.model_copy(deep=True))
+        findings.append(Finding(statement=finding.statement, refs=refs))
+    output = InvestigationOutput(findings=findings, tentative_hypotheses=list(selection.tentative_hypotheses),
+        missing_information=list(selection.missing_information), escalation_team=selection.escalation_team)
+    validate_output(output, executor.evidence)
+    return output, "reference_selection_v2"
+
+
 def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None):
     if not 1 <= max_steps <= 4:
         raise ValueError("max_steps must be 1..4")
@@ -83,9 +117,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                       "span_id": task_span, "parent_span_id": context.root_span, **fields})
     messages = [SystemMessage(content=SYSTEM), HumanMessage(content=json.dumps({
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
-        "output_schema": InvestigationOutput.model_json_schema(), "step_limit": max_steps}, ensure_ascii=False))]
+        "output_schema": InvestigationSelection.model_json_schema(), "step_limit": max_steps}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
+    output_protocol = "none"
     with activate(context), context.span("task", "investigation"):
         event("task_created")
         event("task_started")
@@ -139,8 +174,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         messages.append(HumanMessage(content="Next step is final: return the output JSON, no tools. State any gaps."))
                     continue
                 try:
-                    candidate = InvestigationOutput.model_validate_json(response.content)
-                    validate_output(candidate, executor.evidence)
+                    candidate, output_protocol = resolve_output(response.content, executor)
                     output = candidate
                     stop = "FINISHED"
                     break
@@ -151,11 +185,13 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     if repairs == 0 and step < max_steps - 1:
                         repairs += 1
                         event("validation_repair", node="investigation")
-                        reference_fields = {eid: e.allowed_field_paths for eid, e in executor.evidence.items()}
+                        reference_options = {eid: [o.model_dump() for o in e.reference_options]
+                                             for eid, e in executor.evidence.items()}
                         messages.append(HumanMessage(content="Output contract/reference check failed. Safe error details: "
-                            + json.dumps(failure) + ". Allowed field_path values by evidence_id: "
-                            + json.dumps(reference_fields) + ". Choose an exact entry; paths are relative to payload, never prepend payload. "
-                            + "Correct JSON using only exact current evidence fields; omit unverifiable findings. No additional tool calls required."))
+                            + json.dumps(failure) + ". Available reference_options by evidence_id: "
+                            + json.dumps(reference_options) + ". Return refs as [{\"reference_id\":\"an exact REF_ ID from the options\"}]. "
+                            + "Do not copy field_path, value, unit, timestamp or quote; never prepend payload. "
+                            + "The server expands these fields. Omit unverifiable findings. No additional tool calls required."))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
                         break
@@ -172,7 +208,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_type": "incident_investigation", "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
-            "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationOutput.model_json_schema(), sort_keys=True)).encode()).hexdigest()[:12],
+            "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)).encode()).hexdigest()[:12],
+            "output_protocol": output_protocol,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],
             "events": events, "run_summary": context.summary(), "repairs": repairs,

@@ -135,10 +135,23 @@ class IncidentToolsTests(unittest.TestCase):
         ex.provider._data["logs"][1]["message"] = "x" * 50000
         result = ex.execute("get_service_logs", {**window(ex), "category": "dependency"})
         self.assertTrue(result.truncated)
-        self.assertLess(len(result.model_dump_json()), 13000)
+        self.assertLessEqual(len(result.model_dump_json()), 12000)
         ex.execute("get_service_metrics", {**window(ex), "metrics": ["db_cpu", "pool_wait"]})
         result = ex.execute("get_service_metrics", {**window(ex), "metrics": ["pool_wait", "db_cpu", "db_cpu"]})
         self.assertEqual(result.error.code, "DUPLICATE_TOOL")
+
+    def test_catalog_bound_and_registration_only_for_returned_evidence(self):
+        ex = executor()
+        template = next(r for r in ex.provider._data["metrics"] if r["metric"] == "db_cpu")
+        ex.provider._data["metrics"] = [{**template, "id": f"r{n:03}"} for n in range(60)]
+        result = ex.execute("get_service_metrics", {**window(ex), "metrics": ["db_cpu"]})
+        self.assertTrue(result.truncated)
+        self.assertLessEqual(len(result.model_dump_json()), 12000)
+        self.assertEqual(set(ex.evidence), {e.evidence_id for e in result.evidence})
+        options = {o.reference_id for e in result.evidence for o in e.reference_options}
+        self.assertEqual(set(ex.references), options)
+        first = result.evidence[0]
+        self.assertTrue(all(o.field_path in first.allowed_field_paths for o in first.reference_options))
 
     def test_duplicate_no_double_count_and_snapshot_immutability(self):
         ex = executor(); args = {**window(ex), "metrics": ["db_cpu"]}

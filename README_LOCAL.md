@@ -102,6 +102,11 @@ $env:PYTHONIOENCODING='utf-8'
 `--fake` 是明确编排的控制演示，不是自主选择评测。JSON 保存真实执行计数、证据快照与顺序事件；
 Markdown 是确定性取证报告。结果为 completed 只表示取证输出完成；假设尚未独立复核、工单未解决。
 
+当前模型输出使用 `reference_selection_v2`：工具证据附带 `reference_options`，模型为每条发现选择
+`reference_id`；程序从当前证据登记表填入原始路径、值、单位、时间、版本和引文，最终 JSON
+继续保存完整引用。未知或未取证的引用编号被拒绝；旧完整引用格式仅保留严格兼容，记录为
+`literal_refs_v1`。输出字段有效不代表自然语言结论已经得到独立复核。
+
 真实调用只由显式 `--live` 启动。先在本项目 `.env.local` 填写自己的 `DASHSCOPE_API_KEY`、
 `MODEL=qwen-turbo` 与 `INCIDENT_BEARER_TOKEN`（从本项目生成的本地演示身份中选择一个）；
 脚本沿用 backend.auth 解析服务端 Principal，不接收用户自报租户/身份。

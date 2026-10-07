@@ -86,6 +86,11 @@ class ToolError(Contract):
     retryable: bool = False
 
 
+class ReferenceOption(Contract):
+    reference_id: str = Field(pattern=r"^REF_[0-9a-f]{24}$")
+    field_path: str = Field(max_length=120)
+
+
 class Evidence(Contract):
     evidence_id: str
     kind: Literal["observation", "runbook", "past_incident"]
@@ -101,6 +106,7 @@ class Evidence(Contract):
     data_version: str
     hash: str
     allowed_field_paths: list[str] = Field(default_factory=list, max_length=40)
+    reference_options: list[ReferenceOption] = Field(default_factory=list, max_length=40)
 
 
 class ToolResult(Contract):
@@ -130,6 +136,20 @@ class InvestigationOutput(Contract):
     tentative_hypotheses: list[str] = Field(default_factory=list, max_length=5)
     missing_information: list[str] = Field(default_factory=list, max_length=8)
     escalation_team: str | None = Field(default=None, max_length=80)
+
+
+class ReferenceSelection(Contract):
+    reference_id: str = Field(pattern=r"^REF_[0-9a-f]{24}$", description="Choose an exact reference_id from an observed evidence.reference_options entry. The server fills all source fields.")
+
+
+class SelectedFinding(Contract):
+    statement: str = Field(min_length=1, max_length=500)
+    refs: list[ReferenceSelection] = Field(min_length=1, max_length=8)
+
+
+class InvestigationSelection(InvestigationOutput):
+    """Model-facing selection contract; the final public output remains fully expanded."""
+    findings: list[SelectedFinding] = Field(default_factory=list, max_length=12)
 
 
 TOOL_ARGS = {

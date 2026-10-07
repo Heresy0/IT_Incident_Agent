@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from backend.auth import Principal
 from mult_agents.harness.runtime import ExecutionError, RunContext
 from .contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, Evidence,
-                        ToolResult, ToolError)
+                        ToolResult, ToolError, ReferenceOption, EvidenceRef)
 from .providers import ProviderError
 from pydantic import ValidationError
 
@@ -28,6 +28,7 @@ class ToolExecutor:
         self.provider, self.principal, self.scope, self.context, self.role = provider, principal, scope, context, role
         self.seen = set()
         self.evidence = {}
+        self.references = {}
 
     def schemas(self):
         allowed = INVESTIGATION_TOOLS if self.role == "investigation" else KNOWLEDGE_TOOLS if self.role == "knowledge" else ()
@@ -75,16 +76,16 @@ class ToolExecutor:
                     rows, truncated = self.provider.query(name, args, self.scope)
                 if time.monotonic() - self.context.started >= self.context.limits.seconds - self.context.limits.reserve_seconds:
                     return self.rejected("BUDGET_EXCEEDED")
-                items, size = [], 0
+                items = []
                 for row in rows:
-                    # Bound the entire message too, not just row count. Omitted rows are explicit.
-                    record_size = 2 * len(json.dumps(row, ensure_ascii=False)) + 800
-                    if size + record_size > 12000:
+                    # Count the serialized reference catalog too; only returned rows are registered.
+                    item = self.prepare_snapshot(name, row)
+                    candidate = ToolResult(status="ok", evidence=[*items, item], truncated=truncated)
+                    if len(candidate.model_dump_json()) > 12000:
                         truncated = True
                         break
-                    size += record_size
                     truncated = truncated or row.get("content_truncated", False)
-                    items.append(self.snapshot(name, row))
+                    items.append(self.register_snapshot(item))
                 return ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated)
             except ExecutionError as exc:
                 return self.rejected(exc.code)
@@ -97,18 +98,38 @@ class ToolExecutor:
                 return self.rejected("PROVIDER_UNAVAILABLE")
         return self.rejected("PROVIDER_UNAVAILABLE")
 
-    def snapshot(self, name, row):
+    def prepare_snapshot(self, name, row):
         encoded = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         digest = hashlib.sha256(encoded.encode()).hexdigest()
         locator = f"{name}/{row['id']}"
         eid = "EV_" + hashlib.sha256(f"{self.provider.name}/{locator}/{digest}".encode()).hexdigest()[:24]
-        if eid not in self.evidence:
-            observed = datetime.fromisoformat(row["timestamp"])
-            self.evidence[eid] = Evidence(evidence_id=eid,
+        if eid in self.evidence:
+            return self.evidence[eid].model_copy(deep=True)
+        observed = datetime.fromisoformat(row["timestamp"])
+        paths = reference_field_paths(row)
+        return Evidence(evidence_id=eid,
                 kind="runbook" if name == "search_runbooks" else "past_incident" if name == "search_incidents" else "observation",
                 provider=self.provider.name, service=row["service"], environment=row["environment"],
                 observed_from=observed, observed_to=observed, retrieved_at=datetime.now(timezone.utc),
                 payload=row, excerpt=encoded, locator=locator, data_version=row["data_version"], hash=digest,
-                allowed_field_paths=reference_field_paths(row))
+                allowed_field_paths=paths, reference_options=[ReferenceOption(
+                    reference_id="REF_" + hashlib.sha256(f"{eid}/{path}".encode()).hexdigest()[:24],
+                    field_path=path) for path in paths])
+
+    def register_snapshot(self, item):
+        if item.evidence_id not in self.evidence:
+            self.evidence[item.evidence_id] = item.model_copy(deep=True)
+            for option in item.reference_options:
+                value = item.payload
+                for part in option.field_path.split("."):
+                    value = value[part]
+                # Extract an actual serialized field fragment, preserving escaping and JSON types.
+                quote = json.dumps({option.field_path.split(".")[-1]: value}, ensure_ascii=False,
+                                   sort_keys=True, separators=(",", ":"))[1:-1][:1000]
+                if quote not in item.excerpt:
+                    raise ValueError("invalid server reference fragment")
+                self.references[option.reference_id] = EvidenceRef(evidence_id=item.evidence_id,
+                    field_path=option.field_path, value=value, unit=item.payload.get("unit", ""),
+                    observed_at=item.observed_from, data_version=item.data_version, quote=quote)
         # Preserve the initial snapshot even if a caller mutates its returned nested payload.
-        return self.evidence[eid].model_copy(deep=True)
+        return self.evidence[item.evidence_id].model_copy(deep=True)

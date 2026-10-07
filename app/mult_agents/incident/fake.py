@@ -39,10 +39,9 @@ class ScriptedModel:
             for e in evidence[:6]:
                 row = e["payload"]
                 field = "value" if "value" in row else "message" if "message" in row else "summary"
+                reference = next(o for o in e["reference_options"] if o["field_path"] == field)
                 findings.append({"statement": f"Observed {row.get('metric', row['id'])}: {row[field]}",
-                    "refs": [{"evidence_id": e["evidence_id"], "field_path": field, "value": row[field],
-                              "unit": row.get("unit", ""), "observed_at": row["timestamp"],
-                              "data_version": row["data_version"], "quote": e["excerpt"]}]})
+                    "refs": [{"reference_id": reference["reference_id"]}]})
             return AIMessage(content=json.dumps({"findings": findings, "tentative_hypotheses": [],
                 "missing_information": ["Scripted control output; real model investigation and independent review remain unverified."],
                 "escalation_team": None}))
