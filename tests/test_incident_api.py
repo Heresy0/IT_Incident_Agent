@@ -87,13 +87,22 @@ class IncidentAPITests(unittest.TestCase):
 
     def test_catalog_scope_and_input_validation(self):
         response = self.req('GET', 'incident-demo-cases')
-        self.assertEqual(len(response.json()['items']), 3)
+        self.assertEqual(len(response.json()['items']), 6)
         self.assertNotIn('gold', response.text)
         fields = catalog(self.owner)[0]['fields']
         for changes in ({'tenant_id': 'team_b'}, {'service': 'other'}, {'start': '2020-01-01'}, {'occurred_at': '2099-01-01T00:00:00Z'}):
             self.assertEqual(self.req('POST', 'incidents', json={**fields, **changes}).status_code, 422)
         self.assertEqual(self.client.get('/api/v1/incidents').status_code, 401)
         self.assertFalse(self.store.incidents)
+
+    def test_new_development_case_runs_through_existing_m4_adapter(self):
+        fields = next(row['fields'] for row in catalog(self.owner) if row['case_id'] == 'case_005')
+        incident = self.create(**fields)
+        run_id = self.start(incident)
+        result = self.result(run_id)
+        self.assertEqual(result['status'], 'completed')
+        self.assertEqual(result['incident_id'], incident['id'])
+        self.assertIn('认证模式', result['output']['hypotheses'][0]['cause'])
 
     def test_owner_isolation_for_incidents_runs_and_events(self):
         incident = self.create(); run_id = self.start(incident); self.result(run_id)

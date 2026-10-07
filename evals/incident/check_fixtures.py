@@ -24,7 +24,7 @@ def check():
             for row in rows:
                 assert row["service"] in {scope["service"], *scope["allowed_dependencies"]}
                 assert row["environment"] == scope["environment"]
-                assert row["data_version"] == manifest["dataset_version"]
+                assert row["data_version"] == entry.get("data_version", manifest["dataset_version"])
                 assert datetime.fromisoformat(row["timestamp"]).tzinfo is not None
         for row in data["metrics"]:
             assert datetime.fromisoformat(scope["start"]) <= datetime.fromisoformat(row["timestamp"]) <= datetime.fromisoformat(scope["end"])
@@ -39,8 +39,25 @@ def check():
         elif entry["case_id"] == "case_002":
             assert latest["dependency_error_rate"] == 0
             assert data["changes"][0]["config_summary"]["auth_audience"] in data["logs"][1]["message"]
-        else:
+        elif entry["case_id"] == "case_003":
             assert latest["pool_usage"] == 1 and latest["pool_wait"] == 1400 and latest["db_cpu"] < 30
+        elif entry["case_id"] == "case_004":
+            assert 0 < latest["dependency_error_rate"] < .5 and latest["pool_usage"] < .5
+            error = next(r for r in data["logs"] if r["error_code"] == "UPSTREAM_READ_TIMEOUT")
+            assert error["timestamp"] < data["changes"][0]["timestamp"]
+            assert any(r["error_code"] == "UPSTREAM_HEALTH_OK" for r in data["logs"])
+            assert data["changes"][0]["config_summary"]["timeout_ms"] == 1500
+        elif entry["case_id"] == "case_005":
+            assert latest["dependency_error_rate"] == 0 and latest["request_error_rate"] > .6
+            config = data["changes"][0]["config_summary"]
+            assert config["auth_mode"] == "anonymous" and config["auth_audience"] == "warehouse-staging"
+            assert all(value in data["logs"][0]["message"] for value in config.values())
+        elif entry["case_id"] == "case_006":
+            assert latest["pool_usage"] == 1 and latest["pool_wait"] >= 1600 and latest["db_cpu"] < 30
+            load = [r["value"] for r in data["metrics"] if r["metric"] == "request_rate"]
+            assert max(load) - min(load) <= 2
+            assert data["changes"][0]["category"] == "configuration"
+            assert data["changes"][0]["config_summary"]["pool_max"] == 8
     return len(catalog)
 
 

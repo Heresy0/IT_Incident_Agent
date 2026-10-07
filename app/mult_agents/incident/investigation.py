@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import ValidationError
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, activate, invoke_chat_model
-from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS
+from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS
 from .tools import ToolExecutor
 from .prompts import SYSTEM
 
@@ -98,10 +98,11 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
 
 
 def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None,
-                context=None, event_log=None, executor=None, objective=None, role="investigation", repair_state=None):
-    if not 1 <= max_steps <= 4:
-        raise ValueError("max_steps must be 1..4")
-    if role not in {"investigation", "knowledge"}:
+                context=None, event_log=None, executor=None, objective=None, role="investigation", repair_state=None,
+                output_schema=InvestigationSelection, output_resolver=resolve_output, system_prompt=None):
+    if not 1 <= max_steps <= (16 if role == "single" else 4):
+        raise ValueError("max_steps exceeds the registered role limit")
+    if role not in {"investigation", "knowledge", "single"}:
         raise ValueError("unregistered observation role")
     standalone = context is None
     if not standalone and event_log is None:
@@ -128,13 +129,14 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     if executor.context is not context or executor.role != role or executor.scope != ticket.scope or executor.principal != principal:
         raise ValueError("shared executor mismatch")
     repair_state = repair_state if repair_state is not None else {"repairs": 0}
-    allowed_tools = INVESTIGATION_TOOLS if role == "investigation" else KNOWLEDGE_TOOLS
-    allowed_kinds = ("observation",) if role == "investigation" else ("runbook", "past_incident")
+    allowed_tools = SINGLE_TOOLS if role == "single" else INVESTIGATION_TOOLS if role == "investigation" else KNOWLEDGE_TOOLS
+    allowed_kinds = ("observation", "runbook", "past_incident") if role == "single" else ("observation",) if role == "investigation" else ("runbook", "past_incident")
     if role == "knowledge":
         from .collaboration_prompts import KNOWLEDGE
         system = KNOWLEDGE
     else:
         system = SYSTEM
+    system = system_prompt or system
     model = model.bind_tools(executor.schemas())
     task_id = str(uuid4())
     def event(kind, **fields):
@@ -142,7 +144,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                       "span_id": task_span, "parent_span_id": task_parent or context.root_span, **fields})
     messages = [SystemMessage(content=system), HumanMessage(content=json.dumps({
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
-        "output_schema": InvestigationSelection.model_json_schema(), "step_limit": max_steps,
+        "output_schema": output_schema.model_json_schema(), "step_limit": max_steps,
         "objective": objective}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
@@ -155,9 +157,12 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         event("task_started")
         for step in range(max_steps):
             try:
-                response = invoke_chat_model(model, messages, role)
+                terminal = role == "single" and (step == max_steps - 1 or not context.can_research())
+                if terminal:
+                    messages.append(HumanMessage(content="Only the final output remains within budget. Return diagnosis JSON, no tools; preserve gaps."))
+                response = invoke_chat_model(model, messages, role, terminal=terminal)
                 # A blocking SDK call is not cancelled by an outer timer. Discard late responses.
-                if time.monotonic() - context.started >= limits.seconds - limits.reserve_seconds:
+                if time.monotonic() - context.started >= limits.seconds - (0 if terminal else limits.reserve_seconds):
                     stop = "TIME_BUDGET_EXCEEDED"
                     break
                 if len(str(response.content)) > 12000:
@@ -178,7 +183,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         selected = call.get("name")
                         name = selected if selected in allowed_tools else "denied"
                         event("tool_selected", name=name, step=step + 1)
-                    if step == max_steps - 1:
+                    if step == max_steps - 1 or terminal:
                         stop = "STEP_LIMIT"
                         break
                     for call in calls:
@@ -222,7 +227,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             "If you cannot obtain evidence, state the specific query gap."))
                     continue
                 try:
-                    candidate, output_protocol = resolve_output(response.content, executor, allowed_kinds)
+                    candidate, output_protocol = output_resolver(response.content, executor, allowed_kinds)
                     output = candidate
                     stop = "FINISHED"
                     break
@@ -253,7 +258,12 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         if standalone:
             context.stop_reason = stop
         if output is None:
-            output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
+            if role == "single":
+                from .collaboration_contracts import DiagnosisDraft
+                output = DiagnosisDraft(findings=[], hypotheses=[], recommended_actions=[],
+                    missing_information=[f"SingleAgent stopped: {stop}; evidence requires human review."], escalation_team=None)
+            else:
+                output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
         # Conservative M2 boundary: a truncated source remains explicitly partial, even
         # when selected fields are valid. M3 can assess whether later checks close that gap.
         incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
@@ -261,7 +271,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_id": task_id, "task_type": "incident_" + role, "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
-            "prompt_version": hashlib.sha256((system + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)
+            "prompt_version": hashlib.sha256((system + json.dumps(output_schema.model_json_schema(), sort_keys=True)
                 + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),

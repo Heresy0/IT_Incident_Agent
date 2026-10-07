@@ -1,0 +1,23 @@
+{
+  "case_id": "case_005",
+  "synthetic": true,
+  "fault_family": "configuration",
+  "cause": "authentication mode changed to anonymous; expected service-token; audience remains correct",
+  "necessary_checks": [
+    "AUTH_MODE_UNSUPPORTED",
+    "auth_mode",
+    "auth_audience",
+    "UPSTREAM_HEALTH_OK"
+  ],
+  "counter_evidence": [
+    "configured audience equals expected audience",
+    "upstream transport healthy"
+  ],
+  "forbidden": [
+    "wrong token audience is the current cause",
+    "upstream unavailable because HTTP 401",
+    "deployment timing alone proves a cause"
+  ],
+  "semantic_review": "manual_required",
+  "note": "Development scenario only; required field coverage does not prove a complete causal statement."
+}

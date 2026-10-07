@@ -162,3 +162,4 @@ TOOL_ARGS = {
 }
 INVESTIGATION_TOOLS = frozenset({"get_service_metrics", "get_service_logs", "get_recent_changes", "get_service_owner"})
 KNOWLEDGE_TOOLS = frozenset({"search_runbooks", "search_incidents"})
+SINGLE_TOOLS = INVESTIGATION_TOOLS | KNOWLEDGE_TOOLS

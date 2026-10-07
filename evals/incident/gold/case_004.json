@@ -1,0 +1,25 @@
+{
+  "case_id": "case_004",
+  "synthetic": true,
+  "fault_family": "dependency",
+  "cause": "ledger dependency slow on a subset of requests while still reachable",
+  "necessary_checks": [
+    "UPSTREAM_READ_TIMEOUT",
+    "UPSTREAM_HEALTH_OK",
+    "dependency_error_rate",
+    "request_latency",
+    "timeout_ms"
+  ],
+  "counter_evidence": [
+    "health HTTP 200",
+    "DB ping 6ms",
+    "rollout after first timeout"
+  ],
+  "forbidden": [
+    "complete ledger outage from read timeout alone",
+    "deployment caused errors that started earlier",
+    "database root cause without current database evidence"
+  ],
+  "semantic_review": "manual_required",
+  "note": "Development scenario only; required field coverage does not prove a complete causal statement."
+}

@@ -15,7 +15,7 @@ class IncidentCreate(Window):
     occurred_at: datetime
     impact: str = Field(default="", max_length=500)
     reported_severity: Literal["unknown", "low", "medium", "high", "critical"] = "unknown"
-    demo_case_id: Literal["case_001", "case_002", "case_003"] | None = None
+    demo_case_id: Literal["case_001", "case_002", "case_003", "case_004", "case_005", "case_006"] | None = None
 
     @model_validator(mode="after")
     def occurred_in_window(self):

@@ -1,6 +1,6 @@
 # Windows 本地启动
 
-Web/API 已具备 M4 工单工程闭环，CLI 支持 Investigation 与 M3 串行协作；真实语义与返工验收仍有缺口。以下安装步骤仅使用本项目自己的依赖、密钥和数据库。
+Web/API 已具备 M4 工单工程闭环，开发案例已增至六个。CLI 支持 Investigation、M3 串行协作及 M5 同预算单/多对照；真实语义与返工验收仍有缺口。以下安装步骤仅使用本项目自己的依赖、密钥和数据库。
 
 ## 首次准备
 
@@ -123,7 +123,7 @@ Investigation 入口无论是否加 `--probe`，都限制为 **一次运行最�
 .\.venv\Scripts\python.exe scripts/investigate_incident.py --live --probe --case case_001 --output output/incident-live
 ```
 
-`scripts/investigate_incident.py --live` 是唯一的付费执行入口；普通测试不会请求模型。未测得完整 token 或费用时保留 unknown，
+该 CLI、M4 页面/API 的显式 live 启动及下文 M5 的显式 live 对照均可能付费；普通测试不会请求模型。未测得完整 token 或费用时保留 unknown，
 不估造数字。大批评测、扩大 live 上限或运行另外两个案例需后续明确执行清单。
 
 内部单任务最多 4 个模型步骤（含结束输出和修复），共享上限 16 模型/24 工具/180 秒，
@@ -134,7 +134,7 @@ Investigation 入口无论是否加 `--probe`，都限制为 **一次运行最�
 M0–M2 实际检查结果与未完成项见 [实施记录](docs/M0-M2-实施记录.md)。
 M2 三案例真实验收见 [验收报告](docs/M2-验收报告.md)。离线检查入口为
 `python -m evals.incident.acceptance --report <run.json>`；逐案显式传入三个报告，
-可加 `--output <summary.json>` 保存安全汇总。它不会请求模型，只有该模块读取 gold。
+可加 `--output <summary.json>` 保存安全汇总。它不会请求模型；gold 仅供离线评估模块读取。
 返回 0 只说明机械检查通过；完整验收仍需逐项核查语义支持与缺口。
 报告的工具执行记录展示校验后的枚举过滤条件和空/错/截断；仅引用元数据的发现被拒绝。
 指标按最新采样优先返回，数量上限与 12000 字符消息上限均保持不变。
@@ -168,7 +168,7 @@ Supervisor 会收到当前可派发任务数；小预算优先保留当前观测
 仅历史支持的原因即便被 Reviewer 接受，程序也降级为 unresolved。
 
 结果保存为 `<run_id>.json/.md`，包含证据、任务、诊断版本、复核、补查请求、协商事件与总计数。
-`supported` 表示当前证据支持；人工确认和工单 resolved 状态仍待 M4。
+`supported` 表示 Reviewer 对当前证据的判断；人工确认和工单 resolved 已由 M4 的 operator 确认接口实现，运行完成本身不会解决工单。
 免费路径的所有角色均为测试替身，不能据此认定真实模型验收通过。
 
 M3 的付费入口必须同时显式指定模型和工具预算；缺少预算、Key 或有效身份会在请求前停止。
@@ -182,3 +182,24 @@ M3 的付费入口必须同时显式指定模型和工具预算；缺少预算�
 预算是调用次数上限，不保证成功或完整 token/费用可知。M3 不兼用 M2 的 `--probe`。
 文件改动、免费验证和未完成项见 [M3 实施记录](docs/M3-实施记录.md)。
 首次真实验证结果与修复见 [M3 验收报告](docs/M3-验收报告.md)。
+
+## 同预算单/多对照（M5 准备）
+
+复用现有工具循环和协作流程，六案例每案各运行一次 SingleAgent 和多 Agent。默认只打印计划；免费执行不加载 Key 或 Bearer 身份：
+
+```powershell
+$env:PYTHONPATH='app'
+$env:PYTHONIOENCODING='utf-8'
+.\.venv\Scripts\python.exe scripts/compare_incident.py --plan --cases case_003 --model-budget 16 --tool-budget 8
+.\.venv\Scripts\python.exe scripts/compare_incident.py --fake
+```
+
+可用 `--cases case_004 case_005` 限定免费案例。单/多每运行使用相同预算，默认 16 模型/8 工具/180 秒，预留 3 模型/20 秒；SingleAgent 无独立复核，假设保持 tentative。脚本结果排除在业务质量评分之外。
+
+输出保存到 `output/incident-comparison/<新目录ID>/`，包含 `bundle.json`、原始运行 JSON、`comparison.json` 和 `review-template.json`，原运行不覆盖。离线入口：
+
+```powershell
+.\.venv\Scripts\python.exe -m evals.incident.comparison --bundle output/incident-comparison/<目录ID>/bundle.json --output output/incident-comparison/<目录ID>/summary.json
+```
+
+真实对照必须同时指定 `--live --execute-live --cases ... --model-budget ... --tool-budget ...`，预算范围与 M3 相同，且使用本项目自己的 Key/注册身份；缺少条件在请求前停止。本轮没有执行。后续应先明确一个案例的两次运行预算，再执行并人工核查语义。完整流程、控制结果和未完成项见 [M5 开发集与对照准备](docs/M5-开发集与对照准备.md)。

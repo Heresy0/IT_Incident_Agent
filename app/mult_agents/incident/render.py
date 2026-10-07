@@ -1,5 +1,5 @@
 def render(result):
-    if result.get("task_type") == "incident_collaboration":
+    if result.get("task_type") in {"incident_collaboration", "incident_single"}:
         return render_collaboration(result)
     output = result["output"]
     lines = ["# Investigation 取证报告", "", f"运行：{result['run_id']}；状态：{result['status']}",
@@ -29,12 +29,13 @@ def render(result):
 
 def render_collaboration(result):
     output = result["output"]
-    lines = ["# 故障协作诊断报告", "", f"运行：{result['run_id']}；状态：{result['status']}；复核：{result['review_status']}",
+    single = result.get("task_type") == "incident_single"
+    lines = ["# 单 Agent 诊断报告" if single else "# 故障协作诊断报告", "", f"运行：{result['run_id']}；状态：{result['status']}；复核：{result['review_status']}",
         f"执行模式：{result.get('execution_mode', 'caller_supplied')}；数据源：{result['data_source']}",
         "当前结论未获人工确认，工单未解决；工具只读，操作建议不会自动执行。", ""]
     if result.get("execution_mode") == "scripted_control_only":
         lines.extend(["这是脚本控制演示，复核与调度也是测试替身，不代表真实模型诊断质量。", ""])
-    lines.append("已复核观测：")
+    lines.append("观测（无独立 Reviewer，语义待核查）：" if single else "已复核观测：")
     for finding in output["findings"]:
         lines.append(f"- {finding['statement']}")
         for ref in finding["refs"]:

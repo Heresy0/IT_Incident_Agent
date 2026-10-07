@@ -1,5 +1,6 @@
 """Scripted collaboration control cases. No model autonomy/quality claims and no gold reads."""
 import json
+from datetime import datetime, timedelta
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 
@@ -9,8 +10,64 @@ def selector(evidence, field):
 
 
 def latest_metrics(evidence):
-    return {e["payload"]["metric"]: e for e in sorted(evidence, key=lambda e: e["observed_at"])
+    return {e["payload"]["metric"]: e for e in sorted(evidence, key=lambda e: e.get("observed_at", e.get("observed_from", "")))
             if "metric" in e["payload"]}
+
+
+def new_control_variant(ticket):
+    symptoms = ticket['symptoms'].casefold()
+    return any(marker in symptoms for marker in ('intermittently', '401', 'settings update'))
+
+
+def control_queries(ticket):
+    scope = ticket["scope"]
+    window = {k: scope[k] for k in ("start", "end")}
+    text = ticket["symptoms"].casefold()
+    category = "configuration" if "401" in text or "audience" in text else "resource" if "waiting" in text else "dependency"
+    metrics = ["pool_usage", "pool_wait", "db_cpu", "request_rate"] if category == "resource" else ["dependency_error_rate", "request_latency"]
+    metric_window = dict(window)
+    if new_control_variant(ticket):
+        metric_window["start"] = (datetime.fromisoformat(scope["end"]) - timedelta(minutes=10)).isoformat()
+    elif category == 'resource':
+        metric_window["start"] = (datetime.fromisoformat(scope["end"]) - timedelta(minutes=15)).isoformat()
+    queries = [("get_service_logs", {**window, "category": category}), ("get_recent_changes", window),
+               ("get_service_metrics", {**metric_window, "metrics": metrics})]
+    if '401' in text:
+        queries.append(("get_service_logs", {**window, "category": "dependency"}))
+    return queries
+
+
+def variant_draft(evidence):
+    errors = {e["payload"].get("error_code"): e for e in evidence if "error_code" in e["payload"]}
+    metrics = latest_metrics(evidence)
+    change = next((e for e in evidence if "config_summary" in e["payload"]), None)
+    key = next((k for k in ("AUTH_MODE_UNSUPPORTED", "UPSTREAM_READ_TIMEOUT", "POOL_ACQUIRE_TIMEOUT") if k in errors), None)
+    if key is None:
+        return {"findings": [], "hypotheses": [], "missing_information": ["Scripted variant did not obtain a discriminating log."]}
+    log = errors[key]
+    refs = [selector(log, "message")]
+    if change:
+        refs.append(selector(change, "summary"))
+    counter = []
+    if key == "AUTH_MODE_UNSUPPORTED":
+        cause = "认证模式与当前依赖要求不一致，仍需人工核查"
+        refs.append(selector(change, "config_summary.auth_mode"))
+        if "UPSTREAM_HEALTH_OK" in errors:
+            counter.append(selector(errors["UPSTREAM_HEALTH_OK"], "message"))
+    elif key == "UPSTREAM_READ_TIMEOUT":
+        cause = "部分依赖请求响应超过读取期限，仍需人工核查"
+        if "UPSTREAM_HEALTH_OK" in errors:
+            counter.append(selector(errors["UPSTREAM_HEALTH_OK"], "message"))
+    else:
+        cause = "当前应用连接池等待异常，配置容量变更需要核查"
+        refs += [selector(metrics[m], "value") for m in ("pool_usage", "pool_wait") if m in metrics]
+        if "db_cpu" in metrics:
+            counter.append(selector(metrics["db_cpu"], "value"))
+    facts = [{"statement": log["payload"]["message"], "refs": [selector(log, "message")]}]
+    return {"findings": facts, "hypotheses": [{"cause": cause, "support_refs": refs, "counter_refs": counter}],
+        "recommended_actions": [{"action": "由值班人员核对原始观测与配置后选择处置", "condition": "独立确认假设适用",
+            "expected_result": "处置后错误与等待恢复", "risk": "修改配置可能影响服务", "requires_approval": True}],
+        "missing_information": ["脚本控制演示，业务语义仍需人工核查"]}
 
 
 class ScriptedRole:
@@ -62,6 +119,8 @@ class ScriptedRole:
             elif objective.get("challenge"):
                 queries = [("get_service_metrics", {**window, "metrics": ["pool_usage", "pool_wait", "db_cpu"]}),
                            ("get_service_logs", {**window, "category": "resource"})]
+            elif new_control_variant(data["ticket"]):
+                queries = control_queries(data["ticket"])
             elif "audience" in symptoms:
                 queries = [("get_recent_changes", window), ("get_service_logs", {**window, "category": "configuration"})]
             elif "waiting" in symptoms:
@@ -81,6 +140,9 @@ class ScriptedRole:
 
     def diagnose(self, payload):
         evidence = payload["evidence"]
+        if any(e["payload"].get("error_code") in {"AUTH_MODE_UNSUPPORTED", "UPSTREAM_READ_TIMEOUT"} for e in evidence) \
+                or any(e["payload"].get("config_summary", {}).get("pool_max") == 8 for e in evidence):
+            return variant_draft(evidence)
         metrics = latest_metrics(evidence)
         errors = {e["payload"]["error_code"]: e for e in evidence if "error_code" in e["payload"]}
         history = next((e for e in evidence if e["kind"] == "past_incident"), None)
@@ -131,3 +193,26 @@ class ScriptedRole:
 
 def scripted_models():
     return {role: ScriptedRole(role) for role in ("supervisor", "investigation", "knowledge", "diagnosis", "reviewer")}
+
+
+class ScriptedSingle:
+    """All six protocols in one scripted control conversation, never a quality baseline."""
+    def bind_tools(self, tools):
+        self.tools = tools
+        return self
+
+    def invoke(self, messages):
+        data = json.loads(next(m.content for m in messages if isinstance(m, HumanMessage)))
+        results = [json.loads(m.content) for m in messages if isinstance(m, ToolMessage)]
+        ticket = data["ticket"]
+        queries = control_queries(ticket) + [
+            ("get_service_owner", {"alias": ticket["scope"]["service"]}),
+            ("search_runbooks", {"query": ticket["symptoms"][:200]}),
+            ("search_incidents", {"symptoms": ticket["symptoms"][:200]})]
+        if len(results) < len(queries):
+            return AIMessage(content="", tool_calls=[{"name": name, "args": args, "id": f"single-control-{n}", "type": "tool_call"}
+                for n, (name, args) in enumerate(queries[len(results):len(results)+6], len(results))])
+        evidence = [e for result in results for e in result["evidence"]]
+        variant = new_control_variant(data["ticket"])
+        draft = variant_draft(evidence) if variant else ScriptedRole("diagnosis").diagnose({"evidence": evidence})
+        return AIMessage(content=json.dumps(draft, ensure_ascii=False))

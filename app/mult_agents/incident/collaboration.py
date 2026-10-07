@@ -12,10 +12,7 @@ from .investigation import INCIDENT_LIMITS, investigate, resolve_output, validat
 from .tools import ToolExecutor
 
 
-class ProtocolError(ValueError):
-    def __init__(self, code):
-        self.code = code
-        super().__init__(code)
+from .diagnosis import ProtocolError, expand_refs, expand_diagnosis
 
 
 class Collaboration:
@@ -106,32 +103,10 @@ class Collaboration:
                     + json.dumps(details) + ". Return JSON only, no tools or additional identity fields.")])
 
     def expand_refs(self, refs):
-        selected, seen = [], set()
-        for item in refs:
-            if item.reference_id not in self.references or item.reference_id in seen:
-                raise ProtocolError("UNKNOWN_OR_DUPLICATE_REFERENCE")
-            seen.add(item.reference_id)
-            selected.append(self.references[item.reference_id].model_copy(deep=True))
-        if selected:
-            # Reuse source value/type/unit/time/version/quote checks, allowing knowledge as clues.
-            validate_output(InvestigationOutput(findings=[Finding(statement="Reference validation", refs=selected)]),
-                            self.evidence, ("observation", "runbook", "past_incident"))
-        return selected
+        return expand_refs(refs, self)
 
     def diagnosis(self, selection):
-        # The existing resolver validates current factual findings. History stays in hypotheses.
-        class Registry:
-            pass
-        registry = Registry()
-        registry.evidence, registry.references = self.evidence, self.references
-        facts, _ = resolve_output(json.dumps({"findings": [f.model_dump() for f in selection.findings]}), registry)
-        hypotheses = [Hypothesis(hypothesis_id=f"H{n}", cause=h.cause,
-            support_refs=self.expand_refs(h.support_refs), counter_refs=self.expand_refs(h.counter_refs),
-            pending_checks=list(h.pending_checks)) for n, h in enumerate(selection.hypotheses, 1)]
-        self.owner(selection.escalation_team)
-        return DiagnosisDraft(findings=facts.findings, hypotheses=hypotheses,
-            recommended_actions=selection.recommended_actions, missing_information=selection.missing_information,
-            escalation_team=selection.escalation_team)
+        return expand_diagnosis(selection, self)
 
     def targets(self):
         return {f"{prefix}{n}": item for prefix, items in (("F", self.draft.findings),

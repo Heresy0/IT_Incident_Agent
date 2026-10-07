@@ -3,18 +3,42 @@
     "case_id": "case_001",
     "title": "Development ticket 001",
     "file": "case_001.json",
-    "visibility": "public_synthetic"
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-v1"
   },
   {
     "case_id": "case_002",
     "title": "Development ticket 002",
     "file": "case_002.json",
-    "visibility": "public_synthetic"
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-v1"
   },
   {
     "case_id": "case_003",
     "title": "Development ticket 003",
     "file": "case_003.json",
-    "visibility": "public_synthetic"
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-v1"
+  },
+  {
+    "case_id": "case_004",
+    "title": "Development ticket 004",
+    "file": "case_004.json",
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-dev-v2"
+  },
+  {
+    "case_id": "case_005",
+    "title": "Development ticket 005",
+    "file": "case_005.json",
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-dev-v2"
+  },
+  {
+    "case_id": "case_006",
+    "title": "Development ticket 006",
+    "file": "case_006.json",
+    "visibility": "public_synthetic",
+    "data_version": "synthetic-dev-v2"
   }
 ]

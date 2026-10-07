@@ -1,0 +1,26 @@
+{
+  "case_id": "case_006",
+  "synthetic": true,
+  "fault_family": "resource",
+  "cause": "pool capacity reduction from 40 to 8 causes acquisition pressure under steady load",
+  "necessary_checks": [
+    "pool_usage",
+    "pool_wait",
+    "db_cpu",
+    "request_rate",
+    "pool_max",
+    "POOL_ACQUIRE_TIMEOUT"
+  ],
+  "counter_evidence": [
+    "DB CPU normal",
+    "request rate steady",
+    "DB ping 7ms"
+  ],
+  "forbidden": [
+    "historical DB CPU proves current DB overload",
+    "traffic surge without request rate evidence",
+    "automatically restore pool configuration"
+  ],
+  "semantic_review": "manual_required",
+  "note": "Development scenario only; required field coverage does not prove a complete causal statement."
+}

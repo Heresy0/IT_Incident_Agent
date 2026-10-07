@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timezone
 from backend.auth import Principal
 from mult_agents.harness.runtime import ExecutionError, RunContext
-from .contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, Evidence,
+from .contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS, Evidence,
                         ToolResult, ToolError, ReferenceOption, EvidenceRef)
 from .providers import ProviderError
 from pydantic import ValidationError
@@ -32,7 +32,7 @@ class ToolExecutor:
         self.last_query_profile = {}
 
     def schemas(self):
-        allowed = INVESTIGATION_TOOLS if self.role == "investigation" else KNOWLEDGE_TOOLS if self.role == "knowledge" else ()
+        allowed = self.allowed_tools()
         descriptions = {
             "get_service_metrics": "Read symptom-relevant metrics and healthy controls within ticket window. dependency_error_rate measures dependency failures; pool_usage/pool_wait measure application connection pressure; db_cpu is a database control; request_error_rate/request_latency show impact. Select a small useful set, not every metric. At most 60 points per metric; 1m/5m granularity.",
             "get_service_logs": "Read one log category: dependency for connectivity/health/timeouts, configuration for authentication/configuration failures, resource for pool acquisition/load/resource pressure. Omit level/error_code unless needed: restrictive filters can hide WARN or INFO controls. Empty means no matching records, not healthy. At most 50 records within ticket window.",
@@ -48,9 +48,12 @@ class ToolExecutor:
     def rejected(code, retryable=False):
         return ToolResult(status="error", error=ToolError(code=code, retryable=retryable))
 
+    def allowed_tools(self):
+        return {"investigation": INVESTIGATION_TOOLS, "knowledge": KNOWLEDGE_TOOLS, "single": SINGLE_TOOLS}.get(self.role, ())
+
     def execute(self, name, raw_args):
         self.last_query_profile = {}
-        allowed = INVESTIGATION_TOOLS if self.role == "investigation" else KNOWLEDGE_TOOLS if self.role == "knowledge" else ()
+        allowed = self.allowed_tools()
         if name not in allowed or self.principal.role not in {"user", "operator"}:
             return self.rejected("TOOL_DENIED")
         if (self.scope.tenant_id, self.scope.user_id) != (self.principal.tenant_id, self.principal.user_id):

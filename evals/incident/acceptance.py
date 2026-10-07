@@ -89,7 +89,7 @@ def main(argv=None):
         result = assess(report, gold)
         result["report_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         results.append(result)
-    all_cases = sorted(r["case_id"] for r in results) == sorted(manifest["cases"])
+    all_cases = sorted(r["case_id"] for r in results) == sorted(manifest.get("m2_acceptance_cases", manifest["cases"]))
     profiles_known = all(all(p["query_profile"] is not None for p in r["observed_path"]) for r in results)
     query_paths = [[{"tool": p["tool"], "query_profile": p["query_profile"]} for p in r["observed_path"]] for r in results]
     distinct_paths = len({json.dumps(path, sort_keys=True) for path in query_paths}) == len(results) if profiles_known else None

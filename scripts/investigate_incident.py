@@ -24,7 +24,7 @@ def main(argv=None):
     parser.add_argument("--workflow", choices=["investigation", "collaboration"], default="investigation")
     parser.add_argument("--model-budget", type=int, help="explicit M3 live allowance, 6-16")
     parser.add_argument("--tool-budget", type=int, help="explicit M3 live allowance, 1-24")
-    parser.add_argument("--case", choices=["case_001", "case_002", "case_003"], default="case_001")
+    parser.add_argument("--case", choices=["case_001", "case_002", "case_003", "case_004", "case_005", "case_006"], default="case_001")
     parser.add_argument("--output", type=Path, help="explicit local report directory (JSON and Markdown)")
     args = parser.parse_args(argv)
     if args.probe and not args.live:
@@ -62,8 +62,12 @@ def main(argv=None):
             from mult_agents.incident.collaboration_fake import scripted_models
             model = scripted_models()
         else:
-            from mult_agents.incident.fake import ScriptedModel
-            model = ScriptedModel()
+            if args.case in {'case_004', 'case_005', 'case_006'}:
+                from mult_agents.incident.collaboration_fake import ScriptedRole
+                model = ScriptedRole('investigation')
+            else:
+                from mult_agents.incident.fake import ScriptedModel
+                model = ScriptedModel()
         principal, limits, steps = Principal("synthetic_demo", "cli_reader"), INCIDENT_LIMITS, 4
     try:
         provider = FixtureProvider(args.case, principal)

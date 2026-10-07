@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-08",
+  "execution_mode": "scripted_control_only",
+  "paid_model_calls": 0,
+  "quality_status": "excluded_scripted",
+  "provenance": {
+    "implementation_sha256_prefix": "e89890dc2f37ce2a",
+    "git_commit": "849a3185fb6e5c2775c695e2dcd2e588a0befd22",
+    "working_tree_dirty": true,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_001": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+      "case_002": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+      "case_004": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+      "case_005": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+      "case_006": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa"
+    }
+  },
+  "configuration": {
+    "cases": [
+      "case_001",
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_005",
+      "case_006"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "scripted",
+    "execution_mode": "scripted_control_only",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "note": "Free control invocations only. Necessary field presence is not a semantic or causal score. Holdout/live acceptance remains pending. Original failed attempts retained under output/.",
+  "runs": [
+    {
+      "case_id": "case_001",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 2,
+      "tool_calls": 6,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_001",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 6,
+      "tool_calls": 2,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_002",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 2,
+      "tool_calls": 6,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_002",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 6,
+      "tool_calls": 2,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 2,
+      "tool_calls": 6,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 13,
+      "tool_calls": 5,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_004",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 2,
+      "tool_calls": 6,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_004",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 6,
+      "tool_calls": 3,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_005",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 3,
+      "tool_calls": 7,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_005",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 6,
+      "tool_calls": 4,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_006",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 2,
+      "tool_calls": 6,
+      "semantic_review": "excluded_scripted"
+    },
+    {
+      "case_id": "case_006",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "model_calls": 8,
+      "tool_calls": 5,
+      "semantic_review": "excluded_scripted"
+    }
+  ]
+}

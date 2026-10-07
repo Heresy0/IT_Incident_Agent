@@ -1,10 +1,13 @@
 {
-  "dataset_version": "synthetic-v1",
+  "dataset_version": "synthetic-dev-v2",
   "split": "development",
   "cases": [
     "case_001",
     "case_002",
-    "case_003"
+    "case_003",
+    "case_004",
+    "case_005",
+    "case_006"
   ],
   "live_runs": [
     {
@@ -79,6 +82,28 @@
     }
   ],
   "business_quality_status": "development_partial",
-  "note": "Three hand-authored development scenarios, not the future 18-case evaluation. No holdout claims.",
-  "m2_acceptance_status": "not_passed"
+  "note": "Six manually authored development scenarios; the original three snapshots retain synthetic-v1. No holdout or production accuracy claims.",
+  "m2_acceptance_status": "not_passed",
+  "m2_acceptance_cases": [
+    "case_001",
+    "case_002",
+    "case_003"
+  ],
+  "development_families": {
+    "dependency": [
+      "case_001",
+      "case_004"
+    ],
+    "configuration": [
+      "case_002",
+      "case_005"
+    ],
+    "resource": [
+      "case_003",
+      "case_006"
+    ]
+  },
+  "holdout_status": "not_authored",
+  "future_acceptance_count": 12,
+  "comparison_status": "not_run_live"
 }
