@@ -1,0 +1,46 @@
+# Python environments and caches
+.venv/
+venv/
+env/
+.uv-cache/
+.pnpm-store/
+.pnpm-cache/
+.npm-cache/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Secrets and machine-specific settings
+.env
+.env.*
+!.env.example
+!.env.local.example
+.auth.local.json
+.demo-credentials.local.json
+
+# Frontend dependencies and generated files
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local data, reports, and logs
+app/data/
+output/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+*.log
+logs/
+volumes/
+
+# Editor and operating system files
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

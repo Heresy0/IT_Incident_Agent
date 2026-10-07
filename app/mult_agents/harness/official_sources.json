@@ -1,0 +1,14 @@
+{
+  "dify": {
+    "aliases": ["Dify"],
+    "origins": ["https://docs.dify.ai", "https://github.com/langgenius/dify"],
+    "verified_from": "https://dify.ai/",
+    "verified_at": "2026-10-07"
+  },
+  "fastgpt": {
+    "aliases": ["FastGPT"],
+    "origins": ["https://doc.fastgpt.io", "https://github.com/labring/FastGPT"],
+    "verified_from": "https://github.com/labring/FastGPT",
+    "verified_at": "2026-10-07"
+  }
+}

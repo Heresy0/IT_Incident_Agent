@@ -1,0 +1,1626 @@
+{
+  "schema_version": 1,
+  "evaluation_id": "c7d8d987-0a9b-4055-ab13-073e3f8f828e",
+  "dataset_version": "c4bfad55448b2f79",
+  "rubric": {
+    "requirements": "met=1, partial=0.5, missing=0; assess the FINAL report, not planned questions",
+    "claims": "supported/unsupported/unclear; check negation, numbers, scope and recommendation premises",
+    "report_quality": "check all final text, including unknowns, recommendations and forbidden conclusions"
+  },
+  "reviews": [
+    {
+      "run_id": "9c14f1fb-c7a5-4298-99ed-673a9b1d554f",
+      "fingerprint": "ce4b3cdc4d48f2160c2890d8fa7a4135f0816249561da3d382699065d1be323a",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "private",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "abb19680-7f68-42fb-abd4-4f47c35e52ff",
+      "fingerprint": "6cc6715dc71f452de2d3bd6f7384338e410826ea01b7d408e08966ae89bf7345",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "a_private",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "b_hosted",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_5",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_6",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_7",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "0cba15f2-7021-4033-bcf9-3c7fc0ef1114",
+      "fingerprint": "4926bcb5891ae40db9993ac2f06b1acfd811c6955c16778db0a101ee9f6a05f0",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "a_sdk",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "b_api",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "claim_5",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "f34fc12b-4901-40cc-ba70-a64e2904d716",
+      "fingerprint": "82682153290cc8ab0ffece2468084e367605576c2dea89a202a0cc8e8df2f572",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "license",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "6caf25cb-3a48-4903-b757-ecd9dd999275",
+      "fingerprint": "e0ed35ccfe7b0b7f098af1559aa973a7a9d5fac59a2a69c44bf6af7c76356da2",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "package",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "overage",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "2fb36156-d154-4299-83d3-25ef23acbb23",
+      "fingerprint": "dbfeb4bd0d863d740c8c3a45bd44bef198ecb6ff71bf5a2394d0e47af5203b4c",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "retention",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "49114aab-9e60-449f-b6db-f10a23106930",
+      "fingerprint": "1a304e83f22c318739d4ebde271a8f893041137ebdb2bad2b3502dd259ca142f",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "dependencies",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "formats",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "e71e781c-b555-4012-a561-54bf9b2412fa",
+      "fingerprint": "90352d4e9f24ccf8aa0cdc3579452090eb2c0661f35b5cc63632523d99404bfc",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "ocr",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "f01ef3d1-45ab-43cb-82e3-acd1a6cb5480",
+      "fingerprint": "062f5a73418b0e78132cdfcace77770f05ccbb12735e09129eb9b47ef6e79799",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "rate",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "throughput_unknown",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "d475ee1b-53c6-4d98-97d0-6fe91497a667",
+      "fingerprint": "bcf0428fd096d5f86546d032b30410bc99a020008484796fa3cb9744771d372f",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "deployment",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "team",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "cost_gap",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f6",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f8",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "11d50626-b921-4c7f-8465-5610eee6e29a",
+      "fingerprint": "a82a50f35e812f7a3d3cbbd4d8903b1fbab17117f07dfe7e6ec76601c5a57086",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "filter",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "recommendation",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f6",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f7",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "21b74e40-da6b-4b29-9676-859ae268c65b",
+      "fingerprint": "05bdc6f0311fb6fb091693246e71594f953605be19e7616389a7b29649d57dfa",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "integration",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "recommendation",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "9b3a0de6-8763-4887-9759-244f3057e122",
+      "fingerprint": "156d385d95871d252c40c95a9b9485734a20c5f470e964b0e39c8704873aab03",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "all_candidates",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "poc",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f6",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f7",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f8",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "r4",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c97debf0-83b3-449b-907d-35d40d5b281e",
+      "fingerprint": "d979335e239e02d6646a83072b24b5360af8ab8f8f8b030a8006648bee7a4f3f",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "unknown_total",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "cost_items",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c3a29db9-350d-49ef-86d5-135304cc3e09",
+      "fingerprint": "9e41e0b8d3e6958a7c5e982847b13f477095d3a9dcaa1d7739436bc19bc9e505",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "current",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "old_branch",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "mapping_gap",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "C-OCR-01",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "2fad9229-5bce-4136-84bd-f21ecc86b004",
+      "fingerprint": "0687d05a2dd1a2aabae11da2f82f7552bf5a276bf05f14c22e25f777ffcd343c",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "abstain",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "05393957-cc89-4495-a001-855cd84f6dfb",
+      "fingerprint": "45bf167dd1a321d7e951db80c9fb638d35c790084e714224e99531d9d7114868",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "correct_premise",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "8956ed85-4d9a-43c2-8aaf-2ae299798325",
+      "fingerprint": "2d8c542ce662ebae91760b3ac25961bae7f62adbb54777ed3b3fe986a93d82a4",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "boundary",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c4",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c26b24e6-992f-4c5e-bd31-0d1e91af7801",
+      "fingerprint": "479ed72ecc8a6e45f0e6dfac82862ddc372f91f3d6fdc5cd5fe08f15dff16c9c",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "fresh_evidence",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "fc9898bd-5a62-44e6-bd18-0219f49d655d",
+      "fingerprint": "e63c2e26f0e645cae10724f253a6c0669ff27ebfb38b4033734f1f42e2629e5f",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "name",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "style",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "edd1229f-2b44-42a0-88df-15340aefc79a",
+      "fingerprint": "642ef1b5e1f1c89d9d4fcb068fb27ee9aa1e8cb5abcbcc70b4c57ab034733e0d",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "private",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c3630035-9f10-4e69-9b75-1b8b09f70997",
+      "fingerprint": "4af65ca69478231d68e71a5e539f808833f8ca838fe4a11430e20b0e53d58116",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "a_private",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "b_hosted",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "14043353-d3c3-4ad9-a794-257377d90066",
+      "fingerprint": "b52ac6279c0e06f2eb78135fcb5f5380a8e98be7ea5e4c91281eb9f9d41f29cf",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "a_sdk",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "b_api",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "b9eebcbd-69f3-4aed-90a0-129fae979540",
+      "fingerprint": "3c7676d588a94842b027b789e8ae805217cdecc40a93379848d977b4353a3f58",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "license",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c70db2e7-e92d-4f7a-b5a1-ff7e04739e8f",
+      "fingerprint": "d865a0664ce4cd2e0fa653e27f33c6584493a8289c6424788b5fef1e997a345b",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "package",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "overage",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c4",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "d4141439-8431-44bb-864f-46bdcc462096",
+      "fingerprint": "bb6981733d84895efc429bc0b55812818ca83639d6333790dab0c6b208abb444",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "retention",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "e46515a3-5476-42be-a300-7a0acd8dd886",
+      "fingerprint": "91ff03138999072c333043f8426b1f495d98a404b4b205bda7c2f2a5a20bfc4b",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "dependencies",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "formats",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c4",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "4af76c2d-2d32-4155-ac12-fdeb3e827719",
+      "fingerprint": "e5d442a06d5c239ef00487423f078cfdef4acd01398d09b088a0ba6230c25b80",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "ocr",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "3d310c18-9bcc-40d6-baae-911b267d3a2e",
+      "fingerprint": "8f068374fb0f996454f316f2a79118d16d58fa5807a19a3f221a176591eed2f1",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "rate",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "throughput_unknown",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "bdb349ad-c1a5-4f8a-a6ba-4c0fcf95dddb",
+      "fingerprint": "d6d4c94bfecd3e7930e85ea17c5b90c91f9d9a5b48db15d95455dabc0a876392",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "deployment",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "team",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "cost_gap",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "5040f27d-df62-4e6b-9883-c69bc3181c1b",
+      "fingerprint": "c16cc8b2e92f47aba7f0af03d587d0e672a0fc273de330624d0cb4885811684d",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "filter",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "recommendation",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c5",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c6",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "88a0d4e5-29a7-44a9-9c9b-e2c380048e08",
+      "fingerprint": "dd7d27c232699fc555b0e1738fd3995f9de6a71df149a5eaf10414ec4a7c0b04",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "integration",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "recommendation",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "5386d618-c5cb-4715-bec3-0e651a87542c",
+      "fingerprint": "c74d0a005bd477150c1c6323f00b90cb40a215d12bbd6c48d863e08ff7928d1a",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "all_candidates",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "maintenance",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "poc",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f4",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f5",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "d9affd09-6b9e-4367-95aa-a13601b16edd",
+      "fingerprint": "a8df9865e446990ef68db5713297c8bcc378d526fe3860b5bdd4373981aca089",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "unknown_total",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "cost_items",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "f2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "f3",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "70476cd1-4afe-483d-b796-781661821303",
+      "fingerprint": "f16a0c31e8579ead0dc1304b29f9afc95899a520dafeb403b72de8677528d41a",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "current",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "old_branch",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "mapping_gap",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "claim_1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "2088abf3-9327-4e4b-afbd-16618e2d8db4",
+      "fingerprint": "fb88c889cf0943c0b0612980dc93851d9a19c624670d6c2c4e7a02e7461b03c6",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "abstain",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "d31931b0-5f7c-4acc-b825-a24496d8ec53",
+      "fingerprint": "fe43f8b97504cf0b56fae00717637d78d0e268f2d6d12500cea3dd03155b8a46",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "correct_premise",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c4edcc05-985c-416c-92e0-fd659bb5a4fd",
+      "fingerprint": "4c9a014880aeebe02681056b1a90b14993a84218387a1a48acb1d7611a2afbea",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "boundary",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c2",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c3",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "claim_id": "c4",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "c2c28016-e43a-47c8-99c8-6c00cf341ee1",
+      "fingerprint": "e9a65bd31135a85272f9e5714c092d7ff5262bb66e107fbcd6e0df8675b555c0",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "fresh_evidence",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "c1",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    },
+    {
+      "run_id": "049d2d9d-6f2d-43b2-9704-ba21cffd98db",
+      "fingerprint": "7bc2c0f9eef11942e081400fc406b620212a5f47d84f24d5233d59b4ec8283a1",
+      "review_status": "pending",
+      "reviewer": {
+        "name": "",
+        "kind": "human"
+      },
+      "requirements": [
+        {
+          "id": "name",
+          "verdict": null,
+          "reason": ""
+        },
+        {
+          "id": "style",
+          "verdict": null,
+          "reason": ""
+        }
+      ],
+      "claims": [],
+      "factual_correctness": null,
+      "uncertainty_handling": null,
+      "forbidden_conclusion_present": null,
+      "notes": ""
+    }
+  ]
+}

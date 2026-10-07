@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "suite": "live_retrieval_memory",
+  "evaluation_id": "research_eval_26d38d4c93844a14",
+  "created_at": "2026-10-07T16:12:57.353949+00:00",
+  "embedding_model": "text-embedding-v1",
+  "fixture_version": "1aee9daffcee5af1",
+  "complete": true,
+  "scope": "Five public synthetic knowledge sections; synthetic user notes; temporary collections and isolated test database. No web or chat model.",
+  "knowledge": [
+    {
+      "id": "r01",
+      "query": "A 如何私有部署和维护？",
+      "expected": [
+        "A"
+      ],
+      "returned": [
+        "A",
+        "TEAM",
+        "B"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r02",
+      "query": "比较 A 与 B 的 Python SDK 和 HTTP API 接入方式。",
+      "expected": [
+        "A",
+        "B"
+      ],
+      "returned": [
+        "A",
+        "B",
+        "TEAM"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r03",
+      "query": "B 的数据保留多久？",
+      "expected": [
+        "B"
+      ],
+      "returned": [
+        "B",
+        "C",
+        "D"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r04",
+      "query": "C 的本地部署依赖和可导入文件格式是什么？",
+      "expected": [
+        "C"
+      ],
+      "returned": [
+        "C",
+        "A",
+        "B"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r05",
+      "query": "C 当前是否支持 OCR？",
+      "expected": [
+        "C"
+      ],
+      "returned": [
+        "D",
+        "C",
+        "B"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 0.5,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r06",
+      "query": "团队的研发人数、验证窗口和预算限制是什么？",
+      "expected": [
+        "TEAM"
+      ],
+      "returned": [
+        "TEAM",
+        "B",
+        "A"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r07",
+      "query": "C 每分钟 60 个请求能说明并发吞吐吗？",
+      "expected": [
+        "C"
+      ],
+      "returned": [
+        "C",
+        "B",
+        "TEAM"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "r08",
+      "query": "C 的旧测试分支有 OCR 预览，当前版本能用吗？",
+      "expected": [
+        "C",
+        "D"
+      ],
+      "returned": [
+        "D",
+        "C",
+        "B"
+      ],
+      "k": 3,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    }
+  ],
+  "memory": [
+    {
+      "id": "m01",
+      "query": "我们偏好用哪种编程语言和接口方式？",
+      "expected": [
+        "python"
+      ],
+      "returned": [
+        "python",
+        "poc"
+      ],
+      "k": 2,
+      "vector_returned": [
+        "python",
+        "poc"
+      ],
+      "vector_query_observed": true,
+      "foreign_vector_hits": 0,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "m02",
+      "query": "可以把内部数据放到公有云吗？",
+      "expected": [
+        "private"
+      ],
+      "returned": [
+        "private",
+        "python"
+      ],
+      "k": 2,
+      "vector_returned": [
+        "private",
+        "python"
+      ],
+      "vector_query_observed": true,
+      "foreign_vector_hits": 0,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    },
+    {
+      "id": "m03",
+      "query": "验证周期和团队规模是什么？",
+      "expected": [
+        "poc"
+      ],
+      "returned": [
+        "poc",
+        "python"
+      ],
+      "k": 2,
+      "vector_returned": [
+        "poc",
+        "python"
+      ],
+      "vector_query_observed": true,
+      "foreign_vector_hits": 0,
+      "metrics": {
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit_at_k": 1
+      }
+    }
+  ],
+  "safety": {
+    "all_notes_indexed": true,
+    "expired_hits": 0,
+    "deleted_hits": 0,
+    "foreign_hits": 0,
+    "foreign_vector_hits": 0,
+    "adapter_errors": []
+  },
+  "cleanup": {
+    "test_tenants": true,
+    "research_eval_26d38d4c93844a14_knowledge": true,
+    "research_eval_26d38d4c93844a14_memory_scoped_v2": true
+  },
+  "errors": [],
+  "duration_ms": 25610,
+  "summary": {
+    "model_calls": 0,
+    "web_calls": 0,
+    "tool_calls": 18,
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "known_calls": 0,
+      "status": "known"
+    },
+    "provider_http_attempts": "unknown_for_model_and_embedding",
+    "estimated_cost": null,
+    "duration_ms": 25610,
+    "termination_reason": "",
+    "errors": [],
+    "limits": {
+      "model_calls": 0,
+      "web_calls": 0,
+      "tool_calls": 40,
+      "seconds": 180,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    }
+  },
+  "knowledge_metrics": {
+    "recall_at_k": 1.0,
+    "reciprocal_rank": 0.9375,
+    "hit_at_k": 1.0
+  },
+  "memory_metrics": {
+    "recall_at_k": 1.0,
+    "reciprocal_rank": 1.0,
+    "hit_at_k": 1.0
+  },
+  "passed": true
+}

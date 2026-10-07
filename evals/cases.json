@@ -1,0 +1,907 @@
+[
+  {
+    "id": "q01",
+    "query": "研究模拟方案 A 是否支持私有部署，并给出资料依据。",
+    "docs": [
+      "A"
+    ],
+    "expected_quotes": [
+      "A 支持私有部署"
+    ],
+    "keywords": [
+      "私有部署"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "private",
+        "description": "确认 A 支持私有部署",
+        "support_docs": [
+          "A"
+        ],
+        "support_quotes": [
+          "A 支持私有部署"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q02",
+    "query": "对比模拟方案 A 与 B 的部署方式，只依据资料输出结论。",
+    "docs": [
+      "A",
+      "B"
+    ],
+    "expected_quotes": [
+      "A 支持私有部署",
+      "B 仅支持公有云托管"
+    ],
+    "keywords": [
+      "私有部署",
+      "公有云"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "a_private",
+        "description": "A 支持私有部署",
+        "support_docs": [
+          "A"
+        ],
+        "support_quotes": [
+          "A 支持私有部署"
+        ]
+      },
+      {
+        "id": "b_hosted",
+        "description": "B 仅公有云托管且不支持私有部署",
+        "support_docs": [
+          "B"
+        ],
+        "support_quotes": [
+          "B 仅支持公有云托管，不提供私有部署"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q03",
+    "query": "研究 A 与 B 的开发集成方式，比较 SDK 与接口。",
+    "docs": [
+      "A",
+      "B"
+    ],
+    "expected_quotes": [
+      "提供 Python SDK",
+      "B 提供 HTTP API"
+    ],
+    "keywords": [
+      "Python",
+      "HTTP"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "a_sdk",
+        "description": "A 提供 Python SDK",
+        "support_docs": [
+          "A"
+        ],
+        "support_quotes": [
+          "提供 Python SDK"
+        ]
+      },
+      {
+        "id": "b_api",
+        "description": "B 提供 HTTP API",
+        "support_docs": [
+          "B"
+        ],
+        "support_quotes": [
+          "B 提供 HTTP API"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q04",
+    "query": "研究方案 A 的许可与维护要求，不补充资料未说明的信息。",
+    "docs": [
+      "A"
+    ],
+    "expected_quotes": [
+      "Apache-2.0 许可",
+      "自行维护应用服务和 PostgreSQL"
+    ],
+    "keywords": [
+      "Apache",
+      "PostgreSQL"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "license",
+        "description": "A 代码采用 Apache-2.0",
+        "support_docs": [
+          "A"
+        ],
+        "support_quotes": [
+          "Apache-2.0 许可"
+        ]
+      },
+      {
+        "id": "maintenance",
+        "description": "A 需要自行维护应用与 PostgreSQL",
+        "support_docs": [
+          "A"
+        ],
+        "support_quotes": [
+          "自行维护应用服务和 PostgreSQL"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q05",
+    "query": "研究 B 的价格和超额费用，区分已知与未知。",
+    "docs": [
+      "B"
+    ],
+    "expected_quotes": [
+      "每月 2000 元",
+      "超过套餐额度的费用没有在资料中说明"
+    ],
+    "keywords": [
+      "2000",
+      "超"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "package",
+        "description": "B 模拟套餐每月 2000 元",
+        "support_docs": [
+          "B"
+        ],
+        "support_quotes": [
+          "每月 2000 元"
+        ]
+      },
+      {
+        "id": "overage",
+        "description": "超额费用未知，不能由套餐价推出总成本",
+        "support_docs": [
+          "B"
+        ],
+        "support_quotes": [
+          "超过套餐额度的费用没有在资料中说明"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q06",
+    "query": "研究 B 的数据保留期，不推测合规结论。",
+    "docs": [
+      "B"
+    ],
+    "expected_quotes": [
+      "B 的数据保留期为 30 天"
+    ],
+    "keywords": [
+      "30"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "retention",
+        "description": "B 保留期 30 天，不推出合规保证",
+        "support_docs": [
+          "B"
+        ],
+        "support_quotes": [
+          "B 的数据保留期为 30 天"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q07",
+    "query": "研究 C 的本地部署依赖与知识文档格式。",
+    "docs": [
+      "C"
+    ],
+    "expected_quotes": [
+      "依赖 PostgreSQL 和 Milvus",
+      "UTF-8 Markdown 与 TXT"
+    ],
+    "keywords": [
+      "PostgreSQL",
+      "Milvus",
+      "Markdown",
+      "TXT"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "dependencies",
+        "description": "C 本地 Docker 部署依赖 PostgreSQL 与 Milvus",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "C 支持本地 Docker 部署，依赖 PostgreSQL 和 Milvus"
+        ]
+      },
+      {
+        "id": "formats",
+        "description": "支持 UTF-8 Markdown 与 TXT",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "UTF-8 Markdown 与 TXT"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q08",
+    "query": "研究 C 是否支持扫描件 OCR，只依据给定资料。",
+    "docs": [
+      "C"
+    ],
+    "expected_quotes": [
+      "C 不支持 OCR"
+    ],
+    "keywords": [
+      "不支持",
+      "OCR"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "ocr",
+        "description": "当前 C 不支持 OCR",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "C 不支持 OCR"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "当前 C 支持 OCR"
+    ]
+  },
+  {
+    "id": "q09",
+    "query": "研究 C 的限流与实际吞吐能力，不能把限流值当吞吐测试结果。",
+    "docs": [
+      "C"
+    ],
+    "expected_quotes": [
+      "每分钟 60 个请求",
+      "资料没有提供并发吞吐测试"
+    ],
+    "keywords": [
+      "60",
+      "吞吐"
+    ],
+    "split": "development",
+    "tags": [
+      "factual"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "rate",
+        "description": "示例限流每分钟 60 请求",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "每分钟 60 个请求"
+        ]
+      },
+      {
+        "id": "throughput_unknown",
+        "description": "没有并发吞吐测量，限流不等于吞吐",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "资料没有提供并发吞吐测试"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "限流 60 请求/分钟就是 60 并发或实测吞吐"
+    ]
+  },
+  {
+    "id": "q10",
+    "query": "结合五人 Python 团队、私有部署与预算约束，对比 A 与 B 的适配性，指出仍需验证的成本。",
+    "docs": [
+      "A",
+      "B",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "内部文档要求私有部署",
+      "预算是否包含服务器和模型费用"
+    ],
+    "keywords": [
+      "私有部署",
+      "预算"
+    ],
+    "split": "development",
+    "tags": [
+      "selection"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "deployment",
+        "description": "A 满足私有部署，B 不满足",
+        "support_docs": [
+          "A",
+          "B",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "A 支持私有部署",
+          "不提供私有部署",
+          "内部文档要求私有部署"
+        ]
+      },
+      {
+        "id": "team",
+        "description": "说明 Python SDK 与团队能力的适配",
+        "support_docs": [
+          "A",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "提供 Python SDK",
+          "主要使用 Python"
+        ]
+      },
+      {
+        "id": "cost_gap",
+        "description": "总费用和预算口径仍待验证",
+        "support_docs": [
+          "TEAM"
+        ],
+        "support_quotes": [
+          "预算是否包含服务器和模型费用"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "B 满足私有部署条件"
+    ]
+  },
+  {
+    "id": "q11",
+    "query": "企业要求私有部署。请对比模拟方案 A 和 B，依据资料建议优先验证的方案，说明为何另一方案不满足硬性条件。",
+    "docs": [
+      "A",
+      "B",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "A 支持私有部署",
+      "B 仅支持公有云托管"
+    ],
+    "keywords": [
+      "私有部署",
+      "A",
+      "B"
+    ],
+    "review_focus": "不能推荐 B 为满足私有部署；建议 A 与依据关联",
+    "split": "development",
+    "tags": [
+      "selection"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "filter",
+        "description": "解释 A 满足、B 不满足私有部署",
+        "support_docs": [
+          "A",
+          "B"
+        ],
+        "support_quotes": [
+          "A 支持私有部署",
+          "不提供私有部署"
+        ]
+      },
+      {
+        "id": "recommendation",
+        "description": "建议优先验证 A，附依据与适用前提",
+        "support_docs": [
+          "A",
+          "B",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "A 支持私有部署",
+          "不提供私有部署"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "B 满足私有部署条件"
+    ]
+  },
+  {
+    "id": "q12",
+    "query": "五人 Python 团队要求私有部署。请对比模拟方案 A 和 C 的集成与维护要求，给出有前提的建议，不推测 C 未说明的 SDK 能力。",
+    "docs": [
+      "A",
+      "C",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "提供 Python SDK",
+      "依赖 PostgreSQL 和 Milvus"
+    ],
+    "keywords": [
+      "Python",
+      "Milvus"
+    ],
+    "review_focus": "未知 SDK 不等于不支持；推荐说明维护取舍",
+    "split": "development",
+    "tags": [
+      "selection"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "integration",
+        "description": "A 有 Python SDK，C 的 SDK 未说明",
+        "support_docs": [
+          "A",
+          "C"
+        ],
+        "support_quotes": [
+          "提供 Python SDK",
+          "依赖 PostgreSQL 和 Milvus"
+        ]
+      },
+      {
+        "id": "maintenance",
+        "description": "解释 A 与 C 的维护依赖取舍",
+        "support_docs": [
+          "A",
+          "C"
+        ],
+        "support_quotes": [
+          "自行维护应用服务和 PostgreSQL",
+          "依赖 PostgreSQL 和 Milvus"
+        ]
+      },
+      {
+        "id": "recommendation",
+        "description": "给出有前提的建议或验证路径",
+        "support_docs": [
+          "A",
+          "C",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "主要使用 Python"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q13",
+    "query": "请为要求私有部署的五人 Python 团队比较模拟方案 A、B、C 的部署与维护条件，给出候选筛选依据和 PoC 验证建议。",
+    "docs": [
+      "A",
+      "B",
+      "C",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "不提供私有部署",
+      "自行维护应用服务和 PostgreSQL",
+      "依赖 PostgreSQL 和 Milvus"
+    ],
+    "keywords": [
+      "A",
+      "B",
+      "C",
+      "私有部署"
+    ],
+    "review_focus": "覆盖三候选；PoC 是建议而非已完成测量",
+    "split": "development",
+    "tags": [
+      "selection"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "all_candidates",
+        "description": "覆盖 A、B、C，按私有部署筛除 B",
+        "support_docs": [
+          "A",
+          "B",
+          "C"
+        ],
+        "support_quotes": [
+          "A 支持私有部署",
+          "不提供私有部署",
+          "C 支持本地 Docker 部署"
+        ]
+      },
+      {
+        "id": "maintenance",
+        "description": "说明 A 与 C 的维护依赖",
+        "support_docs": [
+          "A",
+          "C"
+        ],
+        "support_quotes": [
+          "自行维护应用服务和 PostgreSQL",
+          "依赖 PostgreSQL 和 Milvus"
+        ]
+      },
+      {
+        "id": "poc",
+        "description": "PoC 步骤明确是建议，不声称已实测",
+        "support_docs": [
+          "TEAM"
+        ],
+        "support_quotes": [
+          "首轮验证窗口为 14 天"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "B 满足私有部署条件"
+    ]
+  },
+  {
+    "id": "q14",
+    "query": "仅凭资料，模拟方案 A 或 C 的整体月成本能否满足团队 2000 元预算？请区分已知条件与未确认费用，不把开源许可等同于免费运行。",
+    "docs": [
+      "A",
+      "C",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "Apache-2.0 许可",
+      "预算是否包含服务器和模型费用"
+    ],
+    "keywords": [
+      "预算",
+      "模型",
+      "服务器"
+    ],
+    "review_focus": "不得给出无依据的总成本或保证满足预算；可返回有限结果",
+    "split": "development",
+    "tags": [
+      "factual",
+      "insufficient_evidence"
+    ],
+    "expected_behavior": "qualified_unknown",
+    "requirements": [
+      {
+        "id": "unknown_total",
+        "description": "不能确认 A 或 C 总月成本满足 2000 元",
+        "support_docs": [
+          "A",
+          "C",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "预算是否包含服务器和模型费用"
+        ]
+      },
+      {
+        "id": "cost_items",
+        "description": "说明服务器、模型等未知费用或预算口径",
+        "support_docs": [
+          "TEAM"
+        ],
+        "support_quotes": [
+          "预算是否包含服务器和模型费用"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "A/C 确定免费或整体月成本不超过 2000 元"
+    ]
+  },
+  {
+    "id": "q15",
+    "query": "当前模拟方案 C 与旧测试分支的 OCR 资料存在差异。请分析能确认的能力与版本缺口，不混用旧分支和当前版本。",
+    "docs": [
+      "C",
+      "D"
+    ],
+    "expected_quotes": [
+      "C 不支持 OCR",
+      "版本对应关系"
+    ],
+    "keywords": [
+      "OCR",
+      "版本"
+    ],
+    "review_focus": "保留旧测试分支适用范围，不拼接成当前产品支持 OCR",
+    "split": "development",
+    "tags": [
+      "factual",
+      "version_conflict"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "current",
+        "description": "明确当前 C 不支持 OCR",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "C 不支持 OCR"
+        ]
+      },
+      {
+        "id": "old_branch",
+        "description": "旧测试分支有 OCR 预览，保留版本范围",
+        "support_docs": [
+          "D"
+        ],
+        "support_quotes": [
+          "旧测试分支",
+          "OCR 预览功能"
+        ]
+      },
+      {
+        "id": "mapping_gap",
+        "description": "对应关系未知，不能推断当前支持",
+        "support_docs": [
+          "D"
+        ],
+        "support_quotes": [
+          "版本对应关系"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证",
+      "当前 C 支持 OCR"
+    ]
+  },
+  {
+    "id": "q16",
+    "query": "研究模拟方案 A 与 B 的企业适配性并附资料依据。",
+    "docs": [],
+    "expected_quotes": [],
+    "keywords": [],
+    "review_focus": "没有证据时停止事实写作，返回有限结果",
+    "split": "development",
+    "tags": [
+      "factual",
+      "insufficient_evidence"
+    ],
+    "expected_behavior": "abstain",
+    "requirements": [
+      {
+        "id": "abstain",
+        "description": "明确没有证据，不输出 A/B 产品事实或无依据推荐",
+        "support_docs": [],
+        "support_quotes": []
+      }
+    ],
+    "forbidden_conclusions": [
+      "任何资料未提供的价格、实测性能或功能保证"
+    ]
+  },
+  {
+    "id": "q17",
+    "split": "holdout",
+    "tags": [
+      "premise_correction",
+      "selection"
+    ],
+    "query": "研究模拟方案 B：它的套餐每月 2000 元，所以能满足内部文档必须私有部署的要求吗？请核对这个推断并附资料依据。",
+    "docs": [
+      "B",
+      "TEAM"
+    ],
+    "expected_quotes": [
+      "不提供私有部署"
+    ],
+    "keywords": [
+      "私有部署"
+    ],
+    "expected_behavior": "answer",
+    "requirements": [
+      {
+        "id": "correct_premise",
+        "description": "价格不能替代部署硬条件，B 不支持私有部署",
+        "support_docs": [
+          "B",
+          "TEAM"
+        ],
+        "support_quotes": [
+          "不提供私有部署",
+          "内部文档要求私有部署"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "B 满足私有部署条件"
+    ]
+  },
+  {
+    "id": "q18",
+    "split": "holdout",
+    "tags": [
+      "measurement_boundary"
+    ],
+    "query": "研究模拟方案 C：接口每分钟允许 60 请求，是否足以证明可以稳定承载 60 个并发用户？请区分已知配置与待做的验证。",
+    "docs": [
+      "C"
+    ],
+    "expected_quotes": [
+      "资料没有提供并发吞吐测试"
+    ],
+    "keywords": [
+      "并发"
+    ],
+    "expected_behavior": "qualified_unknown",
+    "requirements": [
+      {
+        "id": "boundary",
+        "description": "限流是配置，不能证明 60 用户并发性能；需要测量",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "每分钟 60 个请求",
+          "资料没有提供并发吞吐测试"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "已证明支持 60 个并发用户"
+    ]
+  },
+  {
+    "id": "q19",
+    "split": "holdout",
+    "tags": [
+      "memory_conflict"
+    ],
+    "query": "研究当前模拟方案 C 是否支持 OCR，只依据本次资料并附来源。",
+    "docs": [
+      "C"
+    ],
+    "expected_quotes": [
+      "C 不支持 OCR"
+    ],
+    "keywords": [
+      "不支持",
+      "OCR"
+    ],
+    "expected_behavior": "answer",
+    "memory_context": "{\"historical_background\": [{\"kind\": \"episodic\", \"content\": \"一年前的任务记录：C 支持 OCR。这个结论可能过期，必须重新取证。\"}]}",
+    "requirements": [
+      {
+        "id": "fresh_evidence",
+        "description": "使用当前资料确认 C 不支持 OCR，历史记忆不作为引用依据",
+        "support_docs": [
+          "C"
+        ],
+        "support_quotes": [
+          "C 不支持 OCR"
+        ]
+      }
+    ],
+    "forbidden_conclusions": [
+      "根据历史记忆认定当前 C 支持 OCR"
+    ]
+  },
+  {
+    "id": "q20",
+    "split": "holdout",
+    "tags": [
+      "memory_personalization",
+      "direct"
+    ],
+    "query": "你好，请告诉我你记住的称呼，并用通俗语言介绍你能做什么。",
+    "docs": [],
+    "expected_quotes": [],
+    "keywords": [
+      "小李"
+    ],
+    "expected_behavior": "personalize",
+    "memory_context": "{\"profile\": {\"display_name\": \"小李\", \"response_style\": \"通俗\"}}",
+    "requirements": [
+      {
+        "id": "name",
+        "description": "正确使用画像里的称呼小李",
+        "support_docs": [],
+        "support_quotes": []
+      },
+      {
+        "id": "style",
+        "description": "通俗介绍助手能力，不凭空添加用户身份或个人经历",
+        "support_docs": [],
+        "support_quotes": []
+      }
+    ],
+    "forbidden_conclusions": [
+      "捏造用户职业、年龄或历史任务"
+    ]
+  }
+]
