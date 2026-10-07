@@ -26,3 +26,9 @@ def build_model(api_key, model="qwen-turbo"):
     # both connection and read timeout. No dependency upgrade required.
     return ClassifiedChat(ChatTongyi(model=model, dashscope_api_key=api_key, temperature=0,
                      max_retries=1, model_kwargs={"request_timeout": 30, "max_tokens": 2200}))
+
+
+def build_roles(api_key, model="qwen-turbo"):
+    # Stateless model calls; each role gets its own prompt/local message list.
+    chat = build_model(api_key, model)
+    return {role: chat for role in ("supervisor", "investigation", "knowledge", "diagnosis", "reviewer")}

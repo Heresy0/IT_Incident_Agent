@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import ValidationError
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, activate, invoke_chat_model
-from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS
+from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS
 from .tools import ToolExecutor
 from .prompts import SYSTEM
 
@@ -35,14 +35,14 @@ def validation_details(exc):
     return {"reason": "invalid_output_type", "details": []}
 
 
-def validate_output(output, evidence):
+def validate_output(output, evidence, allowed_kinds=("observation",)):
     for fi, finding in enumerate(output.findings):
         for ri, ref in enumerate(finding.refs):
             path = f"findings.{fi}.refs.{ri}"
             item = evidence.get(ref.evidence_id)
             if item is None:
                 raise ReferenceValidationError("unknown_evidence", path + ".evidence_id")
-            if item.kind != "observation":
+            if item.kind not in allowed_kinds:
                 raise ReferenceValidationError("non_current_evidence", path + ".evidence_id")
             value = item.payload
             for part in ref.field_path.split("."):
@@ -57,7 +57,7 @@ def validate_output(output, evidence):
                     ("quote", ref.quote in item.excerpt)):
                 if not matches:
                     raise ReferenceValidationError(field + "_mismatch", path + "." + field)
-        if not any(ref.field_path in {"value", "message", "error_code", "summary", "team", "escalation"}
+        if not any(ref.field_path in {"value", "message", "error_code", "summary", "team", "escalation", "text", "resolution"}
                    or ref.field_path.startswith("config_summary.") for ref in finding.refs):
             raise ReferenceValidationError("metadata_only_reference", f"findings.{fi}.refs")
     teams = {item.payload["team"] for item in evidence.values() if "team" in item.payload}
@@ -65,7 +65,7 @@ def validate_output(output, evidence):
         raise ReferenceValidationError("unobserved_team", "escalation_team")
 
 
-def resolve_output(content, executor):
+def resolve_output(content, executor, allowed_kinds=("observation",)):
     data = json.loads(content)
     # Explicit compatibility for literal refs from old offline fixtures. Still strictly checked.
     # The schema and prompts supplied to new models contain only reference_id selectors.
@@ -75,7 +75,7 @@ def resolve_output(content, executor):
                      for f in data["findings"])
         if legacy:
             output = InvestigationOutput.model_validate_json(content)
-            validate_output(output, executor.evidence)
+            validate_output(output, executor.evidence, allowed_kinds)
             return output, "literal_refs_v1"
     selection = InvestigationSelection.model_validate_json(content)
     findings = []
@@ -93,15 +93,23 @@ def resolve_output(content, executor):
         findings.append(Finding(statement=finding.statement, refs=refs))
     output = InvestigationOutput(findings=findings, tentative_hypotheses=list(selection.tentative_hypotheses),
         missing_information=list(selection.missing_information), escalation_team=selection.escalation_team)
-    validate_output(output, executor.evidence)
+    validate_output(output, executor.evidence, allowed_kinds)
     return output, "reference_selection_v2"
 
 
-def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None):
+def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None,
+                context=None, event_log=None, executor=None, objective=None, role="investigation", repair_state=None):
     if not 1 <= max_steps <= 4:
         raise ValueError("max_steps must be 1..4")
-    events = []
+    if role not in {"investigation", "knowledge"}:
+        raise ValueError("unregistered observation role")
+    standalone = context is None
+    if not standalone and event_log is None:
+        raise ValueError("shared context requires its event log")
+    events = [] if standalone else event_log
+    event_start = len(events)
     task_span = ""
+    task_parent = ""
     def on_event(event):
         nonlocal task_span
         if event.get("type") == "call_start" and event.get("kind") == "task":
@@ -111,25 +119,43 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         if emit:
             emit(event)
     ticket = provider.ticket()
-    context = RunContext(limits=limits, emit=on_event, scope=ticket.scope)
-    executor = ToolExecutor(provider, principal, ticket.scope, context)
+    if standalone:
+        context = RunContext(limits=limits, emit=on_event, scope=ticket.scope)
+    elif context.scope != ticket.scope:
+        raise ValueError("shared scope mismatch")
+    limits = context.limits
+    executor = executor or ToolExecutor(provider, principal, ticket.scope, context, role=role)
+    if executor.context is not context or executor.role != role or executor.scope != ticket.scope or executor.principal != principal:
+        raise ValueError("shared executor mismatch")
+    repair_state = repair_state if repair_state is not None else {"repairs": 0}
+    allowed_tools = INVESTIGATION_TOOLS if role == "investigation" else KNOWLEDGE_TOOLS
+    allowed_kinds = ("observation",) if role == "investigation" else ("runbook", "past_incident")
+    if role == "knowledge":
+        from .collaboration_prompts import KNOWLEDGE
+        system = KNOWLEDGE
+    else:
+        system = SYSTEM
     model = model.bind_tools(executor.schemas())
     task_id = str(uuid4())
     def event(kind, **fields):
-        context.emit({"type": kind, "role": "investigation", "task_id": task_id,
-                      "span_id": task_span, "parent_span_id": context.root_span, **fields})
-    messages = [SystemMessage(content=SYSTEM), HumanMessage(content=json.dumps({
+        context.emit({"type": kind, "role": role, "task_id": task_id,
+                      "span_id": task_span, "parent_span_id": task_parent or context.root_span, **fields})
+    messages = [SystemMessage(content=system), HumanMessage(content=json.dumps({
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
-        "output_schema": InvestigationSelection.model_json_schema(), "step_limit": max_steps}, ensure_ascii=False))]
+        "output_schema": InvestigationSelection.model_json_schema(), "step_limit": max_steps,
+        "objective": objective}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
     output_protocol = "none"
-    with activate(context), context.span("task", "investigation"):
+    with activate(context), context.span("task", role):
+        if not standalone:
+            task_span = events[-1]["span_id"]
+            task_parent = events[-1]["parent_span_id"]
         event("task_created")
         event("task_started")
         for step in range(max_steps):
             try:
-                response = invoke_chat_model(model, messages, "investigation")
+                response = invoke_chat_model(model, messages, role)
                 # A blocking SDK call is not cancelled by an outer timer. Discard late responses.
                 if time.monotonic() - context.started >= limits.seconds - limits.reserve_seconds:
                     stop = "TIME_BUDGET_EXCEEDED"
@@ -150,7 +176,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     empty_observations = []
                     for call in calls:
                         selected = call.get("name")
-                        name = selected if selected in INVESTIGATION_TOOLS else "denied"
+                        name = selected if selected in allowed_tools else "denied"
                         event("tool_selected", name=name, step=step + 1)
                     if step == max_steps - 1:
                         stop = "STEP_LIMIT"
@@ -165,7 +191,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             stop = "INVALID_ARGUMENTS"
                             break
                         result = executor.execute(call["name"], call["args"])
-                        event("tool_result", name=call["name"] if call["name"] in INVESTIGATION_TOOLS else "denied",
+                        event("tool_result", name=call["name"] if call["name"] in allowed_tools else "denied",
                               status=result.status, evidence_ids=[e.evidence_id for e in result.evidence],
                               query_profile=dict(executor.last_query_profile),
                               sample_order=result.sample_order,
@@ -196,17 +222,18 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             "If you cannot obtain evidence, state the specific query gap."))
                     continue
                 try:
-                    candidate, output_protocol = resolve_output(response.content, executor)
+                    candidate, output_protocol = resolve_output(response.content, executor, allowed_kinds)
                     output = candidate
                     stop = "FINISHED"
                     break
                 except (ValidationError, ValueError, TypeError) as exc:
                     failure = {"step": step + 1, **validation_details(exc)}
                     failures.append(failure)
-                    event("validation_failure", node="investigation", **failure)
-                    if repairs == 0 and step < max_steps - 1:
+                    event("validation_failure", node=role, **failure)
+                    if repair_state["repairs"] == 0 and step < max_steps - 1:
                         repairs += 1
-                        event("validation_repair", node="investigation")
+                        repair_state["repairs"] += 1
+                        event("validation_repair", node=role)
                         reference_options = {eid: [o.model_dump() for o in e.reference_options]
                                              for eid, e in executor.evidence.items()}
                         messages.append(HumanMessage(content="Output contract/reference check failed. Safe error details: "
@@ -218,26 +245,27 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         stop = "MODEL_OUTPUT_INVALID"
                         break
             except ExecutionError as exc:
-                context.error(exc, "investigation")
+                context.error(exc, role)
                 stop = exc.code
                 break
         if not stop:
             stop = "STEP_LIMIT"
-        context.stop_reason = stop
+        if standalone:
+            context.stop_reason = stop
         if output is None:
             output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
         # Conservative M2 boundary: a truncated source remains explicitly partial, even
         # when selected fields are valid. M3 can assess whether later checks close that gap.
-        incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events)
+        incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
         status = "completed" if stop == "FINISHED" and output.findings and not incomplete else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
         event("task_completed", status=status, reason=stop)
-    return {"run_id": context.run_id, "task_type": "incident_investigation", "incident_id": ticket.incident_id,
+    return {"run_id": context.run_id, "task_id": task_id, "task_type": "incident_" + role, "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
-            "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)
+            "prompt_version": hashlib.sha256((system + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)
                 + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "observation_coverage": "limited_by_truncation" if incomplete else "not_truncated",
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],
-            "events": events, "run_summary": context.summary(), "repairs": repairs,
+            "events": list(events[event_start:]), "run_summary": {**context.summary(), "termination_reason": stop}, "repairs": repairs,
             "validation_failures": failures}
