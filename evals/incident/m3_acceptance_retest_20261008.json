@@ -1,0 +1,240 @@
+{
+  "date": "2026-10-08",
+  "source_commit": "df83c2a",
+  "split": "development",
+  "acceptance_status": "partial_engineering_flow_verified",
+  "paid_model_calls": 15,
+  "actual_tool_calls": 10,
+  "input_tokens": 58457,
+  "output_tokens": 6035,
+  "provider_http_attempts": "unknown",
+  "estimated_cost": null,
+  "note": "Budget finalization works in both live runs. Semantic gaps and the untested live rework branch prevent full M3 acceptance. Prior reports are preserved.",
+  "runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "a51648a1-224b-44a8-bfcb-8f6bcaa741d0",
+      "source_commit": "df83c2a",
+      "prompt_version": "d9500199054d",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "status": "completed",
+      "review_status": "passed",
+      "business_result": "diagnosis_available",
+      "termination_reason": "FINISHED",
+      "model_calls": 6,
+      "tool_calls": 2,
+      "limits": {
+        "model_calls": 6,
+        "tool_calls": 4
+      },
+      "token_usage": {
+        "input_tokens": 20734,
+        "output_tokens": 2749,
+        "known_calls": 6,
+        "status": "known"
+      },
+      "duration_ms": 26781,
+      "estimated_cost": null,
+      "snapshot_integrity": true,
+      "references_structurally_valid": true,
+      "review_target_coverage_valid": true,
+      "used_evidence_ids_valid": true,
+      "event_sequence_valid": true,
+      "step_accounting_valid": true,
+      "within_call_limits": true,
+      "missing_observations": [],
+      "rework_rounds": 0,
+      "reviews": 1,
+      "drafts": 1,
+      "repairs": 0,
+      "task_roles": [
+        "investigation"
+      ],
+      "manual_semantic_review": {
+        "status": "gaps_remain",
+        "issues": [
+          "F1 includes HTTP 504 and profile availability without corresponding selected observation fields.",
+          "Missing-information wording about configuration changes is not grounded in an executed changes query."
+        ]
+      },
+      "tool_path": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "db_cpu",
+              "dependency_error_rate",
+              "pool_usage",
+              "pool_wait",
+              "request_error_rate",
+              "request_latency"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": true,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "category": "dependency",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        }
+      ],
+      "report_sha256": "026a58fec5df68f752af82f447b1b2f71a15ad0dd19e0c520bc499e30b500b9c"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "c7eca586-9c20-409a-b8b4-ed9b94b5127e",
+      "source_commit": "df83c2a",
+      "prompt_version": "d9500199054d",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "status": "partial",
+      "review_status": "needs_information",
+      "business_result": "escalation_recommended",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 9,
+      "tool_calls": 8,
+      "limits": {
+        "model_calls": 16,
+        "tool_calls": 8
+      },
+      "token_usage": {
+        "input_tokens": 37723,
+        "output_tokens": 3286,
+        "known_calls": 9,
+        "status": "known"
+      },
+      "duration_ms": 36109,
+      "estimated_cost": null,
+      "snapshot_integrity": true,
+      "references_structurally_valid": true,
+      "review_target_coverage_valid": true,
+      "used_evidence_ids_valid": true,
+      "event_sequence_valid": true,
+      "step_accounting_valid": true,
+      "within_call_limits": true,
+      "missing_observations": [
+        "db_cpu"
+      ],
+      "rework_rounds": 0,
+      "reviews": 1,
+      "drafts": 1,
+      "repairs": 0,
+      "task_roles": [
+        "investigation",
+        "investigation"
+      ],
+      "manual_semantic_review": {
+        "status": "gaps_remain",
+        "issues": [
+          "F5 cites owner escalation to claim no configuration changes; this source cannot support that statement.",
+          "db_cpu was not observed. No live Knowledge/challenge/rework/revision branch occurred."
+        ]
+      },
+      "tool_path": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "pool_usage",
+              "pool_wait",
+              "request_error_rate",
+              "request_latency"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": true,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "category": "resource",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "category": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "category": "configuration",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "category": "configuration"
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "category": "resource",
+            "level": "WARN"
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "pool_usage",
+              "pool_wait"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_owner",
+          "status": "ok",
+          "query_profile": {},
+          "truncated": false,
+          "error_code": null
+        }
+      ],
+      "report_sha256": "2351b881004a4777a6525273029060c15782c7d2070269b0ca255d2fd3d47df5"
+    }
+  ]
+}

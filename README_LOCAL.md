@@ -167,7 +167,7 @@ Supervisor 会收到当前可派发任务数；小预算优先保留当前观测
 
 M3 的付费入口必须同时显式指定模型和工具预算；缺少预算、Key 或有效身份会在请求前停止。
 模型上限允许 6–16、工具上限允许 1–24；不自动跑三个案例。以下命令仅作为后续显式执行清单，
-首次真实验证已执行该预算的简单案例，以及 16 模型/8 工具的冲突案例；修复后尚未追加调用：
+首次真实验证及修复后的复测均按此简单案例预算，以及 16 模型/8 工具的冲突案例预算执行：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/investigate_incident.py --live --workflow collaboration --case case_001 --model-budget 6 --tool-budget 4 --output output/incident-live-m3
