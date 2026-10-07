@@ -537,12 +537,15 @@ body {
 @media (max-width: 1024px) {
   .chat-shell {
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
     padding: 10px;
     gap: 10px;
   }
 
   .chat-sidebar {
-    display: none;
+    display: block;
+    max-height: 320px;
+    overflow: auto;
   }
 
   .main-header {

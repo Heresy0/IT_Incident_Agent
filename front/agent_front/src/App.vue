@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
+import IncidentPanel from './IncidentPanel.vue'
+import { readEvents } from './sse'
+const workspace = ref<'incident' | 'research'>('incident')
+const role = ref('user')
 
 type RunSummary = {
   model_calls?: number; web_calls?: number; tool_calls?: number; duration_ms?: number
@@ -262,41 +266,28 @@ const consume = async (response: Response, statusId: string): Promise<boolean> =
   if (!response.body) throw new Error('流式响应不可用')
   const headerRun = response.headers.get('X-Research-Run-ID')
   if (headerRun && activeRun) { activeRun.runId = headerRun; runId.value = headerRun; saveRun() }
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder('utf-8')
-  let buffer = '', finished = false
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (controller.signal.aborted) throw new DOMException('身份已退出', 'AbortError')
-      if (done) break
-      buffer += decoder.decode(value, { stream: true })
-      const parts = buffer.split(/\r?\n\r?\n/)
-      buffer = parts.pop() || ''
-      for (const part of parts) {
-        const data = part.split(/\r?\n/).find(line => line.startsWith('data: '))
-        if (!data) continue
-        const event = JSON.parse(data.slice(6)) as StreamEvent
-        if (event.run_id && activeRun) {
-          activeRun.runId = event.run_id
-          activeRun.seq = event.seq || activeRun.seq
-          runId.value = event.run_id
-          saveRun()
-        }
-        if (event.type === 'call_start' && event.kind === 'node') pushProgress(`开始：${nodeLabels[event.name || ''] || event.name}`)
-        if (event.type === 'phase') pushProgress(`完成：${nodeLabels[event.node || ''] || event.node}`)
-        if (event.type === 'warning') pushProgress(event.message || '执行出现问题，正在返回可用结果')
-        if (event.type === 'status') pushProgress(event.message || '研究已接收')
-        if (event.type === 'coverage') pushProgress('证据复核及问题覆盖检查已完成')
-        showProgress(statusId)
-        if (event.type === 'final') {
-          applyResult(event as RunResult, statusId)
-          finished = true
-        }
-      }
-      await scrollToBottom()
+  let finished = false
+  await readEvents<StreamEvent>(response, async event => {
+    if (controller.signal.aborted) throw new DOMException('身份已退出', 'AbortError')
+    if (event.run_id && activeRun) {
+      activeRun.runId = event.run_id
+      activeRun.seq = event.seq || activeRun.seq
+      runId.value = event.run_id
+      saveRun()
     }
-  } finally { reader.releaseLock() }
+    if (event.type === 'call_start' && event.kind === 'node') pushProgress(`开始：${nodeLabels[event.name || ''] || event.name}`)
+    if (event.type === 'phase') pushProgress(`完成：${nodeLabels[event.node || ''] || event.node}`)
+    if (event.type === 'warning') pushProgress(event.message || '执行出现问题，正在返回可用结果')
+    if (event.type === 'status') pushProgress(event.message || '研究已接收')
+    if (event.type === 'coverage') pushProgress('证据复核及问题覆盖检查已完成')
+    showProgress(statusId)
+    if (event.type === 'final') {
+      applyResult(event as RunResult, statusId)
+      finished = true
+    }
+
+    await scrollToBottom()
+  })
   return finished
 }
 
@@ -380,7 +371,7 @@ const checkResponse = async (response: Response) => {
   throw new Error(message)
 }
 const authorizedFetch = (url: string, options: RequestInit = {}) => fetch(url, {
-  ...options, signal: controller.signal,
+  ...options, signal: options.signal ? AbortSignal.any([controller.signal, options.signal]) : controller.signal,
   headers: { ...options.headers, Authorization: `Bearer ${token.value}` },
 })
 const logout = () => {
@@ -401,12 +392,12 @@ const authenticate = async () => {
   try {
     const response = await fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${candidate}` } })
     await checkResponse(response)
-    const identity = await response.json() as { user_id: string; tenant_id: string }
+    const identity = await response.json() as { user_id: string; tenant_id: string; role: string }
     identityVersion++
     controller.abort(); controller = new AbortController()
     token.value = candidate
     sessionStorage.setItem('deepresearch.access-token', candidate)
-    userId.value = identity.user_id; tenantId.value = identity.tenant_id
+    userId.value = identity.user_id; tenantId.value = identity.tenant_id; role.value = identity.role
     const saved = sessionStorage.getItem(storageKey())
     createNewChat()
     if (saved) {
@@ -466,13 +457,17 @@ onMounted(async () => {
     <aside class="chat-sidebar">
       <div class="sidebar-brand">
         <p class="brand-badge">AI Copilot</p>
-        <h1>DeepResearch</h1>
-        <p class="brand-desc">多智能体研究工作台，支持快速回答与深度调研。</p>
+        <h1>IT Incident Agent</h1>
+        <p class="brand-desc">故障工单与资料研究工作台。</p>
       </div>
       <div class="sidebar-head">
+        <button @click="workspace = 'incident'">故障工单</button>
+        <button @click="workspace = 'research'">资料研究</button>
+      </div>
+      <div v-if="workspace === 'research'" class="sidebar-head">
         <button class="new-chat-btn" :disabled="loading" @click="createNewChat">新建会话</button>
       </div>
-      <div class="quick-entry">
+      <div v-if="workspace === 'research'" class="quick-entry">
         <p class="section-title">推荐起手问题</p>
         <button
           v-for="item in starterPrompts.slice(0, 3)"
@@ -488,22 +483,23 @@ onMounted(async () => {
         <input v-model="draftToken" type="password" autocomplete="off" class="sidebar-input" :disabled="!!token || authenticating" placeholder="从本地凭据文件复制" />
         <button v-if="!token" :disabled="authenticating || !draftToken.trim()" @click="authenticate">{{ authenticating ? '验证中…' : '验证身份' }}</button>
         <button v-else @click="logout">退出当前身份</button>
+        <p v-if="errorMessage && workspace === 'incident'" class="error" role="alert">{{ errorMessage }}</p>
       </div>
       <div class="settings-group">
         <label>User ID（服务端绑定）</label>
         <input :value="userId" readonly class="sidebar-input" />
       </div>
       <div class="settings-group">
-        <label>Thread ID</label>
+        <label>Thread ID（资料研究）</label>
         <input v-model="threadId" :disabled="loading" class="sidebar-input" />
       </div>
       <div class="settings-group">
         <label>Tenant ID</label>
         <input :value="tenantId" readonly class="sidebar-input" />
       </div>
-      <label class="memory-toggle"><input v-model="enableMemory" type="checkbox" />启用会话记忆（默认关闭）</label>
+      <label v-if="workspace === 'research'" class="memory-toggle"><input v-model="enableMemory" type="checkbox" />启用会话记忆（默认关闭）</label>
       <p class="hint-text">当前身份：{{ tenantId || '未验证' }} / {{ userId }}</p>
-      <details v-if="token" class="settings-group">
+      <details v-if="token && workspace === 'research'" class="settings-group">
         <summary>管理我的记忆</summary>
         <button @click="memoryAction('read')">读取记忆</button>
         <label>称呼</label><input v-model="profile.display_name" maxlength="40" class="sidebar-input" />
@@ -521,7 +517,8 @@ onMounted(async () => {
       </details>
     </aside>
 
-    <main class="chat-main">
+    <IncidentPanel v-if="workspace === 'incident'" :key="tenantId + '/' + userId + '/' + role" :ready="!!token" :tenant-id="tenantId" :user-id="userId" :role="role" :fetcher="authorizedFetch" />
+    <main v-else class="chat-main">
       <header class="main-header">
         <div>
           <h2>DeepResearch Enterprise Workspace</h2>

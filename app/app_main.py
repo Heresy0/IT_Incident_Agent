@@ -11,6 +11,7 @@ from backend.router import health_router, research_router
 from backend.service import get_workflow_service
 from backend.auth import router as auth_router, get_current_principal, Principal
 from backend.router.memory_router import router as memory_router
+from backend.router.incident_router import router as incident_router
 from mult_agents.harness.telemetry import configure_logging, METRICS
 
 
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(research_router)
     app.include_router(auth_router)
     app.include_router(memory_router)
+    app.include_router(incident_router)
     @app.get("/metrics", include_in_schema=False)
     def metrics(principal: Principal = Depends(get_current_principal)):
         if principal.role != "operator":

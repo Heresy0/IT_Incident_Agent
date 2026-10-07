@@ -19,7 +19,7 @@ class ProtocolError(ValueError):
 
 
 class Collaboration:
-    def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None):
+    def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None, event_log=None):
         if set(models) != {"supervisor", "investigation", "knowledge", "diagnosis", "reviewer"}:
             raise ValueError("five registered models required")
         self.models, self.provider, self.principal = models, provider, principal
@@ -32,7 +32,12 @@ class Collaboration:
             self.events.append(event)
             if emit:
                 emit(event)
-        self.context = RunContext(limits=limits, scope=self.ticket.scope, emit=sink)
+        if context is None:
+            self.context = RunContext(limits=limits, scope=self.ticket.scope, emit=sink)
+        else:
+            if context.scope != self.ticket.scope or event_log is None:
+                raise ValueError("shared collaboration context requires matching scope and event log")
+            self.context, self.events = context, event_log
         self.executors = {role: ToolExecutor(provider, principal, self.ticket.scope, self.context, role=role)
                           for role in ("investigation", "knowledge")}
         self.repairs = {"repairs": 0}
@@ -371,5 +376,5 @@ class Collaboration:
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
 
-def collaborate(models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None):
-    return Collaboration(models, provider, principal, limits=limits, emit=emit).run()
+def collaborate(models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None, event_log=None):
+    return Collaboration(models, provider, principal, limits=limits, emit=emit, context=context, event_log=event_log).run()

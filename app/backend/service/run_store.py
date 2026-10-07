@@ -5,9 +5,12 @@ from datetime import datetime, timezone
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
+from pathlib import Path
+from .incident_store import PostgresIncidents, MemoryIncidents
+from .incident_support import interrupted_result, now
 
 
-class PostgresRunStore:
+class PostgresRunStore(PostgresIncidents):
     def __init__(self, dsn):
         self.pool = ConnectionPool(dsn, min_size=1, max_size=4, timeout=5,
                                    kwargs={"row_factory": dict_row, "connect_timeout": 5, "options": "-c statement_timeout=10000"})
@@ -24,6 +27,7 @@ class PostgresRunStore:
                 run_id TEXT NOT NULL REFERENCES research_runs(run_id) ON DELETE CASCADE,
                 seq BIGINT NOT NULL, event JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 PRIMARY KEY(run_id, seq))""")
+            conn.execute((Path(__file__).parent / "migrations/001_incidents.sql").read_text(encoding="utf-8"))
 
     def create(self, run_id, request, config):
         with self.pool.connection() as conn:
@@ -47,12 +51,15 @@ class PostgresRunStore:
     def finish(self, run_id, result):
         with self.pool.connection() as conn:
             # Finish state and the last client event commit together exactly once.
-            row = conn.execute("SELECT status FROM research_runs WHERE run_id=%s FOR UPDATE", (run_id,)).fetchone()
+            row = conn.execute("SELECT status,config FROM research_runs WHERE run_id=%s FOR UPDATE", (run_id,)).fetchone()
             if not row or row["status"] != "running":
                 return False
             conn.execute("UPDATE research_runs SET status=%s,result=%s,finished_at=NOW() WHERE run_id=%s",
                          (result["status"], Jsonb(result), run_id))
             self._append(conn, run_id, {"type": "final", **result})
+            if row["config"].get("task_type") == "incident":
+                conn.execute("UPDATE incidents SET business_status=%s,updated_at=NOW() WHERE id=%s AND latest_run_id=%s",
+                             ("open" if result["status"] == "failed" else "awaiting_confirmation", row["config"]["incident_id"], run_id))
             return True
 
     def get(self, run_id, principal=None):
@@ -82,28 +89,30 @@ class PostgresRunStore:
     def fail_interrupted(self):
         # The application explicitly supports one backend process, no multi-worker deployment.
         with self.pool.connection() as conn:
-            rows = conn.execute("SELECT run_id,query,user_id,thread_id,tenant_id FROM research_runs WHERE status='running' FOR UPDATE").fetchall()
+            rows = conn.execute("SELECT run_id,query,user_id,thread_id,tenant_id,config FROM research_runs WHERE status='running' FOR UPDATE").fetchall()
             for row in rows:
-                result = {**row, "status": "failed", "final": "后端进程中断，本次研究未完成；请重新提交研究。",
-                          "run_summary": {"termination_reason": "PROCESS_INTERRUPTED"}, "sources": [], "route": "unknown"}
+                result = interrupted_result(row)
                 conn.execute("UPDATE research_runs SET status='failed',result=%s,finished_at=NOW() WHERE run_id=%s", (Jsonb(result), row["run_id"]))
                 self._append(conn, row["run_id"], {"type": "final", **result})
+                if row["config"].get("task_type") == "incident":
+                    conn.execute("UPDATE incidents SET business_status='open',updated_at=NOW() WHERE id=%s AND latest_run_id=%s", (row["config"]["incident_id"], row["run_id"]))
         return len(rows)
 
     def cleanup(self, days=14):
         with self.pool.connection() as conn:
-            result = conn.execute("DELETE FROM research_runs WHERE status <> 'running' AND created_at < NOW() - (%s * INTERVAL '1 day')", (days,))
+            result = conn.execute("DELETE FROM research_runs WHERE status <> 'running' AND COALESCE(config->>'task_type','research') <> 'incident' AND created_at < NOW() - (%s * INTERVAL '1 day')", (days,))
             return result.rowcount
 
     def close(self):
         self.pool.close()
 
 
-class MemoryRunStore:
+class MemoryRunStore(MemoryIncidents):
     """Explicit test adapter. Production never silently falls back to this store."""
     def __init__(self):
         from threading import RLock
         self.lock, self.runs, self.history = RLock(), {}, {}
+        self.incidents, self.cases = {}, {}
 
     def create(self, run_id, request, config):
         with self.lock:
@@ -124,6 +133,11 @@ class MemoryRunStore:
                 return False
             self.runs[run_id].update(status=result["status"], result=result)
             self.append(run_id, {"type": "final", **result})
+            cfg = self.runs[run_id]["config"]
+            if cfg.get("task_type") == "incident":
+                row = self.incidents[cfg["incident_id"]]
+                if row["latest_run_id"] == run_id:
+                    row.update(business_status="open" if result["status"] == "failed" else "awaiting_confirmation", updated_at=now())
             return True
 
     def get(self, run_id, principal=None):
@@ -142,7 +156,11 @@ class MemoryRunStore:
             return deepcopy(self.history.get(run_id, [])[after:after + limit])
 
     def fail_interrupted(self):
-        return 0
+        with self.lock:
+            rows = [r for r in self.runs.values() if r["status"] == "running"]
+            for row in rows:
+                self.finish(row["run_id"], interrupted_result(row))
+            return len(rows)
 
     def close(self):
         pass
