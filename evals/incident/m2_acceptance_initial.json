@@ -1,0 +1,200 @@
+{
+  "dataset_version": "synthetic-v1",
+  "split": "development",
+  "all_three_cases": true,
+  "distinct_query_paths": null,
+  "mechanical_pass": false,
+  "acceptance_status": "not_passed",
+  "runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "7ecf4b00-bfd8-42a0-9d27-2706b4169fc4",
+      "model": "qwen-turbo",
+      "prompt_version": "7072350590ec",
+      "checks": {
+        "live": true,
+        "completed": true,
+        "selection_protocol": true,
+        "small_budget": true,
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": false,
+        "necessary_observations": false
+      },
+      "mechanical_pass": false,
+      "missing_checks": [
+        "dependency_error_rate"
+      ],
+      "observed_path": [
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "deployment"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "request_error_rate",
+            "request_latency"
+          ],
+          "truncated": false
+        }
+      ],
+      "model_calls": 2,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 8676,
+        "output_tokens": 738,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 7610,
+      "repairs": 0,
+      "semantic_review": "required",
+      "note": "Necessary-observation coverage and valid references do not prove statement support or root cause.",
+      "report_sha256": "633242671984ca8505c10188890cffa9831f31b609f3f26283b19ee432fabeb2"
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "b27c113f-72c2-4987-b28e-9f9fa9293210",
+      "model": "qwen-turbo",
+      "prompt_version": "7072350590ec",
+      "checks": {
+        "live": true,
+        "completed": true,
+        "selection_protocol": true,
+        "small_budget": true,
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "necessary_observations": false
+      },
+      "mechanical_pass": false,
+      "missing_checks": [
+        "AUTH_AUDIENCE_MISMATCH"
+      ],
+      "observed_path": [
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "deployment"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": null,
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "request_error_rate",
+            "request_latency"
+          ],
+          "truncated": false
+        }
+      ],
+      "model_calls": 2,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 7342,
+        "output_tokens": 510,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 6016,
+      "repairs": 0,
+      "semantic_review": "required",
+      "note": "Necessary-observation coverage and valid references do not prove statement support or root cause.",
+      "report_sha256": "a6cbc5298628f0a37ce74849b043fa98cd59fc9666d3a456869fcbdce3992f7f"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "5c66b839-e4b7-4e7d-a8f0-de39a134e404",
+      "model": "qwen-turbo",
+      "prompt_version": "7072350590ec",
+      "checks": {
+        "live": true,
+        "completed": true,
+        "selection_protocol": true,
+        "small_budget": true,
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "necessary_observations": false
+      },
+      "mechanical_pass": false,
+      "missing_checks": [
+        "POOL_ACQUIRE_TIMEOUT",
+        "db_cpu",
+        "pool_usage",
+        "pool_wait"
+      ],
+      "observed_path": [
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": null,
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": null,
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": null,
+          "returned_fields": [
+            "dependency_error_rate",
+            "request_error_rate",
+            "request_latency"
+          ],
+          "truncated": false
+        }
+      ],
+      "model_calls": 2,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 8045,
+        "output_tokens": 595,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 6687,
+      "repairs": 0,
+      "semantic_review": "required",
+      "note": "Necessary-observation coverage and valid references do not prove statement support or root cause.",
+      "report_sha256": "ba86e87fd05adbdd51ed8baf7e708a56b9974c4ff478f1e4976ebabecab2c811"
+    }
+  ]
+}

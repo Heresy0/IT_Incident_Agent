@@ -29,13 +29,14 @@ class ToolExecutor:
         self.seen = set()
         self.evidence = {}
         self.references = {}
+        self.last_query_profile = {}
 
     def schemas(self):
         allowed = INVESTIGATION_TOOLS if self.role == "investigation" else KNOWLEDGE_TOOLS if self.role == "knowledge" else ()
         descriptions = {
-            "get_service_metrics": "Read registered metrics within ticket window, at most 60 points per metric; 1m/5m granularity.",
-            "get_service_logs": "Read logs filtered by category, level and error code within ticket window, at most 50 records.",
-            "get_recent_changes": "Read sanitized deployments/config/scaling within ticket window, at most 10 changes.",
+            "get_service_metrics": "Read symptom-relevant metrics and healthy controls within ticket window. dependency_error_rate measures dependency failures; pool_usage/pool_wait measure application connection pressure; db_cpu is a database control; request_error_rate/request_latency show impact. Select a small useful set, not every metric. At most 60 points per metric; 1m/5m granularity.",
+            "get_service_logs": "Read one log category: dependency for connectivity/health/timeouts, configuration for authentication/configuration failures, resource for pool acquisition/load/resource pressure. Omit level/error_code unless needed: restrictive filters can hide WARN or INFO controls. Empty means no matching records, not healthy. At most 50 records within ticket window.",
+            "get_recent_changes": "Read sanitized changes within ticket window, at most 10. category deployment/configuration/scaling is optional: omit it to inspect all change kinds. Release timing alone does not prove cause.",
             "get_service_owner": "Read registered owner for ticket service or allowed dependency alias.",
             "search_runbooks": "Search applicable readable synthetic runbooks, at most 4 passages.",
             "search_incidents": "Search visible confirmed active cases of applicable version, at most 4 cases.",
@@ -48,6 +49,7 @@ class ToolExecutor:
         return ToolResult(status="error", error=ToolError(code=code, retryable=retryable))
 
     def execute(self, name, raw_args):
+        self.last_query_profile = {}
         allowed = INVESTIGATION_TOOLS if self.role == "investigation" else KNOWLEDGE_TOOLS if self.role == "knowledge" else ()
         if name not in allowed or self.principal.role not in {"user", "operator"}:
             return self.rejected("TOOL_DENIED")
@@ -65,6 +67,9 @@ class ToolExecutor:
             return self.rejected("WINDOW_DENIED")
         if name == "get_service_owner" and args.alias not in {self.scope.service, *self.scope.allowed_dependencies}:
             return self.rejected("SERVICE_DENIED")
+        # Only validated enums/registered metric names, never free text, identity or timestamps.
+        self.last_query_profile = {key: value for key, value in args.model_dump(mode="json").items()
+                                   if key in {"metrics", "granularity", "category", "level"}}
         signature = (name, args.model_dump_json())
         if signature in self.seen:
             return self.rejected("DUPLICATE_TOOL")

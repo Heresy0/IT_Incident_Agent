@@ -57,6 +57,9 @@ def validate_output(output, evidence):
                     ("quote", ref.quote in item.excerpt)):
                 if not matches:
                     raise ReferenceValidationError(field + "_mismatch", path + "." + field)
+        if not any(ref.field_path in {"value", "message", "error_code", "summary", "team", "escalation"}
+                   or ref.field_path.startswith("config_summary.") for ref in finding.refs):
+            raise ReferenceValidationError("metadata_only_reference", f"findings.{fi}.refs")
     teams = {item.payload["team"] for item in evidence.values() if "team" in item.payload}
     if output.escalation_team is not None and output.escalation_team not in teams:
         raise ReferenceValidationError("unobserved_team", "escalation_team")
@@ -162,6 +165,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         result = executor.execute(call["name"], call["args"])
                         event("tool_result", name=call["name"] if call["name"] in INVESTIGATION_TOOLS else "denied",
                               status=result.status, evidence_ids=[e.evidence_id for e in result.evidence],
+                              query_profile=dict(executor.last_query_profile),
                               truncated=result.truncated, error=result.error.model_dump() if result.error else None)
                         messages.append(ToolMessage(content=result.model_dump_json(), tool_call_id=cid))
                         if result.error and result.error.code == "BUDGET_EXCEEDED":
@@ -208,7 +212,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_type": "incident_investigation", "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
-            "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)).encode()).hexdigest()[:12],
+            "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationSelection.model_json_schema(), sort_keys=True)
+                + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],

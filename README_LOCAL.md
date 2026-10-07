@@ -92,7 +92,7 @@ cd D:\code\it_incident_agent
 $env:PYTHONPATH='app'
 $env:PYTHONIOENCODING='utf-8'
 .\.venv\Scripts\python.exe scripts/probe_incident_tools.py
-.\.venv\Scripts\python.exe -m unittest tests.test_incident_tools tests.test_incident_investigation -v
+.\.venv\Scripts\python.exe -m unittest tests.test_incident_tools tests.test_incident_investigation tests.test_incident_acceptance -v
 .\.venv\Scripts\python.exe -m evals.incident.check_fixtures
 .\.venv\Scripts\python.exe scripts/investigate_incident.py --fake --case case_001 --output output/incident
 .\.venv\Scripts\python.exe scripts/investigate_incident.py --fake --case case_002 --output output/incident
@@ -126,3 +126,8 @@ Markdown 是确定性取证报告。结果为 completed 只表示取证输出完
 当前 Provider 只有合成目录，不为自由工单制造观测；知识工具目前是 fixture 检索，尚未验证真实 Milvus 召回。
 
 M0–M2 实际检查结果与未完成项见 [实施记录](docs/M0-M2-实施记录.md)。
+M2 三案例真实验收见 [验收报告](docs/M2-验收报告.md)。离线检查入口为
+`python -m evals.incident.acceptance --report <run.json>`；逐案显式传入三个报告，
+可加 `--output <summary.json>` 保存安全汇总。它不会请求模型，只有该模块读取 gold。
+返回 0 只说明机械检查通过；完整验收仍需逐项核查语义支持与缺口。
+报告的工具执行记录展示校验后的枚举过滤条件和空/错/截断；仅引用元数据的发现被拒绝。

@@ -1,8 +1,49 @@
 {
   "dataset_version": "synthetic-v1",
   "split": "development",
-  "cases": ["case_001", "case_002", "case_003"],
-  "live_runs": [],
-  "business_quality_status": "not_evaluated",
-  "note": "Three hand-authored development scenarios, not the future 18-case evaluation. No holdout claims."
+  "cases": [
+    "case_001",
+    "case_002",
+    "case_003"
+  ],
+  "live_runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "36434cdf-f9d8-4441-8628-a291f1e1d9b6",
+      "code_commit": "505572d",
+      "status": "partial",
+      "phase": "initial_tool_probe"
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "07558997-9fde-4b53-92fb-9ba207a9603f",
+      "code_commit": "f9615ee",
+      "status": "partial",
+      "phase": "reference_path_retest"
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "7ecf4b00-bfd8-42a0-9d27-2706b4169fc4",
+      "code_commit": "d08d982",
+      "status": "completed",
+      "phase": "m2_initial_acceptance"
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "b27c113f-72c2-4987-b28e-9f9fa9293210",
+      "code_commit": "d08d982",
+      "status": "completed",
+      "phase": "m2_initial_acceptance"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "5c66b839-e4b7-4e7d-a8f0-de39a134e404",
+      "code_commit": "d08d982",
+      "status": "completed",
+      "phase": "m2_initial_acceptance"
+    }
+  ],
+  "business_quality_status": "development_review_not_passed",
+  "note": "Three hand-authored development scenarios, not the future 18-case evaluation. No holdout claims.",
+  "m2_acceptance_status": "not_passed"
 }

@@ -3,6 +3,13 @@ def render(result):
     lines = ["# Investigation 取证报告", "", f"运行：{result['run_id']}；状态：{result['status']}",
              f"执行模式：{result.get('execution_mode', 'caller_supplied')}；数据源：{result.get('data_source', 'unknown')}",
              "", "当前仅为单角色取证；假设未经 Diagnosis/Reviewer 复核，故障未确认解决。", ""]
+    lines.extend(["工具执行记录（empty 只表示所选过滤条件未匹配，truncated 表示结果不完整）：", ""])
+    for event in result["events"]:
+        if event["type"] == "tool_result":
+            profile = event.get("query_profile", {})
+            lines.append(f"- {event['name']}: {event['status']}; filters={profile}; truncated={event['truncated']}"
+                         + (f"; error={event['error']['code']}" if event.get("error") else ""))
+    lines.append("")
     for finding in output["findings"]:
         lines.append(f"- 观测：{finding['statement']}")
         for ref in finding["refs"]:

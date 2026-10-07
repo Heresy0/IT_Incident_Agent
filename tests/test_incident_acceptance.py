@@ -1,0 +1,84 @@
+import copy
+import json
+import unittest
+
+from evals.incident.acceptance import assess, ROOT
+from mult_agents.incident.fake import ScriptedModel
+from mult_agents.incident.investigation import investigate, resolve_output, ReferenceValidationError
+from mult_agents.harness.runtime import Limits
+from tests.test_incident_tools import executor, P, window
+from tests.test_incident_investigation import Responses, selected
+from langchain_core.messages import AIMessage
+
+
+class IncidentAcceptanceTests(unittest.TestCase):
+    def report(self):
+        ex = executor()
+        result = investigate(ScriptedModel(), ex.provider, P,
+                             limits=Limits(model_calls=3, tool_calls=6, reserve_model_calls=0), max_steps=3)
+        result.update(execution_mode="scripted_control_only", model="scripted")
+        gold = json.loads((ROOT / "evals/incident/gold/case_001.json").read_text(encoding="utf-8"))
+        return result, gold
+
+    def test_scripted_and_completed_are_not_business_acceptance(self):
+        report, gold = self.report()
+        self.assertEqual(report["status"], "completed")
+        result = assess(report, gold)
+        self.assertFalse(result["checks"]["live"])
+        self.assertFalse(result["mechanical_pass"])
+        self.assertEqual(result["semantic_review"], "required")
+        gold["necessary_checks"].append("unobserved_metric")
+        self.assertIn("unobserved_metric", assess(report, gold)["missing_checks"])
+
+    def test_tampered_snapshot_reference_and_counts_fail(self):
+        report, gold = self.report()
+        for mutate, check in [
+            (lambda r: r["evidence"][0]["payload"].update(message="tampered"), "snapshot_integrity"),
+            (lambda r: r["output"]["findings"][0]["refs"][0].update(value="tampered"), "references_valid"),
+            (lambda r: r["run_summary"].update(tool_calls=4), "step_accounting"),
+            (lambda r: r["run_summary"]["limits"].update(model_calls=16), "small_budget"),
+            (lambda r: r["events"][0].update(seq=99), "event_sequence"),
+        ]:
+            changed = copy.deepcopy(report)
+            mutate(changed)
+            self.assertFalse(assess(changed, gold)["checks"][check])
+
+    def test_mechanical_pass_still_requires_semantic_review(self):
+        report, _ = self.report()
+        # Synthetic checker input, not a live model result or a business score.
+        report["execution_mode"] = "live"
+        result = assess(report, {"necessary_checks": ["dependency_error_rate"]})
+        self.assertTrue(result["mechanical_pass"])
+        self.assertEqual(result["semantic_review"], "required")
+        report["output"]["findings"][0]["refs"][0]["value"] = "invalid"
+        changed = assess(report, {"necessary_checks": ["dependency_error_rate"]})
+        self.assertTrue(changed["checks"]["snapshot_integrity"])
+        self.assertFalse(changed["checks"]["references_valid"])
+
+    def test_query_profiles_only_contain_validated_enums(self):
+        ex = executor()
+        ex.execute("get_service_logs", {**window(ex), "category": "dependency", "error_code": "PRIVATE_CODE"})
+        self.assertEqual(ex.last_query_profile, {"category": "dependency", "level": None})
+        ex.execute("get_service_owner", {"alias": "TEST_SECRET_CANARY"})
+        self.assertEqual(ex.last_query_profile, {})
+        ex.execute("get_service_logs", {**window(ex), "category": "TEST_SECRET_CANARY"})
+        self.assertEqual(ex.last_query_profile, {})
+
+    def test_metadata_only_finding_rejected_and_repair_can_select_real_field(self):
+        ex = executor()
+        item = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        options = {o.field_path: o.reference_id for o in item.reference_options}
+        def content(path):
+            return json.dumps({"findings": [{"statement": "Observed owner", "refs": [{"reference_id": options[path]}]}]})
+        with self.assertRaises(ReferenceValidationError) as caught:
+            resolve_output(content("service"), ex)
+        self.assertEqual(caught.exception.reason, "metadata_only_reference")
+        result = investigate(Responses([selected(), AIMessage(content=content("service")), AIMessage(content=content("team"))]),
+                             ex.provider, P, limits=Limits(model_calls=3, tool_calls=6, reserve_model_calls=0), max_steps=3)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["run_summary"]["model_calls"], 3)
+        self.assertEqual(result["repairs"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
