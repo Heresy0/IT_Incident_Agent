@@ -222,6 +222,55 @@ class IncidentCollaborationTests(unittest.TestCase):
                 self.assertEqual(exc.exception.code, 2)
                 build.assert_not_called()
 
+    def test_six_call_budget_defers_optional_task_and_tells_leaf_its_actual_steps(self):
+        models = scripted_models()
+        def add_optional(response, _, calls):
+            if calls == 1:
+                data = json.loads(response.content)
+                data["tasks"].insert(0, {"role": "knowledge", "goal": "Optional history"})
+                return json_response(data)
+            return response
+        models["supervisor"] = AlterOutput(models["supervisor"], add_optional)
+        result = self.run_case(models=models, limits=Limits(model_calls=6, tool_calls=4,
+            reserve_model_calls=3, reserve_seconds=20))
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["run_summary"]["model_calls"], 6)
+        self.assertEqual([t["role"] for t in result["task_results"]], ["investigation"])
+        self.assertEqual(len(result["scheduling_decisions"][0]["tasks"]), 2)
+        self.assertEqual(sum(e["type"] == "task_deferred" for e in result["events"]), 1)
+        first = json.loads(models["investigation"].histories[0][1].content)
+        self.assertEqual(first["step_limit"], 2)
+
+    def test_tool_budget_exhaustion_still_runs_diagnosis_and_review(self):
+        models = scripted_models()
+        models["supervisor"] = AlterOutput(models["supervisor"], lambda _, __, calls:
+            json_response({"action": "dispatch", "reason": "continue collecting", "tasks": [
+                {"role": "investigation", "goal": f"Further checks {calls}"}]}))
+        result = self.run_case(models=models, limits=Limits(model_calls=8, tool_calls=2,
+            reserve_model_calls=3, reserve_seconds=20))
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(len(result["reviews"]), 1)
+        self.assertEqual(result["run_summary"]["model_calls"], 6)
+        self.assertEqual(result["run_summary"]["tool_calls"], 2)
+        self.assertTrue(any(e["type"] == "finalization_started" for e in result["events"]))
+
+    def test_remaining_batch_task_is_deferred_when_tools_are_consumed(self):
+        models = scripted_models()
+        def add_optional(response, _, calls):
+            if calls == 1:
+                data = json.loads(response.content)
+                data["tasks"].append({"role": "knowledge", "goal": "Optional history"})
+                return json_response(data)
+            return response
+        models["supervisor"] = AlterOutput(models["supervisor"], add_optional)
+        result = self.run_case(models=models, limits=Limits(model_calls=10, tool_calls=2,
+            reserve_model_calls=3, reserve_seconds=20))
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(models["knowledge"].histories, [])
+        self.assertEqual(result["run_summary"]["model_calls"], 5)
+        self.assertEqual(result["run_summary"]["tool_calls"], 2)
+        self.assertEqual(len(result["reviews"]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

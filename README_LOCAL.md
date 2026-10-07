@@ -156,6 +156,9 @@ Supervisor 根据实际输入决定派发 Investigation/Knowledge 或交给 Diag
 1 轮返工、2 次复核和全运行 1 次结构修复。排查步骤仍最多 4 次。
 取证保留 3 次模型/20 秒供收尾；最终调度、Diagnosis 和 Reviewer 可使用预留。
 派发前检查最低调用余量；实际多步取证也受共享预算限制，余量不足便保留缺口。
+Supervisor 会收到当前可派发任务数；小预算优先保留当前观测任务，延后超额任务。
+子任务 step_limit 按实际剩余模型额度缩小。取证预算耗尽且已有观测时转入 Diagnosis/Reviewer，
+不会仅因工具额度耗尽跳过复核；收尾失败或证据不足仍保留 partial。
 仅历史支持的原因即便被 Reviewer 接受，程序也降级为 unresolved。
 
 结果保存为 `<run_id>.json/.md`，包含证据、任务、诊断版本、复核、补查请求、协商事件与总计数。
@@ -164,7 +167,7 @@ Supervisor 根据实际输入决定派发 Investigation/Knowledge 或交给 Diag
 
 M3 的付费入口必须同时显式指定模型和工具预算；缺少预算、Key 或有效身份会在请求前停止。
 模型上限允许 6–16、工具上限允许 1–24；不自动跑三个案例。以下命令仅作为后续显式执行清单，
-本阶段没有执行该命令：
+首次真实验证已执行该预算的简单案例，以及 16 模型/8 工具的冲突案例；修复后尚未追加调用：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/investigate_incident.py --live --workflow collaboration --case case_001 --model-budget 6 --tool-budget 4 --output output/incident-live-m3
@@ -172,3 +175,4 @@ M3 的付费入口必须同时显式指定模型和工具预算；缺少预算�
 
 预算是调用次数上限，不保证成功或完整 token/费用可知。M3 不兼用 M2 的 `--probe`。
 文件改动、免费验证和未完成项见 [M3 实施记录](docs/M3-实施记录.md)。
+首次真实验证结果与修复见 [M3 验收报告](docs/M3-验收报告.md)。

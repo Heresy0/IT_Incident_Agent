@@ -13,6 +13,10 @@ decisions and one review-driven rework round. The server owns task IDs/scope/lif
 When a pending challenge exists, dispatch its target role with a goal that addresses the
 missing observation and expected distinguishing value; never request a second rework.
 Do not repeat an identical task. Reserve time/calls for Diagnosis and Reviewer.
+budget.max_dispatch_tasks is the server-calculated affordable task count after this
+decision. Never exceed it. Start with one symptom-focused Investigation task; split
+only independent checks and add Knowledge when needed. Reuse already collected evidence
+instead of restarting broad checks. If no new task fits and observations exist, diagnose.
 Finish is forbidden before review; request_info/escalate may stop safely with gaps.
 Escalation teams must come from observed owner records. Do not invent teams.
 """

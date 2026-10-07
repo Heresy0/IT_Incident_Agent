@@ -1,0 +1,225 @@
+{
+  "date": "2026-10-08",
+  "source_commit": "356ddcd",
+  "split": "development",
+  "acceptance_status": "not_passed",
+  "paid_model_calls": 13,
+  "actual_tool_calls": 8,
+  "input_tokens": 63799,
+  "output_tokens": 3408,
+  "provider_http_attempts": "unknown",
+  "estimated_cost": null,
+  "note": "Original live reports are preserved; subsequent fixes have only free control validation. Valid references do not prove semantic support.",
+  "runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "bd452b9a-3fba-4d06-a835-096fc9010e34",
+      "source_commit": "356ddcd",
+      "prompt_version": "92b7889836a7",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "BUDGET_EXCEEDED",
+      "model_calls": 1,
+      "tool_calls": 0,
+      "limits": {
+        "model_calls": 6,
+        "tool_calls": 4
+      },
+      "token_usage": {
+        "input_tokens": 879,
+        "output_tokens": 160,
+        "known_calls": 1,
+        "status": "known"
+      },
+      "duration_ms": 2250,
+      "estimated_cost": null,
+      "snapshot_integrity": null,
+      "saved_leaf_references_valid": null,
+      "event_sequence_valid": true,
+      "step_accounting_valid": true,
+      "within_call_limits": true,
+      "missing_observations": [
+        "UPSTREAM_UNREACHABLE",
+        "dependency_error_rate"
+      ],
+      "rework_rounds": 0,
+      "reviews": 0,
+      "drafts": 0,
+      "repairs": 0,
+      "task_roles": [],
+      "tool_path": [],
+      "report_sha256": "628cd58d8331179f0ff0b04aab18d85f21d9eb66e1ecfb1e94b044234acb7ad8"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "01deee1d-f3eb-4a2b-9b5c-8c926f828617",
+      "source_commit": "356ddcd",
+      "prompt_version": "92b7889836a7",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "BUDGET_EXCEEDED",
+      "model_calls": 12,
+      "tool_calls": 8,
+      "limits": {
+        "model_calls": 16,
+        "tool_calls": 8
+      },
+      "token_usage": {
+        "input_tokens": 62920,
+        "output_tokens": 3248,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "duration_ms": 38984,
+      "estimated_cost": null,
+      "snapshot_integrity": true,
+      "saved_leaf_references_valid": true,
+      "event_sequence_valid": true,
+      "step_accounting_valid": true,
+      "within_call_limits": true,
+      "missing_observations": [
+        "db_cpu"
+      ],
+      "rework_rounds": 0,
+      "reviews": 0,
+      "drafts": 0,
+      "repairs": 1,
+      "task_roles": [
+        "investigation",
+        "investigation",
+        "investigation",
+        "knowledge"
+      ],
+      "tool_path": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "pool_usage",
+              "pool_wait",
+              "request_error_rate",
+              "request_latency"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": true,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "category": "resource",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "category": "configuration",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "category": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "category": "resource",
+            "level": "ERROR"
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "dependency_error_rate",
+              "pool_usage",
+              "pool_wait",
+              "request_error_rate",
+              "request_latency"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": true,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "category": "dependency",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "category": "configuration",
+            "level": null
+          },
+          "truncated": false,
+          "error_code": "DUPLICATE_TOOL"
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "status": "error",
+          "query_profile": {
+            "category": null
+          },
+          "truncated": false,
+          "error_code": "DUPLICATE_TOOL"
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "metrics": [
+              "pool_usage",
+              "pool_wait",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false,
+          "error_code": null
+        }
+      ],
+      "report_sha256": "e463203b48355db6a75928221fafde3e705507773cff2eaf55b52c4a685d0565"
+    }
+  ]
+}

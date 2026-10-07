@@ -26,6 +26,7 @@ class Collaboration:
         self.ticket = provider.ticket()
         provider.authorize(principal, self.ticket.scope)
         self.events, self.tasks, self.negotiation, self.drafts, self.reviews = [], [], [], [], []
+        self.decisions = []
         def sink(event):
             event = {**event, "seq": len(self.events) + 1}
             self.events.append(event)
@@ -217,21 +218,43 @@ class Collaboration:
             if key in self.seen_tasks or key in keys:
                 raise ProtocolError("DUPLICATE_TASK")
             keys.append(key)
-        remaining = self.context.limits.model_calls - self.context.counts["model_calls"]
-        if remaining < 2 * len(decision.tasks) + self.context.limits.reserve_model_calls or not self.context.can_research():
-            self.event("rework_denied" if self.phase == "rework" else "dispatch_denied", code="BUDGET_EXCEEDED")
+        capacity = self.dispatch_capacity()
+        if capacity < 1 or not self.context.can_research():
+            self.event("rework_denied" if self.phase == "rework" else "dispatch_denied", code="BUDGET_EXCEEDED",
+                       requested_roles=[t.role for t in decision.tasks], available_tasks=capacity)
+            if self.phase == "collect" and any(e.kind == "observation" for e in self.evidence.values()):
+                self.event("finalization_started", reason="research_budget_unavailable")
+                self.diagnose_and_review()
+                return
             raise ExecutionError("BUDGET_EXCEEDED")
-        self.seen_tasks.update(keys)
+        selected = list(zip(decision.tasks, keys))
+        if capacity < len(selected):
+            # Current observations are a prerequisite for diagnosis; knowledge is optional.
+            if not any(e.kind == "observation" for e in self.evidence.values()):
+                selected.sort(key=lambda pair: pair[0].role != "investigation")
+            for task, _ in selected[capacity:]:
+                self.event("task_deferred", task.role, reason="insufficient_dispatch_budget")
+            selected = selected[:capacity]
+        self.seen_tasks.update(key for _, key in selected)
         follow_up = self.phase == "rework"
         if follow_up:
             self.reworks += 1
-        for task in decision.tasks:
+        for index, (task, _) in enumerate(selected):
+            if not self.context.can_research():
+                self.event("task_deferred", task.role, reason="research_budget_unavailable")
+                if not follow_up and any(e.kind == "observation" for e in self.evidence.values()):
+                    self.event("finalization_started", reason="research_budget_unavailable")
+                    self.diagnose_and_review()
+                    return
+                raise ExecutionError("BUDGET_EXCEEDED")
             ids = list(dict.fromkeys([*task.evidence_ids, *(self.pending["evidence_ids"] if follow_up else [])]))[:8]
             objective = {"goal": task.goal, "evidence": self.sources(ids), "challenge": self.pending if follow_up else None}
             before = dict(self.context.counts)
+            available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - before["model_calls"]
+            steps = min(4, available_steps - 2 * (len(selected) - index - 1))
             result = investigate(self.models[task.role], self.provider, self.principal, context=self.context,
                 event_log=self.events, executor=self.executors[task.role], objective=objective,
-                role=task.role, repair_state=self.repairs)
+                role=task.role, repair_state=self.repairs, max_steps=max(1, steps))
             self.tasks.append({"task_id": result["task_id"], "role": task.role, "goal": task.goal,
                 "challenge_id": self.pending["challenge_id"] if follow_up else None,
                 "status": result["status"], "output": result["output"],
@@ -245,6 +268,11 @@ class Collaboration:
         if follow_up:
             self.diagnose_and_review()
 
+    def dispatch_capacity(self, pending_model_call=False):
+        available = self.context.limits.model_calls - self.context.counts["model_calls"] - int(pending_model_call)
+        tools = self.context.limits.tool_calls - self.context.counts["tool_calls"]
+        return max(0, min(2, tools, (available - self.context.limits.reserve_model_calls) // 2))
+
     def run(self):
         with activate(self.context), self.context.span("workflow", "incident_collaboration"):
             self.workflow_span = self.events[-1]["span_id"]
@@ -256,11 +284,15 @@ class Collaboration:
                     decision = self.ask("supervisor", SupervisorDecision, {
                         "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                         "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
-                        "tasks": [{k: t[k] for k in ("role", "goal", "status", "evidence_ids")} for t in self.tasks],
-                        "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__}},
+                        "tasks": [{**{k: t[k] for k in ("role", "goal", "status", "evidence_ids")},
+                                   "missing_information": t["output"]["missing_information"]} for t in self.tasks],
+                        "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
+                                   "max_dispatch_tasks": self.dispatch_capacity(pending_model_call=True)}},
                         terminal=bool(self.evidence and self.phase == "collect"))
                     self.supervisor_calls += 1
-                    self.event("supervisor_decision", action=decision.action, round=self.supervisor_calls)
+                    self.decisions.append({"round": self.supervisor_calls, **decision.model_dump(mode="json")})
+                    self.event("supervisor_decision", action=decision.action, round=self.supervisor_calls,
+                               requested_roles=[t.role for t in decision.tasks])
                     if decision.action != "dispatch" and decision.tasks:
                         raise ProtocolError("UNEXPECTED_TASKS")
                     if decision.action == "dispatch":
@@ -328,6 +360,7 @@ class Collaboration:
             "task_results": self.tasks, "drafts": self.drafts, "reviews": self.reviews, "negotiation": self.negotiation,
             "events": self.events, "run_summary": self.context.summary(), "repairs": self.repairs["repairs"],
             "rework_rounds": self.reworks, "supervisor_decisions": self.supervisor_calls,
+            "scheduling_decisions": self.decisions,
             "prompt_version": self.prompt_version()}
 
     def prompt_version(self):
