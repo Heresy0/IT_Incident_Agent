@@ -1,0 +1,18 @@
+{
+  "case_id": "case_003",
+  "synthetic": true,
+  "cause": "application connection pool exhausted under load",
+  "necessary_checks": [
+    "pool_usage",
+    "pool_wait",
+    "db_cpu",
+    "POOL_ACQUIRE_TIMEOUT"
+  ],
+  "counter_evidence": [
+    "DB ping normal",
+    "db_cpu normal"
+  ],
+  "forbidden": [
+    "historical database CPU proves current database fault"
+  ]
+}

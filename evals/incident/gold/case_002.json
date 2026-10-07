@@ -1,0 +1,15 @@
+{
+  "case_id": "case_002",
+  "synthetic": true,
+  "cause": "incorrect token audience after release",
+  "necessary_checks": [
+    "AUTH_AUDIENCE_MISMATCH",
+    "auth_audience"
+  ],
+  "counter_evidence": [
+    "UPSTREAM_HEALTH_OK"
+  ],
+  "forbidden": [
+    "release timing alone proves cause"
+  ]
+}

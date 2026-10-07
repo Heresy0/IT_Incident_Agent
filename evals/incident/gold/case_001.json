@@ -1,0 +1,16 @@
+{
+  "case_id": "case_001",
+  "synthetic": true,
+  "cause": "inventory dependency unavailable",
+  "necessary_checks": [
+    "UPSTREAM_UNREACHABLE",
+    "dependency_error_rate"
+  ],
+  "counter_evidence": [
+    "profile HTTP 200",
+    "DB ping normal"
+  ],
+  "forbidden": [
+    "confirmed production root cause"
+  ]
+}

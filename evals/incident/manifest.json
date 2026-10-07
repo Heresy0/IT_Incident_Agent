@@ -1,0 +1,8 @@
+{
+  "dataset_version": "synthetic-v1",
+  "split": "development",
+  "cases": ["case_001", "case_002", "case_003"],
+  "live_runs": [],
+  "business_quality_status": "not_evaluated",
+  "note": "Three hand-authored development scenarios, not the future 18-case evaluation. No holdout claims."
+}

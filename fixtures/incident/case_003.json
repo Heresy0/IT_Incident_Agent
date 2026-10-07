@@ -1,0 +1,379 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "case_003",
+    "title": "Development ticket 003",
+    "symptoms": "Checkout latency and connection waiting increased while database CPU remains normal.",
+    "scope": {
+      "service": "checkout-api",
+      "environment": "staging",
+      "service_version": "1.4.2",
+      "start": "2026-09-14T09:50:00+00:00",
+      "end": "2026-09-14T10:20:00+00:00",
+      "allowed_dependencies": [
+        "inventory-api"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.2,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 120,
+      "unit": "ms",
+      "aggregation": "p95",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 1800,
+      "unit": "ms",
+      "aggregation": "p95",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "dependency_error_rate",
+      "value": 0.0,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "dependency_error_rate",
+      "value": 0.0,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 25,
+      "unit": "percent",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 26,
+      "unit": "percent",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_usage-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_usage",
+      "value": 0.3,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_usage-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_usage",
+      "value": 1.0,
+      "unit": "ratio",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_wait-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_wait",
+      "value": 2,
+      "unit": "ms",
+      "aggregation": "p95",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_wait-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_wait",
+      "value": 1400,
+      "unit": "ms",
+      "aggregation": "p95",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_rate-before",
+      "timestamp": "2026-09-14T10:00:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_rate",
+      "value": 35,
+      "unit": "requests/s",
+      "aggregation": "mean",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_rate-after",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_rate",
+      "value": 100,
+      "unit": "requests/s",
+      "aggregation": "mean",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "id": "health-control",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "DB_PING_OK",
+      "message": "Database ping succeeded in 8ms; profile endpoint HTTP 200."
+    },
+    {
+      "id": "pool-error",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "resource",
+      "level": "WARN",
+      "error_code": "POOL_ACQUIRE_TIMEOUT",
+      "message": "Connection acquire waited 1500ms; pool in_use=20 max=20 waiters=45; database ping 8ms."
+    }
+  ],
+  "changes": [
+    {
+      "id": "traffic-change",
+      "timestamp": "2026-09-14T10:02:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "scaling",
+      "version": "1.4.2",
+      "summary": "Load rose from 35 to 100 requests/s; application pool max remains 20.",
+      "config_summary": {
+        "pool_max": 20
+      }
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner-checkout",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "aliases": [
+        "checkout-api"
+      ],
+      "team": "Checkout on-call",
+      "escalation": "Internal Checkout support queue"
+    },
+    {
+      "id": "owner-inventory",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "inventory-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "aliases": [
+        "inventory-api"
+      ],
+      "team": "Inventory on-call",
+      "escalation": "Internal Inventory support queue"
+    }
+  ],
+  "runbooks": [
+    {
+      "id": "rb-1",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "dependency",
+      "versions": [
+        "1.4.2"
+      ],
+      "updated_at": "2026-09-14T09:50:00+00:00",
+      "search_text": "timeout dependency inventory UPSTREAM_TIMEOUT",
+      "text": "For checkout 1.4.x: compare inventory health and other endpoints before attributing timeout to a dependency; escalate observed connection refusal to Inventory on-call."
+    },
+    {
+      "id": "rb-2",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "configuration",
+      "versions": [
+        "1.4.2"
+      ],
+      "updated_at": "2026-09-14T09:50:00+00:00",
+      "search_text": "authentication audience config AUTH_AUDIENCE_MISMATCH release",
+      "text": "Audience mismatch: compare expected audience in rejected response with sanitized release config. Release timing alone does not establish cause. Rollback is a human-approved suggestion."
+    },
+    {
+      "id": "rb-3",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "category": "resource",
+      "versions": [
+        "1.4.2"
+      ],
+      "updated_at": "2026-09-14T09:50:00+00:00",
+      "search_text": "pool waiting latency database POOL_ACQUIRE_TIMEOUT",
+      "text": "Compare pool utilization and acquire wait against DB CPU/ping and load. A normal database does not rule out application pool exhaustion. Escalate to Checkout on-call."
+    }
+  ],
+  "incidents": [
+    {
+      "id": "hist-1",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "versions": [
+        "1.4.2"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-14T09:50:00+00:00",
+      "error_codes": [
+        "POOL_ACQUIRE_TIMEOUT"
+      ],
+      "search_text": "latency database pool timeout",
+      "text": "Synthetic past event: high database CPU caused checkout latency. This is a historical clue and does not establish current cause.",
+      "resolution": "DB operator adjusted capacity after measurement."
+    },
+    {
+      "id": "hist-2",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "versions": [
+        "1.3.0"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-14T09:50:00+00:00",
+      "error_codes": [
+        "AUTH_AUDIENCE_MISMATCH"
+      ],
+      "search_text": "authentication audience config release",
+      "text": "Historical 1.3.x auth change.",
+      "resolution": "Human restored audience."
+    },
+    {
+      "id": "hist-unconfirmed",
+      "timestamp": "2026-09-14T10:05:00+00:00",
+      "service": "checkout-api",
+      "environment": "staging",
+      "data_version": "synthetic-v1",
+      "visibility": "public_synthetic",
+      "versions": [
+        "1.4.2"
+      ],
+      "confirmed": false,
+      "validity": "active",
+      "confirmed_at": "2026-09-14T09:50:00+00:00",
+      "error_codes": [],
+      "search_text": "timeout latency",
+      "text": "Unconfirmed model guess: dependency outage.",
+      "resolution": "Not confirmed."
+    }
+  ]
+}

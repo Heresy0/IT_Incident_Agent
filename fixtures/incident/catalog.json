@@ -1,0 +1,20 @@
+[
+  {
+    "case_id": "case_001",
+    "title": "Development ticket 001",
+    "file": "case_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "case_002",
+    "title": "Development ticket 002",
+    "file": "case_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "case_003",
+    "title": "Development ticket 003",
+    "file": "case_003.json",
+    "visibility": "public_synthetic"
+  }
+]
