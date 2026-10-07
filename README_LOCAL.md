@@ -1,6 +1,6 @@
 # Windows 本地启动
 
-本仓库当前运行研究底座，IT 工单功能待实施。以下是新副本的首次安装步骤；复制源码没有复制依赖、密钥或数据库。
+Web/API 当前运行研究底座；M0–M2 新增独立 Investigation CLI。以下安装步骤仅使用本项目自己的依赖、密钥和数据库。
 
 ## 首次准备
 
@@ -82,3 +82,42 @@ $env:DASHSCOPE_API_KEY='test-only'
 ```
 
 测试通过说明研究底座的工程约束通过检查，不代表 IT 工单功能已完成。
+
+## Investigation CLI（M0–M2）
+
+无需 Docker、Milvus、搜索 Key 或模型 Key 即可运行免费控制探针、工具/循环回归与资料检查：
+
+```powershell
+cd D:\code\it_incident_agent
+$env:PYTHONPATH='app'
+$env:PYTHONIOENCODING='utf-8'
+.\.venv\Scripts\python.exe scripts/probe_incident_tools.py
+.\.venv\Scripts\python.exe -m unittest tests.test_incident_tools tests.test_incident_investigation -v
+.\.venv\Scripts\python.exe -m evals.incident.check_fixtures
+.\.venv\Scripts\python.exe scripts/investigate_incident.py --fake --case case_001 --output output/incident
+.\.venv\Scripts\python.exe scripts/investigate_incident.py --fake --case case_002 --output output/incident
+.\.venv\Scripts\python.exe scripts/investigate_incident.py --fake --case case_003 --output output/incident
+```
+
+`--fake` 是明确编排的控制演示，不是自主选择评测。JSON 保存真实执行计数、证据快照与顺序事件；
+Markdown 是确定性取证报告。结果为 completed 只表示取证输出完成；假设尚未独立复核、工单未解决。
+
+真实调用只由显式 `--live` 启动。先在本项目 `.env.local` 填写自己的 `DASHSCOPE_API_KEY`、
+`MODEL=qwen-turbo` 与 `INCIDENT_BEARER_TOKEN`（从本项目生成的本地演示身份中选择一个）；
+脚本沿用 backend.auth 解析服务端 Principal，不接收用户自报租户/身份。
+初始入口无论是否加 `--probe`，都限制为 **一次运行最多 3 次模型请求、6 次工具实际尝试**，包括结构修复/工具重试，
+不自动批量运行。没有 Key/有效身份会在请求前停止。需费用时由用户显式执行：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/investigate_incident.py --live --probe --case case_001 --output output/incident-live
+```
+
+这是唯一的付费执行入口；普通测试不会请求模型。未测得完整 token 或费用时保留 unknown，
+不估造数字。大批评测、扩大 live 上限或运行另外两个案例需后续明确执行清单。
+
+内部单任务最多 4 个模型步骤（含结束输出和修复），共享上限 16 模型/24 工具/180 秒，
+保留 3 次模型/20 秒给未来 Diagnosis/Reviewer。当前只有 Investigation，没有使用预留来伪装复核。
+请求连接/读超时为 30 秒；不声称 180 秒严格 SLA，晚到结果不会变成有效取证输出。
+当前 Provider 只有合成目录，不为自由工单制造观测；知识工具目前是 fixture 检索，尚未验证真实 Milvus 召回。
+
+M0–M2 实际检查结果与未完成项见 [实施记录](docs/M0-M2-实施记录.md)。
