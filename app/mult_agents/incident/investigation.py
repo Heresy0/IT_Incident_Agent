@@ -146,6 +146,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     stop = "MODEL_OUTPUT_INVALID"
                     break
                 if calls:
+                    step_truncated = False
                     for call in calls:
                         selected = call.get("name")
                         name = selected if selected in INVESTIGATION_TOOLS else "denied"
@@ -166,7 +167,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         event("tool_result", name=call["name"] if call["name"] in INVESTIGATION_TOOLS else "denied",
                               status=result.status, evidence_ids=[e.evidence_id for e in result.evidence],
                               query_profile=dict(executor.last_query_profile),
+                              sample_order=result.sample_order,
                               truncated=result.truncated, error=result.error.model_dump() if result.error else None)
+                        step_truncated = step_truncated or result.truncated
                         messages.append(ToolMessage(content=result.model_dump_json(), tool_call_id=cid))
                         if result.error and result.error.code == "BUDGET_EXCEEDED":
                             stop = "BUDGET_EXCEEDED"
@@ -176,6 +179,11 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     # Explicit final-step instruction counts as part of the normal conversation.
                     if step == max_steps - 2:
                         messages.append(HumanMessage(content="Next step is final: return the output JSON, no tools. State any gaps."))
+                    elif step_truncated:
+                        messages.append(HumanMessage(content="A tool result was truncated. Metrics are latest-first; "
+                            "the returned samples do not cover the full requested window. Use remaining steps for "
+                            "a focused query with fewer relevant metrics or a discriminating log check before finalizing. "
+                            "Do not infer service health or absence of errors from incomplete observations."))
                     continue
                 try:
                     candidate, output_protocol = resolve_output(response.content, executor)
@@ -208,7 +216,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         context.stop_reason = stop
         if output is None:
             output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
-        status = "completed" if stop == "FINISHED" and output.findings else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
+        # Conservative M2 boundary: a truncated source remains explicitly partial, even
+        # when selected fields are valid. M3 can assess whether later checks close that gap.
+        incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events)
+        status = "completed" if stop == "FINISHED" and output.findings and not incomplete else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_type": "incident_investigation", "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
@@ -216,6 +227,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
+            "observation_coverage": "limited_by_truncation" if incomplete else "not_truncated",
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],
             "events": events, "run_summary": context.summary(), "repairs": repairs,
             "validation_failures": failures}

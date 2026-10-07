@@ -78,7 +78,10 @@ class FixtureProvider:
                 and visible(r, self.principal)]
         if hasattr(args, "start"):
             rows = [r for r in rows if args.start <= datetime.fromisoformat(r["timestamp"]) <= args.end]
-        rows = sorted(rows, key=lambda r: (r["timestamp"], r["id"]))
+        # Recent measurements must survive both the per-metric cap and the message cap.
+        # Oldest-first truncation can hide the incident entirely behind healthy baselines.
+        rows = sorted(rows, key=lambda r: (-datetime.fromisoformat(r["timestamp"]).timestamp(), r["id"])) \
+            if name == "get_service_metrics" else sorted(rows, key=lambda r: (r["timestamp"], r["id"]))
         if name == "get_service_metrics":
             selected, counts = [], {}
             for row in rows:

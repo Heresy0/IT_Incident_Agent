@@ -114,6 +114,7 @@ class ToolResult(Contract):
     evidence: list[Evidence] = Field(default_factory=list)
     truncated: bool = False
     error: ToolError | None = None
+    sample_order: Literal["source_order", "latest_first"] = "source_order"
 
 
 class EvidenceRef(Contract):

@@ -41,9 +41,30 @@
       "code_commit": "d08d982",
       "status": "completed",
       "phase": "m2_initial_acceptance"
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "785cb676-a779-4a50-9ceb-b5f07348cdf2",
+      "code_commit": "34ed7f3",
+      "status": "completed",
+      "phase": "m2_focused_query_retest"
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "df2587ba-4fee-4f2d-aa22-875575da28fb",
+      "code_commit": "34ed7f3",
+      "status": "completed",
+      "phase": "m2_focused_query_retest"
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "bd3698ec-fb00-4575-852e-7b7ff1a959b3",
+      "code_commit": "34ed7f3",
+      "status": "completed",
+      "phase": "m2_focused_query_retest"
     }
   ],
-  "business_quality_status": "development_review_not_passed",
+  "business_quality_status": "development_partial",
   "note": "Three hand-authored development scenarios, not the future 18-case evaluation. No holdout claims.",
   "m2_acceptance_status": "not_passed"
 }

@@ -79,6 +79,22 @@ class IncidentAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["run_summary"]["model_calls"], 3)
         self.assertEqual(result["repairs"], 1)
 
+    def test_truncated_observations_prompt_focus_and_cannot_finish_completed(self):
+        ex = executor("case_003")
+        args = {**window(ex), "metrics": ["db_cpu", "dependency_error_rate", "pool_usage", "pool_wait",
+                                         "request_error_rate", "request_latency", "request_rate"]}
+        observation = ex.execute("get_service_metrics", args)
+        item = next(e for e in observation.evidence if e.payload["metric"] == "pool_usage")
+        rid = next(o.reference_id for o in item.reference_options if o.field_path == "value")
+        model = Responses([selected("get_service_metrics", args), AIMessage(content=json.dumps({
+            "findings": [{"statement": "A pool usage sample", "refs": [{"reference_id": rid}]}]}))])
+        result = investigate(model, ex.provider, P, limits=Limits(model_calls=3, tool_calls=6, reserve_model_calls=0), max_steps=3)
+        self.assertEqual(result["status"], "partial")
+        self.assertEqual(result["observation_coverage"], "limited_by_truncation")
+        self.assertIn("focused query", model.history[1][-1].content)
+        self.assertEqual(result["run_summary"]["model_calls"], 2)
+        self.assertEqual(result["run_summary"]["tool_calls"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

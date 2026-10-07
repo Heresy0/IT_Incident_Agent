@@ -14,6 +14,9 @@ Choose a few focused checks, inspect their results, then use remaining steps for
 discriminating observations. If a restrictive query is empty, reconsider its category or
 optional level/error_code filters within scope. Do not end merely because impact increased.
 Never assume a change category; omit it when the relevant type is not yet known.
+Metric points are returned latest-first. A truncated result is a sample, not the whole
+incident window. Prefer a few relevant metrics; after truncation narrow the query or check
+logs. Never infer normal operation for the whole window from one point or an old baseline.
 You have four observation tools; knowledge lookup is reserved for the future Knowledge role.
 Finish with ONLY JSON matching the supplied output schema. For each finding return refs
 as [{"reference_id":"an exact REF_ ID from the observed evidence.reference_options"}].

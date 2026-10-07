@@ -3,6 +3,8 @@ def render(result):
     lines = ["# Investigation 取证报告", "", f"运行：{result['run_id']}；状态：{result['status']}",
              f"执行模式：{result.get('execution_mode', 'caller_supplied')}；数据源：{result.get('data_source', 'unknown')}",
              "", "当前仅为单角色取证；假设未经 Diagnosis/Reviewer 复核，故障未确认解决。", ""]
+    if result.get("observation_coverage") == "limited_by_truncation":
+        lines.extend(["观测不完整：工具结果发生截断，已保留的采样不能代表完整查询窗口。", ""])
     lines.extend(["工具执行记录（empty 只表示所选过滤条件未匹配，truncated 表示结果不完整）：", ""])
     for event in result["events"]:
         if event["type"] == "tool_result":

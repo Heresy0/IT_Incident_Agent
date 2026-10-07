@@ -85,13 +85,15 @@ class ToolExecutor:
                 for row in rows:
                     # Count the serialized reference catalog too; only returned rows are registered.
                     item = self.prepare_snapshot(name, row)
-                    candidate = ToolResult(status="ok", evidence=[*items, item], truncated=truncated)
+                    candidate = ToolResult(status="ok", evidence=[*items, item], truncated=truncated,
+                        sample_order="latest_first" if name == "get_service_metrics" else "source_order")
                     if len(candidate.model_dump_json()) > 12000:
                         truncated = True
                         break
                     truncated = truncated or row.get("content_truncated", False)
                     items.append(self.register_snapshot(item))
-                return ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated)
+                return ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated,
+                    sample_order="latest_first" if name == "get_service_metrics" else "source_order")
             except ExecutionError as exc:
                 return self.rejected(exc.code)
             except ProviderError as exc:

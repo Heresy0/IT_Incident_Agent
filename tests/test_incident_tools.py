@@ -69,6 +69,33 @@ class IncidentToolsTests(unittest.TestCase):
         self.assertEqual(result.status, "empty")
         self.assertIsNone(result.error)
 
+    def test_truncation_keeps_incident_measurements_instead_of_only_baselines(self):
+        metrics = ["request_error_rate", "request_latency", "dependency_error_rate", "db_cpu",
+                   "pool_usage", "pool_wait", "request_rate"]
+        for case, expected in [("case_001", {"dependency_error_rate": .92}),
+                               ("case_003", {"pool_usage": 1.0, "pool_wait": 1400, "db_cpu": 26})]:
+            ex = executor(case)
+            result = ex.execute("get_service_metrics", {**window(ex), "metrics": metrics})
+            self.assertTrue(result.truncated)
+            self.assertEqual(result.sample_order, "latest_first")
+            self.assertLessEqual(len(result.model_dump_json()), 12000)
+            observed = {e.payload["metric"]: e.payload["value"] for e in result.evidence}
+            for metric, value in expected.items():
+                self.assertEqual(observed[metric], value)
+            self.assertTrue(all(e.payload["timestamp"] == "2026-09-14T10:05:00+00:00" for e in result.evidence))
+            self.assertEqual(ex.context.counts["tool_calls"], 1)
+
+    def test_provider_metric_cap_keeps_latest_sixty_points(self):
+        ex = executor()
+        template = next(r for r in ex.provider._data["metrics"] if r["metric"] == "db_cpu")
+        ex.provider._data["metrics"] = [{**template, "id": f"point-{n:03}", "value": n,
+            "timestamp": (ex.scope.start + timedelta(seconds=n)).isoformat()} for n in range(62)]
+        args = TOOL_ARGS["get_service_metrics"].model_validate_json(json.dumps({**window(ex), "metrics": ["db_cpu"]}))
+        rows, truncated = ex.provider.query("get_service_metrics", args, ex.scope)
+        self.assertTrue(truncated)
+        self.assertEqual(len(rows), 60)
+        self.assertEqual([row["value"] for row in rows], list(range(61, 1, -1)))
+
     def test_logs_changes_and_configuration_redaction(self):
         ex = executor("case_002")
         args = {**window(ex), "category": "configuration", "level": "ERROR", "error_code": "AUTH_AUDIENCE_MISMATCH"}
