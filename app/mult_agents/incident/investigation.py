@@ -12,25 +12,52 @@ from .prompts import SYSTEM
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
 
+class ReferenceValidationError(ValueError):
+    """Only fixed reasons and server-generated paths; never rejected model values."""
+    def __init__(self, reason, path):
+        self.reason, self.path = reason, path
+        super().__init__(reason)
+
+
+def validation_details(exc):
+    if isinstance(exc, ValidationError):
+        fields = {"findings", "statement", "refs", "evidence_id", "field_path", "value", "unit",
+                  "observed_at", "data_version", "quote", "tentative_hypotheses",
+                  "missing_information", "escalation_team"}
+        errors = exc.errors(include_input=False, include_context=False, include_url=False)[:5]
+        return {"reason": "invalid_json" if any(e["type"] == "json_invalid" for e in errors) else "schema_mismatch",
+                "details": [{"path": ".".join(str(p) if isinstance(p, int) or p in fields else "<extra>" for p in e["loc"]),
+                             "type": e["type"]} for e in errors]}
+    if isinstance(exc, ReferenceValidationError):
+        return {"reason": "reference_mismatch", "details": [{"path": exc.path, "type": exc.reason}]}
+    return {"reason": "invalid_output_type", "details": []}
+
+
 def validate_output(output, evidence):
-    for finding in output.findings:
-        for ref in finding.refs:
+    for fi, finding in enumerate(output.findings):
+        for ri, ref in enumerate(finding.refs):
+            path = f"findings.{fi}.refs.{ri}"
             item = evidence.get(ref.evidence_id)
-            if item is None or item.kind != "observation":
-                raise ValueError("unknown/non-current evidence")
+            if item is None:
+                raise ReferenceValidationError("unknown_evidence", path + ".evidence_id")
+            if item.kind != "observation":
+                raise ReferenceValidationError("non_current_evidence", path + ".evidence_id")
             value = item.payload
             for part in ref.field_path.split("."):
                 if not isinstance(value, dict) or part not in value:
-                    raise ValueError("unknown field")
+                    raise ReferenceValidationError("unknown_field", path + ".field_path")
                 value = value[part]
             if type(value) is not type(ref.value) or value != ref.value:
-                raise ValueError("value mismatch")
-            if (ref.unit != item.payload.get("unit", "") or ref.observed_at != item.observed_from
-                    or ref.data_version != item.data_version or ref.quote not in item.excerpt):
-                raise ValueError("unit/time/version/quote mismatch")
+                raise ReferenceValidationError("value_mismatch", path + ".value")
+            for field, matches in (("unit", ref.unit == item.payload.get("unit", "")),
+                    ("observed_at", ref.observed_at == item.observed_from),
+                    ("data_version", ref.data_version == item.data_version),
+                    ("quote", ref.quote in item.excerpt)):
+                if not matches:
+                    raise ReferenceValidationError(field + "_mismatch", path + "." + field)
     teams = {item.payload["team"] for item in evidence.values() if "team" in item.payload}
     if output.escalation_team is not None and output.escalation_team not in teams:
-        raise ValueError("unobserved escalation team")
+        raise ReferenceValidationError("unobserved_team", "escalation_team")
 
 
 def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None):
@@ -58,6 +85,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
         "output_schema": InvestigationOutput.model_json_schema(), "step_limit": max_steps}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
+    failures = []
     with activate(context), context.span("task", "investigation"):
         event("task_created")
         event("task_started")
@@ -71,6 +99,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 if len(str(response.content)) > 12000:
                     stop = "MODEL_OUTPUT_INVALID"
                     break
+                finish = getattr(response, "response_metadata", {}).get("finish_reason")
+                event("model_output", step=step + 1, output_chars=len(str(response.content)),
+                      finish_reason=finish if finish in {"stop", "length", "tool_calls"} else "unknown")
                 messages.append(response)
                 calls = response.tool_calls
                 if getattr(response, "invalid_tool_calls", None) or len(calls) > 6:
@@ -113,11 +144,15 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     output = candidate
                     stop = "FINISHED"
                     break
-                except (ValidationError, ValueError, TypeError):
+                except (ValidationError, ValueError, TypeError) as exc:
+                    failure = {"step": step + 1, **validation_details(exc)}
+                    failures.append(failure)
+                    event("validation_failure", node="investigation", **failure)
                     if repairs == 0 and step < max_steps - 1:
                         repairs += 1
                         event("validation_repair", node="investigation")
-                        messages.append(HumanMessage(content="Output contract/reference check failed. Correct JSON using only exact current evidence fields; omit unverifiable findings. No additional tool calls required."))
+                        messages.append(HumanMessage(content="Output contract/reference check failed. Safe error details: "
+                            + json.dumps(failure) + ". Correct JSON using only exact current evidence fields; omit unverifiable findings. No additional tool calls required."))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
                         break
@@ -137,4 +172,5 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
             "prompt_version": hashlib.sha256((SYSTEM + json.dumps(InvestigationOutput.model_json_schema(), sort_keys=True)).encode()).hexdigest()[:12],
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],
-            "events": events, "run_summary": context.summary(), "repairs": repairs}
+            "events": events, "run_summary": context.summary(), "repairs": repairs,
+            "validation_failures": failures}

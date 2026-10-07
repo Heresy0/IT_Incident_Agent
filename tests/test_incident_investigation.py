@@ -217,6 +217,31 @@ class IncidentInvestigationTests(unittest.TestCase):
                     main(["--live", "--probe"])
                 build.assert_not_called()
 
+    def test_validation_diagnostics_do_not_store_rejected_text_or_extra_keys(self):
+        invalid = AIMessage(content='{"findings":[{"statement":"TEST_SECRET_CANARY","refs":[]}],"TEST_SECRET_EXTRA_KEY":"private"}')
+        result = self.run_model(Responses([invalid, AIMessage(content="{}")]))
+        failure = result["validation_failures"][0]
+        self.assertEqual(failure["reason"], "schema_mismatch")
+        self.assertIn({"path": "findings.0.refs", "type": "too_short"}, failure["details"])
+        self.assertIn({"path": "<extra>", "type": "extra_forbidden"}, failure["details"])
+        self.assertNotIn("TEST_SECRET", json.dumps(result))
+        self.assertEqual(sum(e["type"] == "validation_failure" for e in result["events"]), 1)
+        self.assertEqual(result["run_summary"]["model_calls"], 2)
+
+    def test_reference_repair_receives_fixed_failure_reason(self):
+        ex = executor()
+        e = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        invalid = {"findings": [{"statement": "Owner", "refs": [{"evidence_id": e.evidence_id,
+            "field_path": "team", "value": "TEST_SECRET_CANARY", "unit": "", "observed_at": e.observed_from.isoformat(),
+            "data_version": e.data_version, "quote": e.excerpt}]}]}
+        model = Responses([selected(), AIMessage(content=json.dumps(invalid)), AIMessage(content="{}")])
+        result = self.run_model(model)
+        self.assertEqual(result["validation_failures"], [{"step": 2, "reason": "reference_mismatch", "details": [
+            {"path": "findings.0.refs.0.value", "type": "value_mismatch"}]}])
+        self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
+        self.assertEqual(result["repairs"], 1)
+        self.assertEqual(result["run_summary"]["model_calls"], 3)
+
 
 if __name__ == "__main__":
     unittest.main()
