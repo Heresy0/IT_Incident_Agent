@@ -100,6 +100,7 @@ class Evidence(Contract):
     locator: str
     data_version: str
     hash: str
+    allowed_field_paths: list[str] = Field(default_factory=list, max_length=40)
 
 
 class ToolResult(Contract):
@@ -111,7 +112,7 @@ class ToolResult(Contract):
 
 class EvidenceRef(Contract):
     evidence_id: str
-    field_path: str = Field(max_length=120)
+    field_path: str = Field(max_length=120, description="Dot path relative to this evidence's payload. Choose an exact allowed_field_paths entry, e.g. value, message, team or config_summary.pool_max. Never prepend payload. or the evidence ID.")
     value: Any
     unit: str
     observed_at: datetime

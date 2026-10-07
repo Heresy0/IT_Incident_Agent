@@ -63,6 +63,8 @@ class IncidentToolsTests(unittest.TestCase):
         self.assertEqual(len(result.evidence), 1)
         self.assertEqual(result.evidence[0].payload["metric"], "db_cpu")
         self.assertEqual(result.evidence[0].payload["unit"], "percent")
+        self.assertIn("value", result.evidence[0].allowed_field_paths)
+        self.assertNotIn("payload.value", result.evidence[0].allowed_field_paths)
         result = ex.execute("get_service_metrics", {**window(ex), "metrics": ["db_cpu"], "granularity": "5m"})
         self.assertEqual(result.status, "empty")
         self.assertIsNone(result.error)
@@ -78,6 +80,8 @@ class IncidentToolsTests(unittest.TestCase):
         result = ex.execute("get_recent_changes", {**window(ex), "category": "deployment"})
         self.assertNotIn("TEST_SECRET_CANARY", result.model_dump_json())
         self.assertIn("checkout-preview", result.model_dump_json())
+        self.assertIn("config_summary.auth_audience", result.evidence[0].allowed_field_paths)
+        self.assertNotIn("config_summary.api_key", result.evidence[0].allowed_field_paths)
         self.assertEqual(ex.execute("get_recent_changes", {**window(ex), "category": "scaling"}).status, "empty")
 
     def test_owner_dependency_registration(self):

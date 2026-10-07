@@ -19,6 +19,7 @@ class Responses:
     def __init__(self, responses):
         self.responses = iter(responses)
         self.calls = 0
+        self.history = []
 
     def bind_tools(self, tools):
         self.tools = tools
@@ -26,6 +27,7 @@ class Responses:
 
     def invoke(self, messages):
         self.calls += 1
+        self.history.append(list(messages))
         value = next(self.responses)
         if isinstance(value, Exception):
             raise value
@@ -241,6 +243,28 @@ class IncidentInvestigationTests(unittest.TestCase):
         self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
         self.assertEqual(result["repairs"], 1)
         self.assertEqual(result["run_summary"]["model_calls"], 3)
+
+    def test_unknown_field_repair_uses_actual_paths_and_preserves_strict_validation(self):
+        ex = executor()
+        e = ex.execute("get_service_owner", {"alias": "checkout-api"}).evidence[0]
+        final = {"findings": [{"statement": "Registered owner", "refs": [{"evidence_id": e.evidence_id,
+            "field_path": "payload.team", "value": "Checkout on-call", "unit": "", "observed_at": e.observed_from.isoformat(),
+            "data_version": e.data_version, "quote": e.excerpt}]}]}
+        corrected = copy.deepcopy(final)
+        corrected["findings"][0]["refs"][0]["field_path"] = "team"
+        model = Responses([selected(), AIMessage(content=json.dumps(final)), AIMessage(content=json.dumps(corrected))])
+        result = self.run_model(model)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["validation_failures"][0]["details"], [{"path": "findings.0.refs.0.field_path", "type": "unknown_field"}])
+        hint = model.history[-1][-1].content
+        self.assertIn(e.evidence_id, hint)
+        self.assertIn('"team"', hint)
+        self.assertIn("never prepend payload", hint)
+        self.assertEqual(result["run_summary"]["model_calls"], 3)
+        self.assertEqual(result["run_summary"]["tool_calls"], 1)
+        # An unknown field is still rejected; the program did not silently strip an alias.
+        with self.assertRaises(ValueError):
+            validate_output(InvestigationOutput.model_validate_json(json.dumps(final)), ex.evidence)
 
 
 if __name__ == "__main__":

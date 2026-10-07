@@ -10,6 +10,18 @@ from .providers import ProviderError
 from pydantic import ValidationError
 
 
+def reference_field_paths(payload, prefix=""):
+    """Describe the actual bounded payload; never invent fields or aliases."""
+    paths = []
+    for key, value in payload.items():
+        path = f"{prefix}.{key}" if prefix else key
+        if isinstance(value, dict):
+            paths.extend(reference_field_paths(value, path))
+        else:
+            paths.append(path)
+    return sorted(paths)[:40]
+
+
 class ToolExecutor:
     """One budget entry per real attempt; all boundaries checked before reservation."""
     def __init__(self, provider, principal: Principal, scope, context: RunContext, role="investigation"):
@@ -96,6 +108,7 @@ class ToolExecutor:
                 kind="runbook" if name == "search_runbooks" else "past_incident" if name == "search_incidents" else "observation",
                 provider=self.provider.name, service=row["service"], environment=row["environment"],
                 observed_from=observed, observed_to=observed, retrieved_at=datetime.now(timezone.utc),
-                payload=row, excerpt=encoded, locator=locator, data_version=row["data_version"], hash=digest)
+                payload=row, excerpt=encoded, locator=locator, data_version=row["data_version"], hash=digest,
+                allowed_field_paths=reference_field_paths(row))
         # Preserve the initial snapshot even if a caller mutates its returned nested payload.
         return self.evidence[eid].model_copy(deep=True)

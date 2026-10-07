@@ -151,8 +151,11 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     if repairs == 0 and step < max_steps - 1:
                         repairs += 1
                         event("validation_repair", node="investigation")
+                        reference_fields = {eid: e.allowed_field_paths for eid, e in executor.evidence.items()}
                         messages.append(HumanMessage(content="Output contract/reference check failed. Safe error details: "
-                            + json.dumps(failure) + ". Correct JSON using only exact current evidence fields; omit unverifiable findings. No additional tool calls required."))
+                            + json.dumps(failure) + ". Allowed field_path values by evidence_id: "
+                            + json.dumps(reference_fields) + ". Choose an exact entry; paths are relative to payload, never prepend payload. "
+                            + "Correct JSON using only exact current evidence fields; omit unverifiable findings. No additional tool calls required."))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
                         break
