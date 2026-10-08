@@ -8,6 +8,7 @@ from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, acti
 from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS
 from .tools import ToolExecutor
 from .prompts import SYSTEM
+from .observations import FACT_RENDERING, source_statement, pool_control_gaps, gap_message
 
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
@@ -76,6 +77,8 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
         if legacy:
             output = InvestigationOutput.model_validate_json(content)
             validate_output(output, executor.evidence, allowed_kinds)
+            output = output.model_copy(update={'findings': [f.model_copy(update={
+                'statement': source_statement(f.refs, executor.evidence)}) for f in output.findings]})
             return output, "literal_refs_v1"
     selection = InvestigationSelection.model_validate_json(content)
     findings = []
@@ -94,6 +97,8 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
     output = InvestigationOutput(findings=findings, tentative_hypotheses=list(selection.tentative_hypotheses),
         missing_information=list(selection.missing_information), escalation_team=selection.escalation_team)
     validate_output(output, executor.evidence, allowed_kinds)
+    output = output.model_copy(update={'findings': [f.model_copy(update={
+        'statement': source_statement(f.refs, executor.evidence)}) for f in output.findings]})
     return output, "reference_selection_v2"
 
 
@@ -148,6 +153,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         "objective": objective}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
+    coverage_gaps, gap_feedback_sent = [], False
     output_protocol = "none"
     with activate(context), context.span("task", role):
         if not standalone:
@@ -228,6 +234,17 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     continue
                 try:
                     candidate, output_protocol = output_resolver(response.content, executor, allowed_kinds)
+                    has_hypotheses = bool(getattr(candidate, 'hypotheses', getattr(candidate, 'tentative_hypotheses', [])))
+                    coverage_gaps = pool_control_gaps(executor.evidence) if has_hypotheses else []
+                    if coverage_gaps and not gap_feedback_sent and not terminal and step < max_steps - 1 and context.can_research():
+                        gap_feedback_sent = True
+                        event('observation_gap', missing_controls=coverage_gaps)
+                        messages.append(HumanMessage(content=gap_message(coverage_gaps) +
+                            ' Use remaining research budget for a focused useful check within scope, or finish with this explicit gap and a qualified hypothesis. Do not repeat completed queries.'))
+                        continue
+                    if coverage_gaps:
+                        candidate = candidate.model_copy(update={'missing_information': list(dict.fromkeys([
+                            gap_message(coverage_gaps), *candidate.missing_information]))[:8]})
                     output = candidate
                     stop = "FINISHED"
                     break
@@ -267,13 +284,14 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         # Conservative M2 boundary: a truncated source remains explicitly partial, even
         # when selected fields are valid. M3 can assess whether later checks close that gap.
         incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
-        status = "completed" if stop == "FINISHED" and output.findings and not incomplete else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
+        status = "completed" if stop == "FINISHED" and output.findings and not incomplete and not coverage_gaps else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_id": task_id, "task_type": "incident_" + role, "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
             "prompt_version": hashlib.sha256((system + json.dumps(output_schema.model_json_schema(), sort_keys=True)
                 + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
+            "fact_rendering": FACT_RENDERING, "coverage_gaps": coverage_gaps,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "observation_coverage": "limited_by_truncation" if incomplete else "not_truncated",
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],

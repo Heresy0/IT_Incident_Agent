@@ -14,7 +14,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m unittest tests.test_controls tests.test_identity_memory.IdentityTests tests.test_evaluation -v
-      - run: python -m unittest tests.test_incident_tools tests.test_incident_investigation tests.test_incident_acceptance tests.test_incident_collaboration tests.test_incident_api tests.test_incident_comparison -v
+      - run: python -m unittest tests.test_incident_tools tests.test_incident_investigation tests.test_incident_acceptance tests.test_incident_collaboration tests.test_incident_api tests.test_incident_comparison tests.test_incident_repairs -v
       - run: python scripts/probe_incident_tools.py
       - run: python -m evals.incident.check_fixtures
       - run: python scripts/compare_incident.py --fake

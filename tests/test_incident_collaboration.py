@@ -90,7 +90,10 @@ class IncidentCollaborationTests(unittest.TestCase):
         rework = initial[-2]
         self.assertEqual(len(inv_histories[-2]), 2)
         self.assertEqual(rework["objective"]["challenge"]["challenge_id"], "C1")
-        self.assertEqual(len(rework["objective"]["evidence"]), 1)
+        carried = {e["evidence_id"] for e in rework["objective"]["evidence"]}
+        self.assertTrue(set(rework["objective"]["focused_evidence_ids"]).issubset(carried))
+        self.assertEqual(len(carried), 2)
+        self.assertTrue(rework["objective"]["collection"])
         self.assertNotIn("数据库 CPU 过高导致延迟", inv_histories[-2][1].content)
         review_input = json.loads(models["reviewer"].histories[-1][1].content)["input"]
         self.assertEqual(len(review_input["collection"]), 5)
@@ -201,16 +204,17 @@ class IncidentCollaborationTests(unittest.TestCase):
         self.assertEqual(result["run_summary"]["termination_reason"], "MODEL_OUTPUT_INVALID")
         self.assertEqual(result["output"]["findings"], [])
 
-    def test_dispatch_limit_stops_repeated_distinct_goals_without_unreviewed_facts(self):
+    def test_no_progress_stops_distinct_goals_and_reviews_existing_observations(self):
         models = scripted_models()
         models["supervisor"] = AlterOutput(models["supervisor"], lambda _, __, calls:
             json_response({"action": "dispatch", "reason": "keep collecting", "tasks": [
                 {"role": "investigation", "goal": f"Check round {calls}"}]}))
         result = self.run_case(models=models)
-        self.assertEqual(result["supervisor_decisions"], 4)
-        self.assertEqual(result["run_summary"]["termination_reason"], "SUPERVISOR_LIMIT")
-        self.assertEqual(result["review_status"], "not_performed")
-        self.assertEqual(result["output"]["findings"], [])
+        self.assertEqual(result["supervisor_decisions"], 2)
+        self.assertEqual(result["run_summary"]["termination_reason"], "FINISHED")
+        self.assertEqual(result["review_status"], "passed")
+        self.assertTrue(result["output"]["findings"])
+        self.assertEqual(sum(e["type"] == "collection_stalled" for e in result["events"]), 1)
         self.assertEqual(result["run_summary"]["tool_calls"], 2)
 
     def test_live_cli_requires_explicit_budgets_before_building_models(self):

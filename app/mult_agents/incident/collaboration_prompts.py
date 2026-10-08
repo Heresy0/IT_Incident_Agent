@@ -17,6 +17,11 @@ budget.max_dispatch_tasks is the server-calculated affordable task count after t
 decision. Never exceed it. Start with one symptom-focused Investigation task; split
 only independent checks and add Knowledge when needed. Reuse already collected evidence
 instead of restarting broad checks. If no new task fits and observations exist, diagnose.
+Inspect collection and observation_gaps before dispatching. A rephrased goal is not a new
+check: request a specific missing observation, not another broad investigation of the same
+pool/latency evidence. Empty results only cover their filters; errors are not observations.
+Prefer diagnosis when current observations suffice. Use current db_cpu to discriminate
+pool pressure from database load; history is optional and cannot replace current controls.
 Finish is forbidden before review; request_info/escalate may stop safely with gaps.
 Escalation teams must come from observed owner records. Do not invent teams.
 """
@@ -37,6 +42,11 @@ support_refs, counter_refs and pending_checks; all start tentative. Past inciden
 cannot establish a current cause. Consider healthy controls, exact log levels, units,
 timestamps, missing channels and truncated samples. Actions are recommendations with
 conditions, expected checks, risks and human approval requirements.
+The server renders facts from selected fields; interpret them in hypotheses only. Use the
+actual metric identity and change category, cite both samples for comparisons, and place
+observed healthy controls in counter_refs where applicable. observation_gaps are unchecked
+controls, not proof of health. Do not declare expansion necessary without database headroom,
+connection budgets and applicability checks; keep uncertainty and pending checks explicit.
 After a challenge, revise the draft based on new evidence and the specific objection;
 do not repeat the old claim merely because a past incident resembles this one.
 """
@@ -49,6 +59,11 @@ does not prove a current cause. A valid numeric reference does not prove its int
 If one useful check can distinguish a disputed hypothesis, request_evidence must name
 that H ID, existing evidence IDs, the missing observation, proposed check, distinguishing
 expected_value and target role. Never supply raw tool calls or delegate directly.
+Inspect observation_gaps and available budget. When a disputed cause can be distinguished
+by one affordable read-only check and rework is unused, request that concrete check and
+mark its H target uncertain/not_supported. Do not approve H while requesting evidence for
+that same H. If action applicability needs a change experiment or budget is unavailable,
+retain uncertainty and escalation rather than proposing a read-only tool as remediation.
 The whole run allows only one rework. On the second review, accept supported revisions,
 or state unresolved gaps and a need to escalate. Do not force approval when evidence is weak.
 """

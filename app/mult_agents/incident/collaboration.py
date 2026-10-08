@@ -13,6 +13,7 @@ from .tools import ToolExecutor
 
 
 from .diagnosis import ProtocolError, expand_refs, expand_diagnosis
+from .observations import FACT_RENDERING, pool_control_gaps, gap_message
 
 
 class Collaboration:
@@ -121,7 +122,8 @@ class Collaboration:
                     value[field] = [{"evidence_id": r["evidence_id"], "field_path": r["field_path"]} for r in value[field]]
             targets[key] = value
         return {"targets": targets, "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
-                "prior_challenge": self.pending}
+                "prior_challenge": self.pending, "observation_gaps": pool_control_gaps(self.evidence),
+                "budget": {"can_collect": self.context.can_research(), "remaining_tools": self.context.limits.tool_calls - self.context.counts['tool_calls']}}
 
     def collection(self):
         # Empty/truncated/error results remain visible to the tool-free judging roles.
@@ -142,6 +144,9 @@ class Collaboration:
                     assessment = assessment.model_copy(update={"verdict": "uncertain",
                         "reason": "Program gate: historical knowledge alone cannot establish a current cause."})
                     self.event("review_gate", "reviewer", target_id=assessment.target_id, code="NO_CURRENT_SUPPORT")
+                elif pool_control_gaps(self.evidence):
+                    assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(pool_control_gaps(self.evidence))})
+                    self.event('review_gate', 'reviewer', target_id=assessment.target_id, code='MISSING_HEALTH_CONTROL')
             checked.append(assessment)
         request = review.request_evidence
         if request:
@@ -154,6 +159,7 @@ class Collaboration:
         self.review = None  # A previous revision's review never approves a new draft.
         payload = {"ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                    "evidence": self.sources(), "collection": self.collection(), "challenge": self.pending,
+                   "observation_gaps": pool_control_gaps(self.evidence),
                    "task_results": [{"role": t["role"], "status": t["status"], "missing_information": t["output"]["missing_information"]} for t in self.tasks]}
         self.draft = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
         revision = len(self.drafts) + 1
@@ -219,6 +225,7 @@ class Collaboration:
         follow_up = self.phase == "rework"
         if follow_up:
             self.reworks += 1
+        previous_evidence = set(self.evidence)
         for index, (task, _) in enumerate(selected):
             if not self.context.can_research():
                 self.event("task_deferred", task.role, reason="research_budget_unavailable")
@@ -228,7 +235,18 @@ class Collaboration:
                     return
                 raise ExecutionError("BUDGET_EXCEEDED")
             ids = list(dict.fromkeys([*task.evidence_ids, *(self.pending["evidence_ids"] if follow_up else [])]))[:8]
-            objective = {"goal": task.goal, "evidence": self.sources(ids), "challenge": self.pending if follow_up else None}
+            # Reuse same-role registered snapshots even when the scheduler supplies no IDs.
+            # Selected sources retain priority, while the bounded fallback exposes earlier checks.
+            available = self.executors[task.role].evidence
+            ordered = list(dict.fromkeys([*ids, *reversed(list(available))]))
+            prior, size = [], 0
+            for source in self.sources(ordered):
+                encoded = len(json.dumps(source, ensure_ascii=False))
+                if size + encoded <= min(6000, self.context.limits.input_chars // 4):
+                    prior.append(source); size += encoded
+            objective = {"goal": task.goal, "evidence": prior, "focused_evidence_ids": ids,
+                "collection": self.collection()[-12:], "observation_gaps": pool_control_gaps(self.evidence),
+                "challenge": self.pending if follow_up else None}
             before = dict(self.context.counts)
             available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - before["model_calls"]
             steps = min(4, available_steps - 2 * (len(selected) - index - 1))
@@ -245,6 +263,10 @@ class Collaboration:
             executor = self.executors[task.role]
             self.evidence.update({k: v.model_copy(deep=True) for k, v in executor.evidence.items()})
             self.references.update({k: v.model_copy(deep=True) for k, v in executor.references.items()})
+        if not follow_up and previous_evidence and not set(self.evidence).difference(previous_evidence):
+            self.event('collection_stalled', reason='no_new_evidence', task_ids=[t['task_id'] for t in self.tasks[-len(selected):]])
+            self.diagnose_and_review()
+            return
         if follow_up:
             self.diagnose_and_review()
 
@@ -264,6 +286,7 @@ class Collaboration:
                     decision = self.ask("supervisor", SupervisorDecision, {
                         "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                         "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
+                        "collection": self.collection(), "observation_gaps": pool_control_gaps(self.evidence),
                         "tasks": [{**{k: t[k] for k in ("role", "goal", "status", "evidence_ids")},
                                    "missing_information": t["output"]["missing_information"]} for t in self.tasks],
                         "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
@@ -339,6 +362,7 @@ class Collaboration:
             "used_evidence_ids": sorted(used), "evidence": [e.model_dump(mode="json") for e in self.evidence.values()],
             "task_results": self.tasks, "drafts": self.drafts, "reviews": self.reviews, "negotiation": self.negotiation,
             "events": self.events, "run_summary": self.context.summary(), "repairs": self.repairs["repairs"],
+            "fact_rendering": FACT_RENDERING, "coverage_gaps": pool_control_gaps(self.evidence),
             "rework_rounds": self.reworks, "supervisor_decisions": self.supervisor_calls,
             "scheduling_decisions": self.decisions,
             "prompt_version": self.prompt_version()}

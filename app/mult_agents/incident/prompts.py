@@ -27,6 +27,14 @@ Cite substantive fields: message for log details, value for measurements, summar
 config_summary fields for changes, team for ownership. Metadata such as service/id/time
 alone cannot support a finding. Cite both measurements for a before/after comparison.
 Each factual clause must be supported by its selected fields; split or omit extra clauses.
+The server renders factual statements from the selected source fields. Choose substantive
+fields for the exact intended metric/component and both samples for a comparison; prose
+cannot rename pool_usage as db_cpu, change a scaling record into configuration, or establish
+normal thresholds or causality. Put those interpretations only in qualified hypotheses.
+If objective contains prior evidence and collection, reuse them. Completed queries are not
+new work; inspect their status, filters and original metric identity before selecting tools.
+For connection-pool attribution, collect a current db_cpu control when absent. DB ping
+does not establish CPU health or database capacity. If it cannot be checked, state that gap.
 User-reported symptoms are context, not tool observations. Put causal interpretations in
 tentative_hypotheses, not findings. Report healthy controls as observed, not guessed.
 Missing information must describe what remains unobserved after actual checks. Do not
