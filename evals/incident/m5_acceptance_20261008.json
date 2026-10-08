@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "evaluation_kind": "directed_development_live_comparison",
+  "case_id": "case_003",
+  "data_source": "public_synthetic_fixture",
+  "acceptance_status": "engineering_verified_business_gaps_remaining",
+  "provenance": {
+    "implementation_sha256_prefix": "e89890dc2f37ce2a",
+    "git_commit": "a9d404f348b83f57e48b959527df88dc375fc6fc",
+    "working_tree_dirty": false,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945"
+    }
+  },
+  "configuration": {
+    "cases": [
+      "case_003"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "qwen-turbo",
+    "execution_mode": "live",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "reviewer": {
+    "name": "Codex",
+    "kind": "assistant"
+  },
+  "human_review_status": "pending",
+  "business_scores": {
+    "cause_accuracy": null,
+    "claim_support_rate": null
+  },
+  "note": "Assistant-assisted inspection, not approved human scoring. One development case cannot establish comparative quality or holdout acceptance. Original reports and pending manual template are preserved.",
+  "total_model_calls": 15,
+  "total_tool_calls": 13,
+  "token_usage": {
+    "input_tokens": 73996,
+    "output_tokens": 5667
+  },
+  "estimated_cost": null,
+  "runs": [
+    {
+      "run_id": "8618fcc3-86e3-48fa-8e1c-8d1e2b3ae7db",
+      "workflow": "single",
+      "status": "completed",
+      "business_result": "diagnosis_available",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 0.75,
+      "missing_checks": [
+        "db_cpu"
+      ],
+      "invalid_tool_results": 1,
+      "empty_queries": 2,
+      "truncated_queries": 0,
+      "model_calls": 3,
+      "tool_calls": 5,
+      "duration_ms": 17485,
+      "token_usage": {
+        "input_tokens": 23374,
+        "output_tokens": 1501,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "termination_reason": "FINISHED",
+      "report_sha256": "b902f62010d11eeac426972f8f331b3ae20dd0d906c3661e99d2aa18ac066a3a",
+      "prompt_version": "1c8546fd162b",
+      "reviewer_target_coverage": null,
+      "duplicate_queries_rejected": 1,
+      "budget_queries_rejected": 0,
+      "knowledge_used": false,
+      "history_queried": false,
+      "review_rounds": 0,
+      "rework_rounds": 0,
+      "counter_references": 0,
+      "assistant_assessments": [
+        {
+          "target_id": "F1",
+          "text": "The application's connection pool usage reached 100% (pool_usage=1.0) at 2026-09-14T10:05:00Z, indicating the pool is fully utilized.",
+          "assistant_verdict": "supported",
+          "assistant_reason": "The current pool_usage sample is 1.0 ratio at the cited timestamp."
+        },
+        {
+          "target_id": "F2",
+          "text": "At the same time, the 95th percentile of connection acquisition wait time (pool_wait) increased to 1400ms, suggesting significant connection waiting.",
+          "assistant_verdict": "partly_supported",
+          "assistant_reason": "1400 ms and p95 are present. The increase clause lacks the earlier 2 ms reference in this finding."
+        },
+        {
+          "target_id": "F3",
+          "text": "The request error rate also increased to 0.2 (20%) at 2026-09-14T10:05:00Z, which aligns with the observed connection issues.",
+          "assistant_verdict": "partly_supported",
+          "assistant_reason": "The cited current error rate is 0.2. The increase clause does not cite the earlier 0.01 sample; association does not establish causation."
+        },
+        {
+          "target_id": "F4",
+          "text": "Before the incident, at 2026-09-14T10:00:00Z, the pool usage was at 0.3 (30%) and the 95th percentile of connection wait time was only 2ms, showing a significant increase during the incident.",
+          "assistant_verdict": "partly_supported",
+          "assistant_reason": "The before values 0.3 and 2 ms are correctly cited. The increase comparison needs corresponding after references in this finding."
+        },
+        {
+          "target_id": "F5",
+          "text": "A configuration change was made at 2026-09-14T10:02:00Z, increasing the load from 35 to 100 requests/s while keeping the application pool max at 20, which could be contributing to the connection pool exhaustion.",
+          "assistant_verdict": "unsupported",
+          "assistant_reason": "The source category is scaling and describes load growth, not a configuration change. A possible causal contribution belongs in a hypothesis."
+        },
+        {
+          "target_id": "H1",
+          "text": "The increase in load caused the connection pool to become fully utilized, leading to connection waiting and higher error rates.",
+          "assistant_verdict": "qualified",
+          "assistant_reason": "The candidate family matches application pool exhaustion under load. db_cpu is not observed, counter_refs/pending_checks are empty, and the causal verb is stronger than the current checks warrant."
+        },
+        {
+          "target_id": "A1",
+          "text": "Increase the maximum size of the connection pool to handle the increased load.",
+          "assistant_verdict": "uncertain",
+          "assistant_reason": "Human approval is required, but database headroom, total connection budget and sustained saturation are unverified. The risk text calls expansion necessary without those checks."
+        },
+        {
+          "target_id": "A2",
+          "text": "Optimize the application's database queries or implement caching to reduce the number of database connections required.",
+          "assistant_verdict": "uncertain",
+          "assistant_reason": "Conditional optimization/caching remains a possible investigation direction; query cost and connection hold time have not been measured."
+        }
+      ]
+    },
+    {
+      "run_id": "d0ec07e1-39b3-4d92-9f44-a28df0231cef",
+      "workflow": "multi",
+      "status": "partial",
+      "business_result": "escalation_recommended",
+      "review_status": "needs_information",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "invalid_tool_results": 4,
+      "empty_queries": 3,
+      "truncated_queries": 0,
+      "model_calls": 12,
+      "tool_calls": 8,
+      "duration_ms": 45563,
+      "token_usage": {
+        "input_tokens": 50622,
+        "output_tokens": 4166,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "report_sha256": "b0a9554e2cb57d83acbabf11cb8722f660a5b62ed48fb0bcf3c57ebe3392e67d",
+      "prompt_version": "d9500199054d",
+      "reviewer_target_coverage": true,
+      "duplicate_queries_rejected": 3,
+      "budget_queries_rejected": 1,
+      "knowledge_used": false,
+      "history_queried": false,
+      "review_rounds": 1,
+      "rework_rounds": 0,
+      "counter_references": 0,
+      "assistant_assessments": [
+        {
+          "target_id": "F1",
+          "text": "Database CPU usage is at 26% (mean) and remains within normal limits.",
+          "assistant_verdict": "partly_supported",
+          "assistant_reason": "The current mean CPU value 26 percent is correct. A normal-range threshold is not returned, and the remains clause lacks a before sample reference; prefer the measured mean and its observed window."
+        },
+        {
+          "target_id": "F2",
+          "text": "Connection pool usage is at 1.0 (ratio), indicating the pool is fully utilized.",
+          "assistant_verdict": "supported",
+          "assistant_reason": "Current pool_usage=1.0 is correctly cited."
+        },
+        {
+          "target_id": "F3",
+          "text": "The 95th percentile of connection wait time increased to 1400 ms, significantly higher than the previous 2 ms.",
+          "assistant_verdict": "supported",
+          "assistant_reason": "Both the current 1400 ms and prior 2 ms p95 measurements are cited."
+        },
+        {
+          "target_id": "F4",
+          "text": "A warning log indicates a pool acquire timeout with 45 waiters and a 1500 ms delay.",
+          "assistant_verdict": "supported",
+          "assistant_reason": "The current WARN log includes POOL_ACQUIRE_TIMEOUT, 45 waiters and 1500 ms wait."
+        },
+        {
+          "target_id": "F5",
+          "text": "Load increased from 35 to 100 requests/s, but the application pool max remains at 20.",
+          "assistant_verdict": "supported",
+          "assistant_reason": "The current change summary supports load 35 to 100 requests/s and application pool max 20."
+        },
+        {
+          "target_id": "H1",
+          "text": "The increase in connection waiting may be due to insufficient database connection pool size relative to the increased load.",
+          "assistant_verdict": "qualified",
+          "assistant_reason": "The cautious candidate matches the pool-exhaustion family and retains a pending check. Current healthy controls were collected but not referenced as counter-evidence; application-side versus database-side pool terminology should be explicit."
+        }
+      ],
+      "preliminary_task_reference_error": {
+        "task_number": 2,
+        "finding_number": 4,
+        "statement": "The database CPU remains normal, ruling out database performance as the primary cause of the increased latency.",
+        "evidence_id": "EV_3393b0277b0b7e51593439fe",
+        "actual_metric": "pool_usage",
+        "actual_value": 1.0,
+        "note": "This preliminary claim cannot establish database CPU health. Final Diagnosis independently cites the correct db_cpu=26 source."
+      },
+      "reviewer_blocked_action": {
+        "target_id": "A1",
+        "verdict": "uncertain",
+        "removed_from_final_actions": true
+      }
+    }
+  ]
+}

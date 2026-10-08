@@ -105,5 +105,29 @@
   },
   "holdout_status": "not_authored",
   "future_acceptance_count": 12,
-  "comparison_status": "not_run_live"
+  "comparison_status": "directed_case_003_live_business_gaps_remaining",
+  "m5_comparison_runs": [
+    {
+      "case_id": "case_003",
+      "workflow": "single",
+      "run_id": "8618fcc3-86e3-48fa-8e1c-8d1e2b3ae7db",
+      "code_commit": "a9d404f",
+      "status": "completed",
+      "phase": "m5_directed_live_comparison",
+      "model_calls": 3,
+      "tool_calls": 5,
+      "human_review": "pending"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "multi",
+      "run_id": "d0ec07e1-39b3-4d92-9f44-a28df0231cef",
+      "code_commit": "a9d404f",
+      "status": "partial",
+      "phase": "m5_directed_live_comparison",
+      "model_calls": 12,
+      "tool_calls": 8,
+      "human_review": "pending"
+    }
+  ]
 }

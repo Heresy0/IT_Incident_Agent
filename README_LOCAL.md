@@ -202,4 +202,11 @@ $env:PYTHONIOENCODING='utf-8'
 .\.venv\Scripts\python.exe -m evals.incident.comparison --bundle output/incident-comparison/<目录ID>/bundle.json --output output/incident-comparison/<目录ID>/summary.json
 ```
 
-真实对照必须同时指定 `--live --execute-live --cases ... --model-budget ... --tool-budget ...`，预算范围与 M3 相同，且使用本项目自己的 Key/注册身份；缺少条件在请求前停止。本轮没有执行。后续应先明确一个案例的两次运行预算，再执行并人工核查语义。完整流程、控制结果和未完成项见 [M5 开发集与对照准备](docs/M5-开发集与对照准备.md)。
+真实对照必须同时指定 `--live --execute-live --cases ... --model-budget ... --tool-budget ...`，预算范围与 M3 相同，且使用本项目自己的 Key/注册身份；缺少条件在请求前停止。Key 写在本项目 `.env.local`；若尚未设置 INCIDENT_BEARER_TOKEN，可将已有本地演示令牌放入当前终端环境，以下只赋值、不显示令牌，也不重新生成身份：
+
+```powershell
+$incidentCredentials = Get-Content -Raw .demo-credentials.local.json | ConvertFrom-Json
+$env:INCIDENT_BEARER_TOKEN = $incidentCredentials.principals[0].token
+```
+
+case_003 已按每运行 16 模型/8 工具完成一次真实单/多对照；机械检查通过，业务语义仍有缺口，没有自动扩展或重跑。后续付费执行先明确运行清单与预算。完整流程、控制结果见 [M5 开发集与对照准备](docs/M5-开发集与对照准备.md)，最新用量和验收缺口见 [M5 真实对照验收记录](docs/M5-真实对照验收记录.md)。
