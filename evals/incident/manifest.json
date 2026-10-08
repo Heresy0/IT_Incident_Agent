@@ -105,7 +105,7 @@
   },
   "holdout_status": "not_authored",
   "future_acceptance_count": 12,
-  "comparison_status": "directed_case_003_input_logs_verified_owner_selection_gap_remaining",
+  "comparison_status": "owner_selection_verified_log_coverage_order_and_rework_execution_gaps_remaining",
   "m5_comparison_runs": [
     {
       "case_id": "case_003",
@@ -171,6 +171,28 @@
       "phase": "m5_directed_live_retest2",
       "model_calls": 12,
       "tool_calls": 7,
+      "human_review": "pending"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "single",
+      "run_id": "16688707-da73-4469-a0ff-647fbd5b6d72",
+      "code_commit": "2003d7c",
+      "status": "partial",
+      "phase": "m5_directed_live_owner_retest",
+      "model_calls": 6,
+      "tool_calls": 6,
+      "human_review": "pending"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "multi",
+      "run_id": "3c1b47cd-fa07-4d3e-a720-2212c84535fd",
+      "code_commit": "2003d7c",
+      "status": "partial",
+      "phase": "m5_directed_live_owner_retest",
+      "model_calls": 13,
+      "tool_calls": 4,
       "human_review": "pending"
     }
   ]
