@@ -105,7 +105,7 @@
   },
   "holdout_status": "not_authored",
   "future_acceptance_count": 12,
-  "comparison_status": "directed_case_003_live_business_gaps_remaining",
+  "comparison_status": "directed_case_003_retest_input_budget_and_readonly_rework_gaps_remaining",
   "m5_comparison_runs": [
     {
       "case_id": "case_003",
@@ -127,6 +127,28 @@
       "phase": "m5_directed_live_comparison",
       "model_calls": 12,
       "tool_calls": 8,
+      "human_review": "pending"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "single",
+      "run_id": "a464ad06-22eb-488d-9611-391b08d7f145",
+      "code_commit": "b113244",
+      "status": "partial",
+      "phase": "m5_directed_live_retest",
+      "model_calls": 2,
+      "tool_calls": 5,
+      "human_review": "pending"
+    },
+    {
+      "case_id": "case_003",
+      "workflow": "multi",
+      "run_id": "596ecc19-2137-4763-85a0-b534385cf272",
+      "code_commit": "b113244",
+      "status": "partial",
+      "phase": "m5_directed_live_retest",
+      "model_calls": 12,
+      "tool_calls": 5,
       "human_review": "pending"
     }
   ]
