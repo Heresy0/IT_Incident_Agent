@@ -1,3 +1,5 @@
+> 历史研究底座说明：该链路已退出当前项目运行与CI，源码在 archive/research 原样归档。本文保留供追溯，旧启动命令不再适用于当前系统。
+
 # Deep Research
 
 基于 LangGraph、FastAPI 和 Vue 的多 Agent 研究助手，支持问题拆解、网络搜索、本地知识库检索、证据分析和 Markdown 报告生成。

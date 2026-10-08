@@ -1,0 +1,266 @@
+{
+  "baseline_commit": "471f67c",
+  "mode": "historical_reference_only",
+  "items": [
+    {
+      "original_path": "app/backend/__init__.py",
+      "archive_path": "app/backend/__init__.py",
+      "sha256": "451a700910ea7aaf2d3b026dbd064db2bf14efce9917485362c8116f774e7236"
+    },
+    {
+      "original_path": "app/backend/router/__init__.py",
+      "archive_path": "app/backend/router/__init__.py",
+      "sha256": "29efffdd2a3163e33e5ec716fc262170f61123baa687e26aab3ebf76413d0611"
+    },
+    {
+      "original_path": "app/backend/router/memory_router.py",
+      "archive_path": "app/backend/router/memory_router.py",
+      "sha256": "79bb744633dca30ce4b23900329d1cc28a3641dbddd4d8781b3be1b6f9a79543"
+    },
+    {
+      "original_path": "app/backend/router/research_router.py",
+      "archive_path": "app/backend/router/research_router.py",
+      "sha256": "89c0bfff2dce9ddcb4822e95242dd9c7a920e0318547f0df986586a654dd7321"
+    },
+    {
+      "original_path": "app/backend/schemas/__init__.py",
+      "archive_path": "app/backend/schemas/__init__.py",
+      "sha256": "84e69ac288c7540171f7f0218f6eb3460dce6c1f06e08c480e564c4ee38f1c3c"
+    },
+    {
+      "original_path": "app/backend/schemas/research.py",
+      "archive_path": "app/backend/schemas/research.py",
+      "sha256": "b73d723e27af2489bc57bdaa0afae048f6d8702816152d6d779c8ab3d36c2022"
+    },
+    {
+      "original_path": "app/mult_agents/__init__.py",
+      "archive_path": "app/mult_agents/__init__.py",
+      "sha256": "6994bea16f5b2fb8980f6bf230176427229cca585f87e69cbbaf28401ad5b207"
+    },
+    {
+      "original_path": "app/mult_agents/config.py",
+      "archive_path": "app/mult_agents/config.py",
+      "sha256": "d41fdc208bbcdff38a220c4c4bc2644be675db20e0d2c02858879a9a04ac0929"
+    },
+    {
+      "original_path": "app/mult_agents/graph.py",
+      "archive_path": "app/mult_agents/graph.py",
+      "sha256": "827e94845059f1dbbe957fb15f9fce4e0550fcd72287c6f52931884a0cae870b"
+    },
+    {
+      "original_path": "app/mult_agents/harness/__init__.py",
+      "archive_path": "app/mult_agents/harness/__init__.py",
+      "sha256": "566330d71c32b01baef6819c968fda648c0a70cb744b27b5c95c722755d1cd00"
+    },
+    {
+      "original_path": "app/mult_agents/harness/coverage.py",
+      "archive_path": "app/mult_agents/harness/coverage.py",
+      "sha256": "5d3cd3dd5fa81c69f955ed3e42dba123fa0ea6dc9c2135160a3362ccdd09011b"
+    },
+    {
+      "original_path": "app/mult_agents/harness/embeddings.py",
+      "archive_path": "app/mult_agents/harness/embeddings.py",
+      "sha256": "b42a2cf82f6f9a505a7a91d2d51c35af5d131d9f0285e84d23ed39b5c430d7c4"
+    },
+    {
+      "original_path": "app/mult_agents/harness/official_sources.json",
+      "archive_path": "app/mult_agents/harness/official_sources.json",
+      "sha256": "641f965009bfd62189c24b6f622fda5cd5ba8fcd44e9f4006bba0d091dbd53e7"
+    },
+    {
+      "original_path": "app/mult_agents/harness/source_policy.py",
+      "archive_path": "app/mult_agents/harness/source_policy.py",
+      "sha256": "239954d62d797cb9e73a6712f775b3cfb044ccd111e3a4e233bdacaf873fc243"
+    },
+    {
+      "original_path": "app/mult_agents/harness/validation.py",
+      "archive_path": "app/mult_agents/harness/validation.py",
+      "sha256": "cb6f6f1546b8a9b75907be77e12331d55b67446d8e2fe93512b3445c999f3ed5"
+    },
+    {
+      "original_path": "app/mult_agents/harness/version.py",
+      "archive_path": "app/mult_agents/harness/version.py",
+      "sha256": "bc330725a928ddef50e3eeffb5e0feabfaf104e626e4db9ba4983439519dbe64"
+    },
+    {
+      "original_path": "app/mult_agents/incident/__init__.py",
+      "archive_path": "app/mult_agents/incident/__init__.py",
+      "sha256": "cdfb8db48ba52125a089cd94195df96726396cf9f4ffe6bb09d8756d7ff6e2f4"
+    },
+    {
+      "original_path": "app/mult_agents/main.py",
+      "archive_path": "app/mult_agents/main.py",
+      "sha256": "c19243c6ac1d420609fe6f7be9fbfb7e4f6db80eb9bdc3e14b6c490699079abd"
+    },
+    {
+      "original_path": "app/mult_agents/memory/__init__.py",
+      "archive_path": "app/mult_agents/memory/__init__.py",
+      "sha256": "885f106e88640c4dc6297421aa26c50c0bcaeb2e225922f775d6157be8b28b11"
+    },
+    {
+      "original_path": "app/mult_agents/memory/base.py",
+      "archive_path": "app/mult_agents/memory/base.py",
+      "sha256": "2c21ad11002df3c2ac2fdfc3eed05d9a5f6bf565c12ff9437d8136cab9097c2c"
+    },
+    {
+      "original_path": "app/mult_agents/memory/long_term.py",
+      "archive_path": "app/mult_agents/memory/long_term.py",
+      "sha256": "72337e871fa09faa1b143c60d042f7f84b39f17ba75a0b3878cac8163a7c18a7"
+    },
+    {
+      "original_path": "app/mult_agents/memory/manager.py",
+      "archive_path": "app/mult_agents/memory/manager.py",
+      "sha256": "2c7f23813b99a9cd72679b6301cca2306310066e8640a84700081ee41f396f18"
+    },
+    {
+      "original_path": "app/mult_agents/memory/scoped.py",
+      "archive_path": "app/mult_agents/memory/scoped.py",
+      "sha256": "374ef29d0ba613f681319cf25646f5d711849bba8d1e61196f18f001bf90e7d9"
+    },
+    {
+      "original_path": "app/mult_agents/memory/short_term.py",
+      "archive_path": "app/mult_agents/memory/short_term.py",
+      "sha256": "ef61a3eae39f028e51279f1100d44ad1c6aeed95dac2cc0322960efbc84aa764"
+    },
+    {
+      "original_path": "app/mult_agents/memory/utils.py",
+      "archive_path": "app/mult_agents/memory/utils.py",
+      "sha256": "f7ee831b88d73305c3ece1d5176a44e38d5c35f920e0ed6169c7ad27b4818de8"
+    },
+    {
+      "original_path": "app/mult_agents/nodes.py",
+      "archive_path": "app/mult_agents/nodes.py",
+      "sha256": "4b132a2c6781f5b9f9f5fab3fe155012b32f53479e2ea653921d0edca71bc1bf"
+    },
+    {
+      "original_path": "app/mult_agents/prompts.py",
+      "archive_path": "app/mult_agents/prompts.py",
+      "sha256": "9f6c32facf49cba20e23cf8a62a55a1c7c1be9031a565491a56e2bee11b4d317"
+    },
+    {
+      "original_path": "app/mult_agents/rag/__init__.py",
+      "archive_path": "app/mult_agents/rag/__init__.py",
+      "sha256": "6bdf66b5bf2a44e658bea2ee86695ab150a06e600bf67cd5cce245ad54962c61"
+    },
+    {
+      "original_path": "app/mult_agents/rag/core.py",
+      "archive_path": "app/mult_agents/rag/core.py",
+      "sha256": "068086615c253ef67a9ef5e72e3b656f108535d092031562f265548b19d49d09"
+    },
+    {
+      "original_path": "app/mult_agents/rag/ingest.py",
+      "archive_path": "app/mult_agents/rag/ingest.py",
+      "sha256": "ea623203dae6063135743bb5f71013572cb5ecf7e5cbc4bf683caa76d3b3a4f9"
+    },
+    {
+      "original_path": "app/mult_agents/rag/scope.py",
+      "archive_path": "app/mult_agents/rag/scope.py",
+      "sha256": "e82e4ce2893889b58966f7ac5f65faa89910949ff0b9acb29df675ca21abfb03"
+    },
+    {
+      "original_path": "app/mult_agents/rag_core.py",
+      "archive_path": "app/mult_agents/rag_core.py",
+      "sha256": "3ef904a4244840810dfd56252ffe6ea4b3d5326a89deb41cb5e0dedea40ce9ed"
+    },
+    {
+      "original_path": "app/mult_agents/state.py",
+      "archive_path": "app/mult_agents/state.py",
+      "sha256": "80ac2ec975e31cf06bc22c3b4a1e4571b86ccf4dd0e72bec3eb3b2dcfd2d1be4"
+    },
+    {
+      "original_path": "app/mult_agents/tools.py",
+      "archive_path": "app/mult_agents/tools.py",
+      "sha256": "81405c9c5fca90b9eb2dd79011f1cc35b462d77e6ca3bfbfc89b395280a30f6a"
+    },
+    {
+      "original_path": "app/test/bocha_api_test.py",
+      "archive_path": "app/test/bocha_api_test.py",
+      "sha256": "86c59ef3d64e2abc3a8ef0a0c799bf47f24eb4b8c920c3b67c41195ec6303e6b"
+    },
+    {
+      "original_path": "evals/cases.json",
+      "archive_path": "evals/cases.json",
+      "sha256": "c4bfad55448b2f7978eff63af1fc2db3447fea2ae1444dbd571f8660ed9268fe"
+    },
+    {
+      "original_path": "evals/fixtures/solutions.md",
+      "archive_path": "evals/fixtures/solutions.md",
+      "sha256": "c824861eab48bdb406496f750491030126dfd0d95d0408da2944a028afff435d"
+    },
+    {
+      "original_path": "evals/metrics.py",
+      "archive_path": "evals/metrics.py",
+      "sha256": "3e4023fe4372d5170411626321df093b064eae8f3fe9526624506d84f55c6f53"
+    },
+    {
+      "original_path": "evals/report.py",
+      "archive_path": "evals/report.py",
+      "sha256": "930b76f34c6981750b1bdd0f4e36fd4dee2620d29067178897d38a1f168bae34"
+    },
+    {
+      "original_path": "evals/retrieval.py",
+      "archive_path": "evals/retrieval.py",
+      "sha256": "037df110adfd04d68bad79a25bbbbb6da7615ef17b1088ec0d82975a26f550ad"
+    },
+    {
+      "original_path": "evals/run.py",
+      "archive_path": "evals/run.py",
+      "sha256": "e9fe5ec8ff8b1c02b6929161d543ee291dbb2f69a5536a2015874de33d2ba391"
+    },
+    {
+      "original_path": "evals/scoring.py",
+      "archive_path": "evals/scoring.py",
+      "sha256": "5101bda403ea0930cdec91fc29854427bd3118acfebb57d38ca22f3951fbd599"
+    },
+    {
+      "original_path": "local/embedEtcd.yaml",
+      "archive_path": "local/embedEtcd.yaml",
+      "sha256": "c171dc65ac077feb014c10f57d616ff3d7a5528ecd35530d3b3b2694dd8ff084"
+    },
+    {
+      "original_path": "scripts/cleanup_memory.py",
+      "archive_path": "scripts/cleanup_memory.py",
+      "sha256": "a80a25ec7896e6d337cb46f6e66d6241ff37bfd786cd122a47eb89dc09b4b477"
+    },
+    {
+      "original_path": "scripts/demo_research.py",
+      "archive_path": "scripts/demo_research.py",
+      "sha256": "668f71dc5d309cde6c0431ce093a2491a4e7a6dc105c982021753f23019dfdde"
+    },
+    {
+      "original_path": "tests/support.py",
+      "archive_path": "tests/support.py",
+      "sha256": "613d10d90582b8bd788a78c0a82d6ed6fa9206bbf103b5245d3ddeffae51a0da"
+    },
+    {
+      "original_path": "tests/test_controls.py",
+      "archive_path": "tests/test_controls.py",
+      "sha256": "5ba60a467c3cfe93944eae6a4bec7ca10ac4c84ae23ea9a7dffebfea88b1676b"
+    },
+    {
+      "original_path": "tests/test_evaluation.py",
+      "archive_path": "tests/test_evaluation.py",
+      "sha256": "655313dcdf79ece9b2eed9328e4118b6d89d3c4714bd15cc3491740c79b24510"
+    },
+    {
+      "original_path": "tests/test_identity_memory.py",
+      "archive_path": "tests/test_identity_memory.py",
+      "sha256": "497f698ad9737f07cc0830d6d69dfd6a8d210e763d66b1f06d1fc08541871bf6"
+    },
+    {
+      "original_path": "tests/test_postgres.py",
+      "archive_path": "tests/test_postgres.py",
+      "sha256": "75bf965eac68fbee318573f971632a87c23f2d516f1f0be71062a65a3f84dd30"
+    },
+    {
+      "original_path": "requirements.txt",
+      "archive_path": "requirements-original.txt",
+      "sha256": "7a47d8268b8784f76d72a7636eeb05ffc47cd68247585cb89efb64d67e3b8f8d"
+    },
+    {
+      "original_path": "scripts/cleanup_runs.py",
+      "archive_path": "scripts/cleanup_runs.py",
+      "sha256": "ff2fcce9e90e2a5b8c67e869eee6f63055c029482a9ba92308461b9f4d897ff1"
+    }
+  ]
+}

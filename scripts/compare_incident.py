@@ -12,14 +12,14 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'app'))
 sys.path.insert(0, str(ROOT))
-from backend.auth import Principal
-from mult_agents.harness.runtime import Limits, RunContext, ExecutionError
-from mult_agents.incident.collaboration import Collaboration
-from mult_agents.incident.collaboration_contracts import DiagnosisDraft
-from mult_agents.incident.providers import FixtureProvider, ProviderError
-from mult_agents.incident.single import single_agent
-from mult_agents.incident.tools import ToolExecutor
-from evals.run import implementation_version, write_json
+from api.auth import Principal
+from runtime.context import Limits, RunContext, ExecutionError
+from workflow.coordinator import Collaboration
+from agents.contracts import DiagnosisDraft
+from providers.fixtures import FixtureProvider, ProviderError
+from agents.single import single_agent
+from tools.executor import ToolExecutor
+from evals.common import implementation_version, write_json
 from evals.incident.comparison import evaluate, review_entry
 
 
@@ -104,7 +104,7 @@ def main(argv=None):
         from dotenv import load_dotenv
         from fastapi import HTTPException
         from fastapi.security import HTTPAuthorizationCredentials
-        from backend.auth import get_current_principal
+        from api.auth import get_current_principal
         load_dotenv(ROOT / '.env.local', override=False)
         key, token = os.getenv('DASHSCOPE_API_KEY', ''), os.getenv('INCIDENT_BEARER_TOKEN', '')
         if not key or key == 'test-only' or not token:
@@ -115,10 +115,10 @@ def main(argv=None):
                 FixtureProvider(cid, principal)  # Preflight every scope before any model invocation.
         except (HTTPException, ProviderError):
             parser.error('Selected cases unavailable for this identity; no request sent')
-        from mult_agents.incident.agents import build_model, build_roles
+        from agents.models import build_model, build_roles
         factory = lambda flow: (build_model if flow == 'single' else build_roles)(key, args.model)
     else:
-        from mult_agents.incident.collaboration_fake import ScriptedSingle, scripted_models
+        from agents.scripted import ScriptedSingle, scripted_models
         principal = Principal('synthetic_demo', 'cli_reader')
         factory = lambda flow: ScriptedSingle() if flow == 'single' else scripted_models()
     directory = args.output / str(uuid4())

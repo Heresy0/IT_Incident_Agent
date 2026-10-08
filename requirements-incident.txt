@@ -1,13 +1,2 @@
-# Existing locked versions constrain the IT runtime; research extras stay optional.
--c requirements.txt
-fastapi
-uvicorn
-pydantic-settings
-python-dotenv
-langchain-core
-langchain-community
-langgraph
-dashscope
-psycopg[binary]
-psycopg-pool
-httpx
+# Compatibility entry; requirements.txt is now IT-only.
+-r requirements.txt

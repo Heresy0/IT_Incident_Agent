@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-08",
+  "stage": "research_retirement_and_module_structure",
+  "paid_calls": 0,
+  "frontend_modified": false,
+  "database_migrated": false,
+  "config_json_modified": false,
+  "regression": {
+    "unique_tests": 127,
+    "passed": 122,
+    "skipped_postgres_without_test_dsn": 5,
+    "execution": "one complete 123-test run plus targeted checks in changed directories"
+  },
+  "archive": {
+    "files_in_integrity_manifest": 52,
+    "baseline_commit": "471f67c",
+    "content_unchanged": true,
+    "runtime_enabled": false
+  },
+  "dependencies": {
+    "pinned_runtime_packages": 67,
+    "pip_check": "passed",
+    "clean_environment_install": "not_run"
+  },
+  "comparison_directory": "output/incident-structure-cleanup/170a40ae-9dde-4c0d-8844-548030a3db68",
+  "quality_status": "excluded_scripted",
+  "provenance": {
+    "implementation_sha256_prefix": "0887977a086af361",
+    "git_commit": "471f67ce0cc38de95448f5203759940bd73f92cf",
+    "working_tree_dirty": true,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_001": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+      "case_002": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+      "case_004": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+      "case_005": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+      "case_006": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa"
+    }
+  },
+  "configuration": {
+    "cases": [
+      "case_001",
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_005",
+      "case_006"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "scripted",
+    "execution_mode": "scripted_control_only",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "workflows": {
+    "single": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 13,
+      "tool_calls_total": 37,
+      "duration_ms_mean": 18.333333333333332,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    },
+    "multi": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 44,
+      "tool_calls_total": 21,
+      "duration_ms_mean": 200.5,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    }
+  },
+  "checks": {
+    "tool_protocol_probe": "passed",
+    "fixture_integrity": "passed",
+    "compile": "passed",
+    "compose_config": "passed",
+    "retired_import_boundary": "passed",
+    "archive_hash_integrity": "passed"
+  },
+  "remaining": [
+    "real_observation_provider",
+    "explicit_live_quality_validation",
+    "frontend_cleanup",
+    "isolated_postgres_validation"
+  ]
+}

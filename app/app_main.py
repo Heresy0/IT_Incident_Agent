@@ -6,13 +6,13 @@ from fastapi import FastAPI, Response, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from backend.config import AppSettings
-from backend.router import health_router
-from backend.service import get_workflow_service
-from backend.auth import router as auth_router, get_current_principal, Principal
-from backend.router.incident_router import router as incident_router
-from backend.router.run_router import router as run_router, get_run, run_events
-from mult_agents.harness.telemetry import configure_logging, METRICS
+from config import AppSettings
+from api.health import router as health_router
+from workflow.dependencies import get_workflow_service
+from api.auth import router as auth_router, get_current_principal, Principal
+from api.incidents import router as incident_router
+from api.runs import router as run_router, get_run, run_events
+from observability.telemetry import configure_logging, METRICS
 
 
 logging.basicConfig(
@@ -20,8 +20,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s",
 )
 configure_logging()
-logging.getLogger("mult_agents").setLevel(logging.INFO)
-logging.getLogger("backend").setLevel(logging.INFO)
+logging.getLogger("incident").setLevel(logging.INFO)
 
 
 def create_app(settings=None) -> FastAPI:
@@ -46,15 +45,9 @@ def create_app(settings=None) -> FastAPI:
     app.include_router(health_router)
     app.include_router(run_router)
     app.include_router(auth_router)
-    if settings.enable_legacy_research:
-        from backend.router.research_router import router as research_router
-        from backend.router.memory_router import router as memory_router
-        app.include_router(research_router)
-        app.include_router(memory_router)
-    else:
-        # Existing UI links and old bookmarked runs continue to work.
-        app.add_api_route('/api/v1/research/runs/{run_id}', get_run, methods=['GET'], include_in_schema=False)
-        app.add_api_route('/api/v1/research/runs/{run_id}/events', run_events, methods=['GET'], include_in_schema=False)
+    # Temporary read-only URL aliases for the current front end and old bookmarks.
+    app.add_api_route('/api/v1/research/runs/{run_id}', get_run, methods=['GET'], include_in_schema=False)
+    app.add_api_route('/api/v1/research/runs/{run_id}/events', run_events, methods=['GET'], include_in_schema=False)
     app.include_router(incident_router)
     @app.get("/metrics", include_in_schema=False)
     def metrics(principal: Principal = Depends(get_current_principal)):

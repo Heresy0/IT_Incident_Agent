@@ -7,8 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from mult_agents.incident.contracts import Evidence, InvestigationOutput
-from mult_agents.incident.investigation import validate_output
+from evidence.contracts import Evidence, InvestigationOutput
+from agents.investigation import validate_output
 
 ROOT = Path(__file__).resolve().parents[2]
 

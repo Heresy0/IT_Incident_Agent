@@ -4,9 +4,9 @@ import hashlib
 import json
 from pathlib import Path
 from .acceptance import assess, ROOT
-from mult_agents.incident.contracts import Evidence, Finding, InvestigationOutput
-from mult_agents.incident.collaboration_contracts import DiagnosisDraft
-from mult_agents.incident.investigation import validate_output
+from evidence.contracts import Evidence, Finding, InvestigationOutput
+from agents.contracts import DiagnosisDraft
+from agents.investigation import validate_output
 
 SCORER_VERSION = "incident-comparison-v1"
 

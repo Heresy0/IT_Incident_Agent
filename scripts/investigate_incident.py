@@ -6,11 +6,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from backend.auth import Principal, get_current_principal
-from mult_agents.harness.runtime import Limits
-from mult_agents.incident.providers import FixtureProvider, ProviderError
-from mult_agents.incident.investigation import investigate, INCIDENT_LIMITS
-from mult_agents.incident.render import render
+from api.auth import Principal, get_current_principal
+from runtime.context import Limits
+from providers.fixtures import FixtureProvider, ProviderError
+from agents.investigation import investigate, INCIDENT_LIMITS
+from evidence.render import render
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,7 +50,7 @@ def main(argv=None):
             principal = get_current_principal(HTTPAuthorizationCredentials(scheme="Bearer", credentials=token))
         except HTTPException:
             parser.error("Local bearer identity unavailable/invalid; no request sent.")
-        from mult_agents.incident.agents import build_model, build_roles
+        from agents.models import build_model, build_roles
         factory = build_roles if args.workflow == "collaboration" else build_model
         model = factory(key, os.getenv("MODEL", "qwen-turbo"))
         # Keep M2's small allowance; M3 uses only explicitly specified bounded allowances.
@@ -59,20 +59,20 @@ def main(argv=None):
         steps = 3
     else:
         if args.workflow == "collaboration":
-            from mult_agents.incident.collaboration_fake import scripted_models
+            from agents.scripted import scripted_models
             model = scripted_models()
         else:
             if args.case in {'case_004', 'case_005', 'case_006'}:
-                from mult_agents.incident.collaboration_fake import ScriptedRole
+                from agents.scripted import ScriptedRole
                 model = ScriptedRole('investigation')
             else:
-                from mult_agents.incident.fake import ScriptedModel
+                from agents.scripted_investigation import ScriptedModel
                 model = ScriptedModel()
         principal, limits, steps = Principal("synthetic_demo", "cli_reader"), INCIDENT_LIMITS, 4
     try:
         provider = FixtureProvider(args.case, principal)
         if args.workflow == "collaboration":
-            from mult_agents.incident.collaboration import collaborate
+            from workflow.coordinator import collaborate
             result = collaborate(model, provider, principal, limits=limits)
         else:
             result = investigate(model, provider, principal, limits=limits, max_steps=steps)

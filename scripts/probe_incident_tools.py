@@ -1,7 +1,7 @@
 """Free protocol/counter probe; never makes network requests."""
 import json
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from mult_agents.harness.runtime import Limits, RunContext, activate, invoke_chat_model
+from runtime.context import Limits, RunContext, activate, invoke_chat_model
 
 
 class ProbeModel:
