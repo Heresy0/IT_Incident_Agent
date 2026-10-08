@@ -59,6 +59,12 @@ does not prove a current cause. A valid numeric reference does not prove its int
 If one useful check can distinguish a disputed hypothesis, request_evidence must name
 that H ID, existing evidence IDs, the missing observation, proposed check, distinguishing
 expected_value and target role. Never supply raw tool calls or delegate directly.
+request_evidence.checks must contain one or two concrete tool/args entries from
+read_only_tools[target_role], within check_scope. These are proposed scoped observations,
+not immediate tool calls. Do not request already-completed identical queries. A human
+capacity/configuration change cannot be represented by these checks; leave it in
+missing_information and omit request_evidence. Free-text proposed_check never authorizes
+an executable operation. ERROR-only empty logs need an unfiltered-level scoped log check.
 Inspect observation_gaps and available budget. When a disputed cause can be distinguished
 by one affordable read-only check and rework is unused, request that concrete check and
 mark its H target uncertain/not_supported. Do not approve H while requesting evidence for

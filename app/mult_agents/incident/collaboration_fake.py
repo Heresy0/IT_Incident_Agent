@@ -184,10 +184,14 @@ class ScriptedRole:
         result = {"assessments": assessments}
         if weak:
             db = metrics["db_cpu"]
+            scope = payload['check_scope']
+            window = {k: scope[k] for k in ('start', 'end')}
             result["request_evidence"] = {"hypothesis_id": "H1", "evidence_ids": [db["evidence_id"]],
                 "missing_observation": "缺少当前应用连接池使用率、等待和获取连接日志",
                 "proposed_check": "检查 pool_usage、pool_wait、db_cpu，并查询 resource 日志，保留 WARN/INFO",
-                "expected_value": "区分数据库负载异常与应用池耗尽", "target_role": "investigation"}
+                "expected_value": "区分数据库负载异常与应用池耗尽", "target_role": "investigation",
+                'checks': [{'tool': 'get_service_metrics', 'args': {**window, 'metrics': ['pool_usage', 'pool_wait', 'db_cpu']}},
+                           {'tool': 'get_service_logs', 'args': {**window, 'category': 'resource'}}]}
         return result
 
 

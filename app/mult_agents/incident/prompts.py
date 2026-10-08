@@ -13,6 +13,10 @@ These are investigation heuristics, not answers: let actual results decide the n
 Choose a few focused checks, inspect their results, then use remaining steps for missing
 discriminating observations. If a restrictive query is empty, reconsider its category or
 optional level/error_code filters within scope. Do not end merely because impact increased.
+An empty ERROR-only log query leaves WARN/INFO unchecked. Use a focused query for the same
+category/window with level omitted; otherwise retain this explicit coverage gap.
+On rework, objective.approved_checks is the only permitted set of tool/argument choices.
+Do not perform any human change or replace these checks with another operation.
 Never assume a change category; omit it when the relevant type is not yet known.
 Metric points are returned latest-first. A truncated result is a sample, not the whole
 incident window. Prefer a few relevant metrics; after truncation narrow the query or check
@@ -27,6 +31,9 @@ Cite substantive fields: message for log details, value for measurements, summar
 config_summary fields for changes, team for ownership. Metadata such as service/id/time
 alone cannot support a finding. Cite both measurements for a before/after comparison.
 Each factual clause must be supported by its selected fields; split or omit extra clauses.
+Tool messages contain compact source fields and substantive reference_options. Full hashes,
+excerpts and metadata catalogs are retained by the server. A compacted conversation reuses
+registered evidence; omitted rows do not establish absence or health.
 The server renders factual statements from the selected source fields. Choose substantive
 fields for the exact intended metric/component and both samples for a comparison; prose
 cannot rename pool_usage as db_cpu, change a scaling record into configuration, or establish

@@ -1,5 +1,5 @@
 """Small, strict contracts for bounded incident collaboration."""
-from typing import Literal
+from typing import Any, Literal
 from pydantic import Field
 from .contracts import Contract, ReferenceSelection, SelectedFinding, Finding, EvidenceRef
 
@@ -67,6 +67,12 @@ class Assessment(Contract):
     evidence_ids: list[str] = Field(default_factory=list, max_length=8)
 
 
+class ReadOnlyCheck(Contract):
+    tool: Literal['get_service_metrics', 'get_service_logs', 'get_recent_changes',
+                  'get_service_owner', 'search_runbooks', 'search_incidents']
+    args: dict[str, Any] = Field(description='Exact arguments from the supplied read-only tool schema; no identities or changes.')
+
+
 class EvidenceRequest(Contract):
     hypothesis_id: str = Field(pattern=r"^H[1-4]$")
     evidence_ids: list[str] = Field(min_length=1, max_length=8)
@@ -74,6 +80,8 @@ class EvidenceRequest(Contract):
     proposed_check: str = Field(min_length=1, max_length=400)
     expected_value: str = Field(min_length=1, max_length=400)
     target_role: Role = "investigation"
+    checks: list[ReadOnlyCheck] = Field(default_factory=list, max_length=2,
+        description='One or two executable read-only checks. Empty means a human-only proposal, never automatic rework.')
 
 
 class ReviewDecision(Contract):

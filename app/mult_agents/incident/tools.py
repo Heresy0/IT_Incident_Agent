@@ -30,6 +30,7 @@ class ToolExecutor:
         self.evidence = {}
         self.references = {}
         self.last_query_profile = {}
+        self.log_gaps = {}
 
     def schemas(self):
         allowed = self.allowed_tools()
@@ -51,25 +52,33 @@ class ToolExecutor:
     def allowed_tools(self):
         return {"investigation": INVESTIGATION_TOOLS, "knowledge": KNOWLEDGE_TOOLS, "single": SINGLE_TOOLS}.get(self.role, ())
 
-    def execute(self, name, raw_args):
-        self.last_query_profile = {}
+    def validate_args(self, name, raw_args):
+        """Shared preflight for tool execution and proposed read-only rework; no calls or mutation."""
         allowed = self.allowed_tools()
         if name not in allowed or self.principal.role not in {"user", "operator"}:
-            return self.rejected("TOOL_DENIED")
+            raise ExecutionError("TOOL_DENIED")
         if (self.scope.tenant_id, self.scope.user_id) != (self.principal.tenant_id, self.principal.user_id):
-            return self.rejected("SCOPE_DENIED")
+            raise ExecutionError("SCOPE_DENIED")
         try:
             # Tool protocol supplies JSON datetime strings; strict JSON rejects coercion of numbers/enums.
             args = TOOL_ARGS[name].model_validate_json(json.dumps(raw_args))
             self.provider.authorize(self.principal, self.scope)
         except (ValidationError, TypeError, ValueError):
-            return self.rejected("INVALID_ARGUMENTS")
+            raise ExecutionError("INVALID_ARGUMENTS") from None
         except ProviderError as exc:
-            return self.rejected(exc.code)
+            raise ExecutionError(exc.code) from None
         if hasattr(args, "start") and (args.start < self.scope.start or args.end > self.scope.end):
-            return self.rejected("WINDOW_DENIED")
+            raise ExecutionError("WINDOW_DENIED")
         if name == "get_service_owner" and args.alias not in {self.scope.service, *self.scope.allowed_dependencies}:
-            return self.rejected("SERVICE_DENIED")
+            raise ExecutionError("SERVICE_DENIED")
+        return args
+
+    def execute(self, name, raw_args):
+        self.last_query_profile = {}
+        try:
+            args = self.validate_args(name, raw_args)
+        except ExecutionError as exc:
+            return self.rejected(exc.code)
         # Only validated enums/registered metric names, never free text, identity or timestamps.
         self.last_query_profile = {key: value for key, value in args.model_dump(mode="json").items()
                                    if key in {"metrics", "granularity", "category", "level"}}
@@ -95,8 +104,17 @@ class ToolExecutor:
                         break
                     truncated = truncated or row.get("content_truncated", False)
                     items.append(self.register_snapshot(item))
-                return ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated,
+                result = ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated,
                     sample_order="latest_first" if name == "get_service_metrics" else "source_order")
+                if name == 'get_service_logs' and not truncated:
+                    if args.level == 'ERROR' and result.status == 'empty':
+                        key = (args.category, args.start, args.end, args.error_code)
+                        self.log_gaps[key] = args.model_dump(mode='json')
+                    elif args.level is None:
+                        self.log_gaps = {k: v for k, v in self.log_gaps.items() if not (
+                            args.category == k[0] and args.start <= k[1] and args.end >= k[2]
+                            and (args.error_code is None or args.error_code == k[3]))}
+                return result
             except ExecutionError as exc:
                 return self.rejected(exc.code)
             except ProviderError as exc:

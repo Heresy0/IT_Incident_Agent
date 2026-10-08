@@ -35,4 +35,8 @@ def pool_control_gaps(evidence):
 
 
 def gap_message(gaps):
-    return 'Current connection-pool attribution lacks observed controls: ' + ', '.join(gaps) + '; DB ping is not a CPU measurement.'
+    return 'Unobserved controls: ' + ', '.join(gaps) + ('; DB ping is not a CPU measurement.' if 'db_cpu' in gaps else '.')
+
+
+def log_control_gaps(executor):
+    return sorted({f"logs:{row['category']}:WARN/INFO" for row in executor.log_gaps.values()})

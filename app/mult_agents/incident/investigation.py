@@ -8,7 +8,8 @@ from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, acti
 from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS
 from .tools import ToolExecutor
 from .prompts import SYSTEM
-from .observations import FACT_RENDERING, source_statement, pool_control_gaps, gap_message
+from .observations import FACT_RENDERING, source_statement, pool_control_gaps, log_control_gaps, gap_message
+from .model_view import MODEL_VIEW_VERSION, result_view, fit_messages, substantive
 
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
@@ -104,7 +105,8 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
 
 def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps=4, emit=None,
                 context=None, event_log=None, executor=None, objective=None, role="investigation", repair_state=None,
-                output_schema=InvestigationSelection, output_resolver=resolve_output, system_prompt=None):
+                output_schema=InvestigationSelection, output_resolver=resolve_output, system_prompt=None,
+                approved_checks=None):
     if not 1 <= max_steps <= (16 if role == "single" else 4):
         raise ValueError("max_steps exceeds the registered role limit")
     if role not in {"investigation", "knowledge", "single"}:
@@ -154,6 +156,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
     coverage_gaps, gap_feedback_sent = [], False
+    permitted = {(c['tool'], executor.validate_args(c['tool'], c['args']).model_dump_json())
+                 for c in (approved_checks or [])}
+    checked, model_omitted = set(), False
     output_protocol = "none"
     with activate(context), context.span("task", role):
         if not standalone:
@@ -166,6 +171,12 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 terminal = role == "single" and (step == max_steps - 1 or not context.can_research())
                 if terminal:
                     messages.append(HumanMessage(content="Only the final output remains within budget. Return diagnosis JSON, no tools; preserve gaps."))
+                collection = [{k: e[k] for k in ('name', 'status', 'query_profile', 'truncated', 'error')}
+                              for e in events if e['type'] == 'tool_result' and e.get('role') == role]
+                messages, compacted = fit_messages(messages, executor, collection, limits.input_chars)
+                if compacted:
+                    model_omitted = model_omitted or bool(compacted['omitted_evidence_count'])
+                    event('model_input_compacted', **compacted)
                 response = invoke_chat_model(model, messages, role, terminal=terminal)
                 # A blocking SDK call is not cancelled by an outer timer. Discard late responses.
                 if time.monotonic() - context.started >= limits.seconds - (0 if terminal else limits.reserve_seconds):
@@ -201,7 +212,23 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         if len(json.dumps(call["args"])) > 2000:
                             stop = "INVALID_ARGUMENTS"
                             break
-                        result = executor.execute(call["name"], call["args"])
+                        signature = None
+                        if permitted:
+                            try:
+                                args = executor.validate_args(call['name'], call['args'])
+                                signature = (call['name'], args.model_dump_json())
+                                code = None if signature in permitted else 'CHECK_NOT_APPROVED'
+                            except ExecutionError as exc:
+                                code = exc.code
+                            if code:
+                                executor.last_query_profile = {}
+                                result = executor.rejected(code)
+                            else:
+                                result = executor.execute(call['name'], call['args'])
+                        else:
+                            result = executor.execute(call["name"], call["args"])
+                        if signature and result.status in {'ok', 'empty'} and not result.truncated:
+                            checked.add(signature)
                         event("tool_result", name=call["name"] if call["name"] in allowed_tools else "denied",
                               status=result.status, evidence_ids=[e.evidence_id for e in result.evidence],
                               query_profile=dict(executor.last_query_profile),
@@ -210,7 +237,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         step_truncated = step_truncated or result.truncated
                         if result.status == "empty" and call["name"] in {"get_service_logs", "get_service_metrics"}:
                             empty_observations.append({"tool": call["name"], "query_profile": dict(executor.last_query_profile)})
-                        messages.append(ToolMessage(content=result.model_dump_json(), tool_call_id=cid))
+                        messages.append(ToolMessage(content=result_view(result), tool_call_id=cid))
                         if result.error and result.error.code == "BUDGET_EXCEEDED":
                             stop = "BUDGET_EXCEEDED"
                             break
@@ -231,16 +258,26 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             "to reconsider optional level/error_code or choose another useful check within scope. "
                             "Do not finalize a claim that the service/category has no logs or is healthy. "
                             "If you cannot obtain evidence, state the specific query gap."))
+                    if executor.log_gaps and step < max_steps - 2:
+                        messages.append(HumanMessage(content='ERROR-only log queries excluded WARN/INFO. '
+                            'Use a focused get_service_logs query for the same category/window, omitting level '
+                            'and unnecessary error_code, or retain that explicit gap. Do not repeat the ERROR query. '
+                            + json.dumps(list(executor.log_gaps.values()))))
                     continue
                 try:
                     candidate, output_protocol = output_resolver(response.content, executor, allowed_kinds)
                     has_hypotheses = bool(getattr(candidate, 'hypotheses', getattr(candidate, 'tentative_hypotheses', [])))
-                    coverage_gaps = pool_control_gaps(executor.evidence) if has_hypotheses else []
+                    coverage_gaps = [*(pool_control_gaps(executor.evidence) if has_hypotheses else []),
+                                     *log_control_gaps(executor)]
+                    if permitted - checked:
+                        coverage_gaps.append('approved_read_only_checks_not_completed')
                     if coverage_gaps and not gap_feedback_sent and not terminal and step < max_steps - 1 and context.can_research():
                         gap_feedback_sent = True
                         event('observation_gap', missing_controls=coverage_gaps)
                         messages.append(HumanMessage(content=gap_message(coverage_gaps) +
-                            ' Use remaining research budget for a focused useful check within scope, or finish with this explicit gap and a qualified hypothesis. Do not repeat completed queries.'))
+                            ' Use remaining research budget for a focused useful check within scope. For ERROR-only log gaps, '
+                            'omit level on the same category/window to include WARN/INFO. On rework use only approved_checks. '
+                            'Otherwise finish with this explicit gap and a qualified hypothesis. Do not repeat completed queries.'))
                         continue
                     if coverage_gaps:
                         candidate = candidate.model_copy(update={'missing_information': list(dict.fromkeys([
@@ -256,7 +293,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         repairs += 1
                         repair_state["repairs"] += 1
                         event("validation_repair", node=role)
-                        reference_options = {eid: [o.model_dump() for o in e.reference_options]
+                        reference_options = {eid: [o.model_dump() for o in e.reference_options if substantive(o.field_path)]
                                              for eid, e in executor.evidence.items()}
                         messages.append(HumanMessage(content="Output contract/reference check failed. Safe error details: "
                             + json.dumps(failure) + ". Available reference_options by evidence_id: "
@@ -283,7 +320,11 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
         # Conservative M2 boundary: a truncated source remains explicitly partial, even
         # when selected fields are valid. M3 can assess whether later checks close that gap.
-        incomplete = any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
+        incomplete = model_omitted or any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
+        if model_omitted:
+            output = output.model_copy(update={'missing_information': [
+                'Some evidence was omitted from the bounded model input; full snapshots remain in the audit report.',
+                *output.missing_information][:8]})
         status = "completed" if stop == "FINISHED" and output.findings and not incomplete and not coverage_gaps else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_id": task_id, "task_type": "incident_" + role, "incident_id": ticket.incident_id,
@@ -292,6 +333,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 + json.dumps(executor.schemas(), sort_keys=True)).encode()).hexdigest()[:12],
             "output_protocol": output_protocol,
             "fact_rendering": FACT_RENDERING, "coverage_gaps": coverage_gaps,
+            "model_input_view": MODEL_VIEW_VERSION, "model_input_omitted": model_omitted,
             "status": status, "review_status": "not_performed", "output": output.model_dump(mode="json"),
             "observation_coverage": "limited_by_truncation" if incomplete else "not_truncated",
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],

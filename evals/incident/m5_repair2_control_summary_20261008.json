@@ -1,0 +1,241 @@
+{
+  "date": "2026-10-08",
+  "purpose": "M5 input, read-only rework and log-filter repair free validation",
+  "quality_status": "excluded_scripted",
+  "paid_model_calls": 0,
+  "unit_tests_passed": 107,
+  "new_regression_tests": 9,
+  "model_input_view": "compact_sources_v1",
+  "configuration": {
+    "cases": [
+      "case_001",
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_005",
+      "case_006"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "scripted",
+    "execution_mode": "scripted_control_only",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "provenance": {
+    "implementation_sha256_prefix": "3fcd3d0535499330",
+    "git_commit": "fbf357866a543fb539131659a28f2265ad43d4bf",
+    "working_tree_dirty": true,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_001": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+      "case_002": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+      "case_004": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+      "case_005": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+      "case_006": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa"
+    }
+  },
+  "report_directory": "output/incident-comparison-repair2-final/b36e33f4-b3da-4d28-bac0-e931a9472929",
+  "workflows": {
+    "single": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 13,
+      "tool_calls_total": 37,
+      "duration_ms_mean": 18.5,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    },
+    "multi": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 45,
+      "tool_calls_total": 21,
+      "duration_ms_mean": 28.666666666666668,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    }
+  },
+  "runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "50954ac9-6ac3-4bfc-817c-764ce9fa2c92",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "fc892af3-067e-400e-8a24-18956380f45d",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 2,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "4b444759-59a7-4f1e-b961-3d3c544c95ab",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "286c91de-c735-438b-a2ee-8ec282d386dc",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 2,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "06fc8d24-68f9-460c-b2de-736f300ed5bd",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "946c1919-4ad2-4a46-bb9d-6ce5298960e4",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 13,
+      "tool_calls": 5,
+      "rework_rounds": 1
+    },
+    {
+      "case_id": "case_004",
+      "run_id": "c40ba5fd-52d6-46c0-a2ca-0099b63b3948",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_004",
+      "run_id": "a448070c-a8a9-4225-b1ff-9503d4fb7178",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 3,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_005",
+      "run_id": "c89380c5-a670-46ae-bbcb-241f3d560d90",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 3,
+      "tool_calls": 7,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_005",
+      "run_id": "9d83ab35-3fcd-4f35-ae2a-c98d060e07bf",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 4,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_006",
+      "run_id": "1f7a0578-f612-40cd-9f93-3496d0d9328a",
+      "workflow": "single",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_006",
+      "run_id": "4948e885-d959-4aff-a288-dae50caa9550",
+      "workflow": "multi",
+      "status": "completed",
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 8,
+      "tool_calls": 5,
+      "rework_rounds": 0
+    }
+  ],
+  "single_retest_path_free_replay": {
+    "same_queries_and_window": true,
+    "message_chars_per_call": [
+      8152,
+      12578,
+      14331
+    ],
+    "input_limit": 28000,
+    "status": "completed",
+    "termination_reason": "FINISHED",
+    "model_calls": 3,
+    "tool_calls": 5,
+    "full_snapshots_retained": 12,
+    "model_input_omitted": false
+  },
+  "limitations": [
+    "Scripted controls do not establish real model quality or cost reduction.",
+    "Previous live reports and gold remain unchanged.",
+    "No live request or budget increase in this repair turn."
+  ]
+}

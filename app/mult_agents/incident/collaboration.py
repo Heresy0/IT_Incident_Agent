@@ -13,7 +13,8 @@ from .tools import ToolExecutor
 
 
 from .diagnosis import ProtocolError, expand_refs, expand_diagnosis
-from .observations import FACT_RENDERING, pool_control_gaps, gap_message
+from .observations import FACT_RENDERING, pool_control_gaps, log_control_gaps, gap_message
+from .model_view import MODEL_VIEW_VERSION, evidence_view
 
 
 class Collaboration:
@@ -66,18 +67,10 @@ class Collaboration:
 
     def sources(self, ids=None):
         items = [self.evidence[eid] for eid in ids] if ids is not None else list(self.evidence.values())
-        result = []
-        for e in items:
-            fields = {k: v for k, v in e.payload.items() if k in {"metric", "value", "unit", "aggregation",
-                "category", "level", "error_code", "message", "summary", "config_summary", "team", "escalation",
-                "text", "resolution", "versions", "updated_at", "confirmed_at", "validity"}}
-            options = [o.model_dump() for o in e.reference_options if o.field_path in {
-                "value", "message", "error_code", "summary", "text", "resolution", "team", "escalation"}
-                or o.field_path.startswith("config_summary.")]
-            result.append({"evidence_id": e.evidence_id, "kind": e.kind, "service": e.service,
-                "environment": e.environment, "observed_at": e.observed_from.isoformat(),
-                "data_version": e.data_version, "payload": fields, "reference_options": options})
-        return result
+        return [evidence_view(e) for e in items]
+
+    def observation_gaps(self):
+        return [*pool_control_gaps(self.evidence), *log_control_gaps(self.executors['investigation'])]
 
     def ask(self, role, schema, payload, *, terminal=False, validate=None):
         messages = [SystemMessage(content=ROLE_PROMPTS[role]), HumanMessage(content=json.dumps({
@@ -122,8 +115,11 @@ class Collaboration:
                     value[field] = [{"evidence_id": r["evidence_id"], "field_path": r["field_path"]} for r in value[field]]
             targets[key] = value
         return {"targets": targets, "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
-                "prior_challenge": self.pending, "observation_gaps": pool_control_gaps(self.evidence),
-                "budget": {"can_collect": self.context.can_research(), "remaining_tools": self.context.limits.tool_calls - self.context.counts['tool_calls']}}
+                "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
+                "check_scope": self.ticket.scope.model_dump(mode='json', exclude={'tenant_id', 'user_id'}),
+                "read_only_tools": {r: ex.schemas() for r, ex in self.executors.items()},
+                "budget": {"can_collect": self.dispatch_capacity(pending_model_call=2) > 0 and self.context.can_research(),
+                           "remaining_tools": self.context.limits.tool_calls - self.context.counts['tool_calls']}}
 
     def collection(self):
         # Empty/truncated/error results remain visible to the tool-free judging roles.
@@ -144,8 +140,8 @@ class Collaboration:
                     assessment = assessment.model_copy(update={"verdict": "uncertain",
                         "reason": "Program gate: historical knowledge alone cannot establish a current cause."})
                     self.event("review_gate", "reviewer", target_id=assessment.target_id, code="NO_CURRENT_SUPPORT")
-                elif pool_control_gaps(self.evidence):
-                    assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(pool_control_gaps(self.evidence))})
+                elif self.observation_gaps():
+                    assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(self.observation_gaps())})
                     self.event('review_gate', 'reviewer', target_id=assessment.target_id, code='MISSING_HEALTH_CONTROL')
             checked.append(assessment)
         request = review.request_evidence
@@ -153,13 +149,35 @@ class Collaboration:
             self.evidence_ids(request.evidence_ids)
             if request.hypothesis_id not in targets or any(a.target_id == request.hypothesis_id and a.verdict == "supported" for a in checked):
                 raise ProtocolError("INVALID_REWORK_TARGET")
-        return review.model_copy(update={"assessments": checked})
+            if self.reworks >= 1:
+                return review.model_copy(update={'assessments': checked})  # Existing second-rework stop still applies.
+            code, normalized = 'READ_ONLY_CHECK_REQUIRED' if not request.checks else None, []
+            signatures = set()
+            executor = self.executors[request.target_role]
+            for check in request.checks:
+                try:
+                    args = executor.validate_args(check.tool, check.args)
+                    signature = (check.tool, args.model_dump_json())
+                    if signature in executor.seen or signature in signatures:
+                        code = 'DUPLICATE_TOOL'
+                    signatures.add(signature)
+                    normalized.append(check.model_copy(update={'args': args.model_dump(mode='json')}))
+                except ExecutionError as exc:
+                    code = exc.code
+            if code:
+                self.event('rework_denied', code=code)
+                gap = 'Rework needs an executable scoped read-only check; human changes/experiments stay pending: ' + request.proposed_check
+                return review.model_copy(update={'assessments': checked, 'request_evidence': None,
+                    'missing_information': [gap, *review.missing_information][:8]})
+            request = request.model_copy(update={'checks': normalized,
+                'proposed_check': 'Read-only checks: ' + ', '.join(c.tool for c in normalized)})
+        return review.model_copy(update={"assessments": checked, 'request_evidence': request})
 
     def diagnose_and_review(self):
         self.review = None  # A previous revision's review never approves a new draft.
         payload = {"ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                    "evidence": self.sources(), "collection": self.collection(), "challenge": self.pending,
-                   "observation_gaps": pool_control_gaps(self.evidence),
+                   "observation_gaps": self.observation_gaps(),
                    "task_results": [{"role": t["role"], "status": t["status"], "missing_information": t["output"]["missing_information"]} for t in self.tasks]}
         self.draft = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
         revision = len(self.drafts) + 1
@@ -189,7 +207,7 @@ class Collaboration:
                 self.phase = "rework"
         else:
             self.pending = None
-            self.stop = "FINISHED" if all(a.verdict == "supported" for a in self.review.assessments) else "REVIEW_INCOMPLETE"
+            self.stop = "FINISHED" if all(a.verdict == "supported" for a in self.review.assessments) and not self.observation_gaps() else "REVIEW_INCOMPLETE"
             self.note("accept" if self.stop == "FINISHED" else "escalate", "reviewer", "supervisor")
 
     def dispatch(self, decision):
@@ -244,15 +262,17 @@ class Collaboration:
                 encoded = len(json.dumps(source, ensure_ascii=False))
                 if size + encoded <= min(6000, self.context.limits.input_chars // 4):
                     prior.append(source); size += encoded
-            objective = {"goal": task.goal, "evidence": prior, "focused_evidence_ids": ids,
-                "collection": self.collection()[-12:], "observation_gaps": pool_control_gaps(self.evidence),
+            approved_checks = [c for c in self.pending['checks']] if follow_up else None
+            objective = {"goal": ('Perform the approved read-only checks.' if follow_up else task.goal),
+                "approved_checks": approved_checks, "evidence": prior, "focused_evidence_ids": ids,
+                "collection": self.collection()[-12:], "observation_gaps": self.observation_gaps(),
                 "challenge": self.pending if follow_up else None}
             before = dict(self.context.counts)
             available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - before["model_calls"]
             steps = min(4, available_steps - 2 * (len(selected) - index - 1))
             result = investigate(self.models[task.role], self.provider, self.principal, context=self.context,
                 event_log=self.events, executor=self.executors[task.role], objective=objective,
-                role=task.role, repair_state=self.repairs, max_steps=max(1, steps))
+                role=task.role, repair_state=self.repairs, max_steps=max(1, steps), approved_checks=approved_checks)
             self.tasks.append({"task_id": result["task_id"], "role": task.role, "goal": task.goal,
                 "challenge_id": self.pending["challenge_id"] if follow_up else None,
                 "status": result["status"], "output": result["output"],
@@ -286,7 +306,7 @@ class Collaboration:
                     decision = self.ask("supervisor", SupervisorDecision, {
                         "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                         "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
-                        "collection": self.collection(), "observation_gaps": pool_control_gaps(self.evidence),
+                        "collection": self.collection(), "observation_gaps": self.observation_gaps(),
                         "tasks": [{**{k: t[k] for k in ("role", "goal", "status", "evidence_ids")},
                                    "missing_information": t["output"]["missing_information"]} for t in self.tasks],
                         "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
@@ -352,6 +372,8 @@ class Collaboration:
                 else:
                     self.extra_gaps.append(f"{a.target_id}: {a.reason}")
         if self.status() != "completed":
+            if self.observation_gaps():
+                self.extra_gaps.append(gap_message(self.observation_gaps()))
             self.extra_gaps.append(f"协作尚有缺口：{self.stop}；需要补充信息或人工升级。")
         return {"run_id": self.context.run_id, "task_type": "incident_collaboration", "incident_id": self.ticket.incident_id,
             "scope": self.ticket.scope.model_dump(mode="json"), "data_source": self.provider.name, "status": self.status(),
@@ -362,7 +384,7 @@ class Collaboration:
             "used_evidence_ids": sorted(used), "evidence": [e.model_dump(mode="json") for e in self.evidence.values()],
             "task_results": self.tasks, "drafts": self.drafts, "reviews": self.reviews, "negotiation": self.negotiation,
             "events": self.events, "run_summary": self.context.summary(), "repairs": self.repairs["repairs"],
-            "fact_rendering": FACT_RENDERING, "coverage_gaps": pool_control_gaps(self.evidence),
+            "fact_rendering": FACT_RENDERING, "coverage_gaps": self.observation_gaps(), 'model_input_view': MODEL_VIEW_VERSION,
             "rework_rounds": self.reworks, "supervisor_decisions": self.supervisor_calls,
             "scheduling_decisions": self.decisions,
             "prompt_version": self.prompt_version()}
