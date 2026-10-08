@@ -11,6 +11,14 @@ def guard_active(plans):
 
 
 class PostgresRepairs:
+    def get_repairs(self, iid, principal):
+        with self.pool.connection() as conn:
+            row = conn.execute('SELECT r.document FROM incidents i LEFT JOIN incident_repairs r ON r.incident_id=i.id '
+                'WHERE i.id=%s AND i.tenant_id=%s AND i.user_id=%s', (iid, principal.tenant_id, principal.user_id)).fetchone()
+        if row is None:
+            raise IncidentError('INCIDENT_NOT_FOUND', 404)
+        return deepcopy(row['document'] or [])
+
     def repair_transaction(self, iid, principal, mutation):
         with self.pool.connection() as conn:
             row = self._incident_lock(conn, iid, principal, allow_repair=True)
@@ -33,12 +41,17 @@ class PostgresRepairs:
                     if plan['status'] == 'executing':
                         plan['status'] = 'manual_required'
                         plan['events'].append({'type': 'interrupted', 'code': 'PROCESS_INTERRUPTED',
-                                               'at': now()})
+                                               'at': now(), 'seq': len(plan['events']) + 1})
                 conn.execute('UPDATE incident_repairs SET document=%s WHERE incident_id=%s',
                              (Jsonb(row['document']), row['incident_id']))
 
 
 class MemoryRepairs:
+    def get_repairs(self, iid, principal):
+        with self.lock:
+            self._incident(iid, principal, allow_repair=True)
+            return deepcopy(self.repair_plans.get(iid, []))
+
     def repair_transaction(self, iid, principal, mutation):
         with self.lock:
             row = self._incident(iid, principal, allow_repair=True)
@@ -54,4 +67,5 @@ class MemoryRepairs:
                 for plan in plans:
                     if plan['status'] == 'executing':
                         plan['status'] = 'manual_required'
-                        plan['events'].append({'type': 'interrupted', 'code': 'PROCESS_INTERRUPTED', 'at': now()})
+                        plan['events'].append({'type': 'interrupted', 'code': 'PROCESS_INTERRUPTED', 'at': now(),
+                                               'seq': len(plan['events']) + 1})

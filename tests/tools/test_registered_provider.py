@@ -11,6 +11,24 @@ from runtime.context import RunContext
 
 
 class RegisteredProviderTests(unittest.TestCase):
+    def test_registered_service_can_search_own_confirmed_history_without_leaking_shared_service_cases(self):
+        from providers.history import ProviderWithHistory
+        from storage.runs import MemoryRunStore
+        from evidence.contracts import IncidentsArgs
+        from dataclasses import replace
+        store = MemoryRunStore()
+        store.cases['confirmed'] = {'id': 'confirmed', 'tenant_id': 'tenant', 'user_id': 'alice', 'validity': 'active',
+            'revision': 1, 'confirmed_at': self.start.isoformat(), 'document': {'incident': self.snapshot,
+                'confirmation': {'confirmed_cause': 'worker unavailable', 'resolution': 'restart worker token=hidden', 'error_codes': []}}}
+        binding = replace(self.binding, users=('alice', 'bob'))
+        registry = ServiceRegistry([binding])
+        for principal, expected in ((self.principal, 1), (Principal('tenant', 'bob'), 0)):
+            ticket = registry.ticket(self.snapshot, principal)
+            base = HTTPObservationProvider(binding, ticket, principal)
+            rows, _ = ProviderWithHistory(base, store, principal).query('search_incidents',
+                IncidentsArgs(symptoms='worker'), ticket.scope)
+            self.assertEqual(len(rows), expected)
+            self.assertNotIn('hidden', str(rows))
     def setUp(self):
         self.principal = Principal('tenant', 'alice')
         self.start = datetime(2026, 10, 8, tzinfo=timezone.utc)

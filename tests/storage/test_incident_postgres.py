@@ -29,16 +29,67 @@ class IncidentPostgresTests(unittest.TestCase):
         self.store = PostgresRunStore(self.dsn)
         self.execution = {'request_key': 'start_a', 'execution_mode': 'scripted_control_only', 'model_budget': None, 'tool_budget': None}
         self.incident = self.store.create_incident(catalog(self.owner)[0]['fields'], self.owner)
+        self.workflow_to_close = None
 
     def tearDown(self):
         # Never clear tables or another test/project's rows.
         with self.store.pool.connection() as conn:
             for table in ('confirmed_incident_cases', 'incidents', 'research_runs'):
                 conn.execute(f'DELETE FROM {table} WHERE tenant_id=%s', (self.owner.tenant_id,))
-        self.store.close()
+        if self.workflow_to_close:
+            self.workflow_to_close.close()
+        else:
+            self.store.close()
 
     def begin(self, execution=None, store=None):
         return (store or self.store).begin_diagnosis(self.incident['id'], str(uuid4()), execution or self.execution, self.owner, {})
+
+    def test_repair_full_lifecycle_and_checkpoints_survive_new_connection(self):
+        import time
+        from providers.registry import ServiceBinding, ServiceRegistry
+        from tests.workflow.test_remediation import OfflineExecutor
+        fields = catalog(self.owner)[0]['fields']
+        executor = OfflineExecutor()
+        binding = ServiceBinding(self.owner.tenant_id, (self.owner.user_id,), fields['service'], fields['environment'],
+            fields['service_version'], repairs={'api': {'executor': 'offline', 'actions': ['restart_service']}})
+        service = WorkflowService('unused', store=self.store, config=TestConfig(),
+            service_registry=ServiceRegistry([binding]), repair_executors={'offline': executor})
+        self.workflow_to_close = service
+        second = PostgresRunStore(self.dsn)
+        try:
+            run_id, _ = service.start_diagnosis(self.incident['id'], self.execution, self.owner)
+            deadline = time.monotonic() + 10
+            while time.monotonic() < deadline:
+                run = service.get_run(run_id, self.owner)
+                if run['status'] != 'running':
+                    break
+                time.sleep(.03)
+            self.assertEqual(run['result']['review_status'], 'passed')
+            plan = service.repairs.propose(self.incident['id'], {'request_key': 'repair', 'revision': 1, 'run_id': run_id,
+                'action': 'restart_service', 'target': 'api', 'parameters': {}, 'reason': 'Database control acceptance',
+                'evidence_ids': [run['result']['evidence'][0]['evidence_id']]}, self.owner)
+            service.repairs.approve(self.incident['id'], plan['id'], {'digest': plan['digest'], 'decision': 'approve'}, self.owner)
+            result = service.repairs.execute(self.incident['id'], plan['id'], {'request_key': 'execute'}, self.owner)
+            persisted = second.get_repairs(self.incident['id'], self.owner)[0]
+            self.assertEqual(result, persisted)
+            self.assertEqual(result['status'], 'verified')
+            self.assertIn('action_started', [event['type'] for event in persisted['events']])
+            self.assertEqual([event['seq'] for event in persisted['events']], list(range(1, len(persisted['events']) + 1)))
+            service.repairs.execute(self.incident['id'], plan['id'], {'request_key': 'execute'}, self.owner)
+            self.assertEqual(executor.writes, 1)
+            # A process loss after the persisted action boundary retains the checkpoints.
+            def interrupted(incident, plans):
+                plans[0]['status'] = 'executing'
+                return plans[0]
+            self.store.repair_transaction(self.incident['id'], self.owner, interrupted)
+            second.recover_repairs()
+            recovered = second.get_repairs(self.incident['id'], self.owner)[0]
+            self.assertEqual(recovered['status'], 'manual_required')
+            self.assertEqual(recovered['events'][-1]['type'], 'interrupted')
+            service.repairs.execute(self.incident['id'], plan['id'], {'request_key': 'execute'}, self.owner)
+            self.assertEqual(executor.writes, 1)
+        finally:
+            second.close()
 
     def test_repair_storage_serializes_claims_and_blocks_business_edits(self):
         second = PostgresRunStore(self.dsn)

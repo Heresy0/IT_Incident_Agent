@@ -2,6 +2,7 @@ import re
 from api.auth import Principal
 from evidence.contracts import IncidentScope, Ticket
 from providers.fixtures import FixtureProvider, ProviderError, ROOT, visible
+from providers.history import private_history
 import json
 
 
@@ -56,17 +57,6 @@ class BoundIncidentProvider:
         rows, truncated = self.base.query(name, args, self.base.ticket().scope)
         if name != "search_incidents":
             return rows, truncated
-        terms = set(re.findall(r"\w+", args.symptoms.casefold()))
-        private = []
-        for row in self.store.confirmed_cases(self.principal):
-            incident, confirmed = row["document"]["incident"], row["document"]["confirmation"]
-            if (incident["service"], incident["environment"], incident["service_version"]) != (scope.service, scope.environment, scope.service_version):
-                continue
-            text = confirmed["confirmed_cause"] + " " + confirmed["resolution"]
-            if not terms.intersection(re.findall(r"\w+", text.casefold())) or args.error_code and args.error_code not in confirmed["error_codes"] or args.version and args.version != scope.service_version:
-                continue
-            private.append({"id": row["id"], "timestamp": row["confirmed_at"], "service": scope.service, "environment": scope.environment,
-                "data_version": f"manual-{row['revision']}", "text": text[:1800], "resolution": confirmed["resolution"][:1800],
-                "confirmed": True, "confirmed_at": row["confirmed_at"], "versions": [scope.service_version], "validity": "active"})
+        private = private_history(self.store, self.principal, scope, args)
         combined = [*private, *rows]
         return combined[:4], truncated or len(combined) > 4

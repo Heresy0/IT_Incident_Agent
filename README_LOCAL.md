@@ -88,6 +88,8 @@ Key、身份或预算不满足时在请求前停止。未知 Token/费用继续�
 
 ## 通用接入和修复
 
+最新完善与实测见[后端完善与持久化验收](docs/后端完善与持久化验收-20261009.md)。Docker Desktop可用时，可显式运行scripts/verify_postgres.py --start，使用独立临时测试库5435并自动清理；不能用业务库。真实修复现在必须登记症状规则及对应指标freshness_query。支持docker_cli执行器，登记固定context和容器ID，无需开放Docker TCP。数据库7项和临时容器重启已实测，真实业务故障闭环仍待接入。
+
 配置结构见examples/services.example.json，具体步骤、权限、API和未完成项见[通用接入与受控修复](docs/通用接入与受控修复.md)。本项目services.local.json已忽略；配置本项目身份、服务版本和固定PromQL/LogQL，然后设置INCIDENT_SERVICES_FILE并重启后端。示例全部为占位值，默认不会连接真实系统。
 
 免费修复演示：

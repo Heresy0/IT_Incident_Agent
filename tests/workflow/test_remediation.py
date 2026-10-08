@@ -12,7 +12,8 @@ from providers.bound import catalog
 from providers.registry import ServiceBinding, ServiceRegistry
 from providers.fixtures import ProviderError
 from repairs.contracts import RepairProposal
-from repairs.executors import DockerExecutor
+from repairs.executors import DockerExecutor, DockerCLIExecutor
+from repairs.verification import SymptomVerifier
 from storage.runs import MemoryRunStore
 from workflow.service import WorkflowService
 from incidents.support import IncidentError
@@ -98,7 +99,9 @@ class RemediationTests(unittest.TestCase):
         self.assertEqual(self.execute(plan), result)
         self.assertEqual((self.executor.writes, self.executor.checks), (1, 1))
         self.assertNotEqual(self.service.get_incident(self.incident['id'], self.owner)['business_status'], 'resolved')
-        self.assertEqual(self.service.repairs.list(self.incident['id'], self.owner)[0], result)
+        returned = self.service.repairs.list(self.incident['id'], self.owner)[0]
+        self.assertEqual(returned.pop('effective_status'), 'verified')
+        self.assertEqual(returned, result)
         with self.assertRaises(IncidentError):
             self.execute(plan, key='different')
 
@@ -212,8 +215,108 @@ class RemediationTests(unittest.TestCase):
             self.service.repairs.capacity.release()
             self.service.repairs.capacity.release()
 
+    def configure_symptoms(self, values):
+        values = iter(values)
+        latest = [10]
+        target = {**self.binding.repairs['api'], 'symptom_checks': [
+            {'metric': 'queue_depth', 'operator': 'lte', 'threshold': 0, 'max_age_seconds': 60}]}
+        binding = ServiceBinding(**{**self.binding.__dict__, 'repairs': {'api': target}, 'observations': {
+            'prometheus': {'url': 'http://127.0.0.1:9090'},
+            'metrics': {'queue_depth': {'query': 'sum(queue_depth{service="test"})',
+                                       'freshness_query': 'max(time()-timestamp(queue_depth{service="test"}))', 'unit': 'jobs'}}}})
+        self.service.services = ServiceRegistry([binding])
+        def reply(request):
+            if 'timestamp' in request.url.params['query']:
+                return httpx.Response(200, json={'status': 'success', 'data': {'resultType': 'vector',
+                    'result': [{'value': [datetime.now(timezone.utc).timestamp(), '1']}]}})
+            latest[0] = next(values, latest[0])
+            return httpx.Response(200, json={'status': 'success', 'data': {'resultType': 'vector',
+                'result': [{'value': [datetime.now(timezone.utc).timestamp(), str(latest[0])]}]}})
+        self.service.repairs.symptom_verifier = SymptomVerifier(transport=httpx.MockTransport(reply))
+
+    def test_healthy_container_is_insufficient_when_original_symptom_remains(self):
+        self.configure_symptoms([10])
+        plan = self.plan(); self.approve(plan)
+        with patch('repairs.service.time.sleep'):
+            result = self.execute(plan)
+        self.assertEqual(result['status'], 'manual_required')
+        observations = [event for event in result['events'] if event['type'] == 'verification']
+        self.assertEqual(len(observations), 3)
+        self.assertTrue(observations[0]['observation']['passed'])
+        self.assertFalse(observations[0]['symptoms']['passed'])
+        self.assertEqual(self.executor.writes, 1)
+
+    def test_original_symptom_recovery_is_recorded_and_required(self):
+        self.configure_symptoms([10, 0])
+        plan = self.plan(); self.approve(plan)
+        self.assertEqual(plan['symptom_checks'][0]['unit'], 'jobs')
+        result = self.execute(plan)
+        self.assertEqual(result['status'], 'verified')
+        observation = next(event for event in result['events'] if event['type'] == 'verification')
+        self.assertTrue(observation['symptoms']['passed'])
+        self.assertEqual(observation['symptoms']['checks'][0]['value'], 0)
+
+    def test_already_recovered_symptom_prevents_unnecessary_write(self):
+        self.configure_symptoms([0])
+        plan = self.plan(); self.approve(plan)
+        result = self.execute(plan)
+        self.assertEqual(result['status'], 'blocked')
+        self.assertEqual(result['events'][-2]['code'], 'SYMPTOM_ALREADY_HEALTHY')
+        self.assertEqual(self.executor.writes, 0)
+
+    def test_crash_after_action_boundary_preserves_audit_and_never_replays(self):
+        plan = self.plan(); self.approve(plan)
+        with patch.object(self.executor, 'execute', side_effect=SystemExit('simulated process loss')):
+            with self.assertRaises(SystemExit):
+                self.execute(plan)
+        stored = self.store.get_repairs(self.incident['id'], self.owner)[0]
+        self.assertEqual(stored['events'][-1]['type'], 'action_started')
+        self.assertEqual(stored['status'], 'executing')
+        self.store.recover_repairs()
+        self.assertEqual(self.execute(plan)['status'], 'manual_required')
+
+    def test_action_is_not_sent_if_audit_boundary_cannot_commit(self):
+        plan = self.plan(); self.approve(plan)
+        original = self.store.repair_transaction
+        def transaction(iid, principal, mutation):
+            def check(incident, plans):
+                result = mutation(incident, plans)
+                if plans[-1]['events'][-1]['type'] == 'action_started':
+                    raise RuntimeError('synthetic storage failure')
+                return result
+            return original(iid, principal, check)
+        with patch.object(self.store, 'repair_transaction', side_effect=transaction):
+            result = self.execute(plan)
+        self.assertEqual(result['status'], 'blocked')
+        self.assertEqual(self.executor.writes, 0)
+        self.assertNotIn('action_started', [event['type'] for event in result['events']])
+
+    def test_read_projection_shows_expiry_without_mutating_approval_or_audit(self):
+        plan = self.plan(); self.approve(plan)
+        stored = self.store.repair_plans[self.incident['id']][0]
+        stored['expires_at'] = (datetime.now(timezone.utc) - timedelta(seconds=1)).isoformat()
+        before = deepcopy(stored)
+        read = self.service.repairs.get(self.incident['id'], plan['id'], self.owner)
+        self.assertEqual(read['effective_status'], 'expired')
+        self.assertEqual(read['status'], 'approved')
+        self.assertEqual(self.store.repair_plans[self.incident['id']][0], before)
+
 
 class DockerAdapterTests(unittest.TestCase):
+    def test_cli_uses_fixed_arguments_and_does_not_expose_inspect_environment(self):
+        from subprocess import CompletedProcess
+        response = {'Id': 'a' * 64, 'Config': {'Healthcheck': {'Test': ['CMD', 'true']}, 'Env': ['KEY=hidden']},
+                    'State': {'Running': True, 'StartedAt': 'old'}}
+        import json
+        with patch('repairs.executors.shutil.which', return_value='docker.exe'), patch(
+                'repairs.executors.subprocess.run', return_value=CompletedProcess([], 0, json.dumps([response]), '')) as run:
+            observation = DockerCLIExecutor().preflight({'container_id': 'a' * 64, 'context': 'desktop-linux'}, 'restart_service', {})
+            self.assertNotIn('hidden', str(observation))
+            self.assertEqual(run.call_args.args[0], ['docker.exe', '--context', 'desktop-linux', 'inspect', '--type', 'container', 'a' * 64])
+            self.assertFalse(run.call_args.kwargs['shell'])
+        with self.assertRaises(ProviderError):
+            DockerCLIExecutor().execute({'container_id': '../other'}, 'restart_service', {})
+
     def test_agent_candidate_requires_registered_capability_and_current_evidence(self):
         from types import SimpleNamespace
         from agents.contracts import DiagnosisSelection
@@ -308,3 +411,18 @@ class RepairAPITests(unittest.TestCase):
     def test_extra_commands_are_rejected_at_http_boundary(self):
         response = self.client.post(self.base, json={**self.fixture.payload, 'parameters': {'command': 'anything'}})
         self.assertEqual(response.status_code, 422)
+
+    def test_detail_and_cursor_events_are_authorized_and_do_not_execute(self):
+        plan = self.client.post(self.base, json=self.fixture.payload).json()
+        route = self.base + '/' + plan['id']
+        self.assertEqual(self.client.get(route).json()['effective_status'], 'pending_approval')
+        self.identity = self.fixture.operator
+        self.client.post(route + '/approval', json={'digest': plan['digest'], 'decision': 'approve'})
+        first = self.client.get(route + '/events', params={'limit': 1}).json()
+        self.assertEqual(first['items'][0]['seq'], 1)
+        self.assertTrue(first['has_more'])
+        tail = self.client.get(route + '/events', params={'after_seq': first['next_seq']}).json()
+        self.assertEqual(tail['items'][0]['type'], 'approved')
+        self.assertEqual(self.fixture.executor.writes, 0)
+        self.identity = Principal('a', 'bob')
+        self.assertEqual(self.client.get(route + '/events').status_code, 404)

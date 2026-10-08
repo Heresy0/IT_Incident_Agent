@@ -21,6 +21,7 @@ class Metrics:
         self.errors = defaultdict(int)
         self.repairs = defaultdict(int)
         self.retries = defaultdict(int)
+        self.remediation_stages = defaultdict(int)
 
     def finish_run(self, status, summary):
         with self.lock:
@@ -32,6 +33,12 @@ class Metrics:
     def event(self, event):
         kind = event.get("type", "")
         with self.lock:
+            if kind == 'repair_stage':
+                action, stage = event.get('action'), event.get('stage')
+                if action in {'restart_service', 'scale_service', 'rollback_release'} and stage in {
+                        'proposed', 'approved', 'rejected', 'execution_claimed', 'preflight_passed', 'action_started',
+                        'action_completed', 'verification', 'execution_error', 'verified', 'blocked', 'manual_required'}:
+                    self.remediation_stages[(action, stage)] += 1
             if kind == "warning":
                 self.errors[(event.get("code", "INTERNAL_ERROR"), event.get("provider", "workflow"))] += 1
             elif kind == "validation_repair":
@@ -56,6 +63,9 @@ class Metrics:
                  "# TYPE it_incident_calls_total counter", "# TYPE it_incident_call_seconds histogram"]
         with self.lock:
             lines.append("# TYPE it_incident_errors_total counter")
+            lines.append('# TYPE it_incident_remediation_stages_total counter')
+            for (action, stage), count in sorted(self.remediation_stages.items()):
+                lines.append(f'it_incident_remediation_stages_total{{action="{action}",stage="{stage}"}} {count}')
             for (code, provider), count in sorted(self.errors.items()):
                 lines.append(f'it_incident_errors_total{{code="{code}",provider="{provider}"}} {count}')
             lines.append("# TYPE it_incident_validation_repairs_total counter")

@@ -4,6 +4,14 @@ from observability.telemetry import JsonFormatter, Metrics
 
 
 class ObservabilityTests(unittest.TestCase):
+    def test_remediation_metrics_use_only_registered_action_and_stage_labels(self):
+        metrics = Metrics()
+        metrics.event({'type': 'repair_stage', 'action': 'restart_service', 'stage': 'verified',
+                       'plan_id': 'private-plan', 'incident_id': 'private-incident'})
+        metrics.event({'type': 'repair_stage', 'action': 'private-action', 'stage': 'private-stage'})
+        output = metrics.render()
+        self.assertIn('it_incident_remediation_stages_total{action="restart_service",stage="verified"} 1', output)
+        self.assertNotIn('private-', output)
     def test_sensitive_message_fragments_are_redacted(self):
         record = logging.LogRecord('incident.api', logging.ERROR, __file__, 1,
             'sk-syntheticcanary Bearer synthetic-token postgresql://user:synthetic-password@localhost/db', (), None)

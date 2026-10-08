@@ -49,6 +49,8 @@ class IncidentAdapter:
             return result
         mode = request["execution"]["execution_mode"]
         if not snapshot.get('demo_case_id'):
+            from providers.history import ProviderWithHistory
+            provider = ProviderWithHistory(provider, self.service._store, self.principal(request))
             provider.repair_capabilities = self.service.repairs.capabilities(provider.binding)
         if mode == "scripted_control_only":
             if not snapshot.get('demo_case_id'):

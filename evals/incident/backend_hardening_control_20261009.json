@@ -1,0 +1,53 @@
+{
+  "baseline_commit": "68ade86",
+  "evaluation_type": "engineering_and_platform_control_only",
+  "paid_model_calls": 0,
+  "business_quality_score": null,
+  "validation": {
+    "initial_full_suite": {
+      "total": 163,
+      "skipped": 0,
+      "failed_tests": 1,
+      "subtest_errors": 2,
+      "cause": "Existing single-agent reference registry has no provider attribute."
+    },
+    "compatibility_fix_targeted": {"total": 6, "passed": 6},
+    "current_unique_coverage": {
+      "total": 166,
+      "unresolved_failures": 0,
+      "method": "One full suite plus targeted verification of fixes and additions, not a repeated final full run."
+    },
+    "postgres_integration": {"executed": 7, "passed": 7, "skipped": 0},
+    "compile": "passed",
+    "diff_whitespace": "passed"
+  },
+  "platform": {
+    "project": "it-incident-acceptance",
+    "postgres_port": 5435,
+    "storage": "disposable tmpfs",
+    "live_restart_attempts": 1,
+    "executor_check": "passed: changed start time, running and healthy",
+    "context_binding_followup": "fixed argv unit check passed; no repeated restart",
+    "container_and_network_cleanup": "completed"
+  },
+  "improvements": [
+    "Persist each repair checkpoint before publishing logs and metrics",
+    "Do not write if the action audit boundary cannot commit",
+    "Require original symptom thresholds and source-data freshness for live repair",
+    "Stop unnecessary repair when the symptom is already healthy",
+    "Bound execution to 180 seconds plus in-flight request timeout",
+    "Read-only repair detail and cursor-based event replay",
+    "Fixed-label remediation metrics",
+    "Native Docker CLI with exact container ID and registered context",
+    "Owner-only confirmed history for registered providers",
+    "Reusable isolated PostgreSQL acceptance entry"
+  ],
+  "unchanged": ["frontend", "existing_credentials", "normal_project_databases", "research_archive", "other_projects"],
+  "remaining": [
+    "Actual business service selection and authorized source registration",
+    "Real Prometheus/Loki data and permissions integration",
+    "Explicit small-budget live model diagnosis and candidate quality evaluation",
+    "Approved business repair with real symptom recovery validation",
+    "Unified front end and approval views"
+  ]
+}

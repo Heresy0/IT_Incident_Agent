@@ -44,6 +44,8 @@ flowchart TD
 
 ## 后端入口
 
+2026-10-09进一步完善：真实修复同时验证容器健康与原症状指标，阶段事件逐步持久化，新增详情/事件续读、固定标签修复指标及Docker Desktop原生CLI执行器。独立临时PostgreSQL的7项集成和临时容器重启已实测通过；当前166项由一次全量加定向验证覆盖，未解决失败0。无付费调用，真实业务系统全链路尚未验收。详见[后端完善与持久化验收](docs/后端完善与持久化验收-20261009.md)。
+
 ```powershell
 cd D:\code\it_incident_agent
 $env:PYTHONIOENCODING='utf-8'

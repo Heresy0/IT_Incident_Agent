@@ -26,7 +26,7 @@ def expand_refs(refs, registry):
 
 
 def expand_diagnosis(selection, registry):
-    capabilities = getattr(registry.provider, 'repair_capabilities', [])
+    capabilities = getattr(getattr(registry, 'provider', None), 'repair_capabilities', [])
     for action in selection.recommended_actions:
         if action.repair is not None:
             intent = action.repair

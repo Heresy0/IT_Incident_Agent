@@ -19,6 +19,7 @@
           "queue_depth": {
             "query": "sum(queue_depth{service=\"example-api\",environment=\"staging\"})",
             "unit": "jobs",
+            "freshness_query": "max(time()-timestamp(queue_depth{service=\"example-api\",environment=\"staging\"}))",
             "aggregation": "sum"
           }
         },
@@ -40,6 +41,7 @@
           "authorization_env": "INCIDENT_DOCKER_AUTHORIZATION",
           "verification_attempts": 4,
           "verification_interval_seconds": 10,
+          "symptom_checks": [{"metric": "queue_depth", "operator": "lte", "threshold": 0, "max_age_seconds": 60}],
           "container_id": "0000000000000000000000000000000000000000000000000000000000000000"
         }
       }
