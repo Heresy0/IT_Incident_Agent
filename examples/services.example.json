@@ -1,0 +1,48 @@
+{
+  "services": [
+    {
+      "tenant_id": "example_tenant",
+      "users": ["example_operator"],
+      "service": "example-api",
+      "environment": "staging",
+      "version": "v1",
+      "dependencies": [],
+      "observations": {
+        "prometheus": {"url": "http://127.0.0.1:9090"},
+        "loki": {"url": "http://127.0.0.1:3100"},
+        "metrics": {
+          "request_rate": {
+            "query": "sum(rate(http_requests_total{service=\"example-api\",environment=\"staging\"}[5m]))",
+            "unit": "requests_per_second",
+            "aggregation": "sum_rate"
+          },
+          "queue_depth": {
+            "query": "sum(queue_depth{service=\"example-api\",environment=\"staging\"})",
+            "unit": "jobs",
+            "aggregation": "sum"
+          }
+        },
+        "log_queries": {
+          "dependency": "{service=\"example-api\",environment=\"staging\"} | json | category=\"dependency\"",
+          "configuration": "{service=\"example-api\",environment=\"staging\"} | json | category=\"configuration\"",
+          "resource": "{service=\"example-api\",environment=\"staging\"} | json | category=\"resource\""
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [],
+        "incidents": []
+      },
+      "repairs": {
+        "api": {
+          "executor": "docker_http",
+          "actions": ["restart_service"],
+          "url": "https://docker-control.example.internal",
+          "authorization_env": "INCIDENT_DOCKER_AUTHORIZATION",
+          "verification_attempts": 4,
+          "verification_interval_seconds": 10,
+          "container_id": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  ]
+}

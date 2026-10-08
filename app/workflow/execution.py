@@ -25,20 +25,37 @@ class IncidentAdapter:
                 "limits": self.limits({"execution": execution}).__dict__}
 
     def scope(self, request):
-        return ticket_for(request["incident_snapshot"], self.principal(request)).scope
+        snapshot, principal = request['incident_snapshot'], self.principal(request)
+        if not snapshot.get('demo_case_id'):
+            from providers.fixtures import ProviderError
+            try:
+                return self.service.services.ticket(snapshot, principal).scope
+            except ProviderError:
+                pass
+        return ticket_for(snapshot, principal).scope
 
     def execute(self, request, context, events):
         from workflow.coordinator import collaborate
         from evidence.render import render
         snapshot = request["incident_snapshot"]
-        if not snapshot.get("demo_case_id"):
+        from providers.fixtures import ProviderError
+        try:
+            provider = (BoundIncidentProvider(snapshot, self.principal(request), self.service._store)
+                        if snapshot.get('demo_case_id') else self.service.services.provider(snapshot, self.principal(request)))
+        except ProviderError:
             result = self.failure(request, context, "OBSERVATION_PROVIDER_UNAVAILABLE")
             result.update(status="partial", business_result="needs_information",
                 final="当前工单尚未绑定真实观测 Provider。没有执行模型或制造观测，请接入日志/指标来源或人工补充证据。")
             return result
-        provider = BoundIncidentProvider(snapshot, self.principal(request), self.service._store)
         mode = request["execution"]["execution_mode"]
+        if not snapshot.get('demo_case_id'):
+            provider.repair_capabilities = self.service.repairs.capabilities(provider.binding)
         if mode == "scripted_control_only":
+            if not snapshot.get('demo_case_id'):
+                result = self.failure(request, context, 'LIVE_DIAGNOSIS_REQUIRED')
+                result.update(status='partial', business_result='needs_information',
+                              final='真实数据源不能使用固定案例脚本诊断；请显式选择live并提供模型和工具预算。')
+                return result
             from agents.scripted import scripted_models
             models = scripted_models()
         else:

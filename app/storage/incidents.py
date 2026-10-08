@@ -30,11 +30,13 @@ class PostgresIncidents:
                                 (principal.tenant_id, principal.user_id, limit, offset)).fetchall()
         return [public_incident(r) for r in rows]
 
-    def _incident_lock(self, conn, iid, principal):
+    def _incident_lock(self, conn, iid, principal, allow_repair=False):
         row = conn.execute("SELECT * FROM incidents WHERE id=%s AND tenant_id=%s AND user_id=%s FOR UPDATE",
                            (iid, principal.tenant_id, principal.user_id)).fetchone()
         if not row:
             raise IncidentError("INCIDENT_NOT_FOUND", 404)
+        if not allow_repair:
+            self._guard_repair(conn, iid)
         return row
 
     def patch_incident(self, iid, document, revision, principal):
@@ -122,10 +124,13 @@ class MemoryIncidents:
             rows = sorted([r for r in self.incidents.values() if same_owner(r, principal)], key=lambda r: (r["created_at"], r["id"]), reverse=True)
             return deepcopy(rows[offset:offset+limit])
 
-    def _incident(self, iid, principal):
+    def _incident(self, iid, principal, allow_repair=False):
         row = self.incidents.get(iid)
         if not same_owner(row, principal):
             raise IncidentError("INCIDENT_NOT_FOUND", 404)
+        if not allow_repair:
+            from storage.repairs import guard_active
+            guard_active(self.repair_plans.get(iid, []))
         return row
 
     def patch_incident(self, iid, document, revision, principal):

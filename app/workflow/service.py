@@ -19,7 +19,8 @@ class CapacityExceeded(RuntimeError):
 
 
 class WorkflowService:
-    def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None):
+    def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None,
+                 service_registry=None, repair_executors=None):
         self._config_path = config_path
         self._store_lock = Lock()
         self._base_config = config
@@ -27,6 +28,10 @@ class WorkflowService:
         self._store_started = False
         self._admission_lock = Lock()
         self._closed = False
+        from providers.registry import ServiceRegistry
+        self.services = service_registry if service_registry is not None else ServiceRegistry.from_environment()
+        from repairs.service import RepairService
+        self.repairs = RepairService(self, repair_executors)
         capacity = max_concurrency or max(1, min(4, int(os.getenv("INCIDENT_MAX_CONCURRENCY", os.getenv("RESEARCH_MAX_CONCURRENCY", 2)))))
         self._capacity = BoundedSemaphore(capacity)
         self._executor = ThreadPoolExecutor(max_workers=capacity, thread_name_prefix="workflow")
@@ -42,6 +47,7 @@ class WorkflowService:
             if self._store is None:
                 self._store = PostgresRunStore(self._base_config.postgres_dsn)
             count = self._store.fail_interrupted()
+            self._store.recover_repairs()
             if count:
                 logger.warning("interrupted_runs_marked_failed | count=%d", count)
             self._store_started = True

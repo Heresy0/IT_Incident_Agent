@@ -43,6 +43,13 @@ class ToolExecutor:
             "search_runbooks": "Search applicable readable synthetic runbooks, at most 4 passages.",
             "search_incidents": "Search visible confirmed active cases of applicable version, at most 4 cases.",
         }
+        definitions = (self.provider.binding.observations.get('metrics', {}) if hasattr(self.provider, 'binding')
+                       else {r['metric']: {} for r in self.provider.base._data['metrics']} if hasattr(self.provider, 'base')
+                       else {r['metric']: {} for r in self.provider._data['metrics']} if hasattr(self.provider, '_data') else {})
+        descriptions['get_service_metrics'] = ('Read only registered metrics within the ticket window; at most 60 points per metric. '
+            'Available metrics and units: ' + json.dumps({k: v.get('unit', '') for k, v in definitions.items()})
+            + '. Select a small useful set. Missing samples do not establish health.')
+        descriptions['search_runbooks'] = 'Search registered applicable readable runbooks, at most 4 passages.'
         return [{"type": "function", "function": {"name": n, "description": descriptions[n],
                 "parameters": TOOL_ARGS[n].model_json_schema()}} for n in sorted(allowed)]
 

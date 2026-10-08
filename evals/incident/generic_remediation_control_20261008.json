@@ -1,0 +1,43 @@
+{
+  "evaluation_type": "excluded_scripted",
+  "baseline_commit": "a5cd300",
+  "paid_model_calls": 0,
+  "live_platform_writes": 0,
+  "frontend_modified": false,
+  "existing_credentials_modified": false,
+  "database_migration_executed": false,
+  "control_checks": {
+    "full_suite_at_initial_extension": {"total": 144, "passed": 139, "skipped": 5},
+    "current_unique_checks_after_targeted_validation": {"total": 151, "passed": 145, "skipped": 6},
+    "skipped_reason": "No isolated PostgreSQL test DSN configured; includes new repair row-lock test.",
+    "agent_api_targeted": "Passed; one new observation test double corrected to include locator and retested.",
+    "archive_preservation": "passed",
+    "compile": "passed",
+    "diff_whitespace": "passed"
+  },
+  "offline_demo": {
+    "entry": "scripts/demo_remediation.py",
+    "status": "verified",
+    "simulated_writes": 1,
+    "replay_additional_writes": 0,
+    "incident_status": "awaiting_confirmation"
+  },
+  "implemented": [
+    "Server-owned tenant/user/service/environment/version bindings",
+    "Fixed-query bounded Prometheus and Loki observation adapters",
+    "Extensible registered metric names",
+    "Agent structured repair candidate with current evidence and capability validation",
+    "Persistent owner-bound proposals, operator digest approval, expiry and source checks",
+    "Atomic execution claim, duplicate protection, bounded verification and interrupted-write handling",
+    "Docker HTTP restart executor with exact container ID and health verification"
+  ],
+  "contract_only_actions": ["scale_service", "rollback_release"],
+  "remaining_validation": [
+    "Real Prometheus/Loki endpoints, selectors and permissions",
+    "Live model diagnosis and candidate quality with explicit small budget",
+    "PostgreSQL 002 migration and cross-connection repair test",
+    "Controlled Docker HTTP endpoint and an approved isolated restart",
+    "Additional platform/action executors and front-end approval UI"
+  ],
+  "business_quality_score": null
+}

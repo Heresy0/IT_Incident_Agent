@@ -7,10 +7,11 @@ from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 from pathlib import Path
 from storage.incidents import PostgresIncidents, MemoryIncidents
+from storage.repairs import PostgresRepairs, MemoryRepairs
 from incidents.support import interrupted_result, now
 
 
-class PostgresRunStore(PostgresIncidents):
+class PostgresRunStore(PostgresIncidents, PostgresRepairs):
     def __init__(self, dsn):
         self.pool = ConnectionPool(dsn, min_size=1, max_size=4, timeout=5,
                                    kwargs={"row_factory": dict_row, "connect_timeout": 5, "options": "-c statement_timeout=10000"})
@@ -28,6 +29,7 @@ class PostgresRunStore(PostgresIncidents):
                 seq BIGINT NOT NULL, event JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 PRIMARY KEY(run_id, seq))""")
             conn.execute((Path(__file__).parent / "migrations/001_incidents.sql").read_text(encoding="utf-8"))
+            conn.execute((Path(__file__).parent / 'migrations/002_repairs.sql').read_text(encoding='utf-8'))
 
     def create(self, run_id, request, config):
         with self.pool.connection() as conn:
@@ -107,12 +109,13 @@ class PostgresRunStore(PostgresIncidents):
         self.pool.close()
 
 
-class MemoryRunStore(MemoryIncidents):
+class MemoryRunStore(MemoryIncidents, MemoryRepairs):
     """Explicit test adapter. Production never silently falls back to this store."""
     def __init__(self):
         from threading import RLock
         self.lock, self.runs, self.history = RLock(), {}, {}
         self.incidents, self.cases = {}, {}
+        self.repair_plans = {}
 
     def create(self, run_id, request, config):
         with self.lock:

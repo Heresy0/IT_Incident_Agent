@@ -53,7 +53,7 @@ docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300 postg
 
 默认端口 PostgreSQL 5434、后端8003；Compose项目 it-incident-local，数据卷独立。现有数据库名和账号保留以兼容既有数据，不在目录清理时迁移；旧 Milvus 容器/卷没有删除。
 
-后端初始化只执行原有运行表和工单迁移，不需要 Milvus、搜索 Key、个人记忆或研究 Agent。自由工单未绑定真实观测源时返回信息缺口，不制造案例证据。后台仅支持单进程，进程中断标记失败，目前不恢复执行。
+后端初始化执行运行表、工单迁移和新增002修复表迁移，不需要 Milvus、搜索 Key、个人记忆或研究 Agent。自由工单可通过INCIDENT_SERVICES_FILE绑定真实观测源；未绑定时返回信息缺口，不制造案例证据。后台仅支持单进程，诊断中断标记失败，修复中断转人工处理，不恢复外部写操作。
 
 ## 日志和指标
 
@@ -84,7 +84,19 @@ $env:PYTHONPATH='app'
 .\.venv\Scripts\python.exe main.py --live --case case_003 --model-budget 16 --tool-budget 8 --output output/incident-live
 ```
 
-Key、身份或预算不满足时在请求前停止。未知 Token/费用继续记为 unknown，不估造价格。自动处置、重启、回滚、扩容和写操作不在工具范围内。
+Key、身份或预算不满足时在请求前停止。未知 Token/费用继续记为 unknown，不估造价格。六个Agent工具仍只读；修复使用单独的审批与执行API，写操作不进入自由工具循环。
+
+## 通用接入和修复
+
+配置结构见examples/services.example.json，具体步骤、权限、API和未完成项见[通用接入与受控修复](docs/通用接入与受控修复.md)。本项目services.local.json已忽略；配置本项目身份、服务版本和固定PromQL/LogQL，然后设置INCIDENT_SERVICES_FILE并重启后端。示例全部为占位值，默认不会连接真实系统。
+
+免费修复演示：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/demo_remediation.py
+```
+
+演示只模拟动作。真实修复需登记目标、真实诊断通过复核、operator审批摘要，再显式调用execute。当前Docker HTTP执行器仅支持restart_service，要求精确容器ID及有效HEALTHCHECK；不会自动开启Docker API或调用现有容器。扩缩容、回滚执行器尚未实现。真实数据库迁移、监控接入、模型候选和容器重启本轮均未实测。
 
 ## 可选前端和停止
 

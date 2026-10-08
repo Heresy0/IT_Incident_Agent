@@ -2,6 +2,7 @@
 from typing import Any, Literal
 from pydantic import Field
 from evidence.contracts import Contract, EscalationSelection, ReferenceSelection, SelectedFinding, Finding, EvidenceRef
+from repairs.contracts import RepairIntent
 
 Role = Literal["investigation", "knowledge"]
 
@@ -49,6 +50,8 @@ class RecommendedAction(Contract):
     expected_result: str = Field(min_length=1, max_length=300)
     risk: str = Field(min_length=1, max_length=300)
     requires_approval: bool
+    repair: RepairIntent | None = Field(default=None,
+        description='Optional candidate from registered repair capabilities; never approval or execution. Cite current evidence IDs.')
 
 
 class DiagnosisSelection(EscalationSelection):

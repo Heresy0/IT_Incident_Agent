@@ -48,6 +48,8 @@ class FixtureProvider:
             rows = [r for r in data["owners"] if args.alias in r["aliases"]]
             cap = 1
         elif name == "get_service_metrics":
+            if any(metric not in {r['metric'] for r in data['metrics']} for metric in args.metrics):
+                raise ProviderError('METRIC_NOT_REGISTERED')
             rows = [r for r in data["metrics"] if r["metric"] in args.metrics and r["granularity"] == args.granularity]
             cap = None
         elif name == "get_service_logs":

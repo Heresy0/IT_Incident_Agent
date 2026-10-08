@@ -17,6 +17,7 @@ jobs:
       - run: python scripts/probe_incident_tools.py
       - run: python -m evals.incident.check_fixtures
       - run: python scripts/compare_incident.py --fake
+      - run: python scripts/demo_remediation.py
       - run: python -m compileall -q app
   frontend:
     runs-on: ubuntu-latest

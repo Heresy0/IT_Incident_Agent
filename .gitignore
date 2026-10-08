@@ -21,6 +21,7 @@ __pycache__/
 !.env.local.example
 .auth.local.json
 .demo-credentials.local.json
+services.local.json
 
 # Frontend dependencies and generated files
 node_modules/

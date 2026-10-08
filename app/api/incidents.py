@@ -33,6 +33,12 @@ async def demos(principal: Principal = Depends(get_current_principal)):
     return {"items": await call(catalog, principal)}
 
 
+@router.get('/incident-services')
+async def registered_services(service: WorkflowService = Depends(get_workflow_service),
+                              principal: Principal = Depends(get_current_principal)):
+    return {'items': await call(service.services.catalog, principal)}
+
+
 @router.post("/incidents", status_code=201)
 async def create(payload: IncidentCreate, service: WorkflowService = Depends(get_workflow_service),
                  principal: Principal = Depends(get_current_principal)):

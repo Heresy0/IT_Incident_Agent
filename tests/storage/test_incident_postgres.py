@@ -40,6 +40,35 @@ class IncidentPostgresTests(unittest.TestCase):
     def begin(self, execution=None, store=None):
         return (store or self.store).begin_diagnosis(self.incident['id'], str(uuid4()), execution or self.execution, self.owner, {})
 
+    def test_repair_storage_serializes_claims_and_blocks_business_edits(self):
+        second = PostgresRunStore(self.dsn)
+        iid = self.incident['id']
+        try:
+            def propose(incident, plans):
+                if not plans:
+                    plans.append({'id': 'plan', 'status': 'approved', 'events': []})
+                return plans[0]
+            self.store.repair_transaction(iid, self.owner, propose)
+            def claim(store):
+                def mutation(incident, plans):
+                    if plans[0]['status'] == 'approved':
+                        plans[0]['status'] = 'executing'
+                        return True
+                    return False
+                return store.repair_transaction(iid, self.owner, mutation)
+            with ThreadPoolExecutor(2) as pool:
+                claims = list(pool.map(claim, (self.store, second)))
+            self.assertEqual(sum(claims), 1)
+            with self.assertRaisesRegex(IncidentError, 'REPAIR_IN_PROGRESS'):
+                second.patch_incident(iid, catalog(self.owner)[0]['fields'], 1, self.owner)
+            with self.assertRaises(IncidentError):
+                second.repair_transaction(iid, Principal(self.owner.tenant_id, 'other'), propose)
+            self.store.recover_repairs()
+            plans = second.repair_transaction(iid, self.owner, lambda incident, plans: plans)
+            self.assertEqual(plans[0]['status'], 'manual_required')
+        finally:
+            second.close()
+
     def test_two_stores_concurrent_idempotency_and_database_constraints(self):
         second = PostgresRunStore(self.dsn)
         try:

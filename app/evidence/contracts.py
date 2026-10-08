@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Any, Literal
+from typing import Any, Literal, Annotated
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
@@ -41,8 +41,7 @@ class Ticket(Contract):
     scope: IncidentScope
 
 
-Metric = Literal["request_error_rate", "request_latency", "dependency_error_rate", "db_cpu",
-                 "pool_usage", "pool_wait", "request_rate"]
+Metric = Annotated[str, Field(min_length=1, max_length=64, pattern=r'^[a-z][a-z0-9_]*$')]
 Category = Literal["dependency", "configuration", "resource"]
 
 

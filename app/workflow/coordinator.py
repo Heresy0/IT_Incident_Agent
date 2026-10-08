@@ -184,6 +184,7 @@ class Collaboration:
         payload = {"ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                    "evidence": self.sources(), "collection": self.collection(), "challenge": self.pending,
                    "observation_gaps": self.observation_gaps(),
+                   "repair_capabilities": getattr(self.provider, 'repair_capabilities', []),
                    "task_results": [{"role": t["role"], "status": t["status"], "missing_information": t["output"]["missing_information"]} for t in self.tasks]}
         self.draft = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
         revision = len(self.drafts) + 1

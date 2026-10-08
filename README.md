@@ -34,9 +34,13 @@ flowchart TD
 
 已支持创建/修订工单、六个开发案例、有界诊断、证据回放、人工确认解决、私有经验检索，以及同预算单/多 Agent 对照。六个工具都只读，执行前校验身份、角色、服务和时间范围。
 
-自由工单仍需接入真实观测 Provider；当前开发案例使用合成观测。系统生成处置建议，重启、回滚、扩容、数据修改和权限变更由人员执行。诊断 completed 不代表工单已解决，也不代表业务准确率已验收。
+自由工单可通过服务端ServiceRegistry绑定Prometheus/Loki观测Provider，查询模板、目标、租户和用户范围由管理员登记。开发案例继续使用合成观测。真实来源诊断必须显式live和预算，未登记来源返回信息缺口。
+
+新增独立修复流程：Agent结构化候选或人工提案 → 绑定证据、工单版本和服务配置 → operator审批 → 单次执行 → 有界验证。Docker HTTP执行器已实现精确登记容器的restart_service，要求有效HEALTHCHECK、启动时间改变且健康恢复；不会开启Docker TCP或操作现有容器。扩缩容/回滚目前只有动作契约及平台扩展机制，默认执行器明确拒绝。真实重启尚未实测。诊断completed或修复verified都不会自动解决工单。
 
 目录迁移后123项 IT 测试：118通过、5项 PostgreSQL 集成因未配置测试 DSN 跳过；再对新增归档与监控检查定向验证，当前共127项、122通过、5项跳过。六案例单/多共12次免费流程检查通过，结果不计入业务质量评分。本轮没有付费调用。历史真实复测的语义质量缺口仍保留，M5尚未整体验收。
+
+通用接入与修复扩展做一次144项全量回归和后续定向验证，累计151项：145通过、6项数据库集成跳过。离线修复演示通过，模拟动作一次，重复请求不再次执行；未调用付费模型、数据库迁移或真实容器。配置、API和验证边界见[通用接入与受控修复](docs/通用接入与受控修复.md)，登记结构参考examples/services.example.json。
 
 ## 后端入口
 
@@ -44,6 +48,7 @@ flowchart TD
 cd D:\code\it_incident_agent
 $env:PYTHONIOENCODING='utf-8'
 .\.venv\Scripts\python.exe main.py --fake --case case_003 --output output/incident
+.\.venv\Scripts\python.exe scripts/demo_remediation.py
 .\.venv\Scripts\python.exe local_run.py backend
 ```
 

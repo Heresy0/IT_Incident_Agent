@@ -26,6 +26,20 @@ def expand_refs(refs, registry):
 
 
 def expand_diagnosis(selection, registry):
+    capabilities = getattr(registry.provider, 'repair_capabilities', [])
+    for action in selection.recommended_actions:
+        if action.repair is not None:
+            intent = action.repair
+            capability = next((item for item in capabilities if item['action'] == intent.action
+                               and item['target'] == intent.target), None)
+            if not capability or not action.requires_approval:
+                raise ProtocolError('REPAIR_CAPABILITY_DENIED')
+            if any(eid not in registry.evidence or registry.evidence[eid].kind != 'observation'
+                   for eid in intent.evidence_ids):
+                raise ProtocolError('REPAIR_CURRENT_EVIDENCE_REQUIRED')
+            if (intent.action == 'scale_service' and intent.parameters['replicas'] > capability['max_replicas']
+                    or intent.action == 'rollback_release' and intent.parameters['version'] not in capability['versions']):
+                raise ProtocolError('REPAIR_PARAMETERS_DENIED')
     facts, _ = resolve_output(json.dumps({"findings": [f.model_dump() for f in selection.findings]}), registry)
     hypotheses = [Hypothesis(hypothesis_id=f"H{n}", cause=h.cause,
         support_refs=expand_refs(h.support_refs, registry), counter_refs=expand_refs(h.counter_refs, registry),
