@@ -15,9 +15,9 @@ def main():
     if not 1 <= args.days <= 365:
         parser.error("days must be between 1 and 365")
     load_local_env()
-    from mult_agents.config import AppConfig
+    from backend.config.incident import IncidentConfig
     from backend.service.run_store import PostgresRunStore
-    store = PostgresRunStore(AppConfig.from_file().postgres_dsn)
+    store = PostgresRunStore(IncidentConfig.from_file(ROOT / 'app' / 'config.json').postgres_dsn)
     try:
         print(f"Deleted terminal run records: {store.cleanup(args.days)}")
     finally:

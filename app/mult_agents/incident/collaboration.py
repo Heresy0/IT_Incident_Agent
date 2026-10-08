@@ -1,4 +1,4 @@
-"""Serial coordinator: model decisions inside a bounded, server-owned lifecycle."""
+"""Role operations and guards reused by the incident LangGraph workflow."""
 import hashlib
 import json
 import time
@@ -46,6 +46,10 @@ class Collaboration:
         self.pending, self.draft, self.review = None, None, None
         self.phase, self.stop, self.extra_gaps, self.team = "collect", "", [], None
         self.workflow_span = self.context.root_span
+        self.dispatch_queue = []
+        self.dispatch_follow_up = False
+        self.dispatch_previous = set()
+        self.next_node = 'supervisor'
 
     def event(self, kind, role="supervisor", **fields):
         self.context.emit({"type": kind, "role": role, "span_id": self.workflow_span,
@@ -175,7 +179,7 @@ class Collaboration:
                 'proposed_check': 'Read-only checks: ' + ', '.join(c.tool for c in normalized)})
         return review.model_copy(update={"assessments": checked, 'request_evidence': request})
 
-    def diagnose_and_review(self):
+    def diagnose(self):
         self.review = None  # A previous revision's review never approves a new draft.
         payload = {"ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                    "evidence": self.sources(), "collection": self.collection(), "challenge": self.pending,
@@ -190,6 +194,10 @@ class Collaboration:
         if not self.targets():
             self.stop = "NEEDS_INFORMATION"
             return
+        self.next_node = 'reviewer'
+
+    def review_draft(self):
+        revision = len(self.drafts)
         self.review = self.ask("reviewer", ReviewDecision, self.reviewer_input(), terminal=True, validate=self.validate_review)
         self.reviews.append({"revision": revision, "review": self.review.model_dump(mode="json")})
         self.event("review_completed", "reviewer", revision=revision,
@@ -207,12 +215,19 @@ class Collaboration:
                 self.note("request_evidence", "reviewer", "supervisor", hypothesis_id=request.hypothesis_id,
                           evidence_ids=request.evidence_ids, reason=request.expected_value, check=request.proposed_check)
                 self.phase = "rework"
+                self.next_node = 'supervisor'
         else:
             self.pending = None
             self.stop = "FINISHED" if all(a.verdict == "supported" for a in self.review.assessments) and not self.observation_gaps() else "REVIEW_INCOMPLETE"
             self.note("accept" if self.stop == "FINISHED" else "escalate", "reviewer", "supervisor")
 
-    def dispatch(self, decision):
+    def diagnose_and_review(self):
+        """Compatibility helper for direct callers; graph uses separate role nodes."""
+        self.diagnose()
+        if not self.stop:
+            self.review_draft()
+
+    def prepare_dispatch(self, decision):
         if not decision.tasks or len(self.tasks) + len(decision.tasks) > 6:
             raise ProtocolError("TASK_LIMIT")
         if self.phase == "rework" and (len(decision.tasks) != 1 or decision.tasks[0].role != self.pending["target_role"]):
@@ -230,7 +245,7 @@ class Collaboration:
                        requested_roles=[t.role for t in decision.tasks], available_tasks=capacity)
             if self.phase == "collect" and any(e.kind == "observation" for e in self.evidence.values()):
                 self.event("finalization_started", reason="research_budget_unavailable")
-                self.diagnose_and_review()
+                self.next_node = 'diagnosis'
                 return
             raise ExecutionError("BUDGET_EXCEEDED")
         selected = list(zip(decision.tasks, keys))
@@ -245,101 +260,109 @@ class Collaboration:
         follow_up = self.phase == "rework"
         if follow_up:
             self.reworks += 1
-        previous_evidence = set(self.evidence)
-        for index, (task, _) in enumerate(selected):
-            if not self.context.can_research():
-                self.event("task_deferred", task.role, reason="research_budget_unavailable")
-                if not follow_up and any(e.kind == "observation" for e in self.evidence.values()):
-                    self.event("finalization_started", reason="research_budget_unavailable")
-                    self.diagnose_and_review()
-                    return
-                raise ExecutionError("BUDGET_EXCEEDED")
-            ids = list(dict.fromkeys([*task.evidence_ids, *(self.pending["evidence_ids"] if follow_up else [])]))[:8]
-            # Reuse same-role registered snapshots even when the scheduler supplies no IDs.
-            # Selected sources retain priority, while the bounded fallback exposes earlier checks.
-            available = self.executors[task.role].evidence
-            ordered = list(dict.fromkeys([*ids, *reversed(list(available))]))
-            prior, size = [], 0
-            for source in self.sources(ordered):
-                encoded = len(json.dumps(source, ensure_ascii=False))
-                if size + encoded <= min(6000, self.context.limits.input_chars // 4):
-                    prior.append(source); size += encoded
-            approved_checks = [c for c in self.pending['checks']] if follow_up else None
-            objective = {"goal": ('Perform the approved read-only checks.' if follow_up else task.goal),
-                "approved_checks": approved_checks, "evidence": prior, "focused_evidence_ids": ids,
-                "collection": self.collection()[-12:], "observation_gaps": self.observation_gaps(),
-                "challenge": self.pending if follow_up else None}
-            before = dict(self.context.counts)
-            available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - before["model_calls"]
-            steps = min(4, available_steps - 2 * (len(selected) - index - 1))
-            result = investigate(self.models[task.role], self.provider, self.principal, context=self.context,
-                event_log=self.events, executor=self.executors[task.role], objective=objective,
-                role=task.role, repair_state=self.repairs, max_steps=max(1, steps), approved_checks=approved_checks)
-            self.tasks.append({"task_id": result["task_id"], "role": task.role, "goal": task.goal,
-                "challenge_id": self.pending["challenge_id"] if follow_up else None,
-                "status": result["status"], "output": result["output"],
-                "model_calls": self.context.counts["model_calls"] - before["model_calls"],
-                "tool_calls": self.context.counts["tool_calls"] - before["tool_calls"],
-                "prompt_version": result["prompt_version"], "termination_reason": result["run_summary"]["termination_reason"],
-                "evidence_ids": [e["evidence_id"] for e in result["evidence"]]})
-            executor = self.executors[task.role]
-            self.evidence.update({k: v.model_copy(deep=True) for k, v in executor.evidence.items()})
-            self.references.update({k: v.model_copy(deep=True) for k, v in executor.references.items()})
-        if not follow_up and previous_evidence and not set(self.evidence).difference(previous_evidence):
-            self.event('collection_stalled', reason='no_new_evidence', task_ids=[t['task_id'] for t in self.tasks[-len(selected):]])
-            self.diagnose_and_review()
+        self.dispatch_previous = set(self.evidence)
+        self.dispatch_follow_up = follow_up
+        self.dispatch_queue = [task for task, _ in selected]
+        self.next_node = self.dispatch_queue[0].role
+
+    def execute_task(self, role):
+        task = self.dispatch_queue.pop(0)
+        if task.role != role:
+            raise ProtocolError('INVALID_TASK_ROUTE')
+        follow_up = self.dispatch_follow_up
+        if not self.context.can_research():
+            self.event("task_deferred", task.role, reason="research_budget_unavailable")
+            if not follow_up and any(e.kind == "observation" for e in self.evidence.values()):
+                self.event("finalization_started", reason="research_budget_unavailable")
+                self.dispatch_queue.clear()
+                self.next_node = 'diagnosis'
+                return
+            raise ExecutionError("BUDGET_EXCEEDED")
+        ids = list(dict.fromkeys([*task.evidence_ids, *(self.pending["evidence_ids"] if follow_up else [])]))[:8]
+        # Reuse same-role registered snapshots even when the scheduler supplies no IDs.
+        # Selected sources retain priority, while the bounded fallback exposes earlier checks.
+        available = self.executors[task.role].evidence
+        ordered = list(dict.fromkeys([*ids, *reversed(list(available))]))
+        prior, size = [], 0
+        for source in self.sources(ordered):
+            encoded = len(json.dumps(source, ensure_ascii=False))
+            if size + encoded <= min(6000, self.context.limits.input_chars // 4):
+                prior.append(source); size += encoded
+        approved_checks = [c for c in self.pending['checks']] if follow_up else None
+        objective = {"goal": ('Perform the approved read-only checks.' if follow_up else task.goal),
+            "approved_checks": approved_checks, "evidence": prior, "focused_evidence_ids": ids,
+            "collection": self.collection()[-12:], "observation_gaps": self.observation_gaps(),
+            "challenge": self.pending if follow_up else None}
+        before = dict(self.context.counts)
+        available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - before["model_calls"]
+        steps = min(4, available_steps - 2 * len(self.dispatch_queue))
+        result = investigate(self.models[task.role], self.provider, self.principal, context=self.context,
+            event_log=self.events, executor=self.executors[task.role], objective=objective,
+            role=task.role, repair_state=self.repairs, max_steps=max(1, steps), approved_checks=approved_checks)
+        self.tasks.append({"task_id": result["task_id"], "role": task.role, "goal": task.goal,
+            "challenge_id": self.pending["challenge_id"] if follow_up else None,
+            "status": result["status"], "output": result["output"],
+            "model_calls": self.context.counts["model_calls"] - before["model_calls"],
+            "tool_calls": self.context.counts["tool_calls"] - before["tool_calls"],
+            "prompt_version": result["prompt_version"], "termination_reason": result["run_summary"]["termination_reason"],
+            "evidence_ids": [e["evidence_id"] for e in result["evidence"]]})
+        executor = self.executors[task.role]
+        self.evidence.update({k: v.model_copy(deep=True) for k, v in executor.evidence.items()})
+        self.references.update({k: v.model_copy(deep=True) for k, v in executor.references.items()})
+        if self.dispatch_queue:
+            self.next_node = self.dispatch_queue[0].role
             return
-        if follow_up:
-            self.diagnose_and_review()
+        if not follow_up and self.dispatch_previous and not set(self.evidence).difference(self.dispatch_previous):
+            self.event('collection_stalled', reason='no_new_evidence')
+            self.next_node = 'diagnosis'
+        else:
+            self.next_node = 'diagnosis' if follow_up else 'supervisor'
 
     def dispatch_capacity(self, pending_model_call=False):
         available = self.context.limits.model_calls - self.context.counts["model_calls"] - int(pending_model_call)
         tools = self.context.limits.tool_calls - self.context.counts["tool_calls"]
         return max(0, min(2, tools, (available - self.context.limits.reserve_model_calls) // 2))
 
+    def supervise(self):
+        if self.supervisor_calls >= 4:
+            self.stop = "SUPERVISOR_LIMIT"
+            return
+        decision = self.ask("supervisor", SupervisorSelection, {
+            "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
+            "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
+            "collection": self.collection(), "observation_gaps": self.observation_gaps(),
+            "tasks": [{**{k: t[k] for k in ("role", "goal", "status", "evidence_ids")},
+                       "missing_information": t["output"]["missing_information"]} for t in self.tasks],
+            "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
+                       "max_dispatch_tasks": self.dispatch_capacity(pending_model_call=True)}},
+            terminal=bool(self.evidence and self.phase == "collect"), validate=self.supervisor_decision)
+        self.supervisor_calls += 1
+        self.decisions.append({"round": self.supervisor_calls, **decision.model_dump(mode="json")})
+        self.event("supervisor_decision", action=decision.action, round=self.supervisor_calls,
+                   requested_roles=[t.role for t in decision.tasks])
+        if decision.action != "dispatch" and decision.tasks:
+            raise ProtocolError("UNEXPECTED_TASKS")
+        if decision.action == "dispatch":
+            self.prepare_dispatch(decision)
+        elif decision.action == "diagnose":
+            if self.phase == "rework" or not any(e.kind == "observation" for e in self.evidence.values()):
+                raise ProtocolError("DIAGNOSIS_WITHOUT_OBSERVATIONS")
+            self.next_node = 'diagnosis'
+        elif decision.action == "finish":
+            if self.review is None or any(a.verdict != "supported" for a in self.review.assessments):
+                raise ProtocolError("UNREVIEWED_FINISH")
+            self.stop = "FINISHED"
+        else:
+            self.team = decision.escalation_team
+            self.extra_gaps.extend(decision.missing_information or [decision.reason])
+            self.note("escalate", "supervisor", "human", reason=decision.reason)
+            self.stop = "ESCALATED" if decision.action == "escalate" else "NEEDS_INFORMATION"
+
     def run(self):
+        from .graph import build_graph
         with activate(self.context), self.context.span("workflow", "incident_collaboration"):
             self.workflow_span = self.events[-1]["span_id"]
-            try:
-                while not self.stop:
-                    if self.supervisor_calls >= 4:
-                        self.stop = "SUPERVISOR_LIMIT"
-                        break
-                    decision = self.ask("supervisor", SupervisorSelection, {
-                        "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
-                        "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
-                        "collection": self.collection(), "observation_gaps": self.observation_gaps(),
-                        "tasks": [{**{k: t[k] for k in ("role", "goal", "status", "evidence_ids")},
-                                   "missing_information": t["output"]["missing_information"]} for t in self.tasks],
-                        "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
-                                   "max_dispatch_tasks": self.dispatch_capacity(pending_model_call=True)}},
-                        terminal=bool(self.evidence and self.phase == "collect"), validate=self.supervisor_decision)
-                    self.supervisor_calls += 1
-                    self.decisions.append({"round": self.supervisor_calls, **decision.model_dump(mode="json")})
-                    self.event("supervisor_decision", action=decision.action, round=self.supervisor_calls,
-                               requested_roles=[t.role for t in decision.tasks])
-                    if decision.action != "dispatch" and decision.tasks:
-                        raise ProtocolError("UNEXPECTED_TASKS")
-                    if decision.action == "dispatch":
-                        self.dispatch(decision)
-                    elif decision.action == "diagnose":
-                        if self.phase == "rework" or not any(e.kind == "observation" for e in self.evidence.values()):
-                            raise ProtocolError("DIAGNOSIS_WITHOUT_OBSERVATIONS")
-                        self.diagnose_and_review()
-                    elif decision.action == "finish":
-                        if self.review is None or any(a.verdict != "supported" for a in self.review.assessments):
-                            raise ProtocolError("UNREVIEWED_FINISH")
-                        self.stop = "FINISHED"
-                    else:
-                        self.team = decision.escalation_team
-                        self.extra_gaps.extend(decision.missing_information or [decision.reason])
-                        self.note("escalate", "supervisor", "human", reason=decision.reason)
-                        self.stop = "ESCALATED" if decision.action == "escalate" else "NEEDS_INFORMATION"
-            except (ExecutionError, ProtocolError) as exc:
-                self.stop = exc.code
-                self.context.error(exc if isinstance(exc, ExecutionError) else ExecutionError(exc.code), "incident_collaboration")
-            self.context.stop_reason = self.stop
-            self.event("workflow_completed", status=self.status(), reason=self.stop)
+            build_graph(self).invoke({}, config={"recursion_limit": 40})
         return self.result()
 
     def status(self):
@@ -388,6 +411,7 @@ class Collaboration:
             "fact_rendering": FACT_RENDERING, "coverage_gaps": self.observation_gaps(), 'model_input_view': MODEL_VIEW_VERSION,
             "rework_rounds": self.reworks, "supervisor_decisions": self.supervisor_calls,
             "scheduling_decisions": self.decisions,
+            "workflow_engine": "langgraph", "workflow_version": "incident_graph_v1",
             "prompt_version": self.prompt_version()}
 
     def prompt_version(self):

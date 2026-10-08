@@ -1,6 +1,7 @@
 import copy
 import json
 import unittest
+from datetime import datetime
 
 from evals.incident.acceptance import assess, ROOT
 from mult_agents.incident.fake import ScriptedModel
@@ -55,10 +56,15 @@ class IncidentAcceptanceTests(unittest.TestCase):
         self.assertTrue(changed["checks"]["snapshot_integrity"])
         self.assertFalse(changed["checks"]["references_valid"])
 
-    def test_query_profiles_only_contain_validated_enums(self):
+    def test_query_profiles_only_contain_validated_filters_and_window(self):
         ex = executor()
         ex.execute("get_service_logs", {**window(ex), "category": "dependency", "error_code": "PRIVATE_CODE"})
-        self.assertEqual(ex.last_query_profile, {"category": "dependency", "level": None})
+        self.assertEqual(set(ex.last_query_profile), {'start', 'end', 'category', 'level'})
+        self.assertEqual(ex.last_query_profile['category'], 'dependency')
+        self.assertIsNone(ex.last_query_profile['level'])
+        self.assertEqual(datetime.fromisoformat(ex.last_query_profile['start']), ex.scope.start)
+        self.assertEqual(datetime.fromisoformat(ex.last_query_profile['end']), ex.scope.end)
+        self.assertNotIn('error_code', ex.last_query_profile)
         ex.execute("get_service_owner", {"alias": "TEST_SECRET_CANARY"})
         self.assertEqual(ex.last_query_profile, {})
         ex.execute("get_service_logs", {**window(ex), "category": "TEST_SECRET_CANARY"})

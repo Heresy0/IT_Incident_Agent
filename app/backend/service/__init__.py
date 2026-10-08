@@ -7,7 +7,7 @@ from .workflow_service import WorkflowService
 @lru_cache(maxsize=1)
 def get_workflow_service() -> WorkflowService:
     settings = AppSettings()
-    return WorkflowService(config_path=settings.config_path)
+    return WorkflowService(config_path=settings.config_path, enable_legacy_research=settings.enable_legacy_research)
 
 
 __all__ = ["WorkflowService", "get_workflow_service"]

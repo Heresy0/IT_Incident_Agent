@@ -62,7 +62,7 @@ async def diagnose(incident_id: UUID, payload: DiagnosisRequest, service: Workfl
                    principal: Principal = Depends(get_current_principal)):
     run_id, replayed = await call(service.start_diagnosis, str(incident_id), payload.model_dump(), principal)
     return {"run_id": run_id, "incident_id": str(incident_id), "replayed": replayed,
-        "result_url": f"/api/v1/research/runs/{run_id}", "event_url": f"/api/v1/research/runs/{run_id}/events"}
+        "result_url": f"/api/v1/runs/{run_id}", "event_url": f"/api/v1/runs/{run_id}/events"}
 
 
 @router.post("/incidents/{incident_id}/resolution")

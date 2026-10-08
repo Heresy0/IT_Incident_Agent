@@ -8,15 +8,8 @@ from threading import BoundedSemaphore, Lock
 from typing import AsyncIterator
 from uuid import uuid4
 
-from mult_agents.config import AppConfig
-from mult_agents.graph import build_app as build_workflow_app
-from mult_agents.main import build_agents, build_checkpointer
-from mult_agents.memory.scoped import ScopedMemoryManager
-from mult_agents.prompts import PROMPTS
-from mult_agents.state import create_initial_state
+from backend.config.incident import IncidentConfig
 from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, activate, register, unregister
-from mult_agents.harness.validation import render_report
-from mult_agents.harness.coverage import final_coverage, coverage_summary
 from mult_agents.harness.telemetry import METRICS
 from mult_agents.harness.version import WORKFLOW_VERSION
 from .run_store import PostgresRunStore
@@ -29,7 +22,10 @@ class CapacityExceeded(RuntimeError):
 
 
 class WorkflowService:
-    def __init__(self, config_path, *, store=None, workflow=None, config=None, max_concurrency=None, incident_model_factory=None):
+    def __init__(self, config_path, *, store=None, workflow=None, config=None, max_concurrency=None, incident_model_factory=None,
+                 enable_legacy_research=None):
+        # An explicitly injected old workflow remains usable in compatibility tests.
+        self.enable_legacy_research = workflow is not None if enable_legacy_research is None else enable_legacy_research
         self._config_path = config_path
         self._lock, self._store_lock = Lock(), Lock()
         self._initialized = workflow is not None
@@ -43,18 +39,24 @@ class WorkflowService:
         self._closed = False
         self._checkpointer_context = None
         self._limits = Limits.from_env()
-        capacity = max_concurrency or max(1, min(4, int(os.getenv("RESEARCH_MAX_CONCURRENCY", 2))))
+        capacity = max_concurrency or max(1, min(4, int(os.getenv("INCIDENT_MAX_CONCURRENCY", os.getenv("RESEARCH_MAX_CONCURRENCY", 2)))))
         self._capacity = BoundedSemaphore(capacity)
         self._executor = ThreadPoolExecutor(max_workers=capacity, thread_name_prefix="workflow")
         from .workflow_adapters import ResearchAdapter, IncidentAdapter
-        self._adapters = {"research": ResearchAdapter(self), "incident": IncidentAdapter(self, incident_model_factory)}
+        self._adapters = {"incident": IncidentAdapter(self, incident_model_factory)}
+        if self.enable_legacy_research:
+            self._adapters['research'] = ResearchAdapter(self)
 
     def start(self):
         with self._store_lock:
             if self._store_started:
                 return
             if self._base_config is None:
-                self._base_config = AppConfig.from_file(self._config_path)
+                if self.enable_legacy_research:
+                    from mult_agents.config import AppConfig
+                    self._base_config = AppConfig.from_file(self._config_path)
+                else:
+                    self._base_config = IncidentConfig.from_file(self._config_path)
             if self._store is None:
                 self._store = PostgresRunStore(self._base_config.postgres_dsn)
             count = self._store.fail_interrupted()
@@ -75,6 +77,9 @@ class WorkflowService:
             self._memory_manager.close()
 
     def _ensure_initialized(self):
+        from mult_agents.config import AppConfig
+        from mult_agents.graph import build_app as build_workflow_app
+        from mult_agents.main import build_agents, build_checkpointer
         if self._initialized:
             return
         with self._lock:
@@ -89,6 +94,9 @@ class WorkflowService:
             self._initialized = True
 
     def get_memory_manager(self):
+        if not self.enable_legacy_research:
+            raise RuntimeError('研究记忆兼容功能未启用')
+        from mult_agents.memory.scoped import ScopedMemoryManager
         self.start()
         with self._memory_lock:
             if not self._base_config.enable_memory:
@@ -104,6 +112,8 @@ class WorkflowService:
             return self._memory_manager
 
     def start_run(self, request, principal=None):
+        if not self.enable_legacy_research:
+            raise RuntimeError('研究兼容功能未启用')
         if principal is not None:
             request = principal.bind(request)
         with self._admission_lock:
@@ -118,6 +128,7 @@ class WorkflowService:
         run_id = str(uuid4())
         active = created = False
         try:
+            from mult_agents.prompts import PROMPTS
             from mult_agents.nodes import SUPPORT_PROMPT
             from mult_agents.harness.validation import SCHEMAS
             contracts = {name: schema.model_json_schema() for name, schema in SCHEMAS.items() if schema}
@@ -177,6 +188,9 @@ class WorkflowService:
             self._capacity.release()
 
     def _research_result(self, request, context):
+        from mult_agents.state import create_initial_state
+        from mult_agents.harness.validation import render_report
+        from mult_agents.harness.coverage import final_coverage, coverage_summary
         run_id = context.run_id
         state = {}
         with activate(context):

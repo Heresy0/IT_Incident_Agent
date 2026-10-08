@@ -4,7 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppSettings(BaseSettings):
-    app_name: str = "DeepResearch Multi-Agent Assistant"
+    app_name: str = "IT Incident Agent"
+    enable_legacy_research: bool = False
     app_env: str = "development"
     host: str = "0.0.0.0"
     port: int = 8000
@@ -12,7 +13,8 @@ class AppSettings(BaseSettings):
     config_path: str = str(Path(__file__).resolve().parents[3] / "config.json")
 
     model_config = SettingsConfigDict(
-        env_file=str(Path(__file__).resolve().parents[3] / ".env"),
+        env_file=(str(Path(__file__).resolve().parents[3] / ".env"),
+                  str(Path(__file__).resolve().parents[4] / ".env.local")),
         env_file_encoding="utf-8",
         extra="ignore",
     )

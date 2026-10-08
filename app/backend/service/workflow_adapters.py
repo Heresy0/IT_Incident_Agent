@@ -42,9 +42,9 @@ class IncidentAdapter:
         from mult_agents.incident import collaboration
         root = Path(collaboration.__file__).parent
         version = hashlib.sha256(b"".join((root / name).read_bytes() for name in (
-            "collaboration.py", "collaboration_contracts.py", "collaboration_prompts.py", "diagnosis.py", "observations.py", "model_view.py", "ownership.py", "investigation.py", "contracts.py", "prompts.py", "tools.py"))).hexdigest()[:12]
+            "collaboration.py", "graph.py", "collaboration_contracts.py", "collaboration_prompts.py", "diagnosis.py", "observations.py", "model_view.py", "ownership.py", "investigation.py", "contracts.py", "prompts.py", "tools.py"))).hexdigest()[:12]
         return {"model": "scripted" if execution["execution_mode"] == "scripted_control_only" else self.service._base_config.model,
-                "workflow_version": "incident_m4_v1", "source_version": version,
+                "workflow_version": "incident_graph_v1", "workflow_engine": "langgraph", "source_version": version,
                 "limits": self.limits({"execution": execution}).__dict__}
 
     def scope(self, request):

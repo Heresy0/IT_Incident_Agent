@@ -38,8 +38,8 @@ def main(argv=None):
             parser.error("M3 live needs explicit --model-budget and --tool-budget; no request sent")
         if not 6 <= args.model_budget <= 16 or not 1 <= args.tool_budget <= 24:
             parser.error("M3 live allowance must be model 6-16 / tool 1-24; no request sent")
-    load_dotenv(ROOT / ".env.local", override=False)
     if args.live:
+        load_dotenv(ROOT / ".env.local", override=False)
         key = os.getenv("DASHSCOPE_API_KEY", "")
         if not key or key == "test-only":
             parser.error("Set DASHSCOPE_API_KEY in this project's .env.local; no request sent.")

@@ -1,26 +1,26 @@
 # Windows 本地启动
 
-Web/API 已具备 M4 工单工程闭环，开发案例已增至六个。CLI 支持 Investigation、M3 串行协作及 M5 同预算单/多对照；真实语义与返工验收仍有缺口。以下安装步骤仅使用本项目自己的依赖、密钥和数据库。
+默认后端已收敛为 IT 工单系统，五个角色使用 LangGraph 节点运行。当前先完善后端，前端稍后统一整理。IT 后端只需要本项目自己的 PostgreSQL；合成免费 CLI 不需要数据库或 Key。真实观测源和业务质量验收仍待完成。
 
 ## 首次准备
 
-安装 Python 3.12、Node.js 20.19+ 或 22.12+（含 npm）、Docker Desktop，并启动 Docker 引擎。
+安装 Python 3.12。运行持久化后端还需 Docker Desktop；前端后续再准备 Node.js。
 
 在 PowerShell 中执行：
 
 ```powershell
 cd D:\code\it_incident_agent
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-incident.txt
 Copy-Item .env.local.example .env.local
 .\.venv\Scripts\python.exe scripts/setup_demo_auth.py
 ```
 
-编辑 `.env.local`，填写自己的 `DASHSCOPE_API_KEY` 与 `BOCHA_API_KEY`。模型默认为 `qwen-turbo`；联网研究需要搜索 Key。API 调用与文本向量入库会消耗相应额度。
+免费控制模式不需要模型 Key；要显式执行付费模型时填写本项目自己的 `DASHSCOPE_API_KEY`，模型默认为 `qwen-turbo`。默认 `ENABLE_LEGACY_RESEARCH=false`，无需搜索 Key、研究记忆或 Milvus。历史研究兼容功能才需要完整 `requirements.txt` 和对应外部服务。
 
 认证脚本生成 `.auth.local.json`（服务端哈希注册表）与 `.demo-credentials.local.json`（本地演示令牌）。页面需要填入后者中的令牌；两个文件均已被 `.gitignore` 排除。
 
-安装前端依赖：
+前端留到后端稳定后处理；如需使用现有页面，可单独安装依赖：
 
 ```powershell
 cd D:\code\it_incident_agent\front\agent_front
@@ -31,13 +31,13 @@ npm ci
 
 ```powershell
 cd D:\code\it_incident_agent
-docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300
+docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300 postgres
 .\.venv\Scripts\python.exe local_run.py check
 .\.venv\Scripts\python.exe local_run.py init
 .\.venv\Scripts\python.exe local_run.py backend
 ```
 
-保留后端终端，在第二个 PowerShell 启动前端：
+后端接口文档：`http://127.0.0.1:8003/docs`。可直接通过接口完成工单流程。以下现有前端步骤是可选的：
 
 ```powershell
 cd D:\code\it_incident_agent
@@ -46,13 +46,13 @@ cd D:\code\it_incident_agent
 
 打开 `http://127.0.0.1:5174`。后端接口文档：`http://127.0.0.1:8003/docs`。
 
-默认打开“故障工单”。验证身份后，选择开发案例填充 → 创建工单 → 保持“免费流程演示”启动 → 查看角色/工具事件、引用与结果 → 刷新或重新连接回放原运行。只有本工单 owner 的 operator 身份可填写原因与实际处理结果并确认已解决；completed/partial 运行本身不会解决工单。资料研究可从左侧切换。
+默认打开“故障工单”。验证身份后，选择开发案例填充 → 创建工单 → 保持“免费流程演示”启动 → 查看角色/工具事件、引用与结果 → 刷新或重新连接回放原运行。只有本工单 owner 的 operator 身份可填写原因与实际处理结果并确认已解决；completed/partial 运行本身不会解决工单。现有页面仍有研究导航，但默认后端关闭研究创建与记忆 API；后续前端收敛时再移除该导航。
 
 后端启动会在本项目配置的 PostgreSQL 中执行 M4 幂等迁移，保留原运行表；只启动一个后端进程，不使用多 worker。真实诊断需手动选择“真实模型（付费）”并指定模型/工具预算，点击启动才会调用本项目 Key。本轮 M4 验收没有付费调用。自由工单尚未绑定真实观测源，会返回需要补充信息；开发案例范围须与原合成观测一致。
 
 接口和验收详情见 [M4 实施与验收记录](docs/M4-实施与验收记录.md)。
 
-新数据库与知识库初始为空；知识库入库方式、权限与记忆管理参见 [研究底座说明](README_RESEARCH.md) 及 [记忆与权限隔离](docs/记忆与权限隔离说明.md)。历史文档中的本机已导入资料和测试记录描述的是研究底座，不是此副本的数据状态。
+新数据库初始为空。IT 的已确认经验使用业务表，不依赖研究知识向量库。历史研究兼容模式的入库方式、权限与记忆管理参见 [研究底座说明](README_RESEARCH.md) 及 [记忆与权限隔离](docs/记忆与权限隔离说明.md)。历史文档中的本机已导入资料和测试记录描述的是研究底座，不是此副本的数据状态。
 
 ## 与研究项目分开运行
 
@@ -76,6 +76,20 @@ Compose 项目名使 PostgreSQL 和 Milvus 使用独立的数据卷；容器内�
 ```powershell
 docker compose -f D:\code\it_incident_agent\docker-compose.local.yml stop
 ```
+
+## 后端收敛验证与兼容
+
+```powershell
+.\.venv\Scripts\python.exe main.py --fake --case case_003 --output output/incident
+$env:PYTHONPATH='app'
+.\.venv\Scripts\python.exe -m unittest tests.test_incident_convergence tests.test_incident_repairs tests.test_incident_api
+```
+
+统一读取接口为 `/api/v1/runs/{run_id}` 和 `/api/v1/runs/{run_id}/events`；旧研究命名的读取 URL 继续兼容。创建工单、启动诊断、人工确认接口保持原路径和权限。
+
+默认 `local_run.py init` 只初始化运行存储和工单业务表；不会构建研究 Agent、连接 Milvus 或调用模型。需使用历史研究兼容能力时，显式运行 `local_run.py backend --legacy-research`；历史知识入库需 `local_run.py ingest <path> --legacy-research`，并自行准备完整依赖与对应配置。研究相关身份变量、数据库表和监控标签保留兼容。
+
+详细改动与当前验证结果见 [后端收敛与 LangGraph 实施记录](docs/后端收敛与LangGraph实施记录.md)。下面的 M0–M5 操作和报告保留为历史参考，旧验证结果不改写。
 
 ## 免费工程回归
 

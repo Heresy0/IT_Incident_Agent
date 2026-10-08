@@ -165,15 +165,47 @@ class IncidentRepairTests(unittest.TestCase):
         models=scripted_models()
         def drift(response,messages,_):
             data=json.loads(messages[1].content)
-            if (data.get('objective') or {}).get('challenge') and response.tool_calls:
-                return selected('get_service_owner',{'alias':'checkout-api'},'drift')
+            if (data.get('objective') or {}).get('challenge'):
+                return selected('get_service_owner',{'alias':'checkout-api'}, f'drift-{_}')
             return response
         models['investigation']=AlterOutput(models['investigation'],drift)
         result=collaborate(models,FixtureProvider('case_003',P),P)
         self.assertTrue(any(e['type']=='tool_result' and e['error'] and e['error']['code']=='CHECK_NOT_APPROVED' for e in result['events']))
-        self.assertEqual(result['run_summary']['tool_calls'],3)
+        self.assertEqual(result['run_summary']['tool_calls'],5)
         self.assertEqual(result['task_results'][-1]['status'],'partial')
-        self.assertIn('approved_read_only_checks_not_completed', '\n'.join(result['task_results'][-1]['output']['missing_information']))
+        executed = [e for e in result['events'] if e['type']=='tool_result' and e.get('execution_source')=='approved_rework']
+        self.assertEqual([e['name'] for e in executed], ['get_service_metrics', 'get_service_logs'])
+        self.assertTrue(all(e['error'] is None for e in executed))
+
+    def test_final_only_model_cannot_skip_approved_rework(self):
+        models=scripted_models()
+        def final_only(response,messages,_):
+            if (json.loads(messages[1].content).get('objective') or {}).get('challenge'):
+                return json_response({'findings':[], 'missing_information':['Needs human interpretation']})
+            return response
+        models['investigation']=AlterOutput(models['investigation'],final_only)
+        result=collaborate(models,FixtureProvider('case_003',P),P)
+        task=result['task_results'][-1]
+        self.assertEqual(task['tool_calls'],2)
+        self.assertEqual(task['model_calls'],1)
+        self.assertNotIn('approved_read_only_checks_not_completed', '\n'.join(task['output']['missing_information']))
+        self.assertEqual(result['rework_rounds'],1)
+
+    def test_broad_log_coverage_is_order_independent_and_window_scoped(self):
+        for category in ('resource','configuration'):
+            ex=executor('case_003')
+            ex.execute('get_service_logs',{**window(ex),'category':category})
+            ex.execute('get_service_logs',{**window(ex),'category':category,'level':'ERROR'})
+            self.assertFalse(ex.log_gaps)
+            self.assertEqual(ex.context.counts['tool_calls'],2)
+            duplicate=ex.execute('get_service_logs',{**window(ex),'category':category})
+            self.assertEqual(duplicate.error.code,'DUPLICATE_TOOL')
+            self.assertEqual(ex.context.counts['tool_calls'],2)
+        ex=executor('case_003')
+        ex.execute('get_service_logs',{**window(ex),'category':'configuration',
+            'start':(ex.scope.start+timedelta(minutes=1)).isoformat()})
+        ex.execute('get_service_logs',{**window(ex),'category':'configuration','level':'ERROR'})
+        self.assertTrue(ex.log_gaps)  # A narrower earlier query cannot cover the whole window.
 
     def test_error_empty_feedback_can_observe_warn_and_info_then_finish(self):
         model=RetestPathModel(error_only=True)

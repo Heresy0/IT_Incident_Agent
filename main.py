@@ -7,19 +7,15 @@ def _bootstrap() -> None:
     src = root / "app"
     if str(src) not in sys.path:
         sys.path.insert(0, str(src))
-    # 加载 .env 文件（在导入其他模块之前）
-    from dotenv import load_dotenv
-
-    env_path = root / ".env"
-    if env_path.exists():
-        load_dotenv(env_path)
 
 
 def main() -> None:
     _bootstrap()
-    from mult_agents.main import main as run_main
-
-    run_main()
+    from scripts.investigate_incident import main as run_main
+    args = sys.argv[1:]
+    if '--workflow' not in args and not any(a.startswith('--workflow=') for a in args):
+        args = ['--workflow', 'collaboration', *args]
+    raise SystemExit(run_main(args))
 
 
 if __name__ == "__main__":

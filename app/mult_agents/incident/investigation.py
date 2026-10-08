@@ -3,7 +3,7 @@ import hashlib
 import time
 from uuid import uuid4
 from pydantic import ValidationError
-from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from mult_agents.harness.runtime import RunContext, Limits, ExecutionError, activate, invoke_chat_model
 from .contracts import InvestigationOutput, InvestigationSelection, Finding, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS
 from .tools import ToolExecutor
@@ -167,7 +167,34 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
             task_parent = events[-1]["parent_span_id"]
         event("task_created")
         event("task_started")
+        # Reviewer-selected, Supervisor-dispatched checks are already authorized.
+        # Execute through the same scoped executor before asking for interpretation,
+        # so a model returning a final answer cannot silently skip the approved work.
+        if approved_checks:
+            calls = [{'name': c['tool'], 'args': c['args'], 'id': f'approved_{n}', 'type': 'tool_call'}
+                     for n, c in enumerate(approved_checks, 1)]
+            messages.append(AIMessage(content='', tool_calls=calls))
+            for call in calls:
+                call_ids.add(call['id'])
+                event('tool_selected', name=call['name'], execution_source='approved_rework')
+                result = executor.execute(call['name'], call['args'])
+                signature = (call['name'], executor.validate_args(call['name'], call['args']).model_dump_json())
+                if result.status in {'ok', 'empty'} and not result.truncated:
+                    checked.add(signature)
+                event('tool_result', name=call['name'], status=result.status,
+                      evidence_ids=[e.evidence_id for e in result.evidence],
+                      query_profile=dict(executor.last_query_profile), sample_order=result.sample_order,
+                      truncated=result.truncated, error=result.error.model_dump() if result.error else None,
+                      execution_source='approved_rework')
+                messages.append(ToolMessage(content=result_view(result), tool_call_id=call['id']))
+                if result.error and result.error.code == 'BUDGET_EXCEEDED':
+                    stop = 'BUDGET_EXCEEDED'
+                    break
+            messages.append(HumanMessage(content='The server executed the approved checks above. Interpret their results '
+                'and return the output JSON. Preserve failed/truncated check gaps; do not repeat completed queries.'))
         for step in range(max_steps):
+            if stop:
+                break
             try:
                 terminal = role == "single" and (step == max_steps - 1 or not context.can_research())
                 if terminal:

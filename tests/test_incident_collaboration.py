@@ -55,7 +55,7 @@ class IncidentCollaborationTests(unittest.TestCase):
         self.assertEqual(result["rework_rounds"], 1)
         self.assertEqual(result["supervisor_decisions"], 3)
         self.assertEqual(len(result["reviews"]), 2)
-        self.assertEqual(result["run_summary"]["model_calls"], 13)
+        self.assertEqual(result["run_summary"]["model_calls"], 12)
         self.assertEqual(result["run_summary"]["tool_calls"], 5)
         self.assertEqual([t["role"] for t in result["task_results"]], ["investigation", "knowledge", "investigation"])
         self.assertEqual(result["task_results"][-1]["challenge_id"], "C1")
@@ -87,14 +87,15 @@ class IncidentCollaborationTests(unittest.TestCase):
         inv_histories = models["investigation"].histories
         initial = [json.loads(next(m.content for m in history if isinstance(m, HumanMessage)))
                    for history in inv_histories]
-        rework = initial[-2]
-        self.assertEqual(len(inv_histories[-2]), 2)
+        rework = initial[-1]
+        # A new role conversation contains the server-executed approved checks.
+        self.assertEqual(len(inv_histories[-1]), 6)
         self.assertEqual(rework["objective"]["challenge"]["challenge_id"], "C1")
         carried = {e["evidence_id"] for e in rework["objective"]["evidence"]}
         self.assertTrue(set(rework["objective"]["focused_evidence_ids"]).issubset(carried))
         self.assertEqual(len(carried), 2)
         self.assertTrue(rework["objective"]["collection"])
-        self.assertNotIn("数据库 CPU 过高导致延迟", inv_histories[-2][1].content)
+        self.assertNotIn("数据库 CPU 过高导致延迟", inv_histories[-1][1].content)
         review_input = json.loads(models["reviewer"].histories[-1][1].content)["input"]
         self.assertEqual(len(review_input["collection"]), 5)
         self.assertTrue(all("truncated" in row and "query_profile" in row for row in review_input["collection"]))

@@ -31,6 +31,7 @@ class ToolExecutor:
         self.references = {}
         self.last_query_profile = {}
         self.log_gaps = {}
+        self.log_coverage = []
 
     def schemas(self):
         allowed = self.allowed_tools()
@@ -79,9 +80,9 @@ class ToolExecutor:
             args = self.validate_args(name, raw_args)
         except ExecutionError as exc:
             return self.rejected(exc.code)
-        # Only validated enums/registered metric names, never free text, identity or timestamps.
+        # Validated filters and query window; no credentials, identity or free text.
         self.last_query_profile = {key: value for key, value in args.model_dump(mode="json").items()
-                                   if key in {"metrics", "granularity", "category", "level"}}
+                                   if key in {"metrics", "granularity", "category", "level", "start", "end"}}
         signature = (name, args.model_dump_json())
         if signature in self.seen:
             return self.rejected("DUPLICATE_TOOL")
@@ -109,8 +110,10 @@ class ToolExecutor:
                 if name == 'get_service_logs' and not truncated:
                     if args.level == 'ERROR' and result.status == 'empty':
                         key = (args.category, args.start, args.end, args.error_code)
-                        self.log_gaps[key] = args.model_dump(mode='json')
+                        if not any(self.covers_logs(coverage, args) for coverage in self.log_coverage):
+                            self.log_gaps[key] = args.model_dump(mode='json')
                     elif args.level is None:
+                        self.log_coverage.append(args)
                         self.log_gaps = {k: v for k, v in self.log_gaps.items() if not (
                             args.category == k[0] and args.start <= k[1] and args.end >= k[2]
                             and (args.error_code is None or args.error_code == k[3]))}
@@ -125,6 +128,12 @@ class ToolExecutor:
             except Exception:
                 return self.rejected("PROVIDER_UNAVAILABLE")
         return self.rejected("PROVIDER_UNAVAILABLE")
+
+    @staticmethod
+    def covers_logs(coverage, query):
+        return (coverage.category == query.category and coverage.start <= query.start
+                and coverage.end >= query.end
+                and (coverage.error_code is None or coverage.error_code == query.error_code))
 
     def prepare_snapshot(self, name, row):
         encoded = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
