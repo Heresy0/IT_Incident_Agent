@@ -3,6 +3,7 @@ from .investigation import investigate, INCIDENT_LIMITS
 from .collaboration_contracts import DiagnosisSelection
 from .diagnosis import expand_diagnosis
 from .prompts import SYSTEM
+from .ownership import parse_owner_selection
 
 SINGLE_SYSTEM = SYSTEM.split("Example shape:")[0].replace(
     "You have four observation tools; knowledge lookup is reserved for the future Knowledge role.",
@@ -22,7 +23,7 @@ Choose tools from actual symptoms/results. Return JSON only and short public dec
 
 
 def resolve_diagnosis(content, executor, allowed_kinds=None):
-    selection = DiagnosisSelection.model_validate_json(content)
+    selection = parse_owner_selection(DiagnosisSelection, content, executor)
     return expand_diagnosis(selection, executor), "reference_selection_v2"
 
 

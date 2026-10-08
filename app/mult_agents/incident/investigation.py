@@ -10,6 +10,7 @@ from .tools import ToolExecutor
 from .prompts import SYSTEM
 from .observations import FACT_RENDERING, source_statement, pool_control_gaps, log_control_gaps, gap_message
 from .model_view import MODEL_VIEW_VERSION, result_view, fit_messages, substantive
+from .ownership import OwnerSelectionError, observed_owner_team, parse_owner_selection, resolve_owner
 
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
@@ -27,12 +28,12 @@ def validation_details(exc):
     if isinstance(exc, ValidationError):
         fields = {"findings", "statement", "refs", "evidence_id", "field_path", "value", "unit",
                   "observed_at", "data_version", "quote", "reference_id", "tentative_hypotheses",
-                  "missing_information", "escalation_team"}
+                  "missing_information", "escalation_team", "escalation_ref", "reference_id"}
         errors = exc.errors(include_input=False, include_context=False, include_url=False)[:5]
         return {"reason": "invalid_json" if any(e["type"] == "json_invalid" for e in errors) else "schema_mismatch",
                 "details": [{"path": ".".join(str(p) if isinstance(p, int) or p in fields else "<extra>" for p in e["loc"]),
                              "type": e["type"]} for e in errors]}
-    if isinstance(exc, ReferenceValidationError):
+    if isinstance(exc, (ReferenceValidationError, OwnerSelectionError)):
         return {"reason": "reference_mismatch", "details": [{"path": exc.path, "type": exc.reason}]}
     return {"reason": "invalid_output_type", "details": []}
 
@@ -62,7 +63,7 @@ def validate_output(output, evidence, allowed_kinds=("observation",)):
         if not any(ref.field_path in {"value", "message", "error_code", "summary", "team", "escalation", "text", "resolution"}
                    or ref.field_path.startswith("config_summary.") for ref in finding.refs):
             raise ReferenceValidationError("metadata_only_reference", f"findings.{fi}.refs")
-    teams = {item.payload["team"] for item in evidence.values() if "team" in item.payload}
+    teams = {team for item in evidence.values() if (team := observed_owner_team(item)) is not None}
     if output.escalation_team is not None and output.escalation_team not in teams:
         raise ReferenceValidationError("unobserved_team", "escalation_team")
 
@@ -81,7 +82,7 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
             output = output.model_copy(update={'findings': [f.model_copy(update={
                 'statement': source_statement(f.refs, executor.evidence)}) for f in output.findings]})
             return output, "literal_refs_v1"
-    selection = InvestigationSelection.model_validate_json(content)
+    selection = parse_owner_selection(InvestigationSelection, content, executor)
     findings = []
     for fi, finding in enumerate(selection.findings):
         refs, seen = [], set()
@@ -96,7 +97,7 @@ def resolve_output(content, executor, allowed_kinds=("observation",)):
             refs.append(ref.model_copy(deep=True))
         findings.append(Finding(statement=finding.statement, refs=refs))
     output = InvestigationOutput(findings=findings, tentative_hypotheses=list(selection.tentative_hypotheses),
-        missing_information=list(selection.missing_information), escalation_team=selection.escalation_team)
+        missing_information=list(selection.missing_information), escalation_team=resolve_owner(selection.escalation_ref, executor))
     validate_output(output, executor.evidence, allowed_kinds)
     output = output.model_copy(update={'findings': [f.model_copy(update={
         'statement': source_statement(f.refs, executor.evidence)}) for f in output.findings]})

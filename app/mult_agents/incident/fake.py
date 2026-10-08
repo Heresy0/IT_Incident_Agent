@@ -44,5 +44,5 @@ class ScriptedModel:
                     "refs": [{"reference_id": reference["reference_id"]}]})
             return AIMessage(content=json.dumps({"findings": findings, "tentative_hypotheses": [],
                 "missing_information": ["Scripted control output; real model investigation and independent review remain unverified."],
-                "escalation_team": None}))
+                "escalation_ref": None}))
         return AIMessage(content="", tool_calls=[{"name": name, "args": args, "id": f"fake-{self.calls}", "type": "tool_call"}])

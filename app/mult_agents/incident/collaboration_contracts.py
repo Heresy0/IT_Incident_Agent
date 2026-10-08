@@ -1,7 +1,7 @@
 """Small, strict contracts for bounded incident collaboration."""
 from typing import Any, Literal
 from pydantic import Field
-from .contracts import Contract, ReferenceSelection, SelectedFinding, Finding, EvidenceRef
+from .contracts import Contract, EscalationSelection, ReferenceSelection, SelectedFinding, Finding, EvidenceRef
 
 Role = Literal["investigation", "knowledge"]
 
@@ -12,11 +12,18 @@ class TaskRequest(Contract):
     evidence_ids: list[str] = Field(default_factory=list, max_length=8)
 
 
-class SupervisorDecision(Contract):
+class SupervisorPlan(Contract):
     action: Literal["dispatch", "diagnose", "request_info", "escalate", "finish"]
     tasks: list[TaskRequest] = Field(default_factory=list, max_length=2)
     reason: str = Field(min_length=1, max_length=500)
     missing_information: list[str] = Field(default_factory=list, max_length=8)
+
+
+class SupervisorSelection(SupervisorPlan, EscalationSelection):
+    """Model selects an observed owner; decisions retain the expanded public team."""
+
+
+class SupervisorDecision(SupervisorPlan):
     escalation_team: str | None = Field(default=None, max_length=80)
 
 
@@ -44,12 +51,11 @@ class RecommendedAction(Contract):
     requires_approval: bool
 
 
-class DiagnosisSelection(Contract):
+class DiagnosisSelection(EscalationSelection):
     findings: list[SelectedFinding] = Field(default_factory=list, max_length=8)
     hypotheses: list[HypothesisSelection] = Field(default_factory=list, max_length=4)
     recommended_actions: list[RecommendedAction] = Field(default_factory=list, max_length=4)
     missing_information: list[str] = Field(default_factory=list, max_length=8)
-    escalation_team: str | None = Field(default=None, max_length=80)
 
 
 class DiagnosisDraft(Contract):

@@ -47,8 +47,12 @@ tentative_hypotheses, not findings. Report healthy controls as observed, not gue
 Missing information must describe what remains unobserved after actual checks. Do not
 claim a tool was not checked when it returned evidence. Empty/truncated/error results
 have limited scope: do not turn them into absence of changes/logs for the whole service.
+For escalation_ref select an exact reference_id whose field_path is team from a current
+get_service_owner observation. The server fills the team name; never write escalation_team.
+Use null when no owner was observed or no escalation is proposed. Do not select a metric,
+log, queue/escalation field, runbook or historical team as an owner reference.
 Example shape: {"findings":[{"statement":"A measured observation","refs":[{"reference_id":"select an actual REF_ ID"}]}],
-"tentative_hypotheses":[],"missing_information":[],"escalation_team":null}.
+"tentative_hypotheses":[],"missing_information":[],"escalation_ref":null}.
 Hypotheses are tentative and unreviewed; never turn a source match into a confirmed cause.
 Never claim resolved or confirmed root cause. Escalation team must have been observed
 through get_service_owner. Report only short public decisions, never hidden reasoning.

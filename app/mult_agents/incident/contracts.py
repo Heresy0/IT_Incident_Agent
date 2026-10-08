@@ -150,9 +150,16 @@ class SelectedFinding(Contract):
     refs: list[ReferenceSelection] = Field(min_length=1, max_length=8)
 
 
-class InvestigationSelection(InvestigationOutput):
+class EscalationSelection(Contract):
+    escalation_ref: ReferenceSelection | None = Field(default=None,
+        description="Choose a reference_options entry for the team field from a current get_service_owner observation. The server fills the team name. Use null if no owner was observed or no escalation is proposed; never write a team name.")
+
+
+class InvestigationSelection(EscalationSelection):
     """Model-facing selection contract; the final public output remains fully expanded."""
     findings: list[SelectedFinding] = Field(default_factory=list, max_length=12)
+    tentative_hypotheses: list[str] = Field(default_factory=list, max_length=5)
+    missing_information: list[str] = Field(default_factory=list, max_length=8)
 
 
 TOOL_ARGS = {

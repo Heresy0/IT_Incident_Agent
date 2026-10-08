@@ -1,0 +1,345 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "evaluation_kind": "owner_selection_repair_free_control",
+  "quality_status": "excluded_scripted",
+  "live_calls": 0,
+  "human_review_status": "pending",
+  "report_directory": "output/incident-comparison-owner-selection-final/05699e17-f183-4982-a479-ae7fb0646575",
+  "configuration": {
+    "cases": [
+      "case_001",
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_005",
+      "case_006"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "scripted",
+    "execution_mode": "scripted_control_only",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "provenance": {
+    "implementation_sha256_prefix": "6a31bbd946168708",
+    "git_commit": "3b21cb6c5a89ea2343d3c8954b98b3ce31e4646a",
+    "working_tree_dirty": true,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_001": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+      "case_002": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+      "case_004": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+      "case_005": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+      "case_006": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa"
+    }
+  },
+  "free_regression": {
+    "unique_tests_passed": 113,
+    "new_owner_selection_tests": 6
+  },
+  "workflows": {
+    "single": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 13,
+      "tool_calls_total": 37,
+      "duration_ms_mean": 15.5,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    },
+    "multi": {
+      "runs": 6,
+      "mechanical_passes": 6,
+      "failed_runs": 0,
+      "necessary_check_coverage_mean": 1.0,
+      "model_calls_total": 45,
+      "tool_calls_total": 21,
+      "duration_ms_mean": 25.833333333333332,
+      "semantic_reviewed_runs": 0,
+      "live_runs": 0,
+      "cause_accuracy_reviewed": null,
+      "overconfident_rate_reviewed": null,
+      "escalation_appropriate_rate_reviewed": null,
+      "claim_support_rate_reviewed": null,
+      "estimated_cost": null
+    }
+  },
+  "runs": [
+    {
+      "case_id": "case_001",
+      "run_id": "5d003075-d6e0-4357-9198-05032ae36418",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_001",
+      "run_id": "004f5f17-1a41-4a09-b975-bf439b0fe3fa",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 2,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "ff92c89c-e3e4-4d6b-97c4-c262f7b83198",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_002",
+      "run_id": "2c0fe256-185e-4a2a-93f2-5005879fc53b",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 2,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "fc7364d0-1e49-49a8-8b1a-b31d2d47ef8d",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "fe6e8f09-95b0-4042-95d7-9d772a267b44",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 13,
+      "tool_calls": 5,
+      "rework_rounds": 1
+    },
+    {
+      "case_id": "case_004",
+      "run_id": "8c0ed12f-f41a-4297-b440-ce0f455182ba",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_004",
+      "run_id": "4df2ca65-ae1b-4800-a269-0e5e57b7b179",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 3,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_005",
+      "run_id": "93c55b00-ba97-4f70-8091-f78ee8737acb",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 3,
+      "tool_calls": 7,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_005",
+      "run_id": "5bd0e6ed-d212-4119-b635-445540d7a75e",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 6,
+      "tool_calls": 4,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_006",
+      "run_id": "f2d8923c-ff71-4044-94c1-2fd655b47b9c",
+      "workflow": "single",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 2,
+      "tool_calls": 6,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "case_006",
+      "run_id": "98f420b7-4f1f-43f5-b997-915d6f8dc4df",
+      "workflow": "multi",
+      "execution_mode": "scripted_control_only",
+      "status": "completed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "model_calls": 8,
+      "tool_calls": 5,
+      "rework_rounds": 0
+    }
+  ],
+  "targeted_control": {
+    "report_file": "owner-regression.json",
+    "status": "completed",
+    "model_calls": 13,
+    "tool_calls": 7,
+    "repairs": 1,
+    "review_rounds": 1,
+    "escalation_team": "Inventory on-call",
+    "coverage_gaps": [],
+    "rework_rounds": 0,
+    "note": "Free synthetic control of the retest task pattern, not a reproduction of rejected live model text or semantic approval."
+  },
+  "previous_live_summary": "evals/incident/m5_retest2_20261008.json"
+}

@@ -5,8 +5,8 @@ import time
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import ValidationError
 from mult_agents.harness.runtime import RunContext, ExecutionError, activate, invoke_chat_model
-from .contracts import Finding, InvestigationOutput
-from .collaboration_contracts import SupervisorDecision, DiagnosisSelection, DiagnosisDraft, Hypothesis, ReviewDecision
+from .contracts import EscalationSelection, Finding, InvestigationOutput
+from .collaboration_contracts import SupervisorDecision, SupervisorSelection, DiagnosisSelection, DiagnosisDraft, Hypothesis, ReviewDecision
 from .collaboration_prompts import ROLE_PROMPTS
 from .investigation import INCIDENT_LIMITS, investigate, resolve_output, validate_output, validation_details
 from .tools import ToolExecutor
@@ -15,6 +15,7 @@ from .tools import ToolExecutor
 from .diagnosis import ProtocolError, expand_refs, expand_diagnosis
 from .observations import FACT_RENDERING, pool_control_gaps, log_control_gaps, gap_message
 from .model_view import MODEL_VIEW_VERSION, evidence_view
+from .ownership import parse_owner_selection, resolve_owner
 
 
 class Collaboration:
@@ -61,9 +62,9 @@ class Collaboration:
         if len(ids) != len(set(ids)) or any(eid not in self.evidence for eid in ids):
             raise ProtocolError("UNKNOWN_OR_DUPLICATE_EVIDENCE")
 
-    def owner(self, team):
-        if team is not None and team not in {e.payload.get("team") for e in self.evidence.values() if "team" in e.payload}:
-            raise ProtocolError("UNOBSERVED_TEAM")
+    def supervisor_decision(self, selection):
+        return SupervisorDecision(**selection.model_dump(exclude={'escalation_ref'}),
+                                  escalation_team=resolve_owner(selection.escalation_ref, self))
 
     def sources(self, ids=None):
         items = [self.evidence[eid] for eid in ids] if ids is not None else list(self.evidence.values())
@@ -84,7 +85,8 @@ class Collaboration:
             try:
                 if response.tool_calls or getattr(response, "invalid_tool_calls", None) or len(str(response.content)) > 12000:
                     raise ProtocolError("ROLE_OUTPUT_INVALID")
-                value = schema.model_validate_json(response.content)
+                value = (parse_owner_selection(schema, response.content, self) if issubclass(schema, EscalationSelection)
+                         else schema.model_validate_json(response.content))
                 return validate(value) if validate else value
             except (ValidationError, ValueError, TypeError) as exc:
                 details = {"reason": exc.code, "details": []} if isinstance(exc, ProtocolError) else validation_details(exc)
@@ -303,7 +305,7 @@ class Collaboration:
                     if self.supervisor_calls >= 4:
                         self.stop = "SUPERVISOR_LIMIT"
                         break
-                    decision = self.ask("supervisor", SupervisorDecision, {
+                    decision = self.ask("supervisor", SupervisorSelection, {
                         "ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
                         "phase": self.phase, "pending_challenge": self.pending, "evidence": self.sources(),
                         "collection": self.collection(), "observation_gaps": self.observation_gaps(),
@@ -311,7 +313,7 @@ class Collaboration:
                                    "missing_information": t["output"]["missing_information"]} for t in self.tasks],
                         "budget": {"used": dict(self.context.counts), "limits": self.context.limits.__dict__,
                                    "max_dispatch_tasks": self.dispatch_capacity(pending_model_call=True)}},
-                        terminal=bool(self.evidence and self.phase == "collect"))
+                        terminal=bool(self.evidence and self.phase == "collect"), validate=self.supervisor_decision)
                     self.supervisor_calls += 1
                     self.decisions.append({"round": self.supervisor_calls, **decision.model_dump(mode="json")})
                     self.event("supervisor_decision", action=decision.action, round=self.supervisor_calls,
@@ -329,7 +331,6 @@ class Collaboration:
                             raise ProtocolError("UNREVIEWED_FINISH")
                         self.stop = "FINISHED"
                     else:
-                        self.owner(decision.escalation_team)
                         self.team = decision.escalation_team
                         self.extra_gaps.extend(decision.missing_information or [decision.reason])
                         self.note("escalate", "supervisor", "human", reason=decision.reason)
@@ -392,7 +393,7 @@ class Collaboration:
     def prompt_version(self):
         from .collaboration_prompts import KNOWLEDGE
         from .prompts import SYSTEM
-        schemas = [SupervisorDecision.model_json_schema(), DiagnosisSelection.model_json_schema(), ReviewDecision.model_json_schema()]
+        schemas = [SupervisorSelection.model_json_schema(), DiagnosisSelection.model_json_schema(), ReviewDecision.model_json_schema()]
         payload = [ROLE_PROMPTS, SYSTEM, KNOWLEDGE, schemas, *[ex.schemas() for ex in self.executors.values()]]
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
