@@ -9,6 +9,7 @@ class IncidentCreate(Window):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=False)
     title: str = Field(min_length=1, max_length=160)
     symptoms: str = Field(min_length=1, max_length=2000)
+    purpose: Literal['diagnosis', 'status_check'] = 'diagnosis'
     service: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     environment: Literal["staging", "production"]
     service_version: str = Field(min_length=1, max_length=40)

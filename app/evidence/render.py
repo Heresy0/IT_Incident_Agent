@@ -30,9 +30,13 @@ def render(result):
 def render_collaboration(result):
     output = result["output"]
     single = result.get("task_type") == "incident_single"
-    lines = ["# 单 Agent 诊断报告" if single else "# 故障协作诊断报告", "", f"运行：{result['run_id']}；状态：{result['status']}；复核：{result['review_status']}",
+    status_check = result.get('purpose') == 'status_check'
+    lines = ["# 服务状态核查报告" if status_check else "# 单 Agent 诊断报告" if single else "# 故障协作诊断报告", "", f"运行：{result['run_id']}；状态：{result['status']}；复核：{result['review_status']}",
         f"执行模式：{result.get('execution_mode', 'caller_supplied')}；数据源：{result['data_source']}",
-        "当前结论未获人工确认，工单未解决；工具只读，操作建议不会自动执行。", ""]
+        "本次核查只复核所列观测，整体健康尚未确认；工具只读，不执行修复。" if status_check
+        else "当前结论未获人工确认，工单未解决；工具只读，操作建议不会自动执行。", ""]
+    if status_check:
+        lines.extend(['核查范围与限制：', *['- ' + note for note in (result.get('status_check_coverage') or {}).get('limitations', [])], ''])
     if result.get("execution_mode") == "scripted_control_only":
         lines.extend(["这是脚本控制演示，复核与调度也是测试替身，不代表真实模型诊断质量。", ""])
     lines.append("观测（无独立 Reviewer，语义待核查）：" if single else "已复核观测：")
@@ -40,11 +44,17 @@ def render_collaboration(result):
         lines.append(f"- {finding['statement']}")
         for ref in finding["refs"]:
             lines.append(f"  - {ref['evidence_id']} / {ref['field_path']} = {ref['value']} {ref['unit']} @ {ref['observed_at']}")
-    lines.extend(["", "原因假设（supported 只表示当前证据支持）："])
+    if not status_check:
+        lines.extend(["", "原因假设（supported 只表示当前证据支持）："])
+        if not output['hypotheses']:
+            lines.append('- 尚未形成原因假设；已有观测不足以作为完整诊断结论。')
     for h in output["hypotheses"]:
         lines.append(f"- {h['hypothesis_id']} [{h['status']}] {h['cause']}")
         lines.append(f"  - 支持：{[r['evidence_id'] for r in h['support_refs']]}；反证：{[r['evidence_id'] for r in h['counter_refs']]}")
-    lines.extend(["", "处理建议："])
+    if not status_check:
+        lines.extend(["", "处理建议："])
+        if not output['recommended_actions']:
+            lines.append('- 尚无经过复核的处理建议。')
     for action in output["recommended_actions"]:
         lines.append(f"- {action['action']}；条件：{action['condition']}；验证：{action['expected_result']}；风险：{action['risk']}；需批准：{action['requires_approval']}")
     lines.extend(["", "协作过程："])

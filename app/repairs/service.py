@@ -103,6 +103,8 @@ class RepairService:
     def propose(self, iid, payload, principal):
         payload = RepairProposal.model_validate(payload).model_dump()
         run = self.workflow.get_run(payload['run_id'], principal)
+        if run and (run.get('result') or {}).get('purpose') == 'status_check':
+            raise IncidentError('REPAIR_REQUIRES_INCIDENT_DIAGNOSIS', 422)
         if (not run or run['status'] != 'completed' or run['config'].get('incident_id') != iid
                 or (run.get('result') or {}).get('review_status') != 'passed'):
             raise IncidentError('REPAIR_REQUIRES_REVIEWED_DIAGNOSIS')

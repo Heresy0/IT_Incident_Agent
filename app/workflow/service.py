@@ -164,6 +164,8 @@ class WorkflowService:
         from incidents.support import IncidentError
         if principal.role != "operator":
             raise IncidentError("OPERATOR_REQUIRED", 403)
+        if self.get_incident(iid, principal).get('purpose') == 'status_check':
+            raise IncidentError('STATUS_CHECK_NOT_RESOLVABLE', 422)
         self.start()
         return self._store.confirm_incident(iid, payload, principal)
 

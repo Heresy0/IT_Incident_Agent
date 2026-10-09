@@ -35,6 +35,33 @@ class IncidentCollaborationTests(unittest.TestCase):
     def run_case(self, case="case_001", models=None, **kwargs):
         return collaborate(models or scripted_models(), FixtureProvider(case, P), P, **kwargs)
 
+    def test_review_coverage_repair_names_missing_duplicate_and_unknown_targets(self):
+        histories = []
+        def omit(response, messages, calls):
+            histories.append(messages)
+            data = json.loads(response.content)
+            if calls == 1:
+                data['assessments'] = [data['assessments'][1], data['assessments'][1],
+                    {**data['assessments'][0], 'target_id': 'F9'}]
+            return json_response(data)
+        models = scripted_models()
+        models['reviewer'] = AlterOutput(models['reviewer'], omit)
+        result = self.run_case(models=models)
+        self.assertEqual(result['review_status'], 'passed')
+        self.assertEqual(result['repairs'], 1)
+        first = json.loads(histories[0][1].content)
+        self.assertEqual(first['input']['required_target_ids'], ['F1', 'H1', 'A1'])
+        schema = first['output_schema']
+        self.assertEqual(schema['$defs']['Assessment']['properties']['target_id']['enum'], ['F1', 'H1', 'A1'])
+        self.assertEqual(schema['properties']['assessments']['minItems'], 3)
+        failure = next(e for e in result['events'] if e['type'] == 'validation_failure')
+        detail = failure['details'][0]
+        self.assertEqual(detail['missing_target_ids'], ['A1', 'F1'])
+        self.assertEqual(detail['duplicate_target_ids'], ['H1'])
+        self.assertEqual(detail['unexpected_target_ids'], ['F9'])
+        self.assertIn('missing_target_ids', histories[1][-1].content)
+        self.assertIn('uncertain', histories[1][-1].content)
+
     def test_simple_cases_skip_knowledge_and_fit_explicit_small_budget(self):
         for case in ("case_001", "case_002"):
             with self.subTest(case=case):

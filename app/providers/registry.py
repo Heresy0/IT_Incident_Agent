@@ -15,7 +15,7 @@ class ObservationProvider(Protocol):
     binding: 'ServiceBinding'
     def ticket(self): ...
     def authorize(self, principal, scope): ...
-    def query(self, name, args, scope): ...
+    def query(self, name, args, scope, *, max_metric_points=60): ...
 
 
 @dataclass(frozen=True)
@@ -62,6 +62,7 @@ class ServiceRegistry:
         binding = self.resolve(snapshot, principal)
         return Ticket.model_validate({
             'incident_id': snapshot['id'], 'title': snapshot['title'], 'symptoms': snapshot['symptoms'],
+            'purpose': snapshot.get('purpose', 'diagnosis'),
             'scope': {'tenant_id': principal.tenant_id, 'user_id': principal.user_id,
                       'service': binding.service, 'environment': binding.environment,
                       'service_version': binding.version, 'allowed_dependencies': binding.dependencies,

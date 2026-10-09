@@ -33,6 +33,16 @@ class ToolExecutor:
         self.log_gaps = {}
         self.log_coverage = []
 
+    def capabilities(self):
+        """Public registration names only; never expose endpoint URLs or query templates."""
+        if not hasattr(self.provider, 'binding'):
+            return {}
+        config = self.provider.binding.observations
+        return {'registered_metrics': {k: {'unit': v.get('unit', '')}
+                    for k, v in config.get('metrics', {}).items()} if config.get('prometheus') else {},
+                'registered_log_categories': sorted(config.get('log_queries', {}))
+                    if config.get('loki') else []}
+
     def schemas(self):
         allowed = self.allowed_tools()
         descriptions = {
@@ -50,8 +60,24 @@ class ToolExecutor:
             'Available metrics and units: ' + json.dumps({k: v.get('unit', '') for k, v in definitions.items()})
             + '. Select a small useful set. Missing samples do not establish health.')
         descriptions['search_runbooks'] = 'Search registered applicable readable runbooks, at most 4 passages.'
-        return [{"type": "function", "function": {"name": n, "description": descriptions[n],
+        capabilities = self.capabilities()
+        if capabilities:
+            descriptions['get_service_logs'] = ('仅查询已登记的日志类别：'
+                + json.dumps(capabilities['registered_log_categories'])
+                + '。未登记表示渠道不可用，不能通过重试补齐；保留信息缺口。最多返回 50 条，通常省略 level。')
+            descriptions['get_service_metrics'] += (' 采样间隔按完整证据容量自动调整；返回 granularity 为实际间隔，'
+                'requested_granularity 为请求值。稀疏采样不能排除短暂故障，必要时缩小时间窗口。')
+        schemas = [{"type": "function", "function": {"name": n, "description": descriptions[n],
                 "parameters": TOOL_ARGS[n].model_json_schema()}} for n in sorted(allowed)]
+        for schema in schemas:
+            if schema['function']['name'] == 'get_service_metrics' and capabilities:
+                schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(capabilities['registered_metrics'])
+            if (schema['function']['name'] == 'get_service_logs' and capabilities
+                    and capabilities['registered_log_categories']):
+                schema['function']['parameters']['properties']['category']['enum'] = capabilities['registered_log_categories']
+        return [schema for schema in schemas if not capabilities or not (
+            schema['function']['name'] == 'get_service_metrics' and not capabilities['registered_metrics']
+            or schema['function']['name'] == 'get_service_logs' and not capabilities['registered_log_categories'])]
 
     @staticmethod
     def rejected(code, retryable=False):
@@ -79,7 +105,35 @@ class ToolExecutor:
             raise ExecutionError("WINDOW_DENIED")
         if name == "get_service_owner" and args.alias not in {self.scope.service, *self.scope.allowed_dependencies}:
             raise ExecutionError("SERVICE_DENIED")
+        if hasattr(self.provider, 'binding'):
+            config = self.provider.binding.observations
+            if name == 'get_service_logs':
+                if not config.get('loki'):
+                    raise ExecutionError('SOURCE_NOT_CONFIGURED')
+                if args.category not in config.get('log_queries', {}):
+                    raise ExecutionError('LOG_CATEGORY_NOT_REGISTERED')
+            if name == 'get_service_metrics':
+                if not config.get('prometheus'):
+                    raise ExecutionError('SOURCE_NOT_CONFIGURED')
+                if any(metric not in config.get('metrics', {}) for metric in args.metrics):
+                    raise ExecutionError('METRIC_NOT_REGISTERED')
         return args
+
+    def metric_point_limit(self, args):
+        # Plan sampling before the read, counting full snapshots and REF catalogs rather
+        # than only compact model messages. Keep the existing 12,000-character boundary.
+        config = self.provider.binding.observations['metrics']
+        cost = 0
+        for metric in args.metrics:
+            definition = config[metric]
+            row = {'id': '0' * 24, 'timestamp': args.end.isoformat(),
+                'service': self.scope.service, 'environment': self.scope.environment,
+                'data_version': self.provider.binding.version, 'metric': metric,
+                'value': -1.7976931348623157e308, 'unit': definition['unit'],
+                'aggregation': definition.get('aggregation', 'registered'),
+                'granularity': '86400s', 'requested_granularity': args.granularity}
+            cost += len(self.prepare_snapshot('get_service_metrics', row).model_dump_json()) + 1
+        return max(1, min(60, (12000 - 256) // cost))
 
     def execute(self, name, raw_args):
         self.last_query_profile = {}
@@ -98,7 +152,11 @@ class ToolExecutor:
             try:
                 self.context.reserve("tool")
                 with self.context.span("tool", name):
-                    rows, truncated = self.provider.query(name, args, self.scope)
+                    if name == 'get_service_metrics' and hasattr(self.provider, 'binding'):
+                        rows, truncated = self.provider.query(name, args, self.scope,
+                            max_metric_points=self.metric_point_limit(args))
+                    else:
+                        rows, truncated = self.provider.query(name, args, self.scope)
                 if time.monotonic() - self.context.started >= self.context.limits.seconds - self.context.limits.reserve_seconds:
                     return self.rejected("BUDGET_EXCEEDED")
                 items = []

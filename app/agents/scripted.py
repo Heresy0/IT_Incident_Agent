@@ -139,6 +139,15 @@ class ScriptedRole:
             "missing_information": []}, ensure_ascii=False))
 
     def diagnose(self, payload):
+        if payload.get('purpose') == 'status_check':
+            facts = []
+            for item in payload['evidence']:
+                if item['kind'] != 'observation':
+                    continue
+                field = next((name for name in ('value', 'message', 'summary') if name in item['payload']), None)
+                if field:
+                    facts.append({'statement': '状态核查观测', 'refs': [selector(item, field)]})
+            return {'findings': facts[:8], 'hypotheses': [], 'recommended_actions': [], 'missing_information': []}
         evidence = payload["evidence"]
         if any(e["payload"].get("error_code") in {"AUTH_MODE_UNSUPPORTED", "UPSTREAM_READ_TIMEOUT"} for e in evidence) \
                 or any(e["payload"].get("config_summary", {}).get("pool_max") == 8 for e in evidence):

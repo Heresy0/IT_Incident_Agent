@@ -82,6 +82,13 @@ class RemediationTests(unittest.TestCase):
     def plan(self):
         return self.service.repairs.propose(self.incident['id'], self.payload, self.owner)
 
+    def test_status_check_result_cannot_become_a_repair_source(self):
+        self.store.runs[self.payload['run_id']]['result']['purpose'] = 'status_check'
+        with self.assertRaises(IncidentError) as denied:
+            self.plan()
+        self.assertEqual(denied.exception.code, 'REPAIR_REQUIRES_INCIDENT_DIAGNOSIS')
+        self.assertEqual(self.executor.writes, 0)
+
     def approve(self, plan):
         return self.service.repairs.approve(self.incident['id'], plan['id'],
             {'digest': plan['digest'], 'decision': 'approve'}, self.operator)

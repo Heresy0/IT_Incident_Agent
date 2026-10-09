@@ -50,6 +50,79 @@ class RegisteredProviderTests(unittest.TestCase):
             with self.assertRaises(ProviderError):
                 self.registry.ticket(snapshot, principal)
 
+    def test_registered_categories_are_advertised_and_unavailable_reads_cost_no_tools(self):
+        provider = HTTPObservationProvider(self.binding, self.ticket, self.principal,
+            transport=httpx.MockTransport(lambda _: self.fail('unregistered reads must not reach HTTP')))
+        ex = ToolExecutor(provider, self.principal, self.ticket.scope, RunContext())
+        schema = next(s['function'] for s in ex.schemas() if s['function']['name'] == 'get_service_logs')
+        self.assertEqual(schema['parameters']['properties']['category']['enum'], ['resource'])
+        self.assertEqual(ex.capabilities()['registered_log_categories'], ['resource'])
+        metric = next(s['function'] for s in ex.schemas() if s['function']['name'] == 'get_service_metrics')
+        self.assertEqual(metric['parameters']['properties']['metrics']['items']['enum'], ['queue_depth'])
+        self.assertNotIn('sum(queue_depth', str(ex.capabilities()))
+        for _ in range(2):
+            result = ex.execute('get_service_logs', {'start': self.snapshot['start'], 'end': self.snapshot['end'],
+                                                     'category': 'configuration'})
+            self.assertEqual(result.error.code, 'LOG_CATEGORY_NOT_REGISTERED')
+        self.assertEqual(ex.context.counts['tool_calls'], 0)
+        self.assertEqual(ex.seen, set())
+
+    def test_long_metric_window_fits_full_evidence_budget_and_records_actual_step(self):
+        from dataclasses import replace
+        from providers.history import ProviderWithHistory
+        from storage.runs import MemoryRunStore
+        binding = replace(self.binding, observations={**self.binding.observations, 'metrics': {
+            'queue_depth': {'query': 'sum(queue)', 'unit': 'jobs'},
+            'workers_active': {'query': 'sum(workers)', 'unit': 'workers'}}})
+        snapshot = {**self.snapshot, 'start': (self.start + timedelta(microseconds=538105)).isoformat(),
+            'end': (self.start + timedelta(hours=24, microseconds=538105)).isoformat()}
+        ticket = ServiceRegistry([binding]).ticket(snapshot, self.principal)
+        calls = []
+        def reply(request):
+            calls.append(request)
+            params = request.url.params
+            start, end, step = float(params['start']), float(params['end']), int(params['step'])
+            self.assertGreaterEqual(start, ticket.scope.start.timestamp())
+            self.assertLessEqual(end, ticket.scope.end.timestamp())
+            self.assertAlmostEqual(end * 1000, round(end * 1000), places=3)
+            points = [[start + i * step, '1'] for i in range(int((end - start) // step) + 1)]
+            return httpx.Response(200, json={'status': 'success', 'data': {'resultType': 'matrix',
+                'result': [{'values': points}]}})
+        base = HTTPObservationProvider(binding, ticket, self.principal, transport=httpx.MockTransport(reply))
+        ex = ToolExecutor(ProviderWithHistory(base, MemoryRunStore(), self.principal), self.principal, ticket.scope, RunContext())
+        result = ex.execute('get_service_metrics', {'start': snapshot['start'], 'end': snapshot['end'],
+            'metrics': ['queue_depth', 'workers_active'], 'granularity': '1m'})
+        self.assertEqual(result.status, 'ok')
+        self.assertFalse(result.truncated)
+        self.assertLessEqual(len(result.model_dump_json()), 12000)
+        self.assertEqual({e.payload['metric'] for e in result.evidence}, {'queue_depth', 'workers_active'})
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(ex.context.counts['tool_calls'], 1)
+        self.assertTrue(all(e.observed_to <= ticket.scope.end for e in result.evidence))
+        self.assertLess((ticket.scope.end - result.evidence[0].observed_to).total_seconds(), .001)
+        for item in result.evidence:
+            self.assertEqual(item.payload['requested_granularity'], '1m')
+            self.assertEqual(item.payload['granularity'], calls[0].url.params['step'] + 's')
+        # A short focused query retains the requested five-minute interval.
+        focused = ex.execute('get_service_metrics', {'start': (ticket.scope.end-timedelta(minutes=5)).isoformat(),
+            'end': snapshot['end'], 'metrics': ['queue_depth'], 'granularity': '5m'})
+        self.assertFalse(focused.truncated)
+        self.assertEqual(focused.evidence[0].payload['granularity'], '5m')
+
+    def test_unexpected_extra_metric_samples_are_still_reported_as_truncated(self):
+        calls = []
+        def reply(request):
+            calls.append(request)
+            points = [[self.start.timestamp() + i, '1'] for i in range(61)]
+            return httpx.Response(200, json={'status': 'success', 'data': {'resultType': 'matrix',
+                'result': [{'values': points}]}})
+        provider = HTTPObservationProvider(self.binding, self.ticket, self.principal, transport=httpx.MockTransport(reply))
+        ex = ToolExecutor(provider, self.principal, self.ticket.scope, RunContext())
+        result = ex.execute('get_service_metrics', {'start': self.snapshot['start'], 'end': self.snapshot['end'],
+            'metrics': ['queue_depth']})
+        self.assertTrue(result.truncated)
+        self.assertLessEqual(len(result.model_dump_json()), 12000)
+
     def test_registered_metric_and_fixed_query_reach_existing_evidence_executor(self):
         calls = []
         def reply(request):

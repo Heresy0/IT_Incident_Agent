@@ -153,6 +153,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     messages = [SystemMessage(content=system), HumanMessage(content=json.dumps({
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
         "output_schema": output_schema.model_json_schema(), "step_limit": max_steps,
+        "read_only_capabilities": executor.capabilities(),
         "objective": objective}, ensure_ascii=False))]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []

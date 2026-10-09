@@ -8,7 +8,9 @@ import time
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 import httpx
+from pydantic import ValidationError
 from providers.fixtures import ProviderError
+from providers.logs import LogMapping
 
 
 def request_json(base, method, path, *, params=None, authorization_env=None, transport=None):
@@ -53,7 +55,10 @@ def request_json(base, method, path, *, params=None, authorization_env=None, tra
 def safe_text(text):
     # Only sanitized log messages enter model prompts/evidence, never raw log documents.
     text = re.sub(r'(?i)bearer\s+\S+', 'Bearer [REDACTED]', str(text))
-    text = re.sub(r'(?i)(password|token|api[_-]?key|secret)\s*[=:]\s*[^\s,;]+', r'\1=[REDACTED]', text)
+    text = re.sub(r'''(?i)(["']?(?:password|token|api[_-]?key|secret|authorization|access_token|refresh_token)["']?\s*[=:]\s*)(?:"[^"]*"|'[^']*'|[^\s,;}]+)''',
+                  r'\1[REDACTED]', text)
+    text = re.sub(r'(?i)([a-z][a-z0-9+.-]*://)[^/@\s]+:[^/@\s]+@', r'\1[REDACTED]@', text)
+    text = re.sub(r'\bsk-[A-Za-z0-9_-]+', '[REDACTED]', text)
     return text[:1800]
 
 
@@ -62,6 +67,10 @@ class HTTPObservationProvider:
 
     def __init__(self, binding, ticket, principal, *, transport=None):
         self.binding, self._ticket, self.principal, self.transport = binding, ticket, principal, transport
+        try:
+            self.log_mapping = LogMapping.model_validate(binding.observations.get('log_mapping', {}))
+        except ValidationError:
+            raise ProviderError('LOG_MAPPING_INVALID') from None
 
     def ticket(self):
         return self._ticket.model_copy(deep=True)
@@ -83,7 +92,7 @@ class HTTPObservationProvider:
         payload['id'] = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:24]
         return payload
 
-    def query(self, name, args, scope):
+    def query(self, name, args, scope, *, max_metric_points=60):
         self.authorize(self.principal, scope)
         if hasattr(args, 'start') and (args.start < scope.start or args.end > scope.end):
             raise ProviderError('WINDOW_DENIED')
@@ -92,12 +101,23 @@ class HTTPObservationProvider:
             if any(metric not in definitions for metric in args.metrics):
                 raise ProviderError('METRIC_NOT_REGISTERED')
             rows, truncated = [], False
+            point_limit = max(1, min(60, max_metric_points))
+            requested_step = 60 if args.granularity == '1m' else 300
+            # Prometheus parses range endpoints at millisecond precision. Round inward
+            # and anchor the grid on the end so the latest observation remains in scope.
+            lower = math.ceil(args.start.timestamp() * 1000) / 1000
+            query_end = math.floor(args.end.timestamp() * 1000) / 1000
+            if lower > query_end:
+                return [], False
+            duration = query_end - lower
+            step = max(requested_step, int(duration / max(1, point_limit - 1)))
+            intervals = min(point_limit - 1, int(duration // step))
+            query_start = query_end - intervals * step
             for metric in args.metrics:
                 definition = definitions[metric]
                 data = self._read('prometheus', '/api/v1/query_range', {
-                    'query': definition['query'], 'start': args.start.timestamp(), 'end': args.end.timestamp(),
-                    'step': max(60 if args.granularity == '1m' else 300,
-                                math.ceil((args.end - args.start).total_seconds() / 59))})
+                    'query': definition['query'], 'start': query_start, 'end': query_end,
+                    'step': step})
                 if data.get('status') != 'success' or data.get('data', {}).get('resultType') != 'matrix':
                     raise ProviderError('PROVIDER_FORMAT_INVALID')
                 series = data['data']['result']
@@ -105,16 +125,18 @@ class HTTPObservationProvider:
                 if len(series) > 1:
                     raise ProviderError('METRIC_QUERY_NOT_AGGREGATED')
                 points = series[0]['values'] if series else []
-                truncated |= len(points) > 60
-                for stamp, value in points[-60:]:
+                truncated |= len(points) > point_limit
+                for stamp, value in points[-point_limit:]:
                     moment = datetime.fromtimestamp(float(stamp), timezone.utc)
                     number = float(value)
                     if args.start <= moment <= args.end and math.isfinite(number):
                         rows.append(self._row(moment.isoformat(), metric=metric, value=number,
                             unit=definition['unit'], aggregation=definition.get('aggregation', 'registered'),
-                            granularity=args.granularity))
+                            granularity=args.granularity if step == requested_step else f'{step}s',
+                            requested_granularity=args.granularity))
             return sorted(rows, key=lambda row: row['timestamp'], reverse=True), truncated
         if name == 'get_service_logs':
+            self.last_log_stats = {}
             expression = self.binding.observations.get('log_queries', {}).get(args.category)
             if not expression:
                 raise ProviderError('LOG_CATEGORY_NOT_REGISTERED')
@@ -125,6 +147,7 @@ class HTTPObservationProvider:
                 raise ProviderError('PROVIDER_FORMAT_INVALID')
             rows = []
             count = 0
+            unusable = filtered = 0
             for stream in data['data']['result']:
                 for stamp, line in stream['values']:
                     count += 1
@@ -135,19 +158,19 @@ class HTTPObservationProvider:
                         record = json.loads(line)
                     except ValueError:
                         record = {'message': line}
-                    if not isinstance(record, dict):
+                    normalized = self.log_mapping.normalize(record)
+                    if normalized is None:
+                        unusable += 1
                         continue
-                    level = str(record.get('level', 'UNKNOWN')).upper().replace('WARNING', 'WARN')
-                    if level not in {'INFO', 'WARN', 'ERROR', 'DEBUG', 'CRITICAL'}:
-                        level = 'UNKNOWN'
-                    code = record.get('error_code')
-                    if not isinstance(code, str) or not re.fullmatch(r'[A-Z0-9_]{1,64}', code):
-                        code = None
+                    message, level, code = normalized
                     if args.level and level != args.level or args.error_code and code != args.error_code:
+                        filtered += 1
                         continue
                     rows.append(self._row(moment.isoformat(), category=args.category, level=level,
-                        error_code=code, message=safe_text(record.get('message', ''))))
+                        error_code=code, message=safe_text(message), content_truncated=len(message) > 1800))
             rows.sort(key=lambda row: (row['timestamp'], row['id']))
+            self.last_log_stats = {'source_rows': count, 'unusable_rows': unusable,
+                                   'filtered_rows': filtered, 'retained_rows': min(len(rows), 50)}
             return rows[:50], count >= 51 or len(rows) > 50
         # Small operator-maintained metadata; no model-supplied paths or knowledge-base credentials.
         key = {'get_recent_changes': 'changes', 'get_service_owner': 'owners',

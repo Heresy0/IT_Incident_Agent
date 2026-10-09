@@ -61,8 +61,17 @@ class OwnerFlowModel:
                 return json_response({'escalation_ref': {'reference_id': 'REF_' + '0' * 24}})
         owner = next(e for e in reversed(sources) if 'team' in e['payload'])
         cpu = next(e for e in sources if e['payload'].get('metric') == 'db_cpu')
-        return json_response({'findings': [{'statement': 'Observed CPU', 'refs': [selector(cpu, 'value')]}],
-            'escalation_ref': selector(owner, 'team')})
+        output = {'findings': [{'statement': 'Observed CPU', 'refs': [selector(cpu, 'value')]}],
+            'escalation_ref': selector(owner, 'team')}
+        if self.role == 'diagnosis':
+            metrics = {e['payload']['metric']: e for e in sources if 'metric' in e['payload']}
+            output.update(hypotheses=[{'cause': '应用连接池压力导致请求等待',
+                'support_refs': [selector(metrics[m], 'value') for m in ('pool_usage', 'pool_wait')],
+                'counter_refs': [selector(cpu, 'value')]}], recommended_actions=[{
+                'action': '由值班人员核查连接池容量与配置', 'condition': '确认连接池使用率与等待异常仍存在',
+                'expected_result': '处置后连接池等待下降', 'risk': '配置调整可能影响服务，需要人工批准',
+                'requires_approval': True}])
+        return json_response(output)
 
 
 class IncidentOwnershipTests(unittest.TestCase):
@@ -145,6 +154,8 @@ class IncidentOwnershipTests(unittest.TestCase):
         self.assertEqual(result['run_summary']['tool_calls'], 7)
         self.assertEqual(result['output']['escalation_team'], 'Inventory on-call')
         self.assertEqual(len(result['output']['findings']), 1)
+        self.assertEqual(result['output']['hypotheses'][0]['status'], 'supported')
+        self.assertEqual(len(result['output']['recommended_actions']), 1)
         self.assertEqual(len(result['reviews']), 1)
         self.assertEqual(result['coverage_gaps'], [])
         self.assertTrue(any(e['type'] == 'collection_stalled' for e in result['events']))

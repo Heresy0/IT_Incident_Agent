@@ -1,6 +1,6 @@
 # Windows 本地启动
 
-当前后端只运行 IT 工单链路。研究源码在 archive/research 中保留历史快照，不能通过旧开关重新启用。前端当前保留原页面，后续再统一整理。
+当前后端只运行 IT 工单链路。研究源码在 archive/research 中保留历史快照，不能通过旧开关重新启用。前端已提供轻量 IT 调试页面。最新试点结果、免费检查和边界见[真实联调验收与稳定版收尾](docs/真实联调验收与稳定版收尾-20261010.md)。
 
 ## 首次准备
 
@@ -55,11 +55,23 @@ docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300 postg
 
 后端初始化执行运行表、工单迁移和新增002修复表迁移，不需要 Milvus、搜索 Key、个人记忆或研究 Agent。自由工单可通过INCIDENT_SERVICES_FILE绑定真实观测源；未绑定时返回信息缺口，不制造案例证据。后台仅支持单进程，诊断中断标记失败，修复中断转人工处理，不恢复外部写操作。
 
+## 接入知识库服务的免费只读联调
+
+本地 `services.local.json` 通过 `INCIDENT_SERVICES_FILE` 加载。知识库事件日志支持登记 `log_mapping`，公开骨架见 `examples/services.enterprise.example.json`。指标、日志地址及选择器由管理员固定，凭据不传给模型。
+
+```powershell
+.\.venv\Scripts\python.exe scripts/probe_registered_service.py --service enterprise-indexing --minutes 1440
+```
+
+该命令只查询已登记观测并校验证据，不调用模型、不创建工单或执行修复。结果写入忽略提交的 `output/registered-service-probe.json`；退出码0表示检查通过，2表示有空结果/截断等缺口，1表示无法开始。指标仅检查最近最多5分钟的小样本，日志使用指定窗口。详细操作与边界见 [知识库服务只读接入与联调](docs/知识库服务只读接入与联调-20261009.md)。配置或代码修改后，HTTP 后端需要重新启动。
+
 ## 日志和指标
+
+真实诊断出现 `REVIEW_TARGET_COVERAGE` 或未登记日志重复查询时，修复、指标采样行为及重新加载步骤见 [真实诊断复核与观测修复](docs/真实诊断复核与观测修复-20261009.md)。长窗口指标采用按证据容量调整的采样，`granularity` 为实际间隔；未截断不表示完整连续历史。
 
 JSON日志写入控制台和 logs/incident.log，单文件约2 MB，保留3个轮转备份；可通过 INCIDENT_LOG_DIR 修改位置。已有 research.log 不删除。
 
-GET /metrics 返回 Prometheus 格式的 it_incident_* 指标，需要 operator 身份。指标为进程内统计，重启清零；事件和运行记录保存到 PostgreSQL。尚未部署 Prometheus/Grafana 或告警。
+GET /metrics 返回 Prometheus 格式的 it_incident_* 指标，需要 operator 身份。指标为进程内统计，重启清零；事件和运行记录保存到 PostgreSQL。本项目自身尚未部署 Prometheus/Grafana 或告警；知识库试点使用外部已部署的 Prometheus/Loki 作为只读观测源。
 
 ## 免费回归
 
@@ -98,11 +110,28 @@ Key、身份或预算不满足时在请求前停止。未知 Token/费用继续�
 .\.venv\Scripts\python.exe scripts/demo_remediation.py
 ```
 
-演示只模拟动作。真实修复需登记目标、真实诊断通过复核、operator审批摘要，再显式调用execute。当前Docker HTTP执行器仅支持restart_service，要求精确容器ID及有效HEALTHCHECK；不会自动开启Docker API或调用现有容器。扩缩容、回滚执行器尚未实现。真实数据库迁移、监控接入、模型候选和容器重启本轮均未实测。
+演示只模拟动作。真实修复需登记目标、真实诊断通过复核、operator审批摘要，再显式调用execute。当前Docker HTTP/CLI执行器仅支持restart_service，要求精确容器ID、有效HEALTHCHECK及登记症状验证；不会自动开启Docker API。扩缩容、回滚执行器尚未实现。此前已验证隔离数据库迁移和临时容器重启；知识库试点只登记只读观测，恢复 Worker 与索引重试由用户执行，本次收尾未重复执行外部修复。
 
 ## 可选前端和停止
 
-前端本轮不改动。要使用现有页面，可在 front/agent_front 安装 Node依赖，并执行 local_run.py frontend，端口5174。旧研究导航尚在，但研究创建/记忆 API 已退出后端；旧只读运行地址保留以继续查看工单。
+工单现在可以显式选择 `purpose=status_check`（观测核查）或 `purpose=diagnosis`（故障原因与建议）；默认兼容旧记录为 diagnosis。状态核查只复核所列观测并说明覆盖范围，不确认整体健康，不生成修复建议。修改目的后先保存修订，再显式启动。实现、验证及使用步骤见[状态核查与登记补查约束](docs/状态核查与登记补查约束-20261009.md)。
+
+故障诊断须包含经过复核的当前观测、原因假设和处理建议。仅有观测、缺少原因或建议时返回 `partial / needs_information`、`DIAGNOSIS_INCOMPLETE`，保留事实和具体缺口，不增加自动重试。修复说明和 Worker 演练示例见[故障诊断完整性修复](docs/故障诊断完整性修复-20261009.md)。
+
+Diagnosis 的引用 Schema 列出本次可见的真实 `REF_` 编号，各引用列表要求不重复，程序继续独立校验。未知引用和重复引用分别报告具体字段位置；使用既有一次纠正额度，不能自动增加预算。实现及免费验证见[诊断引用约束与纠正修复](docs/诊断引用约束与纠正修复-20261009.md)。
+
+当前提供轻量 IT 调试页面，复用 Vue 工单与事件回放，入口已去掉研究和记忆导航。已有前端依赖可直接启动：
+
+```powershell
+cd D:\code\it_incident_agent
+.\.venv\Scripts\python.exe local_run.py frontend
+```
+
+打开 http://127.0.0.1:5174/，输入本项目访问令牌，选择登记服务、填写问题和时间窗口、保存工单，再设置预算并勾选本次付费授权。真实诊断只在点击启动后执行；刷新、读取结果和事件回放不会重新启动。令牌仅保存在页面内存，刷新后重新认证即可读取同一身份的工单。免费开发案例不调用真实模型。
+
+用户反馈服务故障无需先提供索引任务 ID，可描述症状、发生时间与影响范围。当前六个工具查询登记观测和知识，不直接查询索引任务；具体任务是否成功仍由业务页面或人工确认。
+
+前端代理从根目录 .env.local/.env 读取后端 PORT，当前本机为8002，缺省为8003；也可用 INCIDENT_API_TARGET 指定地址。修改代理配置后重启前端。尚未提供修复审批和执行页面。界面、构建与限制见[前端说明](front/agent_front/README.md)。
 
 前后端按 Ctrl+C 停止；数据库仅停止本项目服务并保留数据：
 

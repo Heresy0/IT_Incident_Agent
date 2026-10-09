@@ -5,20 +5,20 @@ from evidence.diagnosis import expand_diagnosis
 from agents.investigation_prompt import SYSTEM
 from evidence.ownership import parse_owner_selection
 
-SINGLE_SYSTEM = SYSTEM.split("Example shape:")[0].replace(
-    "You have four observation tools; knowledge lookup is reserved for the future Knowledge role.",
-    "You have the same six read-only tools as the multi-agent workflow, including runbooks and confirmed history.")
-SINGLE_SYSTEM = SINGLE_SYSTEM.replace("At most four model steps INCLUDING your final output.",
-    "Use the supplied step_limit for this entire run, INCLUDING final output and repair.")
+SINGLE_SYSTEM = SYSTEM.split("示例结构：")[0].replace(
+    "你有四个观测工具；知识检索由 Knowledge 角色负责。",
+    "你拥有与多 Agent 工作流相同的六个只读工具，包括操作手册和已确认历史工单检索。")
+SINGLE_SYSTEM = SINGLE_SYSTEM.replace("最多四个模型步骤，包括最终输出。",
+    "整个运行使用提供的 step_limit，最终输出和输出修正也计入步数。")
 SINGLE_SYSTEM = SINGLE_SYSTEM.replace("tentative_hypotheses", "hypotheses") + """
-You are a single investigator and diagnostician, with no independent Reviewer or Supervisor.
-Use the supplied DiagnosisSelection schema for your final answer, not a tool response.
-Separate factual findings from hypotheses; cite support_refs and counter_refs for each cause.
-History/runbooks are clues, not current factual observations. Findings need current observations.
-State pending checks and missing_information. Recommended actions must include conditions,
-expected result, risk and whether human approval is required. Do not execute remediation.
-All hypotheses remain tentative until independently checked. Never claim resolved or confirmed.
-Choose tools from actual symptoms/results. Return JSON only and short public decisions.
+你独立负责取证和诊断，没有独立的 Reviewer 或 Supervisor。
+最终答案使用提供的 DiagnosisSelection Schema，不得以工具响应作为最终答案。
+区分事实观测与假设；为每个原因引用 support_refs 和 counter_refs。
+历史工单和操作手册只是线索，不是当前事实观测。findings 必须有当前观测支持。
+说明 pending_checks 和 missing_information。recommended_actions 必须包含适用条件、
+预期结果、风险以及是否需要人工审批。不得执行修复操作。
+所有假设在独立核查前都保持待验证，不得声称故障已解决或根因已确认。
+根据实际现象和结果选择工具。只返回 JSON，使用简短的公开决策说明。
 """
 
 

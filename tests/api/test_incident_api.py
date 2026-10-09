@@ -55,6 +55,23 @@ class IncidentAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 201, response.text)
         return response.json()
 
+    def test_explicit_status_check_is_saved_reviewed_and_not_a_resolution(self):
+        incident = self.create(purpose='status_check')
+        self.assertEqual(incident['purpose'], 'status_check')
+        run_id = self.start(incident)
+        result = self.result(run_id)
+        self.assertEqual(result['purpose'], 'status_check')
+        self.assertEqual(result['business_result'], 'status_checked')
+        self.assertEqual(result['incident_snapshot']['purpose'], 'status_check')
+        self.assertEqual(result['output']['hypotheses'], [])
+        self.assertEqual(self.req('GET', f'incidents/{incident["id"]}').json()['business_status'], 'awaiting_confirmation')
+        response = self.req('POST', f'incidents/{incident["id"]}/resolution', token='op', json={
+            'request_key': 'resolve-status', 'revision': incident['revision'], 'run_id': run_id,
+            'confirmed_cause': '空闲', 'resolution': '无需操作'})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'], 'STATUS_CHECK_NOT_RESOLVABLE')
+
+
     def start(self, incident, key='start_a', **changes):
         response = self.req('POST', f'incidents/{incident["id"]}/diagnoses', json={'request_key': key, **changes})
         self.assertEqual(response.status_code, 202, response.text)

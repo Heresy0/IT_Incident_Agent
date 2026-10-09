@@ -36,10 +36,10 @@ class ProviderWithHistory:
     def authorize(self, principal, scope):
         self.base.authorize(principal, scope)
 
-    def query(self, name, args, scope):
+    def query(self, name, args, scope, **options):
         self.authorize(self.principal, scope)
         if name != 'search_incidents':
-            return self.base.query(name, args, scope)
+            return self.base.query(name, args, scope, **options)
         try:
             rows, truncated = self.base.query(name, args, scope)
         except ProviderError as exc:

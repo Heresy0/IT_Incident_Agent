@@ -1,42 +1,44 @@
-# agent_front
+# IT 故障调试前端
 
-This template should help get you started developing with Vue 3 in Vite.
+复用 Vue 3、TypeScript、Vite 和现有 IncidentPanel。当前入口仅提供 IT 工单调试，不展示研究或记忆导航。
 
-## Recommended IDE Setup
+## 启动
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+在项目根目录启动后端，再开一个终端启动前端：
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```powershell
+cd D:\code\it_incident_agent
+.\.venv\Scripts\python.exe local_run.py backend
+# 另一个终端
+.\.venv\Scripts\python.exe local_run.py frontend
 ```
 
-### Compile and Hot-Reload for Development
+页面：http://127.0.0.1:5174/。开发服务器仅绑定127.0.0.1，端口被占用时退出，不自动换端口。
 
-```sh
-npm run dev
-```
+开发代理读取根目录的 .env.local/.env 中 PORT，默认连接8003；当前本机配置为8002。可通过 INCIDENT_API_TARGET 指定地址。配置变化后重启前端。/api、/health、/docs、/openapi.json 由开发服务器代理，模型 Key 和根目录后端配置不传给浏览器。
 
-### Type-Check, Compile and Minify for Production
+依赖未安装时在本目录执行 npm ci；已有 node_modules 可直接启动。本轮未安装新依赖。
 
-```sh
+## 使用
+
+1. 在左侧输入本项目访问令牌，点击“验证身份并连接”；可直接粘贴token或带Bearer前缀的内容。认证通过后显示租户、用户和角色。
+2. 选择“已登记服务”，或选择“开发案例”。只有一个真实服务时自动填充；可以修改标题和症状。真实服务初始内容是状态核查，不预设故障。
+3. 通过本地时间选择器和15分钟/1小时/24小时按钮设置窗口，发生时间须在窗口内。创建或保存工单不调用模型。
+4. 保存后设置模型与工具预算。真实服务必须使用live；免费脚本模式只用于开发案例。勾选本次付费授权，再点击“启动付费诊断”。修改预算会清除授权。
+5. 查看角色/工具事件、格式化诊断报告、原文、结构化结果及证据。事件回放、断线重连、刷新后重新认证只读取已有运行，不重新POST诊断。
+6. operator 可使用已有人工确认功能记录实际原因和解决结果；这是关闭工单与保存经验，不会调用修复执行器。
+
+令牌仅保存在当前页面内存，刷新后须重新输入。sessionStorage 只保存当前身份下的工单ID、运行ID、事件序号及尚未确认的诊断请求参数，不保存令牌或症状正文。启动响应丢失时，重试沿用原幂等请求编号和预算。
+
+## 验证
+
+工单表单增加“核查目的”：状态核查只复核观测和覆盖限制，故障诊断分析原因与建议。登记服务新工单默认状态核查，旧工单按故障诊断兼容；可以手动修改并保存修订。目的未保存时无法启动。状态核查结果不会出现人工确认解决表单。后端代码更新后必须重启再使用新增字段。
+
+```powershell
+# 本目录
 npm run build
 ```
+
+本轮类型检查和生产构建通过。临时浏览器检查覆盖创建、预算授权、报告HTML转义、刷新/回放不重复启动、令牌不持久化及移动端布局；真实后端只执行GET核对健康、身份、服务和工单列表。模拟的live响应不代表真实模型诊断质量，未执行真实付费调用或数据库写入。
+
+这是开发调试页面，尚未提供修复计划、审批和执行按钮，也不是完整生产前端。Vite代理仅用于开发；生产部署需要单独配置静态资源与API代理。

@@ -32,7 +32,8 @@ def ticket_for(snapshot, principal):
     dependencies = FixtureProvider(snapshot["demo_case_id"], principal).ticket().scope.allowed_dependencies if snapshot.get("demo_case_id") else ()
     scope = IncidentScope.model_validate_json(json.dumps({**{k: snapshot[k] for k in ("service", "environment", "service_version", "start", "end")},
         "tenant_id": principal.tenant_id, "user_id": principal.user_id, "allowed_dependencies": list(dependencies)}))
-    return Ticket(incident_id=snapshot["id"], title=snapshot["title"], symptoms=snapshot["symptoms"], scope=scope)
+    return Ticket(incident_id=snapshot["id"], title=snapshot["title"], symptoms=snapshot["symptoms"],
+                  purpose=snapshot.get('purpose', 'diagnosis'), scope=scope)
 
 
 class BoundIncidentProvider:

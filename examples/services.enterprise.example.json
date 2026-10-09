@@ -1,0 +1,49 @@
+{
+  "services": [
+    {
+      "tenant_id": "example_tenant",
+      "users": ["example_operator"],
+      "service": "enterprise-indexing",
+      "environment": "staging",
+      "version": "local-v1",
+      "dependencies": [],
+      "observations": {
+        "prometheus": {"url": "http://127.0.0.1:9090"},
+        "loki": {"url": "http://127.0.0.1:3100"},
+        "metrics": {
+          "workers_active": {
+            "query": "sum(enterprise_indexing_workers_active{job=\"enterprise-knowledge-api\"})",
+            "unit": "workers",
+            "aggregation": "sum"
+          },
+          "queue_depth": {
+            "query": "sum(enterprise_indexing_queue_jobs{job=\"enterprise-knowledge-api\",status=\"queued\"})",
+            "unit": "jobs",
+            "aggregation": "sum"
+          }
+        },
+        "log_queries": {
+          "resource": "{stack=\"enterprise-knowledge\",service=\"worker\",environment=\"local\"}"
+        },
+        "log_mapping": {
+          "event_only": true,
+          "event_allowlist": [
+            "indexing.worker.started", "indexing.worker.stopped",
+            "indexing.worker.heartbeat_failed", "indexing.worker.stop_failed",
+            "indexing.job.started", "indexing.job.completed", "indexing.job.failed",
+            "indexing.job.recovered", "indexing.candidate.cleaned"
+          ],
+          "detail_fields": [
+            "heartbeat_seconds", "metrics_port", "attempt_count", "indexed_chunk_count",
+            "duration_ms", "count", "status", "error_type"
+          ]
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [],
+        "incidents": []
+      },
+      "repairs": {}
+    }
+  ]
+}

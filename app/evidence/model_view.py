@@ -3,7 +3,7 @@ import json
 from langchain_core.messages import HumanMessage
 
 MODEL_VIEW_VERSION = 'compact_sources_v1'
-FIELDS = {'id', 'metric', 'value', 'unit', 'aggregation', 'granularity', 'category', 'level',
+FIELDS = {'id', 'metric', 'value', 'unit', 'aggregation', 'granularity', 'requested_granularity', 'category', 'level',
           'error_code', 'message', 'summary', 'config_summary', 'team', 'escalation', 'text',
           'resolution', 'versions', 'updated_at', 'confirmed_at', 'validity'}
 

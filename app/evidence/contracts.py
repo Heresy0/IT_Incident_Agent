@@ -38,6 +38,7 @@ class Ticket(Contract):
     incident_id: str
     title: str = Field(max_length=160)
     symptoms: str = Field(max_length=2000)
+    purpose: Literal['diagnosis', 'status_check'] = 'diagnosis'
     scope: IncidentScope
 
 
