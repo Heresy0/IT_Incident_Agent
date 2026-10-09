@@ -13,6 +13,15 @@ sys.path.insert(0, str(ROOT / 'app'))
 from providers.configuration import read_configuration, validate_configuration, ServiceConfigurationError
 
 
+PROFILES = {
+    'generic': ('services.example.json', 0),
+    'enterprise': ('services.enterprise.example.json', 0),
+    'enterprise-api': ('services.enterprise-stack.example.json', 0),
+    'postgres': ('services.enterprise-stack.example.json', 1),
+    'redis': ('services.enterprise-stack.example.json', 2),
+}
+
+
 class SafeArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         self.exit(2, '命令参数无效；请使用 --help 查看用法，参数值不会输出。\n')
@@ -38,10 +47,10 @@ def display(result, as_json=False):
 
 
 def template(args):
-    path = ROOT / 'examples' / ('services.enterprise.example.json' if args.profile == 'enterprise'
-                                else 'services.example.json')
-    data = deepcopy(read_configuration(path))
+    filename, index = PROFILES[args.profile]
+    data = {'services': [deepcopy(read_configuration(ROOT / 'examples' / filename)['services'][index])]}
     row = data['services'][0]
+    old_service = row['service']
     row.update(tenant_id=args.tenant, users=args.user, service=args.service,
                environment=args.environment, version=args.version)
     # Repair authority is never copied from the example or enabled by template generation.
@@ -63,6 +72,10 @@ def template(args):
     if args.owner_team:
         row['observations']['owners'] = [{'timestamp': datetime.now(timezone.utc).isoformat(),
                                          'team': args.owner_team, 'aliases': [args.service]}]
+    for record in row['observations'].get('runbooks', []):
+        record['text'] = record['text'].replace(old_service, args.service)
+        record['versions'] = [args.version]
+        record['timestamp'] = datetime.now(timezone.utc).isoformat()
     return data
 
 
@@ -70,7 +83,7 @@ def main(argv=None):
     parser = SafeArgumentParser(description='服务登记模板与免费预检；不连接外部系统，不输出配置值或凭据。')
     sub = parser.add_subparsers(dest='command', required=True)
     generate = sub.add_parser('template', help='生成独立的新文件，默认只读，不覆盖已有登记')
-    generate.add_argument('--profile', choices=('generic', 'enterprise'), default='generic')
+    generate.add_argument('--profile', choices=tuple(PROFILES), default='generic')
     generate.add_argument('--service', required=True)
     generate.add_argument('--tenant', required=True)
     generate.add_argument('--user', action='append', required=True, help='允许访问的用户，可重复传入')

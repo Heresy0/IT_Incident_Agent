@@ -1,0 +1,149 @@
+{
+  "services": [
+    {
+      "tenant_id": "example_tenant",
+      "users": [
+        "example_operator"
+      ],
+      "service": "enterprise-api",
+      "environment": "staging",
+      "version": "local-v1",
+      "dependencies": [
+        "enterprise-postgres",
+        "enterprise-redis"
+      ],
+      "observations": {
+        "loki": {
+          "url": "http://127.0.0.1:3100"
+        },
+        "metrics": {
+          "api_up": {
+            "query": "min(up{job=\"enterprise-knowledge-api\"})",
+            "unit": "boolean",
+            "aggregation": "min"
+          },
+          "request_rate": {
+            "query": "sum(rate(enterprise_http_requests_total{job=\"enterprise-knowledge-api\"}[5m]))",
+            "unit": "requests_per_second",
+            "aggregation": "sum_rate"
+          },
+          "request_error_rate": {
+            "query": "sum(rate(enterprise_http_requests_total{job=\"enterprise-knowledge-api\",status=~\"5..\"}[5m])) or (sum(rate(enterprise_http_requests_total{job=\"enterprise-knowledge-api\"}[5m])) * 0)",
+            "unit": "errors_per_second",
+            "aggregation": "sum_rate"
+          },
+          "request_latency_p95": {
+            "query": "histogram_quantile(0.95, sum by (le) (rate(enterprise_http_request_duration_seconds_bucket{job=\"enterprise-knowledge-api\"}[5m])))",
+            "unit": "seconds",
+            "aggregation": "histogram_quantile_p95"
+          }
+        },
+        "log_queries": {
+          "resource": "{stack=\"enterprise-knowledge\",service=\"api\",environment=\"local\"} | json event=\"event\" | __error__=\"\" | event=~\"qa[.](completed|failed|rate_limited|concurrency_limited)\"",
+          "dependency": "{stack=\"enterprise-knowledge\",service=\"api\",environment=\"local\"} | json event=\"event\" | __error__=\"\" | event=~\"qa[.](rate_limiter_unavailable|concurrency_limiter_unavailable|concurrency_release_failed|failed)\"",
+          "configuration": "{stack=\"enterprise-knowledge\",service=\"api\",environment=\"local\"} | json event=\"event\" | __error__=\"\" | event=~\"qa[.](denied|invalid)\""
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [
+          {
+            "timestamp": "2026-10-10T00:00:00+00:00",
+            "versions": [
+              "local-v1"
+            ],
+            "text": "enterprise-api 知识库 API 只读排查：先核查 api_up，再结合 request_rate、request_error_rate 和 request_latency_p95 确认接口影响。api_up 仅表示 Prometheus 抓取成功，不代表数据库、Redis 或业务健康。request_error_rate 是每秒 HTTP 5xx 请求数，不是百分比；0 仅在已有请求指标序列时补齐，来源缺失仍为缺口。无流量、短窗口或历史采样不足时，速率和P95可能无有效样本。日志仅覆盖已登记的 qa 运维事件；事件名不能证明深层原因，未覆盖上传接口、完整异常堆栈和业务数据。dependency 中 Redis 限流器不可用事件仅提供关联线索；不得直接认定 Redis 根因。PostgreSQL 与 Redis 当前只登记运行日志，需另开对应服务工单核查。未登记本服务的自动修复，不要自动重启 API 或依赖。"
+          }
+        ],
+        "incidents": [],
+        "prometheus": {
+          "url": "http://127.0.0.1:9090"
+        },
+        "log_mapping": {
+          "event_only": true,
+          "event_allowlist": [
+            "qa.completed",
+            "qa.failed",
+            "qa.rate_limited",
+            "qa.concurrency_limited",
+            "qa.rate_limiter_unavailable",
+            "qa.concurrency_limiter_unavailable",
+            "qa.concurrency_release_failed",
+            "qa.denied",
+            "qa.invalid"
+          ],
+          "detail_fields": [
+            "error_type",
+            "outcome",
+            "duration_ms",
+            "status"
+          ]
+        }
+      },
+      "repairs": {}
+    },
+    {
+      "tenant_id": "example_tenant",
+      "users": [
+        "example_operator"
+      ],
+      "service": "enterprise-postgres",
+      "environment": "staging",
+      "version": "local-v1",
+      "dependencies": [],
+      "observations": {
+        "loki": {
+          "url": "http://127.0.0.1:3100"
+        },
+        "metrics": {},
+        "log_queries": {
+          "resource": "{stack=\"enterprise-knowledge\",service=\"postgres\",environment=\"local\"} |~ \"(?i)(database system is ready to accept connections|database system is shut down|database system is starting up|database system is in recovery mode|database system was interrupted|received fast shutdown request|received smart shutdown request|received immediate shutdown request|terminating connection due to administrator command|too many clients already|remaining connection slots are reserved|password authentication failed|could not receive data from client|could not send data to client|could not write|no space left on device|deadlock detected|canceling statement due to statement timeout)\" | regexp \"(?i)(?P<state>database system is ready to accept connections|database system is shut down|database system is starting up|database system is in recovery mode|database system was interrupted|received fast shutdown request|received smart shutdown request|received immediate shutdown request|terminating connection due to administrator command|too many clients already|remaining connection slots are reserved|password authentication failed|could not receive data from client|could not send data to client|could not write|no space left on device|deadlock detected|canceling statement due to statement timeout)\" | __error__=\"\" | state!=\"\" | line_format \"{{.state}}\""
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [
+          {
+            "timestamp": "2026-10-10T00:00:00+00:00",
+            "versions": [
+              "local-v1"
+            ],
+            "text": "enterprise-postgres 知识库 PostgreSQL 只读排查：当前只读取对应 postgres 容器的固定运维状态日志，日志输出保留状态短语及时间，不包含SQL、数据库名、用户或数据内容。先核对启动、恢复、停止、连接耗尽、认证失败、写入失败、死锁和超时状态；单次启动完成日志只说明该历史时刻，不证明当前数据库可用。当前没有登记独立 PostgreSQL exporter，不具备连接数、CPU、磁盘、慢查询等直接指标；空日志也不表示健康。请人工结合实际发生时间和业务影响补齐观测。没有数据库写权限或自动修复目标，涉及重启、SQL、数据修复的操作须另行登记与审批。"
+          }
+        ],
+        "incidents": []
+      },
+      "repairs": {}
+    },
+    {
+      "tenant_id": "example_tenant",
+      "users": [
+        "example_operator"
+      ],
+      "service": "enterprise-redis",
+      "environment": "staging",
+      "version": "local-v1",
+      "dependencies": [],
+      "observations": {
+        "loki": {
+          "url": "http://127.0.0.1:3100"
+        },
+        "metrics": {},
+        "log_queries": {
+          "resource": "{stack=\"enterprise-knowledge\",service=\"redis\",environment=\"local\"} |~ \"(?i)(Ready to accept connections|Redis is starting|Server initialized|User requested shutdown|Redis is now ready to exit|Saving the final RDB snapshot before exiting|Background saving started|Background saving terminated|Background saving error|Error writing to the AOF file|Can't save in background|OOM command not allowed when used memory|MISCONF Redis is configured|Connection refused|Connection reset by peer|NOAUTH Authentication required|WRONGPASS invalid username-password pair)\" | regexp \"(?i)(?P<state>Ready to accept connections|Redis is starting|Server initialized|User requested shutdown|Redis is now ready to exit|Saving the final RDB snapshot before exiting|Background saving started|Background saving terminated|Background saving error|Error writing to the AOF file|Can't save in background|OOM command not allowed when used memory|MISCONF Redis is configured|Connection refused|Connection reset by peer|NOAUTH Authentication required|WRONGPASS invalid username-password pair)\" | __error__=\"\" | state!=\"\" | line_format \"{{.state}}\""
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [
+          {
+            "timestamp": "2026-10-10T00:00:00+00:00",
+            "versions": [
+              "local-v1"
+            ],
+            "text": "enterprise-redis 知识库 Redis 只读排查：当前只读取对应 redis 容器的固定运维状态日志，保留启动、就绪、停止、持久化及常见资源/认证错误短语，不查询缓存键值和业务内容。历史 Ready to accept connections 日志不证明当前可用。当前没有登记 Redis exporter，不具备实时连接数、内存、命中率和阻塞等直接指标；无匹配日志须保留信息缺口。API 限流器事件与Redis容器日志需分别核查，不能只根据一个关联事件确定根因。没有 Redis 命令写权限或自动修复目标，重启、清缓存和配置变更须另行登记与审批。"
+          }
+        ],
+        "incidents": []
+      },
+      "repairs": {}
+    }
+  ]
+}

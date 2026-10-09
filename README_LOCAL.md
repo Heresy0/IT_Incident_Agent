@@ -2,6 +2,19 @@
 
 当前后端只运行 IT 工单链路。研究源码在 archive/research 中保留历史快照，不能通过旧开关重新启用。前端已提供轻量 IT 调试页面。最新试点结果、免费检查和边界见[真实联调验收与稳定版收尾](docs/真实联调验收与稳定版收尾-20261010.md)。
 
+## 免费求职演示
+
+已有本项目 Python 环境时直接运行：
+
+```powershell
+cd D:\code\it_incident_agent
+.\.venv\Scripts\python.exe scripts/showcase_incident.py
+```
+
+会生成 `output/showcase/<批次>/index.html`、`summary.json` 和报告。三条演示使用真实图、脚本模型与合成观测，覆盖正常诊断、一次实际补查、预算不足退出；同时运行同预算模拟对照及现有约束测试。没有模型 Key、数据库或 Docker 也能运行，不产生付费调用或真实修复。新机器先按下节创建虚拟环境并安装依赖，演示无需设置身份或启动数据库。
+
+架构取舍、历史真实对照、五分钟讲解和人工评分入口见 [公开展示材料](examples/showcase/README.md)。历史报告和人工评分模板仅本机可用，公开仓库只提供安全指标摘要；助手分析不当作人工确认。
+
 ## 首次准备
 
 使用本项目自己的 Python 3.12 环境和 PostgreSQL，不复制其他项目的密钥、令牌或数据。已有环境和配置无需重建。
@@ -72,6 +85,8 @@ $env:PYTHONIOENCODING='utf-8'
 
 `--profile generic` 复用通用指标和日志例子，替换示例服务、环境标签；`--profile enterprise` 复用现有知识库 Worker 的固定指标和日志映射，其 job/stack/日志环境选择器仍需核对实际部署。可用 `--prometheus-url`、`--loki-url` 指定基础地址；省略则保留示例本机地址。`--user` 可以重复传入。负责人未明确就省略 `--owner-team`，脚本会保留信息缺口。
 
+新增三个知识库组件模板：`--profile enterprise-api`、`--profile postgres`、`--profile redis`，复用 `examples/services.enterprise-stack.example.json`。API 模板登记实际已实现的 HTTP 指标；PostgreSQL/Redis 模板只登记运维日志，独立 exporter 尚未接入，缺少直接指标会明确提示。生成时手册同步服务标识与指定版本；固定 Docker service、stack、日志环境和 Prometheus job 选择器仍须核对部署。
+
 模板始终生成 `repairs: {}`，不会复制示例中的重启权限，也不会自动合并或覆盖 `services.local.json`；目标文件已存在就退出。默认输出到忽略提交的 `output/service-registration/services.template.json`。新增服务时先核对模板 `services[0]`，再手工加入现有文件的 `services` 数组，保留其他登记。修复目标仍需另行登记固定 context/容器ID和新鲜症状恢复规则。
 
 预检和后端启动共用规则：字段类型与必填项、租户/服务/环境重复、访问用户、基础地址和凭据环境变量名称、固定查询来源、日志映射、负责人/手册字段、修复动作和预算、症状指标引用与新鲜度查询。错误只显示字段位置和安全原因；例如 `$.services[0].observations.metrics[1].unit` 指第一个服务下第二个指标缺少单位。动态字典键按文件顺序编号，避免错误输出泄露误填的凭据。
@@ -96,6 +111,38 @@ $env:PYTHONIOENCODING='utf-8'
 ```
 
 该命令只查询已登记观测并校验证据，不调用模型、不创建工单或执行修复。结果写入忽略提交的 `output/registered-service-probe.json`；退出码0表示检查通过，2表示有空结果/截断等缺口，1表示无法开始。指标仅检查最近最多5分钟的小样本，日志使用指定窗口。详细操作与边界见 [知识库服务只读接入与联调](docs/知识库服务只读接入与联调-20261009.md)。配置或代码修改后，HTTP 后端需要重新启动。
+
+## 新增 API、PostgreSQL 与 Redis 登记
+
+本机已在 `services.local.json` 追加 `enterprise-api`、`enterprise-postgres`、`enterprise-redis`，沿用索引 Worker 的租户、允许访问用户、环境、版本和本项目已登记观测地址；用户确认三个服务负责人均为 alice。API 的依赖登记为上述数据库和缓存，提供依赖负责人查询；跨服务指标和日志仍需各自工单范围，不自动扩大当前工单权限。原 Worker 登记和修复目标保持原样，新三项 `repairs: {}`。
+
+| 服务 | 当前可查内容 | 限制 |
+| --- | --- | --- |
+| enterprise-api | api_up、request_rate、request_error_rate、request_latency_p95；QA 运维事件的 resource/dependency/configuration 日志；负责人、手册 | api_up 仅为抓取状态；错误速率不是错误百分比；日志未覆盖所有上传/接口异常堆栈 |
+| enterprise-postgres | postgres 容器启动、停止、恢复、连接、认证、写入和超时等固定状态日志；负责人、手册 | 未登记独立指标，没有连接数、CPU、磁盘或慢查询观测 |
+| enterprise-redis | redis 容器启动、停止、持久化及常见资源/认证错误状态日志；负责人、手册 | 未登记独立指标，没有内存、连接数、命中率或阻塞观测 |
+
+API 使用事件白名单和既有日志映射，仅保留事件名与允许的运维字段。PostgreSQL/Redis 在 Loki 查询中提取固定状态短语，不返回SQL、缓存键值、用户或业务内容。历史就绪日志与空日志均不能证明当前健康。源码实现依据为现有知识库监控代码、Prometheus job 和 Alloy 标签；实际查询语义及采样覆盖留待统一试连确认。
+
+当前工单后端已在空闲时重载，8002 和 5174 前端代理的目录读取均能看到四个服务。已打开的页面刷新后重新认证，即可更新服务列表。2026-10-10 已显式执行一次下列免费统一联调，结果见下文；命令保留供后续按需使用：
+
+```powershell
+cd D:\code\it_incident_agent
+$env:PYTHONIOENCODING='utf-8'
+$onboardingServices = @('enterprise-indexing', 'enterprise-api', 'enterprise-postgres', 'enterprise-redis')
+$onboardingResults = @()
+foreach ($onboardingService in $onboardingServices) {
+    .\.venv\Scripts\python.exe scripts/probe_registered_service.py --service $onboardingService --environment staging --minutes 1440 --output "output/service-onboarding/probes/$onboardingService.json"
+    $onboardingResults += [pscustomobject]@{Service=$onboardingService; ExitCode=$LASTEXITCODE}
+}
+$onboardingResults | Format-Table
+```
+
+该批次只读取已登记观测，模型调用为0；多个 operator 时为命令补上 `--user` 和 `--tenant`。PostgreSQL/Redis 缺少指标时，现有探针会报告 `partial / metrics: NO_REGISTERED_METRICS`，这是明确的覆盖缺口。日志无匹配数据也保留缺口。结果不等于整体健康或故障诊断通过。真实诊断与隔离异常演练后续另行显式启动，继续遵循既有预算与付费授权。
+
+登记实施阶段36项定向免费测试通过，实际登记离线预检0错误、2项指标缺口提示；当时未执行真实观测查询或业务修复，未修改知识库项目。详细范围和统一测试计划见 [三个组件接入与后续统一测试](docs/知识库API与PostgreSQL及Redis登记-20261010.md)。
+
+后续统一联调已完成：20次工具尝试、0模型调用，17项检查返回有效结果、3项API QA日志为空，24条实质引用全部校验通过，provider错误0。四份报告均partial：Worker日志因证据容量截断，API固定QA筛选无匹配，PostgreSQL/Redis未登记指标。两次额外只读统计确认API同窗口有5870条日志，固定事件筛选0条；没有故障注入或修复操作。详细结果见 [四服务统一只读联调结果](docs/四服务统一只读联调结果-20261010.md)。
 
 ## 日志和指标
 

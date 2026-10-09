@@ -1,8 +1,26 @@
 # IT Incident Agent
 
-面向内部服务故障工单的诊断与处置辅助系统：读取工单范围内的指标、日志和变更，形成有引用的原因假设，独立复核，输出处理建议，最后由运维人员确认处理结果。
+面向内部服务故障工单的诊断与处置辅助系统：读取工单范围内的指标、日志和变更，形成有引用的原因假设，由 Reviewer 角色单独复核，输出处理建议，最后由运维人员确认处理结果。
 
 当前后端已整理为独立 IT 系统：**研究执行与启用开关已移除，五个 Agent 通过真实 LangGraph 节点运行**。模块按 API、Agent、工作流、工具、Provider、证据、运行控制、监控和存储组织。现提供轻量 IT 调试前端：身份验证、服务选择、工单编辑、显式预算诊断、报告与事件回放，以及已登记目标的修复提案、审批、执行与阶段结果查看。
+
+## Agent 编排与 Harness 展示
+
+项目重点是**模型驱动的任务与工具选择，以及程序控制的权限、预算、证据和审批边界**。五角色使用同一底层模型的不同提示词；LangGraph 当前串行执行，没有 checkpoint 恢复。格式与引用正确不能保证因果判断正确。
+
+安装根目录依赖后，一条命令运行三条演示、六案例同预算模拟对照、五类 Harness 约束和模拟审批闭环：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/showcase_incident.py
+```
+
+不需要数据库、Docker 或密钥，不调用真实模型，不执行真实修复。输出路径会显示在终端，打开其中的 `index.html` 查看任务和节点轨迹；原始控制报告及 `summary.json` 同时保留。正常诊断、实际执行一次复核补查、预算不足受控退出均已验证。模拟结果只证明程序控制行为，模型质量标为 `excluded_scripted`。
+
+展示材料可随仓库阅读：[演示与五分钟讲解](examples/showcase/README.md)、[设计取舍](examples/showcase/design.md)、[Harness 证据](examples/showcase/harness.md)、[历史真实模型对照](examples/showcase/historical-comparison.json)。历史对照是一组旧版本合成开发案例：单 Agent 6 次模型/24.234 秒，多 Agent 13 次模型/62.672 秒，两者均 partial；未证明多 Agent 质量提升。报告哈希和机械检查已核验，逐项助手分析与正式人工评分分开，人工评分仍待确认，不宣称生产准确率。
+
+2026-10-10 经用户授权补充[当前版本真实对照](examples/showcase/current-comparison.json)：同一 case_003、qwen-turbo、每条16模型/8工具上限，各运行一次。单 Agent 2模型/4工具、10.438秒、completed/not_performed，必要检查4/4；多 Agent 6模型/1工具、18.328秒、completed/passed，必要检查3/4，未查询获取连接超时日志。当前单 Agent 更快、取证更全，多 Agent 建议更谨慎；内部复核通过不等于完整诊断，未证明综合质量领先。总共8次模型调用，没有追加重测；正式人工评分仍待审阅。
+
+当前以已有 Worker 诊断、人工审批恢复及用户反馈入库成功作为业务闭环案例。接下来优先完善评测与展示，暂缓更多运维指标、服务管理页面和修复动作。
 
 ## 当前后端架构
 
@@ -47,6 +65,8 @@ flowchart TD
 通用接入配置、API和验证边界见[通用接入与受控修复](docs/通用接入与受控修复.md)，登记结构参考examples/services.example.json。各阶段历史测试结果保留在原验收记录中。
 
 服务登记现支持 `scripts/register_service.py template` 生成独立的只读模板，以及 `check` 免费离线预检。复用已有通用/知识库配置示例，模板不携带修复权限、不覆盖现有文件；预检与后端启动共用字段、来源、范围及症状验证规则，错误不输出配置值或凭据。结构通过后可显式运行已有 `probe_registered_service.py` 只读试连，再将核对后的条目加入 `services.local.json`。具体命令见 [Windows 本地启动](README_LOCAL.md)。
+
+新增知识库 API、PostgreSQL 和 Redis 的只读接入示例与三个模板 profile，见 `examples/services.enterprise-stack.example.json`。本机登记已追加三项并加载到工单目录，负责人均经用户确认为alice；原索引 Worker 保持原配置。API登记4个HTTP指标和QA运维事件，数据库与缓存仅登记固定运维状态日志，缺少直接指标明确保留提示；新三项不开放修复动作。36项定向测试及实际登记离线预检通过。后续四服务真实只读联调已完成：20次工具尝试、0模型调用，provider错误0、24条实质引用全部校验通过；报告保留Worker日志截断、API事件空结果及数据库/缓存指标缺口，不代表完整健康验收通过。详见 [四服务统一只读联调结果](docs/四服务统一只读联调结果-20261010.md)。
 
 ## 后端入口
 

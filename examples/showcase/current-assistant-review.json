@@ -1,0 +1,42 @@
+{
+  "reviewer_kind": "assistant",
+  "reviewer": "Codex",
+  "reviewed_on": "2026-10-10",
+  "human_review_status": "pending",
+  "rubric": "supported：陈述由所引当前来源支持；qualified：候选或检查方向合理，但不证明完整因果或操作必要性；insufficient：引用不足。仅辅助审阅，不计算人工准确率。",
+  "runs": [
+    {
+      "run_id": "7f77e5da-2aa7-486e-9114-38d436fd1ceb",
+      "report_sha256": "7739107e1c69c434d3d28fcb501932e2c42c1b6ca1a0603bf9d05f4490b8d0f9",
+      "overall": "本次取证覆盖四项必要检查，并读取负载变更及负责人。原因候选使用当前等待、连接获取日志和负载变更，较旧次引用更充分；扩容建议的必要性仍缺少承载评估。completed 表示单 Agent 执行结束，不是独立复核通过。",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overconfidence_issue": "A1 风险文字称扩容是必要的；尚未核实数据库承载能力和容量调整条件。counter_refs、pending_checks 和 missing_information 均为空，未充分表达这些限制。",
+      "escalation_assessment": "升级团队来自已读取的负责人观测，来源合法；仅选择团队不代表真实消息已经发送或工单已经升级解决。",
+      "claim_assessments": [
+        {"target_id": "F1", "verdict": "supported", "reason": "当前 db_cpu=26 percent 与引用来源一致，不代表全部数据库状态正常。"},
+        {"target_id": "F2", "verdict": "supported", "reason": "当前 pool_usage=1.0 与引用采样一致。"},
+        {"target_id": "F3", "verdict": "supported", "reason": "当前 pool_wait=1400ms 与引用采样一致。"},
+        {"target_id": "F4", "verdict": "supported", "reason": "当前日志记录连接池满、等待者和正常 ping，引用原文一致。"},
+        {"target_id": "F5", "verdict": "supported", "reason": "当前变更记录说明负载从35升至100请求/秒，池上限仍为20。"},
+        {"target_id": "H1", "verdict": "qualified", "reason": "连接池饱和候选得到当前等待、池满日志和负载变更支持，方向符合案例；tentative 合理，仍不是独立确认的最终原因。"},
+        {"target_id": "A1", "verdict": "qualified", "reason": "提出带条件的扩容候选可以讨论，但声称扩容必要缺少容量与资源适用性检查，不能直接作为确定处置。"}
+      ]
+    },
+    {
+      "run_id": "b6d38c28-d724-4211-9628-bfadc675631a",
+      "report_sha256": "0275e211bb092be4f70da3dcdb798714c784bd884721908028e406f539e51bc1",
+      "overall": "本次五角色工作流只实际派发 Investigation，读取一组指标后诊断和复核，未触发补查。输出谨慎检查建议并列出配置缺口；缺少连接获取超时日志和负载变更，覆盖不如单 Agent。",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overconfidence_issue": "supported 仅是本次 Reviewer 认可候选，不证明已取得全部必要观测。H1 引用池使用率，对导致等待的解释仍缺少等待字段和获取连接日志的支持引用。",
+      "escalation_assessment": "保留配置和其他连接占用缺口较谨慎，未读取负责人故未选升级团队；未取得日志不能被视为没有日志异常。",
+      "claim_assessments": [
+        {"target_id": "F1", "verdict": "supported", "reason": "db_cpu=26 percent 与 pool_wait=1400ms 与当前来源一致。"},
+        {"target_id": "F2", "verdict": "supported", "reason": "池使用率从0.3到1.0与所列采样一致。"},
+        {"target_id": "H1", "verdict": "qualified", "reason": "池满候选得到当前使用率支持；等待因果引用及必要的超时日志不足，不能据 passed 称完整原因已确认。"},
+        {"target_id": "A1", "verdict": "supported", "reason": "检查配置和容量适用性直接回应当前池压力，要求人工确认，没有声称扩容已经必要或成功。"}
+      ]
+    }
+  ]
+}

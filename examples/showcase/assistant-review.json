@@ -1,0 +1,43 @@
+{
+  "reviewer_kind": "assistant",
+  "reviewer": "Codex",
+  "reviewed_on": "2026-10-10",
+  "human_review_status": "pending",
+  "rubric": "supported：陈述可由所引观测支持；qualified：候选或人工检查方向合理，但不能确认为原因或处置必要性；insufficient：当前引用不足以支持所述解释。仅辅助分析，不计算人工准确率。",
+  "runs": [
+    {
+      "run_id": "16688707-da73-4469-a0ff-647fbd5b6d72",
+      "report_sha256": "ae91ca5f8d3b3831cc778998eab82926f1a21fb836402b9b76c10af63c830a5a",
+      "overall": "原因方向与连接池压力相符，但不构成完整诊断。事实覆盖全部必要检查，不代表最终假设引用了全部证据；最终未引用已取得的获取连接超时日志。",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overconfidence_issue": "A1 风险字段称增加容量是必要的，缺少容量适用性和配置/负载观测支撑该必要性。",
+      "escalation_assessment": "保持 partial 合理；没有确认下一步排查条件已完成。负责人曾被读取，不代表已升级或问题已解决。",
+      "claim_assessments": [
+        {"target_id": "F1", "verdict": "supported", "reason": "当前数据库 CPU 25/26 percent 与来源字段一致，只说明所列采样。"},
+        {"target_id": "F2", "verdict": "supported", "reason": "连接池等待由 2ms 到 1400ms，与所引采样一致。"},
+        {"target_id": "F3", "verdict": "supported", "reason": "连接池使用率由 0.3 到 1.0，与所引采样一致。"},
+        {"target_id": "H1", "verdict": "qualified", "reason": "当前池压力支持池耗尽候选；配置错误或流量上涨仍未区分，tentative 合理。"},
+        {"target_id": "A1", "verdict": "qualified", "reason": "核查容量是合理人工方向，但增加容量是否必要未证实，建议的风险文字过强。"},
+        {"target_id": "A2", "verdict": "qualified", "reason": "查询效率可作为条件性人工检查方向，未取得慢查询证据，不能视为已证实的修复原因。"}
+      ]
+    },
+    {
+      "run_id": "3c1b47cd-fa07-4d3e-a720-2212c84535fd",
+      "report_sha256": "1c208a2bb1a77b0d74f35d036eb848fc5066833ef769dd8a0e3e752fd1339a51",
+      "overall": "取得更多来源事实，但本次多角色没有形成更好的最终诊断。补查任务未取得新观测，达到返工上限；不得将派发补查当作成功执行补查。",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overconfidence_issue": "最终 H1 保持 unresolved，没有声称恢复成功；初稿缺口曾称没有具体错误日志，与已引用超时日志矛盾。",
+      "escalation_assessment": "保留 needs_information 与 REWORK_LIMIT 合理；没有形成可复核处置建议，也未选择升级团队。",
+      "claim_assessments": [
+        {"target_id": "F1", "verdict": "supported", "reason": "当前数据库 CPU 采样与字段引用一致。"},
+        {"target_id": "F2", "verdict": "supported", "reason": "连接池使用率采样与字段引用一致。"},
+        {"target_id": "F3", "verdict": "supported", "reason": "连接池等待采样与字段引用一致。"},
+        {"target_id": "F4", "verdict": "supported", "reason": "日志记录池满、等待及正常数据库 ping，所引字段可核查。"},
+        {"target_id": "F5", "verdict": "supported", "reason": "变更记录说明负载上升且池上限保持 20，所引字段可核查。"},
+        {"target_id": "H1", "verdict": "insufficient", "reason": "选中支持引用主要是基线池使用率与池上限，缺少当前等待和负载上涨字段；已有完整观测不等于该假设引用充分。保持 unresolved 合理。"}
+      ]
+    }
+  ]
+}

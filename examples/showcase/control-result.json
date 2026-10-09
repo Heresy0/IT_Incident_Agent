@@ -1,0 +1,188 @@
+{
+  "schema_version": "showcase-control-v1",
+  "verified_on": "2026-10-10",
+  "execution_mode": "scripted_control_only",
+  "business_quality_status": "excluded_scripted",
+  "paid_calls": 0,
+  "live_writes": 0,
+  "implementation_sha256_prefix": "42923fcafc2a4a0c",
+  "passed": true,
+  "demonstrations": [
+    {
+      "key": "normal",
+      "case_id": "case_001",
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls": 6,
+      "tool_calls": 2,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 0,
+      "evidence_count": 4,
+      "report_sha256": "75359d67540cc4ccf50b62eb2e0bbfb92dc5aadd31e043dc328ac9756efa0416",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior_pass": true
+    },
+    {
+      "key": "rework",
+      "case_id": "case_003",
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls": 12,
+      "tool_calls": 5,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 1,
+      "evidence_count": 10,
+      "report_sha256": "28ade0d108eb356b9995e561a5e62ef656dca5dd5bd76e227b6a3c33ef635eee",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior_pass": true
+    },
+    {
+      "key": "bounded_failure",
+      "case_id": "case_003",
+      "status": "partial",
+      "review_status": "needs_information",
+      "model_calls": 8,
+      "tool_calls": 3,
+      "termination_reason": "BUDGET_EXCEEDED",
+      "rework_rounds": 0,
+      "evidence_count": 4,
+      "report_sha256": "165d49f7dde00a706ec32beb96405463cb473ba723bb9732c675111b95dd3972",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior_pass": true
+    }
+  ],
+  "paired_control": {
+    "cases": [
+      "case_001",
+      "case_002",
+      "case_003",
+      "case_004",
+      "case_005",
+      "case_006"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "workflows": {
+      "single": {
+        "runs": 6,
+        "mechanical_passes": 6,
+        "failed_runs": 0,
+        "necessary_check_coverage_mean": 1.0,
+        "model_calls_total": 13,
+        "tool_calls_total": 37,
+        "duration_ms_mean": 23.0,
+        "semantic_reviewed_runs": 0,
+        "live_runs": 0,
+        "cause_accuracy_reviewed": null,
+        "overconfident_rate_reviewed": null,
+        "escalation_appropriate_rate_reviewed": null,
+        "claim_support_rate_reviewed": null,
+        "estimated_cost": null
+      },
+      "multi": {
+        "runs": 6,
+        "mechanical_passes": 6,
+        "failed_runs": 0,
+        "necessary_check_coverage_mean": 1.0,
+        "model_calls_total": 44,
+        "tool_calls_total": 21,
+        "duration_ms_mean": 57.5,
+        "semantic_reviewed_runs": 0,
+        "live_runs": 0,
+        "cause_accuracy_reviewed": null,
+        "overconfident_rate_reviewed": null,
+        "escalation_appropriate_rate_reviewed": null,
+        "claim_support_rate_reviewed": null,
+        "estimated_cost": null
+      }
+    }
+  },
+  "harness_controls": [
+    {
+      "category": "scope",
+      "test": "tests.tools.test_incident_tools.IncidentToolsTests.test_role_unknown_tools_and_extra_fields",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "scope",
+      "test": "tests.tools.test_incident_tools.IncidentToolsTests.test_window_timezone_service_and_scope_expansion",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "references",
+      "test": "tests.workflow.test_diagnosis_references.DiagnosisReferenceTests.test_persistent_invalid_reference_stops_after_one_repair_with_public_error_location",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "structure",
+      "test": "tests.workflow.test_incident_collaboration.IncidentCollaborationTests.test_schema_repair_allowance_is_shared_across_leaf_and_reviewer",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "retry_and_dedup",
+      "test": "tests.tools.test_incident_tools.IncidentToolsTests.test_retry_count_error_sanitization_and_limit",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "retry_and_dedup",
+      "test": "tests.tools.test_incident_tools.IncidentToolsTests.test_duplicate_no_double_count_and_snapshot_immutability",
+      "passed": true,
+      "tests_run": 1
+    },
+    {
+      "category": "budget",
+      "test": "tests.workflow.test_incident_collaboration.IncidentCollaborationTests.test_small_budget_keeps_review_and_refuses_unaffordable_rework",
+      "passed": true,
+      "tests_run": 1
+    }
+  ],
+  "simulated_remediation": {
+    "status": "verified",
+    "simulated_writes": 1,
+    "incident_status": "awaiting_confirmation"
+  },
+  "backend_regression": {
+    "tests_run": 239,
+    "passed": 232,
+    "skipped": 7,
+    "failures": 0,
+    "errors": 0,
+    "duration_seconds": 16.442,
+    "database_integration_executed": false
+  }
+}
