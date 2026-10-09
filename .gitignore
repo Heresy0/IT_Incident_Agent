@@ -40,6 +40,9 @@ output/
 logs/
 volumes/
 
+# Local project documents (keep files locally, exclude from source tracking)
+/docs/
+
 # Editor and operating system files
 .idea/
 .DS_Store
