@@ -407,13 +407,77 @@ class RepairAPITests(unittest.TestCase):
     def test_reviewed_structured_recommendation_becomes_pending_plan(self):
         payload = self.fixture.payload
         run = self.fixture.store.runs[payload['run_id']]
+        details = {'condition': '确认不是计划维护，且启动条件满足。',
+                   'risk': '待执行任务会恢复消费，需要关注重试。',
+                   'expected_result': '核对新鲜Worker指标，并人工确认测试文档入库。'}
         run['result']['output']['recommended_actions'] = [{'action': 'Restart the registered API after approval.',
-            'requires_approval': True, 'repair': {key: payload[key] for key in ('action', 'target', 'parameters', 'evidence_ids')}}]
-        response = self.client.post(self.base + '/from-recommendation', json={
-            'request_key': 'from_agent', 'revision': 1, 'run_id': payload['run_id'], 'action_index': 0})
+            **details, 'requires_approval': True,
+            'repair': {key: payload[key] for key in ('action', 'target', 'parameters', 'evidence_ids')}}]
+        request = {'request_key': 'from_agent', 'revision': 1, 'run_id': payload['run_id'], 'action_index': 0}
+        response = self.client.post(self.base + '/from-recommendation', json=request)
         self.assertEqual(response.status_code, 201, response.text)
-        self.assertEqual(response.json()['status'], 'pending_approval')
+        plan = response.json()
+        self.assertEqual(plan['status'], 'pending_approval')
+        self.assertEqual(plan['proposal']['approval_details'], details)
+        self.assertEqual(plan['recommendation_source'], {'run_id': payload['run_id'], 'action_index': 0})
+        self.assertEqual(self.client.post(self.base + '/from-recommendation', json=request).json(), plan)
+        # Reading stored plans must not depend on later contents of the source response.
+        run['result']['output']['recommended_actions'][0]['condition'] = '改变后的适用条件'
+        stored = self.client.get(self.base + '/' + plan['id']).json()
+        self.assertEqual(stored['proposal']['approval_details'], details)
+        self.assertEqual(stored['digest'], plan['digest'])
+        self.assertEqual(self.client.post(self.base + '/from-recommendation', json=request).status_code, 409)
         self.assertEqual(self.fixture.executor.writes, 0)
+
+    def test_manual_approval_details_are_persisted_and_cannot_claim_model_source(self):
+        details = {'condition': '人工确认允许恢复。', 'risk': '目标短暂中断。', 'expected_result': '核对业务恢复。'}
+        body = {**self.fixture.payload, 'approval_details': details}
+        response = self.client.post(self.base, json=body)
+        self.assertEqual(response.status_code, 201, response.text)
+        plan = response.json()
+        self.assertEqual(plan['proposal']['approval_details'], details)
+        self.assertNotIn('recommendation_source', plan)
+        self.assertEqual(self.client.get(self.base).json()['items'][0]['proposal']['approval_details'], details)
+        self.assertEqual(self.client.post(self.base, json=body).json(), plan)
+        changed = {**body, 'approval_details': {**details, 'risk': '改变后的风险'}}
+        self.assertEqual(self.client.post(self.base, json=changed).status_code, 409)
+        forged = {**body, 'request_key': 'forged', 'recommendation_source': {'action_index': 0}}
+        self.assertEqual(self.client.post(self.base, json=forged).status_code, 422)
+        self.identity = self.fixture.operator
+        self.assertEqual(self.client.post(self.base + '/' + plan['id'] + '/approval', json={
+            'digest': '0' * 64, 'decision': 'approve'}).status_code, 409)
+        approved = self.client.post(self.base + '/' + plan['id'] + '/approval', json={
+            'digest': plan['digest'], 'decision': 'approve'})
+        self.assertEqual(approved.status_code, 200, approved.text)
+        self.assertEqual(approved.json()['proposal']['approval_details'], details)
+        self.assertEqual(self.fixture.executor.writes, 0)
+
+    def test_incomplete_or_forged_recommendation_details_are_rejected(self):
+        payload = self.fixture.payload
+        request = {'request_key': 'from_agent', 'revision': 1, 'run_id': payload['run_id'], 'action_index': 0}
+        run = self.fixture.store.runs[payload['run_id']]
+        run['result']['output']['recommended_actions'] = [{'action': '恢复登记目标', 'requires_approval': True,
+            'repair': {key: payload[key] for key in ('action', 'target', 'parameters', 'evidence_ids')}}]
+        response = self.client.post(self.base + '/from-recommendation', json=request)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'], 'REPAIR_RECOMMENDATION_INCOMPLETE')
+        details = {'condition': '人工条件', 'risk': '风险', 'expected_result': '检查恢复'}
+        self.assertEqual(self.client.post(self.base + '/from-recommendation', json={
+            **request, 'approval_details': details}).status_code, 422)
+        for invalid in ({'risk': '风险', 'expected_result': '验证'}, {**details, 'condition': '  '},
+                        {**details, 'risk': 'x' * 1001}, {**details, 'command': 'forbidden'}):
+            with self.subTest(invalid_fields=list(invalid)):
+                self.assertEqual(self.client.post(self.base, json={
+                    **payload, 'approval_details': invalid}).status_code, 422)
+        self.assertEqual(self.fixture.executor.writes, 0)
+
+    def test_legacy_plan_keeps_its_digest_and_payload_when_replayed(self):
+        plan = self.client.post(self.base, json=self.fixture.payload).json()
+        self.assertNotIn('approval_details', plan['proposal'])
+        self.assertNotIn('recommendation_source', plan)
+        replay = self.client.post(self.base, json={**self.fixture.payload, 'approval_details': None})
+        self.assertEqual(replay.status_code, 201, replay.text)
+        self.assertEqual(replay.json(), plan)
 
     def test_extra_commands_are_rejected_at_http_boundary(self):
         response = self.client.post(self.base, json={**self.fixture.payload, 'parameters': {'command': 'anything'}})

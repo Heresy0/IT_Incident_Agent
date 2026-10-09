@@ -4,6 +4,7 @@ export type RepairIncident = {
 }
 export type RepairEvidence = { evidence_id: string; kind: string; excerpt: string }
 export type RepairIntent = { action: string; target: string; parameters: Record<string, unknown>; evidence_ids: string[] }
+export type RepairApprovalDetails = { condition: string; risk: string; expected_result: string }
 export type RepairRecommendation = {
   action: string; condition: string; expected_result: string; risk: string; requires_approval: boolean
   repair?: RepairIntent | null
@@ -24,7 +25,9 @@ export type RepairEvent = {
 }
 export type RepairPlan = {
   id: string; incident_id: string; status: string; effective_status?: string; digest: string; live: boolean
-  proposal: RepairIntent & { revision: number; run_id: string; reason: string; request_key: string }
+  proposal: RepairIntent & { revision: number; run_id: string; reason: string; request_key: string;
+    approval_details?: RepairApprovalDetails | null }
+  recommendation_source?: { run_id: string; action_index: number }
   impact: string; rollback: string; success_condition: string; symptom_checks: SymptomCheck[]
   expires_at: string; created_at: string; approved_by?: string; execution_key?: string
   verification_budget: { attempts: number; interval_seconds: number; execution_seconds: number }
@@ -46,6 +49,7 @@ export const repairErrors: Record<string, string> = {
   REPAIR_IN_PROGRESS: '本工单已有修复正在执行，请等待并刷新结果。',
   REPAIR_REQUIRES_REVIEWED_DIAGNOSIS: '需要通过复核且与本工单匹配的完整诊断。',
   REPAIR_REQUIRES_INCIDENT_DIAGNOSIS: '状态核查不能作为修复来源，请使用故障诊断。',
+  REPAIR_RECOMMENDATION_INCOMPLETE: '该诊断建议缺少适用条件、风险或预期验证，不能直接采用；请核对报告后填写人工提案。',
   SYNTHETIC_DIAGNOSIS_CANNOT_REPAIR_LIVE_TARGET: '合成演示不能用于真实修复。',
   REPAIR_TARGET_DENIED: '该目标或动作未登记，请核对服务配置。',
   REPAIR_ALREADY_ATTEMPTED: '此方案已尝试执行，请读取结果，不要再次发起新动作。',

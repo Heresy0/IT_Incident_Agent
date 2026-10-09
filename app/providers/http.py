@@ -13,13 +13,24 @@ from providers.fixtures import ProviderError
 from providers.logs import LogMapping
 
 
-def request_json(base, method, path, *, params=None, authorization_env=None, transport=None):
-    parsed = urlsplit(base)
+def validate_endpoint(base):
+    """Shared offline/runtime endpoint policy; no requests or credential reads."""
+    if not isinstance(base, str):
+        raise ProviderError('ENDPOINT_INVALID')
+    try:
+        parsed = urlsplit(base)
+        parsed.port
+    except (ValueError, TypeError):
+        raise ProviderError('ENDPOINT_INVALID') from None
     if (parsed.scheme not in {'http', 'https'} or not parsed.hostname or parsed.username or parsed.password
             or parsed.query or parsed.fragment or parsed.path not in {'', '/'}):
         raise ProviderError('ENDPOINT_INVALID')
     if parsed.scheme == 'http' and parsed.hostname not in {'localhost', '127.0.0.1', '::1'}:
         raise ProviderError('ENDPOINT_TLS_REQUIRED')
+
+
+def request_json(base, method, path, *, params=None, authorization_env=None, transport=None):
+    validate_endpoint(base)
     headers = {}
     if authorization_env:
         token = os.getenv(authorization_env)

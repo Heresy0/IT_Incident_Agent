@@ -65,13 +65,18 @@ class IncidentPostgresTests(unittest.TestCase):
                     break
                 time.sleep(.03)
             self.assertEqual(run['result']['review_status'], 'passed')
+            details = {'condition': '仅在隔离测试服务上恢复。', 'risk': '模拟操作，无真实业务影响。',
+                       'expected_result': '验证模拟健康恢复及审批依据跨连接持久化。'}
             plan = service.repairs.propose(self.incident['id'], {'request_key': 'repair', 'revision': 1, 'run_id': run_id,
                 'action': 'restart_service', 'target': 'api', 'parameters': {}, 'reason': 'Database control acceptance',
+                'approval_details': details,
                 'evidence_ids': [run['result']['evidence'][0]['evidence_id']]}, self.owner)
+            self.assertEqual(second.get_repairs(self.incident['id'], self.owner)[0]['proposal']['approval_details'], details)
             service.repairs.approve(self.incident['id'], plan['id'], {'digest': plan['digest'], 'decision': 'approve'}, self.owner)
             result = service.repairs.execute(self.incident['id'], plan['id'], {'request_key': 'execute'}, self.owner)
             persisted = second.get_repairs(self.incident['id'], self.owner)[0]
             self.assertEqual(result, persisted)
+            self.assertEqual(persisted['proposal']['approval_details'], details)
             self.assertEqual(result['status'], 'verified')
             self.assertIn('action_started', [event['type'] for event in persisted['events']])
             self.assertEqual([event['seq'] for event in persisted['events']], list(range(1, len(persisted['events']) + 1)))

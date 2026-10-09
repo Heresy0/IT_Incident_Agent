@@ -17,6 +17,7 @@ const pending = ref<PendingProposal | null>(saved.pending || null)
 const capabilities = ref<RepairCapability[]>([]), plans = ref<RepairPlan[]>([]), selectedId = ref(saved.planId || '')
 const busy = ref(false), loading = ref(false), error = ref(''), notice = ref(''), executingRequest = ref(false)
 const target = ref(''), reason = ref(''), evidenceIds = ref<string[]>([]), suggestion = ref('')
+const condition = ref(''), risk = ref(''), expectedResult = ref('')
 const approveConsent = ref(false), executeConsent = ref(false), clock = ref(Date.now())
 const controller = new AbortController()
 let alive = true, version = 0, polling = false
@@ -31,6 +32,9 @@ const observations = computed(() => props.result?.evidence?.filter(item => item.
 const eligible = computed(() => sourceMatches(props.incident, props.result))
 const recommendations = computed(() => (props.result?.output?.recommended_actions || [])
   .map((item, index) => ({ item, index })).filter(({ item }) => item.requires_approval && item.repair
+    && typeof item.condition === 'string' && item.condition.trim().length > 0
+    && typeof item.risk === 'string' && item.risk.trim().length > 0
+    && typeof item.expected_result === 'string' && item.expected_result.trim().length > 0
     && item.repair.action === 'restart_service' && capabilities.value.some(cap => capabilityKey(cap) === capabilityKey(item.repair!))))
 const state = computed(() => {
   const plan = selectedPlan.value
@@ -45,7 +49,9 @@ const state = computed(() => {
 const running = computed(() => executingRequest.value || plans.value.some(plan => plan.status === 'executing'))
 const blocked = computed(() => busy.value || loading.value || props.parentBusy || running.value)
 const canCreate = computed(() => eligible.value && !!chosenCapability.value && !blocked.value
-  && !pending.value && reason.value.trim().length > 0 && evidenceIds.value.length > 0 && evidenceIds.value.length <= 8)
+  && !pending.value && reason.value.trim().length > 0 && condition.value.trim().length > 0
+  && risk.value.trim().length > 0 && expectedResult.value.trim().length > 0
+  && evidenceIds.value.length > 0 && evidenceIds.value.length <= 8)
 const operator = computed(() => props.role === 'operator')
 const canApprove = computed(() => operator.value && state.value === 'pending_approval' && !blocked.value && approveConsent.value)
 const canExecute = computed(() => operator.value && state.value === 'approved' && !blocked.value && executeConsent.value)
@@ -100,6 +106,7 @@ const useSuggestion = () => {
   const choice = recommendations.value.find(item => String(item.index) === suggestion.value)?.item
   if (!choice?.repair) return
   target.value = capabilityKey(choice.repair); reason.value = choice.action
+  condition.value = choice.condition; risk.value = choice.risk; expectedResult.value = choice.expected_result
   evidenceIds.value = choice.repair.evidence_ids.filter(id => observations.value.some(item => item.evidence_id === id))
 }
 const postProposal = async () => {
@@ -111,10 +118,13 @@ const postProposal = async () => {
   notice.value = '方案已创建，尚未审批或执行。'
 }
 const create = () => guarded(async () => {
-  if (!eligible.value || !chosenCapability.value || !reason.value.trim() || !evidenceIds.value.length) return
+  if (!eligible.value || !chosenCapability.value || !reason.value.trim() || !condition.value.trim()
+      || !risk.value.trim() || !expectedResult.value.trim() || !evidenceIds.value.length) return
   const recommended = recommendations.value.find(item => String(item.index) === suggestion.value)
   const intent = recommended?.item.repair
   const exactSuggestion = intent && capabilityKey(intent) === target.value && reason.value === recommended.item.action
+    && condition.value === recommended.item.condition && risk.value === recommended.item.risk
+    && expectedResult.value === recommended.item.expected_result
     && JSON.stringify(evidenceIds.value) === JSON.stringify(intent.evidence_ids)
   pending.value = exactSuggestion ? { route: 'repairs/from-recommendation', body: {
     request_key: crypto.randomUUID(), revision: props.incident.revision, run_id: props.result!.run_id, action_index: recommended.index,
@@ -122,6 +132,7 @@ const create = () => guarded(async () => {
     request_key: crypto.randomUUID(), revision: props.incident.revision, run_id: props.result!.run_id,
     action: chosenCapability.value.action, target: chosenCapability.value.target, parameters: {},
     reason: reason.value.trim(), evidence_ids: [...evidenceIds.value],
+    approval_details: { condition: condition.value.trim(), risk: risk.value.trim(), expected_result: expectedResult.value.trim() },
   }}
   persist(); await postProposal()
 })
@@ -180,6 +191,10 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
         </div>
         <p v-if="chosenCapability" class="impact">影响：{{ chosenCapability.impact }}</p>
         <label>处理依据<textarea v-model="reason" rows="2" maxlength="500" placeholder="说明为何需要对该目标执行重启" required /></label>
+        <label>适用条件与执行前确认<textarea v-model="condition" rows="2" maxlength="1000" placeholder="例如：确认不是计划维护，且启动条件满足后再执行" required /></label>
+        <label>操作风险<textarea v-model="risk" rows="2" maxlength="1000" placeholder="说明中断、重试或重复处理等实际风险" required /></label>
+        <label>预期结果与验证方法<textarea v-model="expectedResult" rows="2" maxlength="1000" placeholder="说明恢复标准以及执行后如何确认业务结果" required /></label>
+        <p class="hint">采用诊断建议会自动填入上述内容；修改建议内容或证据后，将作为人工提案保存。适用条件需要人工核实，登记指标验证不能替代业务确认。</p>
         <fieldset class="evidence-list"><legend>选择支持本次动作的当前观测（1–8 条）</legend>
           <label v-for="item in observations" :key="item.evidence_id" class="check"><input v-model="evidenceIds" type="checkbox" :value="item.evidence_id" :disabled="!evidenceIds.includes(item.evidence_id) && evidenceIds.length >= 8" /><span>{{ item.excerpt }}<small>{{ item.evidence_id }}</small></span></label>
           <p v-if="!observations.length" class="hint">没有可用于修复的当前观测证据。</p>
@@ -192,12 +207,21 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
     <article v-if="selectedPlan" class="plan-card">
       <div class="plan-heading"><h4>{{ label(selectedPlan.proposal.action) }} · {{ selectedPlan.proposal.target }}</h4><span class="status" :class="state">{{ label(state) }}</span></div>
       <p>{{ selectedPlan.proposal.reason }}</p><p class="hint">{{ selectedPlan.live ? '真实操作' : '模拟操作' }} · 有效期至 {{ when(selectedPlan.expires_at) }}</p>
+      <div v-if="selectedPlan.proposal.approval_details" class="approval-details">
+        <h4>审批依据</h4>
+        <p class="hint">{{ selectedPlan.recommendation_source ? '来自已复核的诊断建议，按创建时的内容保存。' : '人工提案，须由审批人独立核对。' }}</p>
+        <dl><dt>适用条件</dt><dd>{{ selectedPlan.proposal.approval_details.condition }}</dd>
+          <dt>操作风险</dt><dd>{{ selectedPlan.proposal.approval_details.risk }}</dd>
+          <dt>预期验证</dt><dd>{{ selectedPlan.proposal.approval_details.expected_result }}</dd></dl>
+        <p class="hint">批准方案表示你已核实执行前条件；模型复核和恢复指标规则不表示这些条件已满足。</p>
+      </div>
+      <p v-else class="hint">此方案未保存完整审批依据。请结合原诊断报告核对适用条件、风险和预期验证；需要补充时创建新方案，历史方案不会自动补写。</p>
       <dl><dt>影响</dt><dd>{{ selectedPlan.impact }}</dd><dt>失败处理</dt><dd>{{ selectedPlan.rollback }}</dd><dt>平台验证</dt><dd>{{ selectedPlan.success_condition }}</dd>
         <dt>症状验证</dt><dd><p v-for="check in selectedPlan.symptom_checks" :key="check.metric">{{ checkLabel(check) }}</p></dd>
         <dt>验证预算</dt><dd>最多 {{ selectedPlan.verification_budget.attempts }} 次，间隔 {{ selectedPlan.verification_budget.interval_seconds }} 秒</dd></dl>
       <p v-if="!operator" class="hint">当前身份可以查看和提案；审批与执行需要本工单所属的 operator。</p>
       <template v-if="operator && state === 'pending_approval'">
-        <label class="check consent"><input v-model="approveConsent" type="checkbox" :disabled="blocked" /><span>我已核对目标、证据、影响和恢复条件，同意此方案。</span></label>
+        <label class="check consent"><input v-model="approveConsent" type="checkbox" :disabled="blocked" /><span>我已核对目标、证据、适用条件、风险和预期验证，已确认允许执行，同意此方案。</span></label>
         <div class="actions"><button class="primary" :disabled="!canApprove" @click="approve('approve')">批准方案</button><button :disabled="blocked" @click="approve('reject')">拒绝方案</button></div>
       </template>
       <template v-if="operator && state === 'approved'">
@@ -228,6 +252,8 @@ fieldset { min-width: 0; border: 0; padding: 0; } .grid { display: grid; grid-te
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }.primary { background: #346bd6; color: #fff; border-color: #346bd6; }.execute { background: #b74428; border-color: #b74428; color: #fff; }
 .plan-card { margin-top: 18px; border: 1px solid #dce3ed; border-radius: 9px; padding: 18px; }.status { border-radius: 6px; padding: 5px 8px; background: #eef3fb; font-size: 13px; }.verified { background: #e5f5eb; color: #256545; }
 .consent, .impact, .pending-request { padding: 12px; border: 1px solid #f0dbb3; border-radius: 8px; background: #fff7e8; line-height: 1.8; }
+.approval-details { margin: 16px 0; padding: 14px; border: 1px solid #dce3ed; border-radius: 8px; background: #f7f9fc; }
+.approval-details dd { white-space: pre-wrap; }
 dl { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 10px; font-size: 14px; line-height: 1.8; } dt { color: #5b6a7d; } dd { margin: 0; overflow-wrap: anywhere; } dd p { margin: 0; }
 .error, .notice, .success { padding: 12px; border-radius: 8px; line-height: 1.8; overflow-wrap: anywhere; }.error { background: #fff1ed; color: #a32a23; }.notice { background: #eef4fc; }.success { background: #e5f5eb; color: #256545; }
 details { margin-top: 14px; } summary { cursor: pointer; font-size: 14px; }.events { padding-left: 22px; }.events li { margin: 12px 0; }.events span { display: block; color: #5b6a7d; font-size: 12px; margin-top: 5px; }.events p { margin: 5px 0; }

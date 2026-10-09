@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class RepairIntent(BaseModel):
@@ -24,11 +24,27 @@ class RepairIntent(BaseModel):
         return self
 
 
+class RepairApprovalDetails(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    condition: str = Field(min_length=1, max_length=1000)
+    risk: str = Field(min_length=1, max_length=1000)
+    expected_result: str = Field(min_length=1, max_length=1000)
+
+    @field_validator('condition', 'risk', 'expected_result')
+    @classmethod
+    def nonblank(cls, value):
+        if not value.strip():
+            raise ValueError('approval details must not be blank')
+        return value
+
+
 class RepairProposal(RepairIntent):
     request_key: str = Field(min_length=1, max_length=80, pattern=r'^[A-Za-z0-9_-]+$')
     revision: int = Field(ge=1)
     run_id: str = Field(min_length=1, max_length=40)
     reason: str = Field(min_length=1, max_length=500)
+    # Optional for existing API clients; new UI proposals collect all three fields.
+    approval_details: RepairApprovalDetails | None = None
 
 
 class RepairFromRecommendation(BaseModel):

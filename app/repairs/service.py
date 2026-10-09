@@ -8,7 +8,8 @@ from uuid import uuid4
 from threading import BoundedSemaphore
 from incidents.support import IncidentError, now
 from providers.fixtures import ProviderError
-from repairs.contracts import ACTIONS, RepairProposal
+from pydantic import ValidationError
+from repairs.contracts import ACTIONS, RepairProposal, RepairApprovalDetails
 from repairs.executors import DockerExecutor, DockerCLIExecutor
 from storage.repairs import guard_active
 from repairs.verification import SymptomVerifier, validate_checks
@@ -95,8 +96,16 @@ class RepairService:
         index = payload['action_index']
         if index >= len(actions) or not actions[index].get('repair') or not actions[index]['requires_approval']:
             raise IncidentError('NO_EXECUTABLE_RECOMMENDATION', 422)
-        return self.propose(iid, {**actions[index]['repair'], 'request_key': payload['request_key'],
-            'revision': payload['revision'], 'run_id': payload['run_id'], 'reason': actions[index]['action']}, principal)
+        recommendation = actions[index]
+        try:
+            details = RepairApprovalDetails.model_validate({key: recommendation.get(key)
+                for key in ('condition', 'risk', 'expected_result')}).model_dump()
+        except ValidationError:
+            raise IncidentError('REPAIR_RECOMMENDATION_INCOMPLETE', 422) from None
+        return self._propose(iid, {**recommendation['repair'], 'request_key': payload['request_key'],
+            'revision': payload['revision'], 'run_id': payload['run_id'], 'reason': recommendation['action'],
+            'approval_details': details}, principal,
+            recommendation_source={'run_id': payload['run_id'], 'action_index': index})
 
     @staticmethod
     def _current(incident, proposal):
@@ -109,7 +118,10 @@ class RepairService:
         plan['events'].append({'type': kind, 'at': now(), 'seq': len(plan['events']) + 1, **fields})
 
     def propose(self, iid, payload, principal):
-        payload = RepairProposal.model_validate(payload).model_dump()
+        return self._propose(iid, payload, principal)
+
+    def _propose(self, iid, payload, principal, *, recommendation_source=None):
+        payload = RepairProposal.model_validate(payload).model_dump(exclude_none=True)
         run = self.workflow.get_run(payload['run_id'], principal)
         if run and (run.get('result') or {}).get('purpose') == 'status_check':
             raise IncidentError('REPAIR_REQUIRES_INCIDENT_DIAGNOSIS', 422)
@@ -122,7 +134,8 @@ class RepairService:
         def create(incident, plans):
             old = next((p for p in plans if p['proposal']['request_key'] == payload['request_key']), None)
             if old:
-                if old['proposal'] != payload:
+                if (old['proposal'] != payload
+                        or old.get('recommendation_source') != recommendation_source):
                     raise IncidentError('REQUEST_KEY_REUSED')
                 return old
             guard_active(plans)
@@ -149,6 +162,8 @@ class RepairService:
                                             'execution_seconds': 180},
                     'symptom_checks': checks,
                     'expires_at': (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat(), 'events': []}
+            if recommendation_source is not None:
+                plan['recommendation_source'] = deepcopy(recommendation_source)
             plan['digest'] = hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()
             self._event(plan, 'proposed')
             plans.append(plan)

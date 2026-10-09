@@ -55,6 +55,38 @@ docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300 postg
 
 后端初始化执行运行表、工单迁移和新增002修复表迁移，不需要 Milvus、搜索 Key、个人记忆或研究 Agent。自由工单可通过INCIDENT_SERVICES_FILE绑定真实观测源；未绑定时返回信息缺口，不制造案例证据。后台仅支持单进程，诊断中断标记失败，修复中断转人工处理，不恢复外部写操作。
 
+## 服务登记模板与免费预检
+
+继续使用根目录 `services.local.json`，不需要服务管理页面。登记按“生成独立模板 → 调整固定查询 → 离线预检 → 显式只读试连 → 合入本地登记并重启后端”进行。已有知识库登记可以直接预检，不需要重新生成或替换。
+
+```powershell
+cd D:\code\it_incident_agent
+$env:PYTHONIOENCODING='utf-8'
+# 预检当前环境指定的登记文件；未指定环境变量时读取 services.local.json。
+.\.venv\Scripts\python.exe scripts/register_service.py check --json
+
+# 为新服务生成独立的只读模板；身份值应换成 /api/v1/auth/me 返回的真实 tenant_id/user_id。
+.\.venv\Scripts\python.exe scripts/register_service.py template --profile generic --service example-api --tenant example_tenant --user example_operator --environment staging --version v1 --owner-team alice --output output/service-registration/new-service.template.json
+.\.venv\Scripts\python.exe scripts/register_service.py check --file output/service-registration/new-service.template.json --json
+```
+
+`--profile generic` 复用通用指标和日志例子，替换示例服务、环境标签；`--profile enterprise` 复用现有知识库 Worker 的固定指标和日志映射，其 job/stack/日志环境选择器仍需核对实际部署。可用 `--prometheus-url`、`--loki-url` 指定基础地址；省略则保留示例本机地址。`--user` 可以重复传入。负责人未明确就省略 `--owner-team`，脚本会保留信息缺口。
+
+模板始终生成 `repairs: {}`，不会复制示例中的重启权限，也不会自动合并或覆盖 `services.local.json`；目标文件已存在就退出。默认输出到忽略提交的 `output/service-registration/services.template.json`。新增服务时先核对模板 `services[0]`，再手工加入现有文件的 `services` 数组，保留其他登记。修复目标仍需另行登记固定 context/容器ID和新鲜症状恢复规则。
+
+预检和后端启动共用规则：字段类型与必填项、租户/服务/环境重复、访问用户、基础地址和凭据环境变量名称、固定查询来源、日志映射、负责人/手册字段、修复动作和预算、症状指标引用与新鲜度查询。错误只显示字段位置和安全原因；例如 `$.services[0].observations.metrics[1].unit` 指第一个服务下第二个指标缺少单位。动态字典键按文件顺序编号，避免错误输出泄露误填的凭据。
+
+预检退出码：0表示结构有效（可能有提示），1表示配置或文件无效，2表示命令参数无效。空观测渠道、负责人/手册缺失、模板容器占位值以提示保留。预检不验证查询语义、地址可达性、凭据有效性或整体健康，不连接数据库、模型、Docker或外部观测服务。认证头仅登记 `authorization_env` 环境变量名，凭据留在本项目环境中，不把明文写入模板或命令参数。
+
+需要核对实际连接时，显式复用已有免费工具：
+
+```powershell
+# 文件中的租户/用户必须匹配本项目本地 operator 身份；多个 operator 时指定 --user 和 --tenant。
+.\.venv\Scripts\python.exe scripts/probe_registered_service.py --services-file output/service-registration/new-service.template.json --service example-api --environment staging --minutes 60
+```
+
+试连会实际读取已登记观测，但不调用模型或执行修复。模板占位地址、固定查询和身份未调整时，不应把空结果当成成功。修改实际登记后，重启 HTTP 后端加载；不会自动重启业务 Worker。实现与本次验证见 [服务登记模板与免费预检](docs/服务登记模板与免费预检-20261010.md)。
+
 ## 接入知识库服务的免费只读联调
 
 本地 `services.local.json` 通过 `INCIDENT_SERVICES_FILE` 加载。知识库事件日志支持登记 `log_mapping`，公开骨架见 `examples/services.enterprise.example.json`。指标、日志地址及选择器由管理员固定，凭据不传给模型。
@@ -121,6 +153,10 @@ Key、身份或预算不满足时在请求前停止。未知 Token/费用继续�
 5. 查看执行阶段及新鲜恢复观测，确认实际业务结果，再填写人工确认表单关闭工单。Worker活跃恢复不等于索引或检索全部成功。
 
 诊断与复核现在共享登记能力及症状恢复标准；有条件建议通过复核不等于审批，未知触发原因仍保留信息缺口。旧partial报告不会自动变为通过。该批定向免费回归71项通过，前端9个模拟浏览器场景及类型/构建检查通过；真实业务成功以用户反馈为依据，未另行核验正式闭单或检索结果。
+
+修复提案现已保存并展示三项审批依据：适用条件与执行前确认、操作风险、预期结果与验证方法。选择诊断建议后自动填入；内容或证据有修改时按人工提案保存。后端从已复核结果读取原始建议，保存来源run_id/action_index，三个字段与来源一起纳入审批摘要。新页面的人工提案须填写完整；API的RepairProposal新增可选approval_details对象（condition/risk/expected_result，非空且每项最多1000字符），兼容现有客户端。from-recommendation接口只接收建议编号等原有参数，不能由调用方替换建议原文；缺失审批依据返回REPAIR_RECOMMENDATION_INCOMPLETE。
+
+已创建方案从数据库读取原内容，不随报告展示变化；旧方案不回填，页面明确显示缺失提示，已有摘要和幂等请求保持兼容。本次完善通过37项后端回归、7项隔离数据库检查、11个模拟浏览器场景及前端类型/构建检查。无需为确认界面变化重新付费诊断或创建真实修复。
 
 ## 可选前端和停止
 

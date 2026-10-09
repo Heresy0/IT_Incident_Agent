@@ -4,7 +4,6 @@ import json
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 from typing import Protocol
 from evidence.contracts import Ticket
 from providers.fixtures import ProviderError
@@ -75,18 +74,23 @@ class ServiceRegistry:
             self.resolve(snapshot, principal), self.ticket(snapshot, principal), principal)
 
     @classmethod
+    def from_file(cls, path):
+        from providers.configuration import read_configuration, validate_configuration, ServiceConfigurationError
+        data = read_configuration(path)
+        issues = validate_configuration(data)
+        errors = [issue for issue in issues if issue['level'] == 'error']
+        if errors:
+            raise ServiceConfigurationError(errors)
+        bindings = []
+        # Validate without normalizing stored values: existing binding fingerprints stay stable.
+        for row in data['services']:
+            row = dict(row)
+            for key in ('users', 'dependencies'):
+                row[key] = tuple(row.get(key, ()))
+            bindings.append(ServiceBinding(**row))
+        return cls(bindings)
+
+    @classmethod
     def from_environment(cls):
         path = os.getenv('INCIDENT_SERVICES_FILE')
-        if not path:
-            return cls()
-        try:
-            data = json.loads(Path(path).read_text(encoding='utf-8'))
-            bindings = []
-            for row in data['services']:
-                row = dict(row)
-                for key in ('users', 'dependencies'):
-                    row[key] = tuple(row.get(key, ()))
-                bindings.append(ServiceBinding(**row))
-            return cls(bindings)
-        except Exception:
-            raise ValueError('服务登记配置无效；请检查字段，配置内容不会输出。') from None
+        return cls.from_file(path) if path else cls()
