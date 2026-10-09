@@ -1,0 +1,5 @@
+# Keep retired snapshots byte-identical to archive/research/manifest.json.
+# The original snapshots use CRLF, except these two original LF files.
+/archive/research/** text eol=crlf
+/archive/research/app/mult_agents/incident/__init__.py text eol=lf
+/archive/research/scripts/cleanup_runs.py text eol=lf
