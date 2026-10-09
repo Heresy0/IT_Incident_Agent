@@ -19,6 +19,12 @@ async def listing(incident_id: UUID, service: WorkflowService = Depends(get_work
     return {'items': await call(service.repairs.list, str(incident_id), principal)}
 
 
+@router.get('/incidents/{incident_id}/repair-capabilities')
+async def capabilities(incident_id: UUID, service: WorkflowService = Depends(get_workflow_service),
+                       principal: Principal = Depends(get_current_principal)):
+    return {'items': await call(service.repairs.incident_capabilities, str(incident_id), principal)}
+
+
 @router.post('/incidents/{incident_id}/repairs', status_code=201)
 async def propose(incident_id: UUID, payload: RepairProposal, service: WorkflowService = Depends(get_workflow_service),
                   principal: Principal = Depends(get_current_principal)):

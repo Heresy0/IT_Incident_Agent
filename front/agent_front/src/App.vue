@@ -61,12 +61,12 @@ onUnmounted(() => authController.abort())
         </form>
         <p v-if="error" class="auth-error" role="alert">{{ error }}</p>
       </section>
-      <section class="steps"><h2>调试流程</h2><ol><li>验证身份，选择服务</li><li>填写问题，保存工单</li><li>设置预算，启动诊断</li><li>查看报告、证据和事件</li></ol></section>
+      <section class="steps"><h2>调试流程</h2><ol><li>验证身份，选择服务</li><li>填写问题，保存工单</li><li>设置预算，启动诊断</li><li>查看报告、证据和事件</li><li>创建修复方案，审批后执行</li><li>确认业务恢复，关闭工单</li></ol></section>
       <p class="sidebar-note">真实服务使用付费模型诊断，只有明确授权并点击启动才会调用。页面刷新与事件重连只读取已有运行。</p>
       <a class="docs-link" href="/docs" target="_blank" rel="noopener">打开后端接口文档 ↗</a>
     </aside>
     <div class="workspace">
-      <header class="topbar"><div><span class="eyebrow">IT INCIDENT AGENT</span><h1>故障工单与诊断</h1></div><span class="badge">开发调试版</span></header>
+      <header class="topbar"><div><span class="eyebrow">IT INCIDENT AGENT</span><h1>故障工单、诊断与修复</h1></div><span class="badge">开发调试版</span></header>
       <IncidentPanel v-if="identity" :key="identityVersion" :ready="true" :tenant-id="identity.tenant_id" :user-id="identity.user_id" :role="identity.role" :fetcher="authenticatedFetch" />
       <main v-else class="welcome"><span class="welcome-mark">IT</span><h2>从一张故障工单开始</h2><p>在左侧验证访问令牌，然后选择已登记服务，查看五个 Agent 的排查过程与诊断结果。</p><div class="welcome-tags"><span>范围受限的只读工具</span><span>证据引用</span><span>显式调用预算</span></div></main>
     </div>

@@ -76,8 +76,16 @@ class RepairService:
                 if action in executor.actions and action in ACTIONS:
                     items.append({'action': action, 'target': target_name, **ACTIONS[action],
                         'max_replicas': config.get('max_replicas', 1), 'versions': config.get('versions', []),
-                        'success_condition': executor.verification, 'requires_approval': True})
+                        'success_condition': executor.verification, 'requires_approval': True,
+                        'symptom_checks': deepcopy(checks)})
         return items
+
+    def incident_capabilities(self, iid, principal):
+        incident = self.workflow.get_incident(iid, principal)
+        if incident.get('demo_case_id'):
+            return []
+        binding = self.workflow.services.resolve(incident, principal)
+        return self.capabilities(binding)
 
     def from_recommendation(self, iid, payload, principal):
         run = self.workflow.get_run(payload['run_id'], principal)

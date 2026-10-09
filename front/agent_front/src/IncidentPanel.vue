@@ -2,6 +2,8 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { readEvents } from './sse'
 import ReportView from './ReportView.vue'
+import RepairPanel from './RepairPanel.vue'
+import type { RepairRecommendation } from './repairs'
 
 type Fields = { title: string; symptoms: string; service: string; environment: string; service_version: string;
   purpose: 'diagnosis' | 'status_check';
@@ -11,7 +13,8 @@ type Demo = { case_id: string; synthetic: boolean; fields: Fields }
 type Service = { service: string; environment: string; service_version: string; metrics: { name: string; unit: string }[] }
 type Result = { run_id: string; status: string; business_result: string; review_status: string; final: string; execution_mode?: string;
   run_summary: { model_calls?: number; tool_calls?: number; termination_reason?: string; duration_ms?: number };
-  output?: { findings?: unknown[]; hypotheses?: unknown[]; recommended_actions?: unknown[]; missing_information?: string[]; escalation_team?: string };
+  purpose?: 'diagnosis' | 'status_check';
+  output?: { findings?: unknown[]; hypotheses?: unknown[]; recommended_actions?: RepairRecommendation[]; missing_information?: string[]; escalation_team?: string };
   evidence?: { evidence_id: string; kind: string; excerpt: string; payload: unknown; locator: string; data_version: string; hash: string }[];
   task_results?: unknown[]; reviews?: unknown[]; negotiation?: unknown[]; incident_snapshot?: Incident }
 type RunEvent = { seq: number; type: string; role?: string; name?: string; status?: string; reason?: string; message?: string }
@@ -20,6 +23,7 @@ const props = defineProps<{ ready: boolean; tenantId: string; userId: string; ro
 const items = ref<Incident[]>([]), demos = ref<Demo[]>([]), services = ref<Service[]>([]), selected = ref<Incident | null>(null)
 const chosenService = ref(''), paidAuthorized = ref(false)
 const chosenDemo = ref(''), error = ref(''), notice = ref(''), busy = ref(false), connecting = ref(false)
+const repairBusy = ref(false)
 const result = ref<Result | null>(null), runId = ref(''), runStatus = ref(''), events = ref<RunEvent[]>([])
 const offset = ref(0), mode = ref('scripted_control_only'), modelBudget = ref(12), toolBudget = ref(8)
 const cause = ref(''), resolution = ref(''), labels = ref(''), codes = ref('')
@@ -39,7 +43,7 @@ const statuses: Record<string, string> = { open: '待排查', investigating: '�
   running: '运行中', completed: '执行完成', partial: '有限结果', failed: '执行失败', diagnosis_available: '诊断可查看',
   needs_information: '需要补充信息', escalation_recommended: '建议升级', status_checked: '所列观测核查完成',
   passed: '模型复核通过', not_performed: '未复核' }
-const locked = computed(() => ['investigating', 'resolved'].includes(selected.value?.business_status || ''))
+const locked = computed(() => repairBusy.value || ['investigating', 'resolved'].includes(selected.value?.business_status || ''))
 const bindingKey = (row: { service: string; environment: string; service_version: string }) =>
   JSON.stringify([row.service, row.environment, row.service_version])
 const selectedBinding = computed(() => services.value.find(row => bindingKey(row) === chosenService.value))
@@ -83,7 +87,7 @@ const api = async (url: string, options: RequestInit = {}) => {
 }
 const jsonOptions = (method: string, body: unknown) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 const guarded = async (work: () => Promise<void>) => {
-  if (busy.value) return
+  if (busy.value || repairBusy.value) return
   busy.value = true; error.value = ''; notice.value = ''
   try { await work() } catch (e) { if (alive) error.value = e instanceof Error ? e.message : '操作失败' }
   finally { if (alive) busy.value = false }
@@ -222,7 +226,7 @@ onUnmounted(() => { alive = false; stopStream(); pageController.abort() })
     <template v-else>
       <p v-if="error" class="error" role="alert">{{ error }}</p><p v-if="notice" role="status">{{ notice }}</p>
       <section class="ticket-list">
-        <div class="actions"><button :disabled="busy" @click="newTicket">新建工单</button><button :disabled="busy" @click="guarded(refreshList)">刷新列表</button>
+        <div class="actions"><button :disabled="busy || repairBusy" @click="newTicket">新建工单</button><button :disabled="busy || repairBusy" @click="guarded(refreshList)">刷新列表</button>
           <button :disabled="!offset || busy" @click="offset -= 20; guarded(refreshList)">上一页</button>
           <button :disabled="items.length < 20 || busy" @click="offset += 20; guarded(refreshList)">下一页</button></div>
         <p v-if="!items.length" class="hint">暂无工单。下面可直接选择已登记服务，或用免费开发案例检查流程。</p>
@@ -288,11 +292,13 @@ onUnmounted(() => { alive = false; stopStream(); pageController.abort() })
           </details>
         </template>
       </section>
+      <RepairPanel v-if="selected" :key="selected.id" :incident="selected" :result="result" :role="role"
+        :tenant-id="tenantId" :user-id="userId" :parent-busy="busy" :fetcher="fetcher" @busy="repairBusy = $event" />
       <section v-if="confirmable">
         <h3>人工确认解决</h3><p>请填写实际核实的原因及处理结果；确认后作为当前身份的历史经验供知识检索。</p>
         <label>已确认原因<textarea v-model="cause" maxlength="1000" /></label><label>实际处理与验证结果<textarea v-model="resolution" maxlength="2000" /></label>
         <div class="grid"><label>标签（逗号分隔，最多 8 个）<input v-model="labels" /></label><label>错误码（逗号分隔，最多 8 个）<input v-model="codes" /></label></div>
-        <button :disabled="busy || !cause.trim() || !resolution.trim()" @click="confirm">确认已解决并保存经验</button>
+        <button :disabled="busy || repairBusy || !cause.trim() || !resolution.trim()" @click="confirm">确认已解决并保存经验</button>
       </section>
       <p v-else-if="selected && role !== 'operator'" class="hint">当前身份可诊断；人工确认需要拥有本工单的 operator 身份。</p>
     </template>

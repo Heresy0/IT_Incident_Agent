@@ -185,6 +185,7 @@ class Collaboration:
                 "purpose": self.ticket.purpose,
                 "diagnosis_completion_gaps": self.diagnosis_completion_gaps(),
                 "read_only_capabilities": {r: ex.capabilities() for r, ex in self.executors.items()},
+                "repair_capabilities": getattr(self.provider, 'repair_capabilities', []),
                 "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
                 "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
                 "check_scope": self.ticket.scope.model_dump(mode='json', exclude={'tenant_id', 'user_id'}),

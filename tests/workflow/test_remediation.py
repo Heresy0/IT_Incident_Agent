@@ -419,6 +419,33 @@ class RepairAPITests(unittest.TestCase):
         response = self.client.post(self.base, json={**self.fixture.payload, 'parameters': {'command': 'anything'}})
         self.assertEqual(response.status_code, 422)
 
+    def test_incident_capabilities_hide_targets_credentials_and_isolate_owners(self):
+        iid = self.fixture.incident['id']
+        self.fixture.store.incidents[iid]['demo_case_id'] = None
+        binding = self.fixture.binding
+        binding.repairs['api'].update(url='https://private.example', container_id='a' * 64,
+                                     authorization_env='PRIVATE_EXECUTOR_TOKEN', context='private-context')
+        binding.repairs['unsupported'] = {'executor': 'missing', 'actions': ['restart_service']}
+        self.fixture.service.services = ServiceRegistry([binding])
+        route = f'/api/v1/incidents/{iid}/repair-capabilities'
+        response = self.client.get(route)
+        self.assertEqual(response.status_code, 200, response.text)
+        items = response.json()['items']
+        self.assertEqual({item['target'] for item in items}, {'api'})
+        self.assertEqual({item['action'] for item in items}, self.fixture.executor.actions)
+        for name in ('url', 'container_id', 'authorization_env', 'context'):
+            self.assertNotIn(name, response.text)
+        self.assertEqual(self.fixture.executor.writes, 0)
+        self.identity = Principal('a', 'bob', 'operator')
+        self.assertEqual(self.client.get(route).status_code, 404)
+        self.identity = Principal('other', 'alice', 'operator')
+        self.assertEqual(self.client.get(route).status_code, 404)
+
+    def test_demo_has_no_real_repair_capabilities(self):
+        route = '/api/v1/incidents/' + self.fixture.incident['id'] + '/repair-capabilities'
+        self.assertEqual(self.client.get(route).json(), {'items': []})
+        self.assertEqual(self.fixture.executor.writes, 0)
+
     def test_detail_and_cursor_events_are_authorized_and_do_not_execute(self):
         plan = self.client.post(self.base, json=self.fixture.payload).json()
         route = self.base + '/' + plan['id']
