@@ -1,6 +1,7 @@
 import hashlib
 import json
 import time
+from copy import deepcopy
 from datetime import datetime, timezone
 from api.auth import Principal
 from runtime.context import ExecutionError, RunContext
@@ -34,6 +35,14 @@ class ToolExecutor:
         self.last_query_profile = {}
         self.log_gaps = {}
         self.log_coverage = []
+
+    def fork(self, context):
+        """Prepare an isolated role ledger before concurrent collection begins."""
+        child = ToolExecutor(self.provider, self.principal, self.scope, context, role=self.role)
+        for field in ('seen', 'check_results', 'evidence', 'references', 'last_query_profile',
+                      'log_gaps', 'log_coverage'):
+            setattr(child, field, deepcopy(getattr(self, field)))
+        return child
 
     def capabilities(self):
         """Public registration names only; never expose endpoint URLs or query templates."""

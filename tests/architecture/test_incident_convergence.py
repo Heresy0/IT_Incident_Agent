@@ -27,12 +27,15 @@ class IncidentConvergenceTests(unittest.TestCase):
         principal = Principal('synthetic_demo', 'cli_reader')
         coordinator = Collaboration(scripted_models(), FixtureProvider('case_003', principal), principal)
         self.assertEqual(set(build_graph(coordinator).get_graph().nodes),
-            {'__start__', '__end__', 'supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer', 'finish'})
+            {'__start__', '__end__', 'supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer',
+             'collect_parallel', 'collect_results', 'finish'})
         result = coordinator.run()
         self.assertEqual(result['workflow_engine'], 'langgraph')
         self.assertEqual(result['status'], 'completed')
         nodes = [e['node'] for e in result['events'] if e['type'] == 'phase']
-        self.assertEqual(nodes, ['supervisor', 'investigation', 'knowledge', 'supervisor',
+        self.assertEqual(nodes[:2], ['supervisor', 'collect_parallel'])
+        self.assertEqual(set(nodes[2:4]), {'investigation', 'knowledge'})
+        self.assertEqual(nodes[4:], ['collect_results', 'supervisor',
             'diagnosis', 'reviewer', 'supervisor', 'investigation', 'diagnosis', 'reviewer'])
         self.assertEqual(result['rework_rounds'], 1)
 

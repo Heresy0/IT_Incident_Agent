@@ -19,9 +19,10 @@ class IncidentAdapter:
 
     def metadata(self, execution):
         from runtime.version import implementation_version
+        from workflow.graph import WORKFLOW_VERSION
         version = implementation_version()[:12]
         return {"model": "scripted" if execution["execution_mode"] == "scripted_control_only" else self.service._base_config.model,
-                "workflow_version": "incident_graph_v1", "workflow_engine": "langgraph", "source_version": version,
+                "workflow_version": WORKFLOW_VERSION, "workflow_engine": "langgraph", "source_version": version,
                 "limits": self.limits({"execution": execution}).__dict__}
 
     def scope(self, request):

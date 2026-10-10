@@ -118,6 +118,15 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
         raise ValueError("shared context requires its event log")
     events = [] if standalone else event_log
     event_start = len(events)
+    collection_keys = ('name', 'status', 'query_profile', 'truncated', 'error')
+    prior_collection = [{k: e[k] for k in collection_keys}
+                        for e in events[:event_start]
+                        if e['type'] == 'tool_result' and e.get('role') == role]
+    # Parallel branches receive a frozen prior-round snapshot instead of the
+    # mutable global event log. Keep that history when adding this task's reads.
+    if not prior_collection and objective:
+        prior_collection = [{k: e[k] for k in collection_keys}
+                            for e in objective.get('collection', []) if e.get('role') == role]
     task_span = ""
     task_parent = ""
     def on_event(event):
@@ -174,10 +183,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                  for c in (approved_checks or [])}
     checked, model_omitted = set(), False
     output_protocol = "none"
-    with activate(context), context.span("task", role):
-        if not standalone:
-            task_span = events[-1]["span_id"]
-            task_parent = events[-1]["parent_span_id"]
+    with activate(context), context.span("task", role) as span:
+        task_span, task_parent = span['span_id'], span['parent_span_id']
         event("task_created")
         event("task_started")
         # Reviewer-selected, Supervisor-dispatched checks are already authorized.
@@ -212,8 +219,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 terminal = role == "single" and (step == max_steps - 1 or not context.can_research())
                 if terminal:
                     messages.append(HumanMessage(content="Only the final output remains within budget. Return diagnosis JSON, no tools; preserve gaps."))
-                collection = [{k: e[k] for k in ('name', 'status', 'query_profile', 'truncated', 'error')}
-                              for e in events if e['type'] == 'tool_result' and e.get('role') == role]
+                collection = [*prior_collection, *[{k: e[k] for k in collection_keys}
+                              for e in events[event_start:]
+                              if e['type'] == 'tool_result' and e.get('role') == role]]
                 current_objective = dict(objective) if objective is not None else None
                 if current_objective is not None:
                     from workflow.task_checks import completion
@@ -370,9 +378,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     failure = {"step": step + 1, **validation_details(exc)}
                     failures.append(failure)
                     event("validation_failure", node=role, **failure)
-                    if repair_state["repairs"] == 0 and step < max_steps - 1:
+                    if step < max_steps - 1 and context.claim_repair(repair_state):
                         repairs += 1
-                        repair_state["repairs"] += 1
                         event("validation_repair", node=role)
                         reference_options = {eid: [o.model_dump() for o in e.reference_options if substantive(o.field_path)]
                                              for eid, e in executor.evidence.items()}

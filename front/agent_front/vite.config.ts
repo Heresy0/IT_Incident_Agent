@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   // Backend settings stay in the dev server; only VITE_* is exposed to browser code.
   const env = loadEnv(mode, fileURLToPath(new URL('../..', import.meta.url)), '')
   const target = process.env.INCIDENT_API_TARGET || env.INCIDENT_API_TARGET
-    || process.env.DEEP_RESEARCH_API_TARGET || `http://127.0.0.1:${env.PORT || '8003'}`
+    || `http://127.0.0.1:${env.PORT || '8003'}`
   return {
   plugins: [vue()],
   server: {

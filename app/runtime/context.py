@@ -3,7 +3,7 @@ import time
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
-from threading import Lock
+from threading import Lock, RLock
 from uuid import uuid4
 
 from observability.telemetry import record_event
@@ -71,6 +71,7 @@ class RunContext:
         self.limits = limits or Limits.from_env()
         self.started = time.monotonic()
         self.lock = Lock()
+        self.event_lock = RLock()
         self.counts = {"model_calls": 0, "web_calls": 0, "tool_calls": 0}
         self.tokens = {"input_tokens": 0, "output_tokens": 0, "known_calls": 0}
         self.errors = []
@@ -83,9 +84,24 @@ class RunContext:
     def emit(self, event):
         event = {"run_id": self.run_id, "trace_id": self.run_id, "timestamp": time.time(), **event}
         # Persist first: clients only see committed events.
-        if self.emit_callback:
-            self.emit_callback(event)
-        record_event(event)
+        with self.event_lock:
+            if self.emit_callback:
+                self.emit_callback(event)
+            record_event(event)
+
+    def claim_repair(self, state):
+        """The one structural correction belongs to the entire run."""
+        with self.lock:
+            if state['repairs'] >= 1:
+                return False
+            state['repairs'] += 1
+            return True
+
+    def add_usage(self, usage):
+        with self.lock:
+            for key in ('input_tokens', 'output_tokens'):
+                self.tokens[key] += int(usage[key])
+            self.tokens['known_calls'] += 1
 
     def reserve(self, kind, terminal=False):
         with self.lock:
@@ -143,7 +159,7 @@ class RunContext:
         token = _SPAN.set(span_id)
         start, status = time.monotonic(), "ok"
         try:
-            yield
+            yield {"span_id": span_id, "parent_span_id": parent}
         except Exception:
             status = "error"
             raise
@@ -200,10 +216,7 @@ def invoke_model(agent, messages, name, terminal=False, system_prompt=None):
             response = result["messages"][-1]
             usage = getattr(response, "usage_metadata", None) or getattr(response, "response_metadata", {}).get("token_usage")
             if usage and "input_tokens" in usage and "output_tokens" in usage:
-                with context.lock:
-                    for key in ("input_tokens", "output_tokens"):
-                        context.tokens[key] += int(usage[key])
-                    context.tokens["known_calls"] += 1
+                context.add_usage(usage)
                 context.emit({"type": "usage", "node": name, "input_tokens": usage["input_tokens"], "output_tokens": usage["output_tokens"]})
         return result
     try:

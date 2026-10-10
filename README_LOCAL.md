@@ -1,6 +1,6 @@
 # Windows 本地启动
 
-当前后端只运行 IT 工单链路。研究源码在 archive/research 中保留历史快照，不能通过旧开关重新启用。前端已提供轻量 IT 调试页面。最新试点结果、免费检查和边界见[真实联调验收与稳定版收尾](docs/真实联调验收与稳定版收尾-20261010.md)。
+当前后端只运行 IT 工单链路。源码结构和能力以[项目入口](README.md)为准；研究源码和旧演示资料集中在 archive/research，只供追溯。前端已提供轻量 IT 调试页面。历史试点结果见本地[真实联调验收与稳定版收尾](docs/真实联调验收与稳定版收尾-20261010.md)。
 
 ## 免费求职演示
 
@@ -28,6 +28,8 @@ if (-not (Test-Path .env.local)) { Copy-Item .env.local.example .env.local }
 ```
 
 requirements.txt 为67个锁定的 IT 运行包，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。本轮使用现有独立环境完成验证，未强制卸载额外包或重新创建环境。
+
+Python 构建配置 `pyproject.toml` 复用同一锁定依赖，只打包 `app/` 下的 IT 模块及数据库迁移。`.env.example` 和 `.env.local.example` 均为当前 IT 模板，前端地址覆盖使用 `INCIDENT_API_TARGET`；未设置时按 `PORT` 自动连接。已有真实环境、身份与登记文件不会被模板覆盖。
 
 免费脚本模式无需模型 Key。显式执行真实模型时，在本项目 .env.local 配置 DASHSCOPE_API_KEY、MODEL=qwen-turbo 和 INCIDENT_BEARER_TOKEN。身份初始化脚本不会覆盖现有 .auth.local.json 和 .demo-credentials.local.json；不要把它们提交到 Git。
 

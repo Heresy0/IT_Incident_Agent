@@ -1,0 +1,170 @@
+{
+  "validation_date": "2026-10-11",
+  "baseline_commit": "662727adee9cfd5da4221d7b17afde338cb047db",
+  "implementation_sha256_prefix": "37c85388d6037ce1",
+  "scope": "cleanup_and_parallel_collection_closeout",
+  "regression": {
+    "total": 357,
+    "passed": 350,
+    "skipped": 7,
+    "failures": 0,
+    "duration_seconds": 41.933,
+    "skip_reason": "isolated PostgreSQL test database not configured"
+  },
+  "archived_snapshots_verified": 52,
+  "frontend_type_check": "passed",
+  "frontend_production_build": "passed",
+  "offline_wheel": {
+    "file": "it_incident_agent-0.1.0-py3-none-any.whl",
+    "sha256": "2116d42ccbf1e1315bd2b14ba1a96d5102fbd12388bd2d6d4063cfec7999cdbc",
+    "locked_dependencies": 67,
+    "sql_migrations_present": true,
+    "app_main_present": true,
+    "retired_packages_included": false
+  },
+  "free_showcase": {
+    "directory": "D:\\code\\it_incident_agent\\output\\showcase\\05554204-5f06-4685-bb21-30cc539a54cb",
+    "passed": true,
+    "demonstrations": [
+      {
+        "key": "normal",
+        "status": "completed",
+        "review_status": "passed",
+        "model_calls": 6,
+        "tool_calls": 2,
+        "termination_reason": "FINISHED",
+        "expected_behavior_pass": true
+      },
+      {
+        "key": "rework",
+        "status": "completed",
+        "review_status": "passed",
+        "model_calls": 12,
+        "tool_calls": 5,
+        "termination_reason": "FINISHED",
+        "expected_behavior_pass": true
+      },
+      {
+        "key": "bounded_failure",
+        "status": "partial",
+        "review_status": "needs_information",
+        "model_calls": 8,
+        "tool_calls": 3,
+        "termination_reason": "BUDGET_EXCEEDED",
+        "expected_behavior_pass": true
+      }
+    ],
+    "controls_passed": 7,
+    "controls_total": 7,
+    "comparison_quality": "excluded_scripted",
+    "paid_calls": 0,
+    "live_writes": 0
+  },
+  "free_parallel_demo": {
+    "output": "D:\\code\\it_incident_agent\\output\\parallel-collection\\84382d8e-da86-4849-98bc-b1894a0bbcd1",
+    "case_id": "case_003",
+    "implementation_sha256_prefix": "37c85388d6037ce1",
+    "workflow_version": "incident_graph_v2_parallel_collection",
+    "execution_mode": "scripted_control_only",
+    "paid_model_calls": 0,
+    "latency_source": "artificial 250ms on first invocation of each collection task",
+    "quality_status": "excluded_scripted",
+    "real_provider_performance": "not_measured",
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "runs": [
+      {
+        "mode": "serial",
+        "duration_ms": 924,
+        "passed": true,
+        "initial_collection_ms": 520,
+        "status": "completed",
+        "review_status": "passed",
+        "model_calls": 12,
+        "tool_calls": 5,
+        "rework_rounds": 1,
+        "initial_roles_overlapped": false,
+        "task_intervals": [
+          {
+            "role": "investigation",
+            "start": 1791650851.6870482,
+            "end": 1791650851.9429543
+          },
+          {
+            "role": "knowledge",
+            "start": 1791650851.9509683,
+            "end": 1791650852.2069082
+          },
+          {
+            "role": "investigation",
+            "start": 1791650852.2726166,
+            "end": 1791650852.5309489
+          }
+        ],
+        "mechanical_checks": {
+          "event_sequence": true,
+          "step_accounting": true,
+          "snapshot_integrity": true,
+          "references_valid": true,
+          "diagnosis_contract": true,
+          "within_budget": true
+        },
+        "report_file": "serial.json",
+        "report_sha256": "62e456165e8c092922728525f644186abb7fc0c43f54a6a3ab8310f74d567302"
+      },
+      {
+        "mode": "parallel",
+        "duration_ms": 680,
+        "passed": true,
+        "initial_collection_ms": 282,
+        "status": "completed",
+        "review_status": "passed",
+        "model_calls": 12,
+        "tool_calls": 5,
+        "rework_rounds": 1,
+        "initial_roles_overlapped": true,
+        "task_intervals": [
+          {
+            "role": "investigation",
+            "start": 1791650852.6367853,
+            "end": 1791650852.9023194
+          },
+          {
+            "role": "knowledge",
+            "start": 1791650852.6397848,
+            "end": 1791650852.9188845
+          },
+          {
+            "role": "investigation",
+            "start": 1791650852.9770799,
+            "end": 1791650853.2358835
+          }
+        ],
+        "mechanical_checks": {
+          "event_sequence": true,
+          "step_accounting": true,
+          "snapshot_integrity": true,
+          "references_valid": true,
+          "diagnosis_contract": true,
+          "within_budget": true
+        },
+        "report_file": "parallel.json",
+        "report_sha256": "4bb00895c750827f0b7fbfd7e6be24cb846edcc96edf4cd87b803a58c0651584"
+      }
+    ],
+    "passed": true
+  },
+  "paid_model_calls": 0,
+  "business_writes": 0,
+  "github_ci": "pending_new_commit",
+  "docs_tracked": false
+}

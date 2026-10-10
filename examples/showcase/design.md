@@ -7,6 +7,12 @@
 ```mermaid
 flowchart TD
     U[工单和显式预算] --> S[Supervisor 选择任务]
+    S -->|两个独立角色且预算足够| P[并行分叉]
+    P --> I
+    P --> K
+    I -->|并行批次| J[结果汇总]
+    K -->|并行批次| J
+    J --> S
     S -->|调查任务| I[Investigation 工具循环]
     S -->|知识任务| K[Knowledge 检索]
     I --> S
@@ -35,9 +41,9 @@ Supervisor 管理任务；Investigation 收集当前观测；Knowledge 收集适
 
 核心文件：`app/workflow/coordinator.py`、`app/agents/contracts.py`、`app/agents/models.py`、`app/agents/single.py`。
 
-## 为什么目前串行，不急于添加恢复
+## 并行取证与恢复边界
 
-`app/workflow/graph.py` 用 StateGraph 条件边切换角色。串行执行便于共享预算、去重、证据目录和审计顺序，适合当前短时诊断范围。尚未证明并行收益，因此未增加并发协调复杂度。
+`app/workflow/graph.py` 用 StateGraph 条件边切换角色，独立的 Investigation / Knowledge 任务可同轮分叉、汇总。分支冻结输入并持有局部台账，共享全局预算、单次结构修复与审计事件锁；结果按固定角色顺序合并。单任务、小工具预算和复核补查继续串行。具体条件与免费演示见[并行取证](parallel-collection.md)，当前没有真实模型并行性能成绩。
 
 业务状态主要在协调器对象，图状态记录阶段与计数快照。RunStore 持久化报告和事件；SSE 可以续读事件，但不能从中断节点继续模型运行。若实现 checkpoint，需要先处理可序列化状态、剩余预算与重复执行，特别不能自动重放修复写操作。
 

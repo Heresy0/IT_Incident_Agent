@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+当前支持[Investigation / Knowledge 并行取证](parallel-collection.md)：同轮独立任务分叉、受共享预算约束、汇总后诊断，复核补查保持顺序。免费串并行演示使用人工延迟和相同脚本响应，验证调度行为；此前真实对照保留原版本属性。
+
 最新[定向真实对照及面试话术](curated-live-guide.md)：两个展示案例与一个修订版，6次真实运行，47模型/16合成工具。保留每轮结果、版本和报告哈希。真实Reviewer将没有直接业务错误证据的具体候选保留为unresolved，展示独立复核对发布的影响；本批未证明整体诊断优势。参见[全部配对](curated-live-comparison.json)、[助手辅助分析](curated-live-assistant-review.json)、[草稿—复核—发布证据](curated-review-evidence.json)。
 
 面试优先阅读[五分钟讲解、复现步骤与追问回答](interview-guide.md)。新增 `scripts/demo_interview.py` 复用两个冻结专项案例和原连接池案例，生成三条完整合成报告、草稿/复核变化、工具轨迹和本地展示页。[交付记录](interview-demo-result.json)保留11/6、9/4、12/5的脚本调用计数；不是自主模型成绩，不修改历史真实结果。

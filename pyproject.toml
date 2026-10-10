@@ -1,27 +1,23 @@
 [project]
-name = "mult_agents"
+name = "it-incident-agent"
 version = "0.1.0"
-description = "Multi-agent LangGraph pipeline with Qwen"
-requires-python = ">=3.10"
-dependencies = [
-  "langgraph",
-  "langgraph-checkpoint-redis",
-  "langgraph-checkpoint-postgres",
-  "fastapi",
-  "uvicorn[standard]",
-  "langchain",
-  "langchain-community",
-  "langchain-core",
-  "langchain-milvus",
-  "dashscope",
-  "pymilvus",
-  "psycopg[binary,pool]",
-  "redis",
-  "python-dotenv",
-  "pydantic-settings",
-  "typing-extensions"
-]
+description = "Budgeted IT incident diagnosis and approved remediation with LangGraph"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
 
 [build-system]
 requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+package-dir = {"" = "app"}
+py-modules = ["app_main"]
+
+[tool.setuptools.packages.find]
+where = ["app"]
+
+[tool.setuptools.package-data]
+storage = ["migrations/*.sql"]

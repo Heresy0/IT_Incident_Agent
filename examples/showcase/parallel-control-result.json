@@ -1,0 +1,165 @@
+{
+  "case_id": "case_003",
+  "implementation_sha256_prefix": "37c85388d6037ce1",
+  "workflow_version": "incident_graph_v2_parallel_collection",
+  "execution_mode": "scripted_control_only",
+  "paid_model_calls": 0,
+  "latency_source": "artificial 250ms on first invocation of each collection task",
+  "quality_status": "excluded_scripted",
+  "real_provider_performance": "not_measured",
+  "limits": {
+    "model_calls": 16,
+    "web_calls": 12,
+    "tool_calls": 8,
+    "seconds": 180,
+    "reserve_model_calls": 3,
+    "reserve_seconds": 20,
+    "input_chars": 28000,
+    "snippet_chars": 1800,
+    "max_sources": 10
+  },
+  "runs": [
+    {
+      "mode": "serial",
+      "duration_ms": 922,
+      "passed": true,
+      "initial_collection_ms": 524,
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls": 12,
+      "tool_calls": 5,
+      "rework_rounds": 1,
+      "initial_roles_overlapped": false,
+      "task_intervals": [
+        {
+          "role": "investigation",
+          "start": 1791649890.6718874,
+          "end": 1791649890.928257
+        },
+        {
+          "role": "knowledge",
+          "start": 1791649890.9368143,
+          "end": 1791649891.1956964
+        },
+        {
+          "role": "investigation",
+          "start": 1791649891.2522256,
+          "end": 1791649891.5110316
+        }
+      ],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "report_file": "serial.json",
+      "report_sha256": "44c5fe4438ab1ab8d19d7cadda956068632938c312563fc290d932967060b6eb"
+    },
+    {
+      "mode": "parallel",
+      "duration_ms": 675,
+      "passed": true,
+      "initial_collection_ms": 269,
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls": 12,
+      "tool_calls": 5,
+      "rework_rounds": 1,
+      "initial_roles_overlapped": true,
+      "task_intervals": [
+        {
+          "role": "investigation",
+          "start": 1791649891.625155,
+          "end": 1791649891.8839276
+        },
+        {
+          "role": "knowledge",
+          "start": 1791649891.6296778,
+          "end": 1791649891.8944712
+        },
+        {
+          "role": "investigation",
+          "start": 1791649891.95751,
+          "end": 1791649892.2165394
+        }
+      ],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "report_file": "parallel.json",
+      "report_sha256": "2ecbe8727df6c2e7c6f8a7cecb54c104286402f572f9419b4cda8ccc97ded519"
+    }
+  ],
+  "passed": true,
+  "validation_date": "2026-10-11",
+  "baseline_commit": "662727adee9cfd5da4221d7b17afde338cb047db",
+  "implementation_commit_status": "uncommitted_workspace_changes",
+  "regression": {
+    "total": 357,
+    "passed": 350,
+    "skipped": 7,
+    "failed": 0,
+    "duration_seconds": 46.454,
+    "skip_reason": "isolated PostgreSQL test database not configured",
+    "log_sha256": "304be45bd96b1ffef5d6f89426e58d0f1378a24b29c6d9cdd84ba8cfe663eb1e"
+  },
+  "focused_regression": {
+    "total": 29,
+    "passed": 29,
+    "failed": 0
+  },
+  "existing_interview_demos": {
+    "directory": "D:\\code\\it_incident_agent\\output\\interview-demo\\ec878a0f-8319-409b-8c09-58cbee8066f7",
+    "passed": true,
+    "paid_calls": 0,
+    "demonstrations": [
+      {
+        "key": "history",
+        "status": "completed",
+        "model_steps": 11,
+        "tool_attempts": 6,
+        "rework_rounds": 0,
+        "expected_behavior": {
+          "reviewed_report": true,
+          "knowledge_retrieval": true,
+          "rejected_historical_candidate": true
+        }
+      },
+      {
+        "key": "scope",
+        "status": "completed",
+        "model_steps": 9,
+        "tool_attempts": 4,
+        "rework_rounds": 0,
+        "expected_behavior": {
+          "reviewed_report": true,
+          "conflicting_sources_preserved": true,
+          "old_instance_candidate_rejected": true
+        }
+      },
+      {
+        "key": "rework",
+        "status": "completed",
+        "model_steps": 12,
+        "tool_attempts": 5,
+        "rework_rounds": 1,
+        "expected_behavior": {
+          "reviewed_report": true,
+          "one_rework": true,
+          "two_reviews": true,
+          "changed_cause": true,
+          "actual_rework_read": true
+        }
+      }
+    ]
+  },
+  "raw_summary_relative_path": "output/parallel-collection/0082e426-2763-449c-9ed6-773ff33026b2/summary.json"
+}

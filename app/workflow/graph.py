@@ -1,13 +1,16 @@
-"""Bounded serial LangGraph, sharing the existing role contracts and execution ledger.
+"""Bounded LangGraph with an optional two-role collection fan-out and join.
 
 The persisted run/events remain the audit record. This graph does not promise
 checkpoint resume: an interrupted worker is still marked failed by RunStore.
 """
-from typing import TypedDict
+from operator import or_
+from typing import Annotated, TypedDict
 
 from langgraph.graph import StateGraph, START, END
 from runtime.context import ExecutionError
 from evidence.diagnosis import ProtocolError
+
+WORKFLOW_VERSION = 'incident_graph_v2_parallel_collection'
 
 
 class IncidentState(TypedDict, total=False):
@@ -20,6 +23,7 @@ class IncidentState(TypedDict, total=False):
     review_count: int
     rework_rounds: int
     counts: dict[str, int]
+    collection_results: Annotated[dict[str, dict], or_]
 
 
 def build_graph(coordinator):
@@ -51,14 +55,32 @@ def build_graph(coordinator):
 
     graph = StateGraph(IncidentState)
     graph.add_node('supervisor', guarded('supervisor', c.supervise))
+    def collector(role):
+        serial = guarded(role, lambda: c.execute_task(role))
+        def node(state):
+            if c.parallel_batch:
+                c.event('phase', role, node=role, phase=c.phase, batch_id=c.parallel_batch)
+                return {'collection_results': {role: c.collect_parallel_role(role)}}
+            return serial(state)
+        return node
+
     for role in ('investigation', 'knowledge'):
-        graph.add_node(role, guarded(role, lambda role=role: c.execute_task(role)))
+        graph.add_node(role, collector(role))
+    graph.add_node('collect_parallel', guarded('collect_parallel', c.prepare_parallel))
+    graph.add_node('collect_results', lambda state: guarded('collect_results',
+        lambda: c.merge_parallel(state.get('collection_results', {})))(state))
     graph.add_node('diagnosis', guarded('diagnosis', c.diagnose))
     graph.add_node('reviewer', guarded('reviewer', c.review_draft))
     graph.add_node('finish', finish)
     graph.add_edge(START, 'supervisor')
-    routes = {n: n for n in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer', 'finish')}
-    for role in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer'):
+    routes = {n: n for n in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer',
+                             'collect_parallel', 'collect_results', 'finish')}
+    for role in ('supervisor', 'diagnosis', 'reviewer', 'collect_results'):
         graph.add_conditional_edges(role, lambda state: state['next_node'], routes)
+    graph.add_conditional_edges('collect_parallel',
+        lambda state: 'finish' if c.stop else ['investigation', 'knowledge'], routes)
+    for role in ('investigation', 'knowledge'):
+        graph.add_conditional_edges(role,
+            lambda state: 'collect_results' if c.parallel_batch else state['next_node'], routes)
     graph.add_edge('finish', END)
     return graph.compile()

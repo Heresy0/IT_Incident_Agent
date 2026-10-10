@@ -7,3 +7,5 @@
 `manifest.json` 保存迁移前的路径与 SHA-256。覆盖与审计实现，包括原 `nodes.py`、`state.py`、`harness/coverage.py` 和 `harness/validation.py`，原样保留；未回退或恢复任何旧草稿。
 
 现有运行记录、数据库及历史验收报告未删除。当前系统说明以根目录 README 和 docs/项目结构与模块说明.md 为准。
+
+旧研究使用说明集中在 [legacy-guide.md](legacy-guide.md)，原技术选型笔记集中在 `examples/tech_selection/`。它们保留历史内容，不是当前 IT 系统的启动或安装入口；52项受清单保护的源码快照未修改。
