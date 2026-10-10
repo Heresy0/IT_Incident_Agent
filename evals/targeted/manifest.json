@@ -1,0 +1,72 @@
+{
+  "dataset_version": "targeted-synthetic-v1",
+  "synthetic": true,
+  "authoring": "人工设计的专项合成压力集；同一开发者已参与编写，不属于外部盲测。",
+  "cases": [
+    "probe_001",
+    "probe_002",
+    "probe_003",
+    "probe_004",
+    "probe_005",
+    "probe_006",
+    "probe_007",
+    "probe_008"
+  ],
+  "splits": {
+    "development": [
+      "probe_001",
+      "probe_002",
+      "probe_003",
+      "probe_007",
+      "probe_008"
+    ],
+    "holdout": [
+      "probe_004",
+      "probe_005",
+      "probe_006"
+    ]
+  },
+  "case_metadata": {
+    "probe_001": {
+      "group": "targeted",
+      "family": "history",
+      "description": "历史容量经验与当前远端拒绝不一致"
+    },
+    "probe_002": {
+      "group": "targeted",
+      "family": "conflict",
+      "description": "绿色探针、旧实例日志与当前业务写入拒绝"
+    },
+    "probe_003": {
+      "group": "targeted",
+      "family": "discrimination",
+      "description": "本地排队与下游慢需要区分性证据"
+    },
+    "probe_004": {
+      "group": "targeted",
+      "family": "history",
+      "description": "独立保留事件：重启经验与当前命令授权"
+    },
+    "probe_005": {
+      "group": "targeted",
+      "family": "conflict",
+      "description": "独立保留事件：只读探针与写路由、旧锁等待"
+    },
+    "probe_006": {
+      "group": "targeted",
+      "family": "discrimination",
+      "description": "独立保留事件：进程存活与消费暂停"
+    },
+    "probe_007": {
+      "group": "control",
+      "family": "simple",
+      "description": "普通对照：有限范围正常状态核查"
+    },
+    "probe_008": {
+      "group": "control",
+      "family": "insufficient",
+      "description": "普通对照：观测渠道不可用，原因无法区分"
+    }
+  },
+  "holdout_policy": "同能力的不同业务事件，不是原快照改名；默认不运行、不解析保留答案。作者已知，不宣称外部未知盲测。解锁后用于改动即转为回归。"
+}

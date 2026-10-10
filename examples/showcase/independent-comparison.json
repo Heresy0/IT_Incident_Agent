@@ -1,0 +1,450 @@
+{
+  "dataset_version": "independent-synthetic-v1",
+  "split": "validation",
+  "implementation": "224a3346bc5cc7fc",
+  "dataset_freeze_sha256": "37ce647284bad9262ff9698d02e3f64015c203644535d8cd797f42328ef2f9a1",
+  "model": "qwen-turbo",
+  "limits": {
+    "model_calls": 16,
+    "web_calls": 12,
+    "tool_calls": 8,
+    "seconds": 180,
+    "reserve_model_calls": 3,
+    "reserve_seconds": 20,
+    "input_chars": 28000,
+    "snippet_chars": 1800,
+    "max_sources": 10
+  },
+  "model_settings": {
+    "temperature": 0,
+    "max_tokens": 2200,
+    "max_retries": 1,
+    "request_timeout": 30
+  },
+  "human_review": "pending",
+  "runs": [
+    {
+      "case_id": "eval_001",
+      "workflow": "single",
+      "run_id": "1ce92110-e405-4e10-a772-717f9520c349",
+      "status": "partial",
+      "review_status": "not_performed",
+      "mechanical_pass": true,
+      "model_calls": 6,
+      "tool_calls": 4,
+      "duration_ms": 20984,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "token_usage": {
+        "input_tokens": 29983,
+        "output_tokens": 1838,
+        "known_calls": 6,
+        "status": "known"
+      },
+      "empty_queries": 1,
+      "invalid_tool_results": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "report_sha256": "a486d3519b298852602a64d11af3a37508dae51bca75efb2a4da91650782464a",
+      "prompt_version": "a4b439669f66",
+      "structure_repairs": 1,
+      "role_model_calls": {
+        "single": 6
+      },
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "reference_mismatch",
+          "details": [
+            {
+              "path": "escalation_ref",
+              "type": "non_owner_reference"
+            }
+          ]
+        },
+        {
+          "role": "single",
+          "reason": "reference_mismatch",
+          "details": [
+            {
+              "path": "escalation_ref",
+              "type": "non_owner_reference"
+            }
+          ]
+        }
+      ],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "upstream_connect_failures"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "request_error_rate",
+            "upstream_connect_failures"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null
+          },
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_owner",
+          "status": "ok",
+          "query_profile": {},
+          "returned_fields": [],
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "case_id": "eval_001",
+      "workflow": "multi",
+      "run_id": "c4885cbf-a290-4b5e-ad13-06bfde0c2cc4",
+      "status": "partial",
+      "review_status": "needs_information",
+      "mechanical_pass": true,
+      "model_calls": 9,
+      "tool_calls": 2,
+      "duration_ms": 40016,
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "token_usage": {
+        "input_tokens": 46450,
+        "output_tokens": 4014,
+        "known_calls": 9,
+        "status": "known"
+      },
+      "empty_queries": 1,
+      "invalid_tool_results": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "report_sha256": "df5af1c3bc94fd3ce221e0ff8d8ba74a5102d5b10ad87adb7f689787b58a902d",
+      "prompt_version": "74c2d7f5e927",
+      "structure_repairs": 1,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 4,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "INVALID_REWORK_NEED",
+          "details": []
+        }
+      ],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "observed_path": [
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "deployment"
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "upstream_connect_failures"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "request_error_rate",
+            "upstream_connect_failures"
+          ],
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "multi",
+      "run_id": "efc340f7-2b2c-41d8-855d-85c5dfbbb142",
+      "status": "partial",
+      "review_status": "not_performed",
+      "mechanical_pass": true,
+      "model_calls": 10,
+      "tool_calls": 3,
+      "duration_ms": 32485,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "token_usage": {
+        "input_tokens": 43645,
+        "output_tokens": 2783,
+        "known_calls": 10,
+        "status": "known"
+      },
+      "empty_queries": 2,
+      "invalid_tool_results": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "report_sha256": "25009362a77fc0290b59fa04435d8d37f3eb1f8f0bf2a2e3d1e4df5a9e701a41",
+      "prompt_version": "5c25b28aaed1",
+      "structure_repairs": 1,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 6,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "INVALID_REWORK_NEED",
+          "details": []
+        }
+      ],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "observed_path": [
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": "ERROR"
+          },
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "single",
+      "run_id": "029817ff-28c8-4037-9d59-fde0c61e32b3",
+      "status": "completed",
+      "review_status": "not_performed",
+      "mechanical_pass": true,
+      "model_calls": 7,
+      "tool_calls": 6,
+      "duration_ms": 15187,
+      "termination_reason": "FINISHED",
+      "token_usage": {
+        "input_tokens": 36457,
+        "output_tokens": 1028,
+        "known_calls": 7,
+        "status": "known"
+      },
+      "empty_queries": 4,
+      "invalid_tool_results": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "report_sha256": "a7d018ea04dda1f0acb76f9b1508aae1003961091bc5c20e9bff921a222775f4",
+      "prompt_version": "491ac5cdbc69",
+      "structure_repairs": 0,
+      "role_model_calls": {
+        "single": 7
+      },
+      "validation_failures": [],
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "api_up",
+              "dependency_tls_failures",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "api_up",
+            "dependency_tls_failures",
+            "request_error_rate"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "resource",
+            "level": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null
+          },
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "search_incidents",
+          "status": "empty",
+          "query_profile": {},
+          "returned_fields": [],
+          "truncated": false
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "model_requests": 32,
+    "synthetic_tool_attempts": 15,
+    "input_tokens": 156535,
+    "output_tokens": 9663,
+    "total_tokens": 166198,
+    "usage_known_calls": 32,
+    "estimated_cost": null,
+    "business_writes": 0,
+    "completed_runs": 1,
+    "partial_runs": 3,
+    "mechanical_passes": 4,
+    "reruns": 0,
+    "holdout_runs": 0
+  },
+  "note": "四运行各一次；真实模型、合成工具；内部状态与机械通过不等于语义成功。两案例不证明总体优劣。"
+}

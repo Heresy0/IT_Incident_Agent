@@ -1,0 +1,276 @@
+{
+  "schema_version": "information-gain-comparison-v1",
+  "execution_date": "2026-10-10",
+  "data_source": "synthetic_fixture",
+  "sample_pairs": 1,
+  "configuration": {
+    "cases": [
+      "case_003"
+    ],
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "qwen-turbo",
+    "execution_mode": "live",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "provenance": {
+    "implementation_sha256_prefix": "918c54b23299f3ed",
+    "git_commit": "53da172c864a94dcea972a080d035dd7920ad4d2",
+    "working_tree_dirty": true,
+    "dataset_version": "synthetic-dev-v2",
+    "fixture_sha256": {
+      "case_003": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945"
+    }
+  },
+  "bundle_sha256": "34f23882b3d3bebbc724d4ba477c823352b328404804cf68f1ecc1f08604fb61",
+  "current_version_model_execution_completed": true,
+  "current_version_model_quality_verified": false,
+  "human_review_status": "pending",
+  "semantic_accuracy": null,
+  "estimated_cost": null,
+  "actual_model_calls": 14,
+  "actual_tool_attempts": 7,
+  "authorization": {
+    "pairs": 1,
+    "per_run_model_call_cap": 16,
+    "per_run_tool_attempt_cap": 8,
+    "automatic_repeat_pairs": 0
+  },
+  "runs": [
+    {
+      "case_id": "case_003",
+      "run_id": "07facafa-8155-4f17-8f71-2aefa74322db",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "completed",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 1.0,
+      "missing_checks": [],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 2,
+      "tool_calls": 4,
+      "duration_ms": 9968,
+      "token_usage": {
+        "input_tokens": 9678,
+        "output_tokens": 958,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "termination_reason": "FINISHED",
+      "report_sha256": "f29982a30193c4d4b1126f63b96eaba0744e39ce4ba8e5632eefee90d146f917",
+      "prompt_version": "ba34bfdaff0d",
+      "structural_repairs": 0,
+      "hypothesis_count": 1,
+      "action_count": 1,
+      "auxiliary_review": {
+        "run_id": "07facafa-8155-4f17-8f71-2aefa74322db",
+        "report_sha256": "f29982a30193c4d4b1126f63b96eaba0744e39ce4ba8e5632eefee90d146f917",
+        "cause_direction_matches_case": true,
+        "complete_diagnosis_supported": false,
+        "overall": "取证4/4，池饱和候选有依据；扩容审批标记为false、容量可承受的判断无来源支持，没有独立复核。",
+        "claim_assessments": [
+          {
+            "target_id": "F1",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F2",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F3",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F4",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F5",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "H1",
+            "verdict": "qualified",
+            "reason": "当前池使用率、等待和连接获取日志支持池饱和近端机制；未排除连接持有过久、泄漏等其他触发原因。"
+          },
+          {
+            "target_id": "A1",
+            "verdict": "insufficient",
+            "reason": "建议直接扩容且requires_approval=false；没有核查数据库连接总容量，却声称新增资源消耗应在当前基础设施限制内可承受。现有观测不支持这个容量判断。"
+          }
+        ],
+        "action_requires_approval": false,
+        "action_capacity_check_complete": false
+      }
+    },
+    {
+      "case_id": "case_003",
+      "run_id": "c7c92e86-ac7e-414c-bc5b-26e5f22ab74f",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "completed",
+      "review_status": "passed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "necessary_check_coverage": 0.75,
+      "missing_checks": [
+        "POOL_ACQUIRE_TIMEOUT"
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 1,
+      "model_calls": 12,
+      "tool_calls": 3,
+      "duration_ms": 48109,
+      "token_usage": {
+        "input_tokens": 71087,
+        "output_tokens": 4440,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "termination_reason": "FINISHED",
+      "report_sha256": "c519e7235690d43cd2349158bd89165440fda03dca4cab14cff6a4bbe1177bc9",
+      "prompt_version": "cb9e8c71eaa3",
+      "structural_repairs": 0,
+      "hypothesis_count": 1,
+      "action_count": 1,
+      "auxiliary_review": {
+        "run_id": "c7c92e86-ac7e-414c-bc5b-26e5f22ab74f",
+        "report_sha256": "c519e7235690d43cd2349158bd89165440fda03dca4cab14cff6a4bbe1177bc9",
+        "cause_direction_matches_case": true,
+        "complete_diagnosis_supported": false,
+        "overall": "关键指标改为批量查询，Reviewer自主请求db_cpu补查并完成修订和二次复核；取证3/4、审批标记true，内部通过仍不代表容量或完整原因已确认。",
+        "claim_assessments": [
+          {
+            "target_id": "F1",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F2",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F3",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F4",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "F5",
+            "verdict": "supported",
+            "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+          },
+          {
+            "target_id": "H1",
+            "verdict": "qualified",
+            "reason": "变更和pool_usage/pool_wait支持池压力与延迟关联；仅正常CPU不能排除所有数据库瓶颈，缺少连接获取超时日志，不能唯一归因于池最大值设置。"
+          },
+          {
+            "target_id": "A1",
+            "verdict": "qualified",
+            "reason": "检查配置并考虑调整是有依据的人工核查方向且需要批准；条件称负载超过池最大值，未交代并发连接需求，不能直接把requests/s与连接数比较。执行调整前仍缺数据库总容量等适用性核验。"
+          }
+        ],
+        "action_requires_approval": true,
+        "action_capacity_check_complete": false,
+        "verified_live_behaviors": [
+          "expected_value在调度和叶子目标中传递",
+          "批量取得pool_usage/pool_wait/request_latency",
+          "H1具体补查db_cpu、实际执行、修订并二次复核"
+        ],
+        "not_triggered_in_this_pair": {
+          "action_target_rework": true,
+          "review_follow_up_correction": true,
+          "query_reused": true,
+          "task_reused": true
+        },
+        "model_role_counts": {
+          "supervisor": 3,
+          "investigation": 5,
+          "diagnosis": 2,
+          "reviewer": 2
+        },
+        "remaining_issues": [
+          "未查询resource日志及POOL_ACQUIRE_TIMEOUT",
+          "A1适用条件和容量判断仍不完整",
+          "最终H1反证为空，已取得的正常CPU未放入counter_refs"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "真实模型+合成开发观测；一组案例不能证明总体质量或生产准确率。",
+    "多Agent实际执行H1的db_cpu补查并修订诊断；A目标补查、复核提醒、空查询复用本次未触发。",
+    "内部passed不等于完整诊断：仍缺POOL_ACQUIRE_TIMEOUT日志，容量适用性和建议条件仍需核实。",
+    "与此前版本对比是描述性结果，未控制模型输出和服务端波动；费用未知。"
+  ],
+  "comparison_to_previous_multi": {
+    "previous_run_id": "963aa5e8-2cb0-4841-bd49-ce420e7af551",
+    "previous_source_fingerprint": "e0219ef8115a9979",
+    "previous": {
+      "status": "partial",
+      "review_status": "needs_information",
+      "model_calls": 15,
+      "tool_calls": 5,
+      "duration_ms": 44718,
+      "necessary_check_coverage": 0.5,
+      "rework_rounds": 0
+    },
+    "current": {
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls": 12,
+      "tool_calls": 3,
+      "duration_ms": 48109,
+      "necessary_check_coverage": 0.75,
+      "rework_rounds": 1
+    },
+    "causal_effect_proven": false
+  }
+}

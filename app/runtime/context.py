@@ -22,6 +22,7 @@ MESSAGES = {
     "MEMORY_UNAVAILABLE": "本次记忆服务不可用，诊断将继续，但不会读写个人记忆。",
     "BUDGET_EXCEEDED": "本次诊断已达到调用或时间预算。",
     "NO_EVIDENCE": "没有取得可支持结论的证据。",
+    "NO_TOOL_PROGRESS": "取证任务未执行声明的只读检查，有限纠正后仍无进展或没有足够纠正预算；已保留信息缺口。",
     "NO_NEW_QUERIES": "没有新的补搜查询，停止重复检索。",
     "INTERNAL_ERROR": "诊断执行失败，请根据运行 ID 查看日志。",
     "PROCESS_INTERRUPTED": "后端进程中断，本次诊断未完成。",

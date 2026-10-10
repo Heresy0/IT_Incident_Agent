@@ -1,0 +1,92 @@
+{
+  "reviewer_kind": "assistant",
+  "reviewer": "Codex",
+  "reviewed_on": "2026-10-10",
+  "human_review_status": "pending",
+  "formal_semantic_accuracy": null,
+  "rubric": "程序完整性与实际取证、发布结论和诊断语义分开；不将覆盖率或partial直接当作准确率。",
+  "runs": [
+    {
+      "run_id": "1f7d290d-18b3-432e-a356-094fba774168",
+      "workflow": "single",
+      "report_sha256": "1cfa578b9e8deaadd61f3587673342df80d8735dce0749d99d4cb0395a0f82fe",
+      "complete_diagnosis_supported": false,
+      "cause_direction_matches_case": null,
+      "overall": "实际获得4/4预设观测，但负责人字段引用两次未通过校验，最终报告为空；不能作为成功诊断或语义准确样本。",
+      "claim_assessments": [],
+      "findings_published": 0,
+      "actual_observations_valid": true,
+      "published_diagnosis_usable": false,
+      "failure_reason": "escalation_ref / non_owner_reference",
+      "structural_repairs": 1,
+      "limitations": [
+        "原始无效模型JSON未保存，无法从记录确定它具体选择了哪个非team字段；不推测错误编号。",
+        "SingleAgent提示词指纹未变，但单次输出和工具路径发生变化，不能归因于本轮多Agent改造。"
+      ]
+    },
+    {
+      "run_id": "d46646d9-eb47-4c19-85a9-653cc02bdd8a",
+      "workflow": "multi",
+      "report_sha256": "11dc59cee4ba1be2311451a6a27c577d59b70fdfb63f467fdd9536a8b7ccb782",
+      "complete_diagnosis_supported": false,
+      "cause_direction_matches_case": "qualified_pool_pressure_direction",
+      "overall": "问题清单、任务关联和独立问题复核真实生效，N2由supported改回pending；查询和补查选择仍不足，最终partial，无经过复核的建议。",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "verdict": "supported",
+          "reason": "当前与基线pool_usage样本支持所列数值变化。"
+        },
+        {
+          "target_id": "F2",
+          "verdict": "supported",
+          "reason": "当前与基线pool_wait样本支持所列等待变化。"
+        },
+        {
+          "target_id": "F3",
+          "verdict": "supported",
+          "reason": "CPU采样支持所列25/26%，不能据此排除所有数据库瓶颈。"
+        },
+        {
+          "target_id": "H1",
+          "verdict": "qualified",
+          "reason": "池占用和等待支持连接池压力候选；配置不足或参数不当的具体触发原因尚未证明，unresolved合理。"
+        }
+      ],
+      "need_assessments": [
+        {
+          "need_id": "N1",
+          "verdict": "qualified",
+          "reason": "池等待与工单连接等待一致，但未取得request_latency直接采样，不能视为所有症状完整独立验证。"
+        },
+        {
+          "need_id": "N2",
+          "verdict": "uncertain",
+          "reason": "配置具体原因缺证据；复核保留歧义。但仅配置变更缺失不必否定池压力近端机制，需要区分结论层级。"
+        },
+        {
+          "need_id": "N3",
+          "verdict": "insufficient",
+          "reason": "无引用且泛称没有合理替代解释；连接持有过久、泄漏及其他DB瓶颈没有被当前证据排除。"
+        }
+      ],
+      "real_behaviors": {
+        "ledger_updated": true,
+        "tasks_linked_to_needs": true,
+        "all_needs_reviewed": true,
+        "supervisor_support_reversed": true,
+        "duplicate_read_denied": true,
+        "actual_rework_executed": false,
+        "review_follow_up_correction": false
+      },
+      "remaining_issues": [
+        "只查configuration变更为空，没有扩大到其他允许变更类别；模拟负载变化在scaling类别。",
+        "未查询resource日志或POOL_ACQUIRE_TIMEOUT。",
+        "Reviewer补查重复已完成的空configuration查询，DUPLICATE_TOOL门禁拒绝且没有实际补查。",
+        "无效请求在校验后被删除；本次没有触发选择其他有效检查的复核提醒。",
+        "把配置问题具体原因和池压力近端机制混在一起；草稿只读核查建议因没有被核查结果被评为uncertain。",
+        "空结果属于已完成查询但无匹配观测，原任务覆盖门禁仍保留缺口；不能只把问题清单加上就声称规划已改善。"
+      ]
+    }
+  ]
+}

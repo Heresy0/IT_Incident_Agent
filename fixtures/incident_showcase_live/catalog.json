@@ -1,0 +1,12 @@
+[
+  {
+    "case_id": "show_001",
+    "file": "show_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "show_002",
+    "file": "show_002.json",
+    "visibility": "public_synthetic"
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "dataset_version": "independent-synthetic-v1",
+  "files": {
+    "evals/independent/manifest.json": "f5ef51da24551e60bc66bc6c596e54038557b0186afdafee8d354996afac96d8",
+    "evals/independent/rubric.json": "cf109c8d97e762a918b054a18b1970f8163483e71119e1c0be6947a1069e96ba",
+    "fixtures/incident_independent/catalog.json": "7a28fee24898b619d3aae1a04e8a7203898f49bd1c42ef230ceeba7c06396c16",
+    "fixtures/incident_independent/eval_001.json": "5ad4bc988df203374423844231ba53c11224dcaeb33e1536a2a3730e2fc45f75",
+    "evals/independent/answers/eval_001.json": "a94da5987207e51061729fe69087b4e33881c9e309c3137f8409cf7105d82fdc",
+    "fixtures/incident_independent/eval_002.json": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+    "evals/independent/answers/eval_002.json": "a706effad074b74f70c7c90c0a8697acf82e1d639a7a0260c3888b86542d3419",
+    "fixtures/incident_independent/eval_003.json": "113a16703a99b30107a040cc7887effdb98fca6fcd818b98030a0654c93dca2c",
+    "evals/independent/answers/eval_003.json": "a35d26b9063b52c6b4222cee04b031b3100e3506dd032d521694ad51ee7459c0",
+    "fixtures/incident_independent/eval_004.json": "d8ddd6564a32f356bb69996c718cd28f6551152bdc51b56de815462c03532557",
+    "evals/independent/answers/eval_004.json": "b4c2ad782216513fd22cd41b4cb54b8b2d4a6a8d1713c0981dee0eb611c15ef1",
+    "fixtures/incident_independent/eval_005.json": "4712f902c09f55a14af2b7c78f0929f12548e39e14b007491556c83e29c27e7a",
+    "evals/independent/answers/eval_005.json": "4a41d65513fbc3d1530c9b83a10c04709cd0d32997f4031d0008ab0f27afe3eb",
+    "fixtures/incident_independent/eval_006.json": "88bad4e591fb997c9913540d31a151e944918d7c368cb8237aaaa55578e7d889",
+    "evals/independent/answers/eval_006.json": "178522d3cc21e883481550206da45d6abadaf708d32ee4dfdf276f52836fa41b",
+    "fixtures/incident_independent/eval_007.json": "0ee61863b20227eb7ca30e68464ddec12bcf67e77e311d78388236a78cb0cc3e",
+    "evals/independent/answers/eval_007.json": "0443ba008a91c846eb657f4c8f9c37c98963fefb2c9cfd67e7e05df4dbdbd9d1",
+    "fixtures/incident_independent/eval_008.json": "219577ddc09d8973d46386faedf547c0d0da1dc5c400ea132a7688e7294c6c59",
+    "evals/independent/answers/eval_008.json": "8d0356d78f917016c287ac3deafe83065daabf25ad06340525cfa23bf7cb5cab",
+    "fixtures/incident_independent/eval_009.json": "37b24f6f68ac86f51557cdc5eb90bc674f45ef18e088da48f75320b2da44cd2c",
+    "evals/independent/answers/eval_009.json": "8e54640e49d6705dcdf2ed0c566f6fb53d7ce4f396e678e2d5fa7adddf13e0bd",
+    "fixtures/incident_independent/eval_010.json": "8db9fd381dbc020f27846705e067d432569a878b1e1e9c44adfb9004503204a4",
+    "evals/independent/answers/eval_010.json": "c346c0a85841f305e8d12bf9938571a170c2de97258eaf1a5a771d1ed49de99b"
+  }
+}

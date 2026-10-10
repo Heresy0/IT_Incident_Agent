@@ -1,0 +1,130 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_001",
+    "title": "独立工单 001",
+    "symptoms": "测试环境结算请求从10:04起大量超时，其他页面仍可使用。",
+    "scope": {
+      "service": "billing-edge",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.94,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "upstream_connect_failures-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "upstream_connect_failures",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "upstream_connect_failures-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "upstream_connect_failures",
+      "value": 28,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "DNS_LOOKUP_FAILED",
+      "message": "10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。"
+    },
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-2",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "PROCESS_READY",
+      "message": "进程存活，事件循环正常；不能据此认定结算接口健康。"
+    }
+  ],
+  "changes": [],
+  "owners": [
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "billing-edge"
+      ],
+      "team": "Synthetic Ops 01",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "billing-edge",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "测试环境结算请求从10:04起大量超时，其他页面仍可使用。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

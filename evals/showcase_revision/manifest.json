@@ -1,0 +1,22 @@
+{
+  "dataset_version": "curated-showcase-ticket-revision-v2",
+  "cases": [
+    "show_101"
+  ],
+  "splits": {
+    "development": [
+      "show_101"
+    ],
+    "holdout": []
+  },
+  "synthetic": true,
+  "curated_for_multi_agent_demonstration": true,
+  "revision_of": "show_001",
+  "informed_by": "output/showcase-live-first/3144422c-c3db-4e9b-905e-f4a23608338a",
+  "changes": [
+    "工单增加用户提供、尚需核对的具体错误码；两个链路相同",
+    "业务目标限定为只读机制诊断及下一步；不要求写操作方案",
+    "当前快照观测和历史语义不变，仅更新版本和检索文本"
+  ],
+  "interpretation": "经前一批反馈修订的开发展示，不能作为独立测试；这是本轮最后一对付费运行。"
+}

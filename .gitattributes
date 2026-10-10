@@ -3,3 +3,13 @@
 /archive/research/** text eol=crlf
 /archive/research/app/mult_agents/incident/__init__.py text eol=lf
 /archive/research/scripts/cleanup_runs.py text eol=lf
+
+# Frozen evaluation hashes and saved provenance bind the exact JSON bytes.
+/evals/independent/**/*.json -text
+/evals/targeted/**/*.json -text
+/evals/showcase_live/**/*.json -text
+/evals/showcase_revision/**/*.json -text
+/fixtures/incident_independent/**/*.json -text
+/fixtures/incident_targeted/**/*.json -text
+/fixtures/incident_showcase_live/**/*.json -text
+/fixtures/incident_showcase_revision/**/*.json -text

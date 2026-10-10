@@ -1,0 +1,123 @@
+{
+  "reviewer_kind": "assistant",
+  "reviewer": "Codex",
+  "reviewed_on": "2026-10-10",
+  "human_review_status": "pending",
+  "rubric": "supported是当前来源支持的所列观测；qualified是有证据的候选机制或有条件方向；insufficient是依据或处置条件不足。助手分析不进入正式人工评分。",
+  "runs": [
+    {
+      "run_id": "07facafa-8155-4f17-8f71-2aefa74322db",
+      "report_sha256": "f29982a30193c4d4b1126f63b96eaba0744e39ce4ba8e5632eefee90d146f917",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overall": "取证4/4，池饱和候选有依据；扩容审批标记为false、容量可承受的判断无来源支持，没有独立复核。",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F2",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F3",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F4",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F5",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "H1",
+          "verdict": "qualified",
+          "reason": "当前池使用率、等待和连接获取日志支持池饱和近端机制；未排除连接持有过久、泄漏等其他触发原因。"
+        },
+        {
+          "target_id": "A1",
+          "verdict": "insufficient",
+          "reason": "建议直接扩容且requires_approval=false；没有核查数据库连接总容量，却声称新增资源消耗应在当前基础设施限制内可承受。现有观测不支持这个容量判断。"
+        }
+      ],
+      "action_requires_approval": false,
+      "action_capacity_check_complete": false
+    },
+    {
+      "run_id": "c7c92e86-ac7e-414c-bc5b-26e5f22ab74f",
+      "report_sha256": "c519e7235690d43cd2349158bd89165440fda03dca4cab14cff6a4bbe1177bc9",
+      "cause_direction_matches_case": true,
+      "complete_diagnosis_supported": false,
+      "overall": "关键指标改为批量查询，Reviewer自主请求db_cpu补查并完成修订和二次复核；取证3/4、审批标记true，内部通过仍不代表容量或完整原因已确认。",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F2",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F3",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F4",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "F5",
+          "verdict": "supported",
+          "reason": "所列事实由当前来源的原始字段支持，不能推广为整个窗口连续状态。"
+        },
+        {
+          "target_id": "H1",
+          "verdict": "qualified",
+          "reason": "变更和pool_usage/pool_wait支持池压力与延迟关联；仅正常CPU不能排除所有数据库瓶颈，缺少连接获取超时日志，不能唯一归因于池最大值设置。"
+        },
+        {
+          "target_id": "A1",
+          "verdict": "qualified",
+          "reason": "检查配置并考虑调整是有依据的人工核查方向且需要批准；条件称负载超过池最大值，未交代并发连接需求，不能直接把requests/s与连接数比较。执行调整前仍缺数据库总容量等适用性核验。"
+        }
+      ],
+      "action_requires_approval": true,
+      "action_capacity_check_complete": false,
+      "verified_live_behaviors": [
+        "expected_value在调度和叶子目标中传递",
+        "批量取得pool_usage/pool_wait/request_latency",
+        "H1具体补查db_cpu、实际执行、修订并二次复核"
+      ],
+      "not_triggered_in_this_pair": {
+        "action_target_rework": true,
+        "review_follow_up_correction": true,
+        "query_reused": true,
+        "task_reused": true
+      },
+      "model_role_counts": {
+        "supervisor": 3,
+        "investigation": 5,
+        "diagnosis": 2,
+        "reviewer": 2
+      },
+      "remaining_issues": [
+        "未查询resource日志及POOL_ACQUIRE_TIMEOUT",
+        "A1适用条件和容量判断仍不完整",
+        "最终H1反证为空，已取得的正常CPU未放入counter_refs"
+      ]
+    }
+  ]
+}

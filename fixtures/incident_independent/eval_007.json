@@ -1,0 +1,131 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_007",
+    "title": "独立工单 007",
+    "symptoms": "部分租户搜索间歇失败，平均错误率看起来较低。",
+    "scope": {
+      "service": "search-facade",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.03,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "rate_limit_rejections-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "rate_limit_rejections",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "rate_limit_rejections-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "rate_limit_rejections",
+      "value": 42,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "dependency",
+      "level": "WARN",
+      "error_code": "TENANT_LIMIT_REACHED",
+      "message": "10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-01T10:03:00+00:00",
+      "category": "configuration",
+      "version": "3.1.0",
+      "summary": "测试租户组每分钟额度由200调整为20；其他组额度不变。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "search-facade"
+      ],
+      "team": "Synthetic Ops 07",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "search-facade",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "部分租户搜索间歇失败，平均错误率看起来较低。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

@@ -85,11 +85,13 @@ class RetestPathModel(PoolModel):
 
 
 class IncidentRepairTests(unittest.TestCase):
-    def test_actual_single_retest_path_now_finishes_without_raising_input_budget(self):
+    def test_actual_single_retest_path_collects_within_budget_but_missing_action_is_partial(self):
         model = RetestPathModel()
         result = single_agent(model, FixtureProvider('case_003',P), P, limits=Limits(model_calls=16,tool_calls=8,
             reserve_model_calls=3,reserve_seconds=20))
-        self.assertEqual(result['status'],'completed')
+        self.assertEqual(result['status'],'partial')
+        self.assertEqual(result['run_summary']['termination_reason'], 'DIAGNOSIS_INCOMPLETE')
+        self.assertEqual(result['output']['recommended_actions'], [])
         self.assertEqual(result['run_summary']['model_calls'],3)
         self.assertEqual(result['run_summary']['tool_calls'],5)
         self.assertLess(max(sum(len(str(m.content)) for m in history) for history in model.history),28000)
@@ -197,20 +199,23 @@ class IncidentRepairTests(unittest.TestCase):
             ex.execute('get_service_logs',{**window(ex),'category':category})
             ex.execute('get_service_logs',{**window(ex),'category':category,'level':'ERROR'})
             self.assertFalse(ex.log_gaps)
-            self.assertEqual(ex.context.counts['tool_calls'],2)
+            expected_reads = 1 if category == 'configuration' else 2
+            self.assertEqual(ex.context.counts['tool_calls'],expected_reads)
             duplicate=ex.execute('get_service_logs',{**window(ex),'category':category})
             self.assertEqual(duplicate.error.code,'DUPLICATE_TOOL')
-            self.assertEqual(ex.context.counts['tool_calls'],2)
+            self.assertEqual(ex.context.counts['tool_calls'],expected_reads)
         ex=executor('case_003')
         ex.execute('get_service_logs',{**window(ex),'category':'configuration',
             'start':(ex.scope.start+timedelta(minutes=1)).isoformat()})
         ex.execute('get_service_logs',{**window(ex),'category':'configuration','level':'ERROR'})
         self.assertTrue(ex.log_gaps)  # A narrower earlier query cannot cover the whole window.
 
-    def test_error_empty_feedback_can_observe_warn_and_info_then_finish(self):
+    def test_error_empty_feedback_observes_controls_but_missing_action_is_partial(self):
         model=RetestPathModel(error_only=True)
         result=single_agent(model,FixtureProvider('case_003',P),P)
-        self.assertEqual(result['status'],'completed')
+        self.assertEqual(result['status'],'partial')
+        self.assertEqual(result['run_summary']['termination_reason'], 'DIAGNOSIS_INCOMPLETE')
+        self.assertEqual(result['output']['recommended_actions'], [])
         self.assertEqual(result['coverage_gaps'],[])
         self.assertEqual(result['run_summary']['model_calls'],4)
         self.assertEqual(result['run_summary']['tool_calls'],3)
@@ -284,11 +289,13 @@ class IncidentRepairTests(unittest.TestCase):
             self.assertIn(e.observed_from.isoformat(), draft.findings[1].statement)
         self.assertNotIn('normal', draft.findings[1].statement)
 
-    def test_missing_cpu_feedback_can_collect_control_within_same_budget(self):
+    def test_missing_cpu_feedback_collects_control_without_promoting_incomplete_diagnosis(self):
         model = PoolModel(True)
         result = single_agent(model, FixtureProvider('case_003', P), P, limits=Limits(model_calls=8, tool_calls=3,
             reserve_model_calls=3, reserve_seconds=20))
-        self.assertEqual(result['status'], 'completed')
+        self.assertEqual(result['status'], 'partial')
+        self.assertEqual(result['run_summary']['termination_reason'], 'DIAGNOSIS_INCOMPLETE')
+        self.assertEqual(result['output']['recommended_actions'], [])
         self.assertEqual(result['coverage_gaps'], [])
         self.assertEqual(result['run_summary']['model_calls'], 4)
         self.assertEqual(result['run_summary']['tool_calls'], 2)

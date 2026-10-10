@@ -5,6 +5,7 @@ from agents.contracts import Hypothesis, DiagnosisDraft
 from agents.investigation import resolve_output, validate_output
 from evidence.ownership import resolve_owner
 from evidence.model_view import evidence_view
+from runtime.context import ExecutionError
 
 
 class ProtocolError(ValueError):
@@ -54,7 +55,32 @@ def expand_diagnosis(selection, registry):
     for index, finding in enumerate(selection.findings):
         validate_selected_refs(finding.refs, registry, f'findings.{index}.refs', allowed_ids)
     capabilities = getattr(getattr(registry, 'provider', None), 'repair_capabilities', [])
+    actions = []
     for action in selection.recommended_actions:
+        if action.kind == 'read_only_check':
+            if action.repair is not None or not action.checks:
+                raise ProtocolError('READ_ONLY_ACTION_INVALID')
+            checks = []
+            for check in action.checks:
+                # Use the same registered tools and scope checks as actual execution.
+                executors = getattr(registry, 'executors', None)
+                executor = (executors['knowledge'] if check.tool in {'search_runbooks', 'search_incidents'}
+                            else executors['investigation']) if executors else registry
+                try:
+                    args = executor.validate_args(check.tool, check.args)
+                except ExecutionError as exc:
+                    raise ProtocolError('READ_ONLY_ACTION_INVALID', [{'code': exc.code,
+                        'instruction': '核查建议必须使用登记工具并遵守角色及工单范围。'}]) from None
+                checks.append(check.model_copy(update={'args': args.model_dump(mode='json')}))
+            action = action.model_copy(update={'checks': checks})
+        elif action.checks:
+            raise ProtocolError('ACTION_KIND_MISMATCH')
+        if action.kind in {'manual_change', 'registered_repair'} and not action.requires_approval:
+            raise ProtocolError('CHANGE_APPROVAL_REQUIRED')
+        if action.kind == 'manual_change' and action.repair is not None:
+            raise ProtocolError('ACTION_KIND_MISMATCH')
+        if action.kind == 'registered_repair' and action.repair is None:
+            raise ProtocolError('REPAIR_CAPABILITY_DENIED')
         if action.repair is not None:
             intent = action.repair
             capability = next((item for item in capabilities if item['action'] == intent.action
@@ -67,10 +93,13 @@ def expand_diagnosis(selection, registry):
             if (intent.action == 'scale_service' and intent.parameters['replicas'] > capability['max_replicas']
                     or intent.action == 'rollback_release' and intent.parameters['version'] not in capability['versions']):
                 raise ProtocolError('REPAIR_PARAMETERS_DENIED')
+            action = action.model_copy(update={'kind': 'registered_repair'})
+        actions.append(action)
     facts, _ = resolve_output(json.dumps({"findings": [f.model_dump() for f in selection.findings]}), registry)
     hypotheses = [Hypothesis(hypothesis_id=f"H{n}", cause=h.cause,
         support_refs=expand_refs(h.support_refs, registry, f'hypotheses.{n - 1}.support_refs', allowed_ids=allowed_ids),
         counter_refs=expand_refs(h.counter_refs, registry, f'hypotheses.{n - 1}.counter_refs', allowed_ids=allowed_ids),
-        pending_checks=list(h.pending_checks)) for n, h in enumerate(selection.hypotheses, 1)]
-    return DiagnosisDraft(findings=facts.findings, hypotheses=hypotheses, recommended_actions=selection.recommended_actions,
+        pending_checks=list(h.pending_checks), level=h.level,
+        evidence_explanation=h.evidence_explanation) for n, h in enumerate(selection.hypotheses, 1)]
+    return DiagnosisDraft(findings=facts.findings, hypotheses=hypotheses, recommended_actions=actions,
                           missing_information=selection.missing_information, escalation_team=resolve_owner(selection.escalation_ref, registry))

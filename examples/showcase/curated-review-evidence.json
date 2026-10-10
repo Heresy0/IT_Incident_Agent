@@ -1,0 +1,85 @@
+{
+  "case_id": "show_101",
+  "run_id": "71ffae20-ea2c-4c56-9ee2-dba123f53434",
+  "report_sha256": "2c7493e3b360ec3c2c1949fe95fd0b0fad67f0bc7dd33ecd90fc23f8cf2d7914",
+  "execution_mode": "live",
+  "source_kind": "synthetic_observations",
+  "initial_hypothesis": {
+    "hypothesis_id": "H1",
+    "cause": "HTTP400 错误可能是由于 recipient_id 字段在配置中缺失或格式错误导致的。",
+    "support_refs": [
+      {
+        "evidence_id": "EV_eee7a79367a6794047e7d232",
+        "field_path": "summary",
+        "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+        "unit": "",
+        "observed_at": "2026-10-11T10:02:00Z",
+        "data_version": "curated-showcase-ticket-revision-v2",
+        "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+      }
+    ],
+    "counter_refs": [],
+    "pending_checks": [
+      "get_service_logs"
+    ],
+    "status": "tentative",
+    "level": "mechanism",
+    "evidence_explanation": "配置变更可能引入了不兼容的字段格式，导致推送失败。"
+  },
+  "hypothesis_assessment": {
+    "target_id": "H1",
+    "verdict": "uncertain",
+    "reason": "配置变更可能引入了不兼容的字段格式，但未找到 HTTP400 错误记录以直接支持该假设。",
+    "evidence_ids": []
+  },
+  "published_hypothesis": {
+    "hypothesis_id": "H1",
+    "cause": "HTTP400 错误可能是由于 recipient_id 字段在配置中缺失或格式错误导致的。",
+    "support_refs": [
+      {
+        "evidence_id": "EV_eee7a79367a6794047e7d232",
+        "field_path": "summary",
+        "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+        "unit": "",
+        "observed_at": "2026-10-11T10:02:00Z",
+        "data_version": "curated-showcase-ticket-revision-v2",
+        "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+      }
+    ],
+    "counter_refs": [],
+    "pending_checks": [
+      "get_service_logs"
+    ],
+    "status": "unresolved",
+    "level": "mechanism",
+    "evidence_explanation": "配置变更可能引入了不兼容的字段格式，导致推送失败。"
+  },
+  "pending_actions": [
+    {
+      "action": "核查服务日志，确认是否存在与 HTTP400 错误相关的记录。",
+      "condition": "当前观测未找到 HTTP400 错误记录，需进一步验证。",
+      "expected_result": "确认是否因配置变更导致的字段格式问题。",
+      "risk": "日志查询可能无法直接定位原因，但可提供关键线索。",
+      "requires_approval": true,
+      "kind": "read_only_check",
+      "checks": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": "UNKNOWN_FIELD"
+          }
+        }
+      ],
+      "repair": null,
+      "target_id": "A1",
+      "review_verdict": "uncertain",
+      "review_reason": "建议核查服务日志以确认是否存在 HTTP400 错误，但当前查询未发现相关记录。",
+      "executable": false
+    }
+  ],
+  "claim": "Reviewer真实拒绝为不充分候选背书；不是正确诊断或总体优势成绩。"
+}

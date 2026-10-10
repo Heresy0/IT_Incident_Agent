@@ -1,0 +1,826 @@
+{
+  "date": "2026-10-10",
+  "analysis_scope": "curated_development_showcase_real_models_synthetic_IT",
+  "model": "qwen-turbo",
+  "batches": [
+    {
+      "suite": "showcase_live",
+      "directory": "output/showcase-live-first/3144422c-c3db-4e9b-905e-f4a23608338a",
+      "bundle_sha256": "08b3ae73819cbd84f0a90246a7f3884a0e54af9f86bf41e3c5ed3c85e91b8b41",
+      "configuration": {
+        "cases": [
+          "show_001",
+          "show_002"
+        ],
+        "split": "development",
+        "release_holdout": false,
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "model": "qwen-turbo",
+        "execution_mode": "live",
+        "model_settings": {
+          "temperature": 0,
+          "max_tokens": 2200,
+          "max_retries": 1,
+          "request_timeout": 30
+        }
+      },
+      "provenance": {
+        "implementation_sha256_prefix": "ba7f01ad1e477d7d",
+        "git_commit": "53da172c864a94dcea972a080d035dd7920ad4d2",
+        "working_tree_dirty": true,
+        "dataset_version": "curated-showcase-v1",
+        "dataset_freeze_sha256": "e409b451b2ca8bfc91c8b136a8903ae264b342e7260fa286c5730f89ebbfd22b",
+        "fixture_sha256": {
+          "show_001": "30caaa99d25d7cba5c46511908ede523365c3f53cb45a0d84a834413831d205c",
+          "show_002": "803eb421153db5fced9b2f4344400e148c53b6fd2ab00a787967eca92203aba2"
+        },
+        "evaluation_code_sha256": {
+          "scripts/compare_incident.py": "28cfc6e6e731b50a8c7794a55718559840e54956e304fba575efcf778460bce0",
+          "scripts/compare_independent.py": "dbee2aedd38c46534325bf107abedc1fd77c3079863ea175b610eafc16ce5fe3",
+          "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+          "evals/independent/control.py": "4a5628ccd88d36069df4d0f80c4112a0ab82d545536714ecf4e2bdad561b6ee2",
+          "evals/independent/suite.py": "6d2ef90d7a5a9df3e9e0fcb65fa3e49dd313e326f78a0efd0f0154f9a48998e2",
+          "evals/independent/scoring.py": "52ec17db9d699c945086bd459ee933473192c0d9e111c3733aa4b5ec667da08e",
+          "evals/incident/comparison.py": "ea630c569b5a382aabf1f3fbed8ae399f46973b9b18559371792f1dec0b75169",
+          "evals/incident/acceptance.py": "88609f49bf6395a0156bcbb362037fa22fa26518b9fb0cc45335dbe8873d69a2",
+          "scripts/compare_showcase_live.py": "237bbeb411716caed426d40d42e19fe9d76b4649085672e34164ff646586ce02",
+          "evals/showcase_live/provider.py": "a4ebc932fc8e4f2cd1083c8d4ab1754c1d5868a73d2bd89e51baf71042cd55b0",
+          "evals/showcase_live/suite.py": "2a50d6e9ceb83dae1ef6e5b5756f99a770b0ae524e890fb3c8560576920ed2d2",
+          "evals/showcase_live/scoring.py": "cd8de52e5f925d0b7a1abe5b89ccc435b7649ed4c1fc8dc23aa92bda7386ce5b"
+        }
+      }
+    },
+    {
+      "suite": "showcase_revision",
+      "directory": "output/showcase-live-revision/6ecf8485-a3cb-40ed-9d61-74311aec157a",
+      "bundle_sha256": "907df45b28259532c127f8493d0577300de91923164b2c3159126b98f9c9d707",
+      "configuration": {
+        "cases": [
+          "show_101"
+        ],
+        "split": "development",
+        "release_holdout": false,
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "model": "qwen-turbo",
+        "execution_mode": "live",
+        "model_settings": {
+          "temperature": 0,
+          "max_tokens": 2200,
+          "max_retries": 1,
+          "request_timeout": 30
+        }
+      },
+      "provenance": {
+        "implementation_sha256_prefix": "ba7f01ad1e477d7d",
+        "git_commit": "53da172c864a94dcea972a080d035dd7920ad4d2",
+        "working_tree_dirty": true,
+        "dataset_version": "curated-showcase-ticket-revision-v2",
+        "dataset_freeze_sha256": "bd5c49db5be908b6994e111d8320cbf743450f22250b7a7a8d7011fd38f02a92",
+        "fixture_sha256": {
+          "show_101": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76"
+        },
+        "evaluation_code_sha256": {
+          "scripts/compare_incident.py": "28cfc6e6e731b50a8c7794a55718559840e54956e304fba575efcf778460bce0",
+          "scripts/compare_independent.py": "dbee2aedd38c46534325bf107abedc1fd77c3079863ea175b610eafc16ce5fe3",
+          "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+          "evals/independent/control.py": "4a5628ccd88d36069df4d0f80c4112a0ab82d545536714ecf4e2bdad561b6ee2",
+          "evals/independent/suite.py": "6d2ef90d7a5a9df3e9e0fcb65fa3e49dd313e326f78a0efd0f0154f9a48998e2",
+          "evals/independent/scoring.py": "52ec17db9d699c945086bd459ee933473192c0d9e111c3733aa4b5ec667da08e",
+          "evals/incident/comparison.py": "ea630c569b5a382aabf1f3fbed8ae399f46973b9b18559371792f1dec0b75169",
+          "evals/incident/acceptance.py": "88609f49bf6395a0156bcbb362037fa22fa26518b9fb0cc45335dbe8873d69a2",
+          "scripts/compare_showcase_revision.py": "201d63116c737d45d91c7f24a6dd010a02b930fc2dd57148978585cdba0b1c29",
+          "evals/showcase_revision/provider.py": "9f761145eea21e6b710d98d78f63785c8b7188bde93e41b878fab5edb3f080c3",
+          "evals/showcase_revision/suite.py": "d8d86425a968c57387c564d2ed5ce9d33b710b67a7cf6d52c5b1ed82b3ba426e",
+          "evals/showcase_revision/scoring.py": "c75c34372f469487a55e03a09b1371042ac37af73c8258bf39de779b8f390085"
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "case_id": "show_001",
+      "run_id": "64f65f5f-4efe-40e2-ba04-acb1a79b3fa8",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "cpu_utilization",
+            "delivery_error_rate",
+            "queue_depth",
+            "workers_active"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "resource",
+            "level": null
+          },
+          "returned_fields": [
+            "resource"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": null
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 4,
+      "tool_calls": 3,
+      "duration_ms": 11953,
+      "token_usage": {
+        "input_tokens": 21175,
+        "output_tokens": 745,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "44a628fc540660c37ddb1b11027fcd0e7abf7e1d558845a290be988672acbe27",
+      "model_role_calls": {
+        "single": 4
+      },
+      "observed_sources": [
+        "get_service_metrics/cpu_utilization-after",
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_service_metrics/workers_active-after",
+        "get_service_logs/res-1",
+        "get_recent_changes/change-1"
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "pending_actions": [],
+      "draft_count": 1,
+      "review_count": 0,
+      "validation_failures": []
+    },
+    {
+      "case_id": "show_001",
+      "run_id": "8e98f7a5-8335-4729-8356-2a70082caa65",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "cpu_utilization",
+            "delivery_error_rate",
+            "queue_depth",
+            "workers_active"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "resource",
+            "level": "ERROR"
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "resource",
+            "level": null
+          },
+          "returned_fields": [
+            "resource"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 1,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 13,
+      "tool_calls": 3,
+      "duration_ms": 55609,
+      "token_usage": {
+        "input_tokens": 73004,
+        "output_tokens": 5147,
+        "known_calls": 13,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "f0a927450e25f9582de202b6e090bfc7662d1edcf94a14575c6eb7fdf407022a",
+      "model_role_calls": {
+        "supervisor": 3,
+        "investigation": 7,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "observed_sources": [
+        "get_service_metrics/cpu_utilization-after",
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_service_metrics/workers_active-after",
+        "get_service_logs/res-1"
+      ],
+      "hypotheses": [
+        {
+          "cause": "资源分配不足或配置异常可能导致了 worker 的拒绝响应和队列积压。",
+          "status": "tentative",
+          "support_evidence_ids": [
+            "EV_a218352686b8112393a8ff2f",
+            "EV_f64328de06aa9f4e109c2412"
+          ]
+        },
+        {
+          "cause": "依赖服务故障或网络问题可能影响了服务的正常运行。",
+          "status": "tentative",
+          "support_evidence_ids": []
+        }
+      ],
+      "actions": [],
+      "pending_actions": [
+        {
+          "action": "检查依赖服务状态及网络连接，确认是否存在异常。",
+          "review_verdict": "not_performed",
+          "executable": false
+        },
+        {
+          "action": "核查服务配置及资源分配策略，确认是否存在异常。",
+          "review_verdict": "not_performed",
+          "executable": false
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 0,
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REQUIRED_EVIDENCE_NEED",
+          "details": []
+        },
+        {
+          "role": "reviewer",
+          "reason": "invalid_json",
+          "details": [
+            {
+              "path": "",
+              "type": "json_invalid"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "show_002",
+      "run_id": "2f17be92-767e-47b9-a29e-0d883c2e0546",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T10:00:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "metrics": [
+              "dependency_latency_ms",
+              "export_error_rate",
+              "health_probe_success"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "dependency_latency_ms",
+            "export_error_rate",
+            "health_probe_success"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T10:00:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR"
+          },
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 10,
+      "tool_calls": 2,
+      "duration_ms": 34969,
+      "token_usage": {
+        "input_tokens": 48409,
+        "output_tokens": 3016,
+        "known_calls": 10,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "fb07e896cd393a81e50a79c33bcbfc9e73f1461f950de1dfd0af2dd4e2d22f87",
+      "model_role_calls": {
+        "supervisor": 2,
+        "investigation": 6,
+        "diagnosis": 2
+      },
+      "observed_sources": [
+        "get_service_metrics/dependency_latency_ms-after",
+        "get_service_metrics/export_error_rate-after",
+        "get_service_metrics/health_probe_success-after",
+        "get_service_logs/write-1"
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "pending_actions": [],
+      "draft_count": 0,
+      "review_count": 0,
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "ACTION_KIND_MISMATCH",
+          "details": []
+        },
+        {
+          "role": "diagnosis",
+          "reason": "ACTION_KIND_MISMATCH",
+          "details": []
+        }
+      ]
+    },
+    {
+      "case_id": "show_002",
+      "run_id": "a644b3bf-19ea-4aef-af48-3414cc05e965",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T10:00:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "metrics": [
+              "dependency_latency_ms",
+              "export_error_rate",
+              "health_probe_success"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "dependency_latency_ms",
+            "export_error_rate",
+            "health_probe_success"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T10:00:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "dependency",
+            "level": null
+          },
+          "returned_fields": [
+            "dependency"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 3,
+      "tool_calls": 2,
+      "duration_ms": 7687,
+      "token_usage": {
+        "input_tokens": 15090,
+        "output_tokens": 573,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "e4099adc73f3840211683a0cedb555391fcb17feba70c0b48ec509cf27119084",
+      "model_role_calls": {
+        "single": 3
+      },
+      "observed_sources": [
+        "get_service_metrics/dependency_latency_ms-after",
+        "get_service_metrics/export_error_rate-after",
+        "get_service_metrics/health_probe_success-after",
+        "get_service_logs/health-1",
+        "get_service_logs/write-1"
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "pending_actions": [],
+      "draft_count": 1,
+      "review_count": 0,
+      "validation_failures": []
+    },
+    {
+      "case_id": "show_101",
+      "run_id": "830a998e-dfc2-4639-8751-9c12a97d16e0",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "completed",
+      "business_result": "diagnosis_available",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "cpu_utilization",
+            "delivery_error_rate",
+            "queue_depth",
+            "workers_active"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": null
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 4,
+      "tool_calls": 3,
+      "duration_ms": 13609,
+      "token_usage": {
+        "input_tokens": 21455,
+        "output_tokens": 986,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "FINISHED",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "89ab0c1b463902fd9f30f2b7668ca9841ed29a98766f45d885b88f705ee8744c",
+      "model_role_calls": {
+        "single": 4
+      },
+      "observed_sources": [
+        "get_service_metrics/cpu_utilization-after",
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_service_metrics/workers_active-after",
+        "get_service_logs/cfg-1",
+        "get_recent_changes/change-1"
+      ],
+      "hypotheses": [
+        {
+          "cause": "推送编码器版本不匹配导致HTTP400错误。",
+          "status": "tentative",
+          "support_evidence_ids": [
+            "EV_eee7a79367a6794047e7d232"
+          ]
+        }
+      ],
+      "actions": [
+        "检查接收端是否支持v2编码器。"
+      ],
+      "pending_actions": [],
+      "draft_count": 1,
+      "review_count": 0,
+      "validation_failures": []
+    },
+    {
+      "case_id": "show_101",
+      "run_id": "71ffae20-ea2c-4c56-9ee2-dba123f53434",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "needs_information",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "delivery_error_rate",
+            "queue_depth"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 1,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 13,
+      "tool_calls": 3,
+      "duration_ms": 41438,
+      "token_usage": {
+        "input_tokens": 66656,
+        "output_tokens": 3408,
+        "known_calls": 13,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "report_sha256": "2c7493e3b360ec3c2c1949fe95fd0b0fad67f0bc7dd33ecd90fc23f8cf2d7914",
+      "model_role_calls": {
+        "supervisor": 4,
+        "investigation": 7,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "observed_sources": [
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_recent_changes/change-1"
+      ],
+      "hypotheses": [
+        {
+          "cause": "HTTP400 错误可能是由于 recipient_id 字段在配置中缺失或格式错误导致的。",
+          "status": "unresolved",
+          "support_evidence_ids": [
+            "EV_eee7a79367a6794047e7d232"
+          ]
+        }
+      ],
+      "actions": [],
+      "pending_actions": [
+        {
+          "action": "核查服务日志，确认是否存在与 HTTP400 错误相关的记录。",
+          "review_verdict": "uncertain",
+          "executable": false
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 1,
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "paired_cases_including_revision": 3,
+    "runs": 6,
+    "model_calls": 47,
+    "tool_calls": 16,
+    "input_tokens": 245789,
+    "output_tokens": 13875,
+    "mechanical_checks_passed": 36,
+    "estimated_cost": null,
+    "real_IT_writes": 0,
+    "additional_runs_after_cap": 0
+  },
+  "formal_semantic_quality_status": "manual_review_pending",
+  "overall_multi_agent_advantage_proven": false,
+  "observed_multi_agent_benefit": "show_101 Reviewer 对缺乏业务错误日志支持的 H1 给 uncertain；发布为 unresolved，A1待确认且不可执行。",
+  "limitations": [
+    "有目的设计、经过一次工单修订，不是盲测或统计证明",
+    "三条multi均未调用Knowledge；本轮不证明历史经验专家的实际收益",
+    "只读建议的过度拒绝与重复补查被拒绝仍有局限；不得把每一次拒绝都当正确",
+    "单Agent候选也标tentative，没有宣称根因已确认；不能称它自信误诊",
+    "重复查询拒绝、权限和预算属于共享Harness，不是多Agent独有能力"
+  ],
+  "preserved_all_trials": true,
+  "credentials_or_raw_prompts_exported": false
+}

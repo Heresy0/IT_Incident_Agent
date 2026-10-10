@@ -1,0 +1,144 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_010",
+    "title": "独立工单 010",
+    "symptoms": "通知出现重复发送，队列积压；希望快速恢复且不要丢失通知。",
+    "scope": {
+      "service": "notification-relay",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "pending_messages-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "pending_messages",
+      "value": 1,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "pending_messages-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "pending_messages",
+      "value": 30,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "delivery_attempts-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "delivery_attempts",
+      "value": 4,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "delivery_attempts-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "delivery_attempts",
+      "value": 60,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "ack_failures-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "ack_failures",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "ack_failures-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "ack_failures",
+      "value": 22,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "dependency",
+      "level": "WARN",
+      "error_code": "ACK_TIMEOUT",
+      "message": "下游返回已接收后确认超时，投递方再次重试；未观测到收件人最终状态或幂等记录。"
+    }
+  ],
+  "changes": [],
+  "owners": [
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "notification-relay"
+      ],
+      "team": "Synthetic Ops 10",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "notification-relay",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "通知出现重复发送，队列积压；希望快速恢复且不要丢失通知。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

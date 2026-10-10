@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-10",
+  "issued_after_trials": true,
+  "case_id": "show_002",
+  "reason": "参考答案复制旧案例时保留了旧runner文字，当前展示快照已去除该观测。",
+  "correction": "评价健康探针与业务写路径差异、当前身份权限以及历史连接超时条件；不要求排除当前快照不存在的旧runner磁盘故障。",
+  "frozen_answer_preserved": true,
+  "model_inputs_changed": false,
+  "scores_changed": false,
+  "formal_semantic_scores": "manual_review_pending",
+  "usage": "人工审阅时同时阅读本说明；不回填成绩、不覆盖原答案。"
+}

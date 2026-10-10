@@ -1,0 +1,190 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_004",
+    "title": "合成工单 004",
+    "symptoms": "10:06后 catalog 同步任务持续失败；过去同步失败曾在清理内存并重启后恢复。",
+    "scope": {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "service_version": "5.1.0",
+      "start": "2026-10-14T09:50:00+00:00",
+      "end": "2026-10-14T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "sync_error_rate-before",
+      "timestamp": "2026-10-14T09:55:00+00:00",
+      "metric": "sync_error_rate",
+      "value": 0.02,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "sync_error_rate-after",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "metric": "sync_error_rate",
+      "value": 0.88,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "memory_utilization-before",
+      "timestamp": "2026-10-14T09:55:00+00:00",
+      "metric": "memory_utilization",
+      "value": 0.4,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "memory_utilization-after",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "metric": "memory_utilization",
+      "value": 0.41,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-before",
+      "timestamp": "2026-10-14T09:55:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-after",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dep-1",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "CACHE_ACL_DENIED",
+      "message": "执行catalog namespace的HSET返回NOPERM；同一身份GET允许；网络连接建立成功。"
+    },
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "ACL_PROFILE_SELECTED",
+      "message": "当前同步客户端选择profile=catalog-read；服务身份10:05更新后使用此profile。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-14T10:05:00+00:00",
+      "category": "configuration",
+      "version": "5.1.0",
+      "summary": "同步客户端权限profile更新；当前profile只包含读取命令。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "aliases": [
+        "catalog-sync"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "5.1.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:06后 catalog 同步任务持续失败；过去同步失败曾在清理内存并重启后恢复。 timeout queue error",
+      "text": "catalog同步分别核对内存、缓存返回码、命令授权与身份；重启不能替代权限检查。"
+    }
+  ],
+  "incidents": [
+    {
+      "service": "catalog-sync",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "history",
+      "timestamp": "2026-10-14T10:10:00+00:00",
+      "versions": [
+        "5.1.0"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-15T08:00:00+00:00",
+      "search_text": "10:06后 catalog 同步任务持续失败；过去同步失败曾在清理内存并重启后恢复。 timeout queue error",
+      "error_codes": [
+        "REQUEST_FAILED"
+      ],
+      "summary": "此前catalog同步进程RSS达到限制，收到OOM退出；恢复前同步身份具有HSET权限。",
+      "resolution": "清理泄漏并人工重启，验证RSS和同步成功率。"
+    }
+  ]
+}

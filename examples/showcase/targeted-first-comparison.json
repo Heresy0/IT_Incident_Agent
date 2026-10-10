@@ -1,0 +1,477 @@
+{
+  "scorer_version": "targeted-semantic-v1",
+  "configuration": {
+    "cases": [
+      "probe_001",
+      "probe_002"
+    ],
+    "split": "development",
+    "release_holdout": false,
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model": "qwen-turbo",
+    "execution_mode": "live",
+    "model_settings": {
+      "temperature": 0,
+      "max_tokens": 2200,
+      "max_retries": 1,
+      "request_timeout": 30
+    }
+  },
+  "provenance": {
+    "implementation_sha256_prefix": "11e895e2f331bf28",
+    "git_commit": "53da172c864a94dcea972a080d035dd7920ad4d2",
+    "working_tree_dirty": true,
+    "dataset_version": "targeted-synthetic-v1",
+    "dataset_freeze_sha256": "a007d431a832905e1403485173d4d371b35f5c724272bc16bca5eb53e0760130",
+    "fixture_sha256": {
+      "probe_001": "bf5990457f779ced68f04f1d0da6e5fcf5693bc095addb2358983f5f88aaa698",
+      "probe_002": "deff0acab534a1d3f894396084ebc6abb690c21849045b10652f0058a321584e"
+    },
+    "evaluation_code_sha256": {
+      "scripts/compare_incident.py": "28cfc6e6e731b50a8c7794a55718559840e54956e304fba575efcf778460bce0",
+      "scripts/compare_independent.py": "dbee2aedd38c46534325bf107abedc1fd77c3079863ea175b610eafc16ce5fe3",
+      "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+      "evals/independent/control.py": "4a5628ccd88d36069df4d0f80c4112a0ab82d545536714ecf4e2bdad561b6ee2",
+      "evals/independent/suite.py": "6d2ef90d7a5a9df3e9e0fcb65fa3e49dd313e326f78a0efd0f0154f9a48998e2",
+      "evals/independent/scoring.py": "52ec17db9d699c945086bd459ee933473192c0d9e111c3733aa4b5ec667da08e",
+      "evals/incident/comparison.py": "ea630c569b5a382aabf1f3fbed8ae399f46973b9b18559371792f1dec0b75169",
+      "evals/incident/acceptance.py": "88609f49bf6395a0156bcbb362037fa22fa26518b9fb0cc45335dbe8873d69a2",
+      "scripts/compare_targeted.py": "73eace0378617135d8e609a372b9d2e3fd6098daddf7f5c859f85ec4d4f39426",
+      "scripts/evaluate_targeted.py": "a703a858ee21f1a88d61f03f2ee269db9bb146463fe2e0316f6324b0ebb385db",
+      "evals/targeted/suite.py": "c229836b2210a06912414de32206bd3001f69355a9126a0d1860d463e4287526",
+      "evals/targeted/provider.py": "0df0d2829c6adeeb43367717cb2a4566753ea99478b986c394ca25443c7e79c3",
+      "evals/targeted/scoring.py": "0acb29bb719619118e2ac33884fb4399f1d36ecb4a75270d8dba1b097eb9cdcc"
+    }
+  },
+  "quality_status": "manual_review_pending",
+  "workflows": {
+    "single": {
+      "runs": 2,
+      "reviewed_runs": 0,
+      "semantic_success_rate_reviewed": null,
+      "dimension_means_reviewed": {
+        "outcome": null,
+        "evidence_reasoning": null,
+        "uncertainty": null,
+        "actions": null,
+        "handoff": null
+      },
+      "model_calls_total": 6,
+      "tool_calls_total": 4,
+      "duration_ms_mean": 9273.0,
+      "failed_runs": 0,
+      "partial_runs": 2,
+      "estimated_cost": null
+    },
+    "multi": {
+      "runs": 2,
+      "reviewed_runs": 0,
+      "semantic_success_rate_reviewed": null,
+      "dimension_means_reviewed": {
+        "outcome": null,
+        "evidence_reasoning": null,
+        "uncertainty": null,
+        "actions": null,
+        "handoff": null
+      },
+      "model_calls_total": 16,
+      "tool_calls_total": 7,
+      "duration_ms_mean": 34046.5,
+      "failed_runs": 0,
+      "partial_runs": 2,
+      "estimated_cost": null
+    }
+  },
+  "paired_outcomes": [
+    {
+      "case_id": "probe_001",
+      "single_success": null,
+      "multi_success": null,
+      "quality_difference": null,
+      "case_group": "targeted",
+      "family": "history",
+      "capability_differences": null
+    },
+    {
+      "case_id": "probe_002",
+      "single_success": null,
+      "multi_success": null,
+      "quality_difference": null,
+      "case_group": "targeted",
+      "family": "conflict",
+      "capability_differences": null
+    }
+  ],
+  "runs": [
+    {
+      "case_id": "probe_001",
+      "run_id": "ca07ff36-b409-4997-811f-65e0f816c3bc",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T09:50:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "cpu_utilization",
+            "delivery_error_rate",
+            "queue_depth",
+            "workers_active"
+          ],
+          "truncated": true
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T09:50:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "resource",
+            "level": null
+          },
+          "returned_fields": [
+            "resource"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T09:50:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": null
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 1,
+      "rework_rounds": 0,
+      "model_calls": 4,
+      "tool_calls": 3,
+      "duration_ms": 12687,
+      "token_usage": {
+        "input_tokens": 22144,
+        "output_tokens": 921,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "case_group": "targeted",
+      "family": "history",
+      "capability_assessments": null
+    },
+    {
+      "case_id": "probe_001",
+      "run_id": "a323d46c-7227-4e46-8810-eb4cf5ed97af",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T09:50:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "delivery_error_rate",
+            "queue_depth"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T09:50:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "scaling"
+          },
+          "returned_fields": [],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 1,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 7,
+      "tool_calls": 2,
+      "duration_ms": 28406,
+      "token_usage": {
+        "input_tokens": 34178,
+        "output_tokens": 2612,
+        "known_calls": 7,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "case_group": "targeted",
+      "family": "history",
+      "capability_assessments": null
+    },
+    {
+      "case_id": "probe_002",
+      "run_id": "14d7a58a-e14f-4531-a0dc-ab8612d8f236",
+      "workflow": "multi",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "metrics": [
+              "export_error_rate",
+              "health_probe_success"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "export_error_rate",
+            "health_probe_success"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "configuration",
+            "level": "ERROR"
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "configuration",
+            "level": null
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "resource",
+            "level": "WARN"
+          },
+          "returned_fields": [],
+          "truncated": false
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "category": "configuration"
+          },
+          "returned_fields": [
+            "configuration"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 2,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 9,
+      "tool_calls": 5,
+      "duration_ms": 39687,
+      "token_usage": {
+        "input_tokens": 50539,
+        "output_tokens": 3560,
+        "known_calls": 9,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "case_group": "targeted",
+      "family": "conflict",
+      "capability_assessments": null
+    },
+    {
+      "case_id": "probe_002",
+      "run_id": "77c001c0-b0dd-4698-a8be-483e97cd7470",
+      "workflow": "single",
+      "execution_mode": "live",
+      "status": "partial",
+      "business_result": "needs_information",
+      "review_status": "not_performed",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "observed_path": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:20:00Z",
+            "metrics": [
+              "dependency_latency_ms",
+              "export_error_rate",
+              "health_probe_success"
+            ],
+            "granularity": "1m"
+          },
+          "returned_fields": [
+            "dependency_latency_ms",
+            "export_error_rate",
+            "health_probe_success"
+          ],
+          "truncated": false
+        }
+      ],
+      "invalid_tool_results": 0,
+      "empty_queries": 0,
+      "truncated_queries": 0,
+      "rework_rounds": 0,
+      "model_calls": 2,
+      "tool_calls": 1,
+      "duration_ms": 5859,
+      "token_usage": {
+        "input_tokens": 9796,
+        "output_tokens": 428,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "estimated_cost": null,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "semantic_review": "pending",
+      "semantic_scores": null,
+      "semantic_success": null,
+      "case_group": "targeted",
+      "family": "conflict",
+      "capability_assessments": null
+    }
+  ],
+  "note": "专项压力集与普通对照分别报告；不保证多Agent胜出，不代表普遍准确率。共享程序门禁不计独有收益。",
+  "case_groups": {
+    "targeted": {
+      "pairs": 2,
+      "reviewed_pairs": 0,
+      "multi_wins": 0,
+      "ties": 0,
+      "single_wins": 0,
+      "mean_quality_difference": null
+    },
+    "control": {
+      "pairs": 0,
+      "reviewed_pairs": 0,
+      "multi_wins": 0,
+      "ties": 0,
+      "single_wins": 0,
+      "mean_quality_difference": null
+    }
+  },
+  "advantage_signal": {
+    "status": "manual_review_pending",
+    "eligible_families": [
+      "conflict",
+      "history"
+    ],
+    "qualifying_families": [],
+    "threshold_met": null,
+    "meaning": "至少两个专项类别出现总分差>=2、结论不退步且多Agent语义通过；仅为本批小样本信号。"
+  }
+}

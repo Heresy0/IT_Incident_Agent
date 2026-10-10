@@ -1,0 +1,145 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_002",
+    "title": "独立工单 002",
+    "symptoms": "新版本上线后登录返回401，用户怀疑认证依赖不可用。",
+    "scope": {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "service_version": "2.7.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.02,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.72,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0.0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0.0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "configuration",
+      "level": "ERROR",
+      "error_code": "AUDIENCE_REJECTED",
+      "message": "认证依赖拒绝audience=portal-preview，期望audience=portal-stage。"
+    },
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-2",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "AUTH_REACHABLE",
+      "message": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-01T10:02:00+00:00",
+      "category": "deployment",
+      "version": "2.7.0",
+      "summary": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+      "config_summary": {
+        "auth_audience": "portal-preview"
+      }
+    }
+  ],
+  "owners": [
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "identity-gateway"
+      ],
+      "team": "Synthetic Ops 02",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "identity-gateway",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "2.7.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "新版本上线后登录返回401，用户怀疑认证依赖不可用。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

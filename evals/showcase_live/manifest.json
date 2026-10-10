@@ -1,0 +1,33 @@
+{
+  "dataset_version": "curated-showcase-v1",
+  "cases": [
+    "show_001",
+    "show_002"
+  ],
+  "splits": {
+    "development": [
+      "show_001",
+      "show_002"
+    ],
+    "holdout": []
+  },
+  "synthetic": true,
+  "curated_for_multi_agent_demonstration": true,
+  "based_on": "targeted-synthetic-v1 probe_001/probe_002; neither original data nor original results replaced",
+  "changes_before_trials": [
+    "明确业务问题和实际可查监控项，两个链路相同",
+    "只保留当前故障采样，缩短窗口，减少上下文噪声",
+    "移除第二例无关旧磁盘日志；加入适用条件不同的历史存储事件"
+  ],
+  "trial_limit": {
+    "initial_pairs": 2,
+    "additional_revision_pairs": 1
+  },
+  "predeclared_comparison": [
+    "当前机制与引用是否对应",
+    "历史修复适用条件是否与当前对照",
+    "建议是否有条件、风险和验证",
+    "诊断与复核是否真实参与，复核是否改变结论或阻止无依据建议"
+  ],
+  "interpretation": "目的性展示，作者已知场景，不是独立测试；保留所有结果，不保证多Agent胜出。"
+}

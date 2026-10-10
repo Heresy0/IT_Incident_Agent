@@ -1,0 +1,34 @@
+{
+  "dataset_version": "independent-synthetic-v1",
+  "synthetic": true,
+  "authoring": "人工设计的新合成事件；同一开发者设计和实现，不属于外部盲测。",
+  "cases": [
+    "eval_001",
+    "eval_002",
+    "eval_003",
+    "eval_004",
+    "eval_005",
+    "eval_006",
+    "eval_007",
+    "eval_008",
+    "eval_009",
+    "eval_010"
+  ],
+  "splits": {
+    "validation": [
+      "eval_001",
+      "eval_002",
+      "eval_003",
+      "eval_004",
+      "eval_005",
+      "eval_006"
+    ],
+    "holdout": [
+      "eval_007",
+      "eval_008",
+      "eval_009",
+      "eval_010"
+    ]
+  },
+  "holdout_policy": "默认禁用；显式释放后属于已见测试。用于修改系统的案例转为回归使用，不再次宣称独立验收。"
+}

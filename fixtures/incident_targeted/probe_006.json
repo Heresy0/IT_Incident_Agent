@@ -1,0 +1,169 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_006",
+    "title": "合成工单 006",
+    "symptoms": "10:06起 archive 积压增加但进程存活，最近发布后开始异常；需要区分进程崩溃与消费被暂停。",
+    "scope": {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "service_version": "7.2.0",
+      "start": "2026-10-16T09:50:00+00:00",
+      "end": "2026-10-16T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_depth-before",
+      "timestamp": "2026-10-16T09:55:00+00:00",
+      "metric": "queue_depth",
+      "value": 0,
+      "unit": "jobs",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_depth-after",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "metric": "queue_depth",
+      "value": 28,
+      "unit": "jobs",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "process_up-before",
+      "timestamp": "2026-10-16T09:55:00+00:00",
+      "metric": "process_up",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "process_up-after",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "metric": "process_up",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "consumer_active-before",
+      "timestamp": "2026-10-16T09:55:00+00:00",
+      "metric": "consumer_active",
+      "value": 2,
+      "unit": "consumers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "consumer_active-after",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "metric": "consumer_active",
+      "value": 0,
+      "unit": "consumers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "res-1",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "PROCESS_READY",
+      "message": "主进程心跳成功，管理接口可用；不报告消费线程状态。"
+    },
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "category": "configuration",
+      "level": "WARN",
+      "error_code": "CONSUMER_PAUSED",
+      "message": "consumer_enabled=false；管理reload后消费线程进入pause，未接收新任务。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-16T10:05:00+00:00",
+      "category": "configuration",
+      "version": "7.2.0",
+      "summary": "归档消费开关由true切换为false；变更摘要未记录维护批准单。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "aliases": [
+        "archive-consumer"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "archive-consumer",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-16T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "7.2.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:06起 archive 积压增加但进程存活，最近发布后开始异常；需要区分进程崩溃与消费被暂停。 timeout queue error",
+      "text": "archive进程心跳与消费线程是不同状态；暂停可能是计划操作，恢复前核对维护批准、积压和重复消费风险。"
+    }
+  ],
+  "incidents": []
+}

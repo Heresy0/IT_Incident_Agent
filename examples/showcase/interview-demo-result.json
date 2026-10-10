@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-10",
+  "execution_mode": "scripted_control_only",
+  "quality_status": "excluded_scripted",
+  "paid_calls": 0,
+  "real_business_writes": 0,
+  "application_changed": false,
+  "implementation_sha256_prefix": "ba7f01ad1e477d7d",
+  "accepted_batch": "output/interview-demo/9471682e-39ec-4832-8479-2d470cd626c8",
+  "summary_sha256": "5376cb1f0d8cf79852b891cc7d608eca402a9120d4742f6c84ccd0c45c6679cd",
+  "source_sha256": {
+    "scripts/demo_interview.py": "a76b7034fcd4cc0e4183ca5d7d21bc6c960b25a5c320cb2d8344111b7d951506",
+    "scripts/interview_demo_models.py": "c59e5e803db0fe4e8c76f9e6f2839cb6f030fe88d7327a4a432ea03023a1e630",
+    "tests/evals/test_interview_demo.py": "6d6a54bd44be8932c84957a147434d3855006dd167788e16bc2d94c2fcad4706"
+  },
+  "demonstrations": [
+    {
+      "key": "history",
+      "case": "probe_001",
+      "name": "历史经验核查",
+      "run_id": "324f1a65-bebc-49fa-9b95-c67440859600",
+      "status": "completed",
+      "review_status": "passed",
+      "model_steps": 11,
+      "tool_attempts": 6,
+      "role_steps": {
+        "supervisor": 3,
+        "investigation": 4,
+        "knowledge": 2,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "rework_rounds": 0,
+      "report_sha256": "1b1054ab66eca71487328a5c8b8c716a2e79ac0ad62f15c85098f0739253bb97",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior": {
+        "reviewed_report": true,
+        "knowledge_retrieval": true,
+        "rejected_historical_candidate": true
+      }
+    },
+    {
+      "key": "scope",
+      "case": "probe_002",
+      "name": "冲突证据与范围核查",
+      "run_id": "836bfde1-96e1-4e24-8a48-a704916330c9",
+      "status": "completed",
+      "review_status": "passed",
+      "model_steps": 9,
+      "tool_attempts": 4,
+      "role_steps": {
+        "supervisor": 3,
+        "investigation": 4,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "rework_rounds": 0,
+      "report_sha256": "106852bd7f6f96386ba19567a53115030a28c66d9ca1799406d9f15c6ee7daff",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior": {
+        "reviewed_report": true,
+        "conflicting_sources_preserved": true,
+        "old_instance_candidate_rejected": true
+      }
+    },
+    {
+      "key": "rework",
+      "case": "case_003",
+      "name": "复核驱动的定向补查",
+      "run_id": "ef8bf94f-4efe-42c2-b87b-b9a33944fa61",
+      "status": "completed",
+      "review_status": "passed",
+      "model_steps": 12,
+      "tool_attempts": 5,
+      "role_steps": {
+        "supervisor": 3,
+        "investigation": 3,
+        "knowledge": 2,
+        "diagnosis": 2,
+        "reviewer": 2
+      },
+      "rework_rounds": 1,
+      "report_sha256": "6774a1e1684dd87081231710ed9e622fd90aec1f0acd43e8272475979c9a063e",
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "expected_behavior": {
+        "reviewed_report": true,
+        "one_rework": true,
+        "two_reviews": true,
+        "changed_cause": true,
+        "actual_rework_read": true
+      }
+    }
+  ],
+  "tests": {
+    "command": "python -m unittest tests.evals.test_interview_demo tests.evals.test_showcase -q",
+    "total": 6,
+    "passed": 6,
+    "new_tests": 2
+  },
+  "authoring_batches": [
+    {
+      "batch": "output/interview-demo/cc3af755-b16f-4361-8972-b19a9f7226c4",
+      "passed": false,
+      "reason": "History reviewer input exceeded the unchanged application input budget.",
+      "change": "Demo load query narrowed to the incident-period last 15 minutes; application limits unchanged."
+    },
+    {
+      "batch": "output/interview-demo/9471682e-39ec-4832-8479-2d470cd626c8",
+      "passed": true
+    }
+  ],
+  "limits": [
+    "Plans, candidates and reviewer verdicts are authored control responses.",
+    "Six mechanical checks per report do not establish model quality.",
+    "No paired single-agent performance or superiority claim.",
+    "Frozen fixtures and historical live results unchanged; no holdout run."
+  ]
+}

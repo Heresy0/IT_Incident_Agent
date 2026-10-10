@@ -1,0 +1,193 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_005",
+    "title": "合成工单 005",
+    "symptoms": "10:04后 invoice 更新失败，read-only健康查询成功，旧报警页仍显示锁等待告警。",
+    "scope": {
+      "service": "invoice-store",
+      "environment": "staging",
+      "service_version": "6.0.0",
+      "start": "2026-10-15T09:50:00+00:00",
+      "end": "2026-10-15T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write_error_rate-before",
+      "timestamp": "2026-10-15T09:55:00+00:00",
+      "metric": "write_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write_error_rate-after",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "metric": "write_error_rate",
+      "value": 0.86,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "read_probe_success-before",
+      "timestamp": "2026-10-15T09:55:00+00:00",
+      "metric": "read_probe_success",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "read_probe_success-after",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "metric": "read_probe_success",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "lock_wait_ms-before",
+      "timestamp": "2026-10-15T09:55:00+00:00",
+      "metric": "lock_wait_ms",
+      "value": 2,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "lock_wait_ms-after",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "metric": "lock_wait_ms",
+      "value": 3,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "read-1",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "READ_PROBE_OK",
+      "message": "SELECT 1返回成功；该探针不执行UPDATE。"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write-1",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "READ_ONLY_TRANSACTION",
+      "message": "UPDATE invoice失败：cannot execute UPDATE in a read-only transaction；route=replica。"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "old-1",
+      "timestamp": "2026-10-15T09:54:00+00:00",
+      "category": "resource",
+      "level": "WARN",
+      "error_code": "LOCK_WAIT",
+      "message": "09:51旧writer会话锁等待900ms，09:54该事务结束；10:10当前锁等待3ms。"
+    },
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "DB_ROUTE_SELECTED",
+      "message": "10:03后更新接口使用route=replica；连接建立成功。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-15T10:03:00+00:00",
+      "category": "configuration",
+      "version": "6.0.0",
+      "summary": "更新接口数据库路由从writer切换到replica。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "aliases": [
+        "invoice-store"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "invoice-store",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-15T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "6.0.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:04后 invoice 更新失败，read-only健康查询成功，旧报警页仍显示锁等待告警。 timeout queue error",
+      "text": "读探针不验证写权限和主从路由；核对请求时间、路由、事务模式，写路由调整需审批与一致性验证。"
+    }
+  ],
+  "incidents": []
+}

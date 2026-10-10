@@ -42,7 +42,8 @@ def score_report(report, gold):
     return {"case_id": report["incident_id"], "run_id": report["run_id"], "workflow": report["workflow"],
         "execution_mode": report["execution_mode"], "status": report["status"], "business_result": report["business_result"],
         "review_status": report["review_status"], "mechanical_checks": checks, "mechanical_pass": all(checks.values()),
-        "necessary_check_coverage": (len(gold["necessary_checks"])-len(legacy["missing_checks"])) / len(gold["necessary_checks"]),
+        "necessary_check_coverage": ((len(gold["necessary_checks"])-len(legacy["missing_checks"])) / len(gold["necessary_checks"]))
+            if gold["necessary_checks"] else None,
         "missing_checks": legacy["missing_checks"], "observed_path": legacy["observed_path"],
         "invalid_tool_results": sum(e["status"] == "error" for e in tools), "empty_queries": sum(e["status"] == "empty" for e in tools),
         "truncated_queries": sum(e["truncated"] for e in tools), "rework_rounds": report["rework_rounds"],

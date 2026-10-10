@@ -8,7 +8,7 @@ from runtime.context import Limits
 from workflow.coordinator import Collaboration, collaborate
 from agents.contracts import DiagnosisSelection, SupervisorSelection
 from evidence.contracts import InvestigationSelection
-from agents.scripted import scripted_models, selector
+from agents.scripted import scripted_models, selector, control_need_assessments
 from agents.investigation import investigate, resolve_output
 from evidence.ownership import OwnerSelectionError, parse_owner_selection
 from providers.fixtures import FixtureProvider
@@ -31,7 +31,8 @@ class OwnerFlowModel:
             return json_response({'action': 'dispatch', 'reason': 'Check missing observations',
                 'tasks': [{'role': 'investigation', 'goal': f"ownerflow{len(data['input']['tasks']) + 1}"}]})
         if self.role == 'reviewer':
-            return json_response({'assessments': [{'target_id': target, 'verdict': 'supported',
+            return json_response({'need_assessments': control_need_assessments(data['input']),
+                'assessments': [{'target_id': target, 'verdict': 'supported',
                 'reason': 'Matches current source field', 'evidence_ids': []}
                 for target in data['input']['targets']]})
         if self.role == 'diagnosis':

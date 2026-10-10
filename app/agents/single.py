@@ -32,9 +32,12 @@ def single_agent(model, provider, principal, *, limits=INCIDENT_LIMITS, emit=Non
         role="single", output_schema=DiagnosisSelection, output_resolver=resolve_diagnosis,
         system_prompt=SINGLE_SYSTEM, emit=emit, context=context, event_log=event_log, executor=executor)
     output = result["output"]
+    purpose = provider.ticket().purpose
     used = {r["evidence_id"] for f in output["findings"] for r in f["refs"]}
     used.update(r["evidence_id"] for h in output["hypotheses"] for r in [*h["support_refs"], *h["counter_refs"]])
     result.update(task_type="incident_single", used_evidence_ids=sorted(used),
-        business_result="diagnosis_available" if result["status"] == "completed" else "needs_information",
+        purpose=purpose,
+        business_result=("status_checked" if purpose == 'status_check' else "diagnosis_available")
+            if result["status"] == "completed" else "needs_information",
         task_results=[], drafts=[output], reviews=[], negotiation=[], rework_rounds=0)
     return result

@@ -38,8 +38,9 @@ def build_graph(coordinator):
             try:
                 operation()
             except (ExecutionError, ProtocolError) as exc:
-                c.stop = exc.code
                 c.context.error(exc if isinstance(exc, ExecutionError) else ExecutionError(exc.code), name)
+                if name != 'supervisor' or not c.recover_supervisor(exc):
+                    c.stop = exc.code
             return snapshot()
         return node
 

@@ -1,0 +1,119 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_007",
+    "title": "合成工单 007",
+    "symptoms": "核查 thumbnail 最近30分钟队列和工作进程状态，未报告业务失败。",
+    "scope": {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "service_version": "1.3.0",
+      "start": "2026-10-17T09:50:00+00:00",
+      "end": "2026-10-17T10:20:00+00:00",
+      "allowed_dependencies": []
+    },
+    "purpose": "status_check"
+  },
+  "metrics": [
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_depth-before",
+      "timestamp": "2026-10-17T09:55:00+00:00",
+      "metric": "queue_depth",
+      "value": 0,
+      "unit": "jobs",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_depth-after",
+      "timestamp": "2026-10-17T10:10:00+00:00",
+      "metric": "queue_depth",
+      "value": 0,
+      "unit": "jobs",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-before",
+      "timestamp": "2026-10-17T09:55:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-after",
+      "timestamp": "2026-10-17T10:10:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "res-1",
+      "timestamp": "2026-10-17T10:10:00+00:00",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "WORKER_READY",
+      "message": "两个worker心跳正常；本窗口没有用户任务样本。"
+    }
+  ],
+  "changes": [],
+  "owners": [
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-17T10:10:00+00:00",
+      "aliases": [
+        "image-thumbnail"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "image-thumbnail",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-17T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "1.3.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "核查 thumbnail 最近30分钟队列和工作进程状态，未报告业务失败。 timeout queue error",
+      "text": "状态核查只描述本窗口所查指标和日志；空队列不保证用户任务端到端成功，无异常依据时无需修复。"
+    }
+  ],
+  "incidents": []
+}

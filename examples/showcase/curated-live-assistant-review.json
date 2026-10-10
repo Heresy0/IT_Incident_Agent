@@ -1,0 +1,51 @@
+{
+  "analysis_type": "assistant_qualitative_review_not_formal_human_score",
+  "date": "2026-10-10",
+  "source_record_sha256": "a6c5745bd60d81b8bc97a93746746aaeb3518bae90b44f6910c9c9b5b8b27c03",
+  "semantic_scores_approved": false,
+  "runs": [
+    {
+      "run_id": "64f65f5f-4efe-40e2-ba04-acb1a79b3fa8",
+      "case_id": "show_001",
+      "workflow": "single",
+      "report_sha256": "44a628fc540660c37ddb1b11027fcd0e7abf7e1d558845a290be988672acbe27",
+      "assessment": "取得当前指标、worker记录和编码器变更；未取得业务拒绝/双方协议对照，H/A为空。"
+    },
+    {
+      "run_id": "8e98f7a5-8335-4729-8356-2a70082caa65",
+      "case_id": "show_001",
+      "workflow": "multi",
+      "report_sha256": "f0a927450e25f9582de202b6e090bfc7662d1edcf94a14575c6eb7fdf407022a",
+      "assessment": "实际执行Diagnosis/Reviewer，但Reviewer契约错误后未完成复核；草稿泛化为资源/配置机制，无完整优势。"
+    },
+    {
+      "run_id": "2f17be92-767e-47b9-a29e-0d883c2e0546",
+      "case_id": "show_002",
+      "workflow": "multi",
+      "report_sha256": "fb07e896cd393a81e50a79c33bcbfc9e73f1461f950de1dfd0af2dd4e2d22f87",
+      "assessment": "取得写403后进入Diagnosis，建议类型校验失败；未形成可发布结论。"
+    },
+    {
+      "run_id": "a644b3bf-19ea-4aef-af48-3414cc05e965",
+      "case_id": "show_002",
+      "workflow": "single",
+      "report_sha256": "e4099adc73f3840211683a0cedb555391fcb17feba70c0b48ec509cf27119084",
+      "assessment": "取得当前指标及读探针、业务写403两份日志；H/A为空，不是完整诊断。"
+    },
+    {
+      "run_id": "830a998e-dfc2-4639-8751-9c12a97d16e0",
+      "case_id": "show_101",
+      "workflow": "single",
+      "report_sha256": "89ab0c1b463902fd9f30f2b7668ca9841ed29a98766f45d885b88f705ee8744c",
+      "assessment": "形成编码器版本不匹配候选及核对接收端兼容性的只读建议，读取配置日志；较快且候选方向合理。H仍tentative，支持引用主要是变更，未核查远端业务拒绝日志或历史。"
+    },
+    {
+      "run_id": "71ffae20-ea2c-4c56-9ee2-dba123f53434",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "report_sha256": "2c7493e3b360ec3c2c1949fe95fd0b0fad67f0bc7dd33ecd90fc23f8cf2d7914",
+      "assessment": "候选“字段缺失或格式错误”没有具体业务错误记录支持，Reviewer将其保留为uncertain，最终unresolved。此处体现独立复核不采纳无依据候选；但取证少于single、未查dependency/历史，补查为重复检查而未执行，不证明诊断更准。"
+    }
+  ],
+  "reference_answer_erratum": "show_002参考答案复制旧例时残留旧runner字样，当前展示快照无该记录；本轮辅助审阅不以旧runner为评价要求，正式人工评分待确认。"
+}

@@ -97,6 +97,8 @@ class RepairService:
         if index >= len(actions) or not actions[index].get('repair') or not actions[index]['requires_approval']:
             raise IncidentError('NO_EXECUTABLE_RECOMMENDATION', 422)
         recommendation = actions[index]
+        if recommendation.get('kind') not in {None, 'unspecified', 'registered_repair'}:
+            raise IncidentError('NO_EXECUTABLE_RECOMMENDATION', 422)
         try:
             details = RepairApprovalDetails.model_validate({key: recommendation.get(key)
                 for key in ('condition', 'risk', 'expected_result')}).model_dump()

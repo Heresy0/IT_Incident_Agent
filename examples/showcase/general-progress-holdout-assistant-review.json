@@ -1,0 +1,570 @@
+{
+  "review_type": "assistant_analysis",
+  "human_approved": false,
+  "formal_quality_status": "manual_review_pending",
+  "implementation": "a08f8b27ef7f719b",
+  "selection_rule": "冻结清单顺序首两例保留集；运行前不按案例内容挑选。",
+  "note": "运行全部保存后核对所选参考答案及观测；不是外部盲测或正式人工评分，不改写报告、评分模板或冻结数据。",
+  "released_cases": [
+    "eval_007",
+    "eval_008"
+  ],
+  "unrun_cases": [
+    "eval_009",
+    "eval_010"
+  ],
+  "runs": [
+    {
+      "case_id": "eval_007",
+      "workflow": "single",
+      "report_sha256": "771cfbb8f9f965aca74e14cea1160981ae1a652c4f678a02b0149f3390c47290",
+      "run_id": "11fe048b-c138-4cc0-a909-ead11c3bea38",
+      "approved": false,
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00; request_error_rate (sample)=0.03 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_3990f2a378c43432b98c4e43",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            },
+            {
+              "evidence_id": "EV_fc33396fa5ee40d6aeeb59eb",
+              "field_path": "value",
+              "value": 0.03,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.03"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "rate_limit_rejections (sample)=0 count @ 2026-10-01T09:55:00+00:00; rate_limit_rejections (sample)=42 count @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_49b93608ac10760a62d474aa",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            },
+            {
+              "evidence_id": "EV_c80f74bf5c732aace9a52add",
+              "field_path": "value",
+              "value": 42,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":42"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        }
+      ],
+      "assessment": "仅取得指标便结束，原因和建议为空；未完成诊断。",
+      "strengths": [
+        "所列当前与故障前指标引用有效；未虚构根因或恢复结果。",
+        "完整性门禁正确输出partial。"
+      ],
+      "gaps": [
+        "没有实际查询日志或变更，仅将其列为缺口。",
+        "2次模型、1次工具后主动收尾，未耗尽预算。"
+      ],
+      "draft_actions": []
+    },
+    {
+      "case_id": "eval_007",
+      "workflow": "multi",
+      "report_sha256": "c01db1fa092f268cba8c312b67f54eb2b925ada24279da8d00e2a6dacedf6584",
+      "run_id": "87de305f-19e6-4faa-8c2b-d5cd817fc35a",
+      "approved": false,
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "dependency log [WARN] error_code=\"TENANT_LIMIT_REACHED\"  @ 2026-10-01T10:10:00+00:00; dependency log [WARN] message=\"10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。\"  @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_75a09000ac202194f678194e",
+              "field_path": "error_code",
+              "value": "TENANT_LIMIT_REACHED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"TENANT_LIMIT_REACHED\""
+            },
+            {
+              "evidence_id": "EV_75a09000ac202194f678194e",
+              "field_path": "message",
+              "value": "10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "rate_limit_rejections (sample)=42 count @ 2026-10-01T10:10:00+00:00; rate_limit_rejections (sample)=0 count @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_c80f74bf5c732aace9a52add",
+              "field_path": "value",
+              "value": 42,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":42"
+            },
+            {
+              "evidence_id": "EV_49b93608ac10760a62d474aa",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F3",
+          "text": "request_error_rate (sample)=0.03 ratio @ 2026-10-01T10:10:00+00:00; request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_fc33396fa5ee40d6aeeb59eb",
+              "field_path": "value",
+              "value": 0.03,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.03"
+            },
+            {
+              "evidence_id": "EV_3990f2a378c43432b98c4e43",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H1",
+          "text": "搜索后端连接前的配额限制可能导致部分租户搜索失败。",
+          "references": [
+            {
+              "evidence_id": "EV_75a09000ac202194f678194e",
+              "field_path": "error_code",
+              "value": "TENANT_LIMIT_REACHED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"TENANT_LIMIT_REACHED\""
+            },
+            {
+              "evidence_id": "EV_75a09000ac202194f678194e",
+              "field_path": "message",
+              "value": "10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"10:08至10:09 tenant-group=test-a请求返回429；其余租户200。配额拒绝发生在搜索后端连接之前。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "日志明确记录局部租户429、其他租户200，以及拒绝发生在连接搜索后端之前，支持限定范围的配额机制。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H2",
+          "text": "租户组 'test-a' 的请求在特定时间段内超过了限流阈值。",
+          "references": [
+            {
+              "evidence_id": "EV_c80f74bf5c732aace9a52add",
+              "field_path": "value",
+              "value": 42,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":42"
+            },
+            {
+              "evidence_id": "EV_49b93608ac10760a62d474aa",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "合并日志可支持该租户触发限制，但本条仅引用总拒绝计数；未核对租户请求分布、配置阈值及其变更，不能确认流量超额这个触发原因。",
+          "assistant_judgment": "qualified"
+        }
+      ],
+      "assessment": "取到租户局部429和连接搜索后端前的配额拒绝，近端机制方向正确；触发原因和可用建议仍不完整。",
+      "strengths": [
+        "ERROR日志为空后放宽过滤，取得WARN关键日志。",
+        "没有把局部失败泛化为整个搜索后端宕机。",
+        "复核提醒发生；重复补查被拒绝，未再次消耗工具。"
+      ],
+      "gaps": [
+        "未查询已有配置变更：测试租户额度由200降至20。",
+        "H2仅引用全局拒绝计数，不能独立证明特定租户的请求分布或具体阈值。",
+        "最终建议被全部剔除；补查没有增加信息。"
+      ],
+      "draft_actions": [
+        {
+          "action": "检查租户组 'test-a' 的限流配置是否合理，并调整配额以避免触发限流。",
+          "condition": "需要确认当前限流配置是否符合实际负载需求。",
+          "expected_result": "减少因限流导致的请求失败情况。",
+          "risk": "不合理的限流配置可能影响其他租户的正常使用。",
+          "requires_approval": true,
+          "repair": null,
+          "assistant_judgment": "conditional_check_not_verified_repair",
+          "reason": "只读核对可作为待办；不能据此确认配置修改/扩容适用性或承诺恢复。"
+        },
+        {
+          "action": "分析限流机制与搜索后端的集成逻辑，确保配额限制在正确阶段触发。",
+          "condition": "需验证限流逻辑是否在搜索请求处理前准确执行。",
+          "expected_result": "避免因限流逻辑错误导致的搜索失败。",
+          "risk": "修改限流逻辑可能影响系统稳定性。",
+          "requires_approval": true,
+          "repair": null,
+          "assistant_judgment": "conditional_check_not_verified_repair",
+          "reason": "只读核对可作为待办；不能据此确认配置修改/扩容适用性或承诺恢复。"
+        }
+      ]
+    },
+    {
+      "case_id": "eval_008",
+      "workflow": "multi",
+      "report_sha256": "0853f72c663c049aed021dfd574da36addbb52dc474739149998eab38e3ccb74",
+      "run_id": "529fc32a-fb00-4a27-8e4d-1d3eeca3143a",
+      "approved": false,
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "cache_hit_ratio (sample)=0.94 ratio @ 2026-10-01T09:55:00+00:00; cache_hit_ratio (sample)=0.42 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_244a7873172dddf696dbd985",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_39125b081869f41dc3ed7ecc",
+              "field_path": "value",
+              "value": 0.42,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.42"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "memory_used_ratio (sample)=0.58 ratio @ 2026-10-01T09:55:00+00:00; memory_used_ratio (sample)=1 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_103ec0ceb05298c154d18201",
+              "field_path": "value",
+              "value": 0.58,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.58"
+            },
+            {
+              "evidence_id": "EV_c08ece4b6b2257f38f0aa33e",
+              "field_path": "value",
+              "value": 1,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":1"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F3",
+          "text": "resource log [WARN] error_code=\"EVICTION_ACTIVE\"  @ 2026-10-01T10:10:00+00:00; resource log [WARN] message=\"缓存达到当前上限并触发淘汰；没有OOM进程退出；宿主机剩余内存未知。\"  @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_44c6d70acec6e146a12faa68",
+              "field_path": "error_code",
+              "value": "EVICTION_ACTIVE",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"EVICTION_ACTIVE\""
+            },
+            {
+              "evidence_id": "EV_44c6d70acec6e146a12faa68",
+              "field_path": "message",
+              "value": "缓存达到当前上限并触发淘汰；没有OOM进程退出；宿主机剩余内存未知。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"缓存达到当前上限并触发淘汰；没有OOM进程退出；宿主机剩余内存未知。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H1",
+          "text": "缓存命中率下降可能是由于缓存过期或数据频繁更新导致的。",
+          "references": [
+            {
+              "evidence_id": "EV_244a7873172dddf696dbd985",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_39125b081869f41dc3ed7ecc",
+              "field_path": "value",
+              "value": 0.42,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.42"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "命中率样本只能证明下降，未观测过期频率或更新频率，不能标为支持过期/频繁更新机制。",
+          "assistant_judgment": "insufficient"
+        },
+        {
+          "target_id": "H2",
+          "text": "内存使用率上升可能是由于内存泄漏或资源未被正确释放。",
+          "references": [
+            {
+              "evidence_id": "EV_103ec0ceb05298c154d18201",
+              "field_path": "value",
+              "value": 0.58,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.58"
+            },
+            {
+              "evidence_id": "EV_c08ece4b6b2257f38f0aa33e",
+              "field_path": "value",
+              "value": 1,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":1"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "内存使用比例样本不能区分上限下调、用量增加和泄漏；没有泄漏证据，不能标为supported。",
+          "assistant_judgment": "insufficient"
+        },
+        {
+          "target_id": "H3",
+          "text": "缓存淘汰警告表明当前缓存容量不足，需进一步分析是否需要扩大缓存。",
+          "references": [
+            {
+              "evidence_id": "EV_44c6d70acec6e146a12faa68",
+              "field_path": "error_code",
+              "value": "EVICTION_ACTIVE",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"EVICTION_ACTIVE\""
+            },
+            {
+              "evidence_id": "EV_44c6d70acec6e146a12faa68",
+              "field_path": "message",
+              "value": "缓存达到当前上限并触发淘汰；没有OOM进程退出；宿主机剩余内存未知。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"缓存达到当前上限并触发淘汰；没有OOM进程退出；宿主机剩余内存未知。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "日志支持达到当前上限并淘汰；不足以确认资源绝对不足或必须扩容。容量变更和宿主机余量仍未核对。",
+          "assistant_judgment": "qualified"
+        }
+      ],
+      "assessment": "取得容量上限与淘汰日志，但遗漏上限变更；Reviewer将缺少因果证据的过期/泄漏假设标为supported。",
+      "strengths": [
+        "两次执行提醒后实际完成声明检查。",
+        "ERROR为空后放宽日志过滤，取得淘汰WARN记录。",
+        "保留宿主机余量未知，没有执行或承诺立即扩容。"
+      ],
+      "gaps": [
+        "未查询已有上限从512MiB降至64MiB的配置变更，也未取得evictions指标。",
+        "命中率下降不能确认过期/频繁更新，内存比例上升不能确认内存泄漏；Reviewer漏拦截。",
+        "没有端到端登录延迟证据，不能确认缓存对登录变慢的贡献；最终建议为空。"
+      ],
+      "draft_actions": [
+        {
+          "action": "检查缓存数据的访问模式，确认是否存在频繁更新或过期问题。",
+          "condition": "缓存命中率下降且存在淘汰警告。",
+          "expected_result": "识别可能导致缓存失效的原因，优化缓存策略。",
+          "risk": "可能需要调整缓存配置或数据结构，影响服务性能。",
+          "requires_approval": true,
+          "repair": null,
+          "assistant_judgment": "conditional_check_not_verified_repair",
+          "reason": "只读核对可作为待办；不能据此确认配置修改/扩容适用性或承诺恢复。"
+        },
+        {
+          "action": "监控内存使用情况，确认是否存在内存泄漏。",
+          "condition": "内存使用率上升至1，且未发现明显异常。",
+          "expected_result": "确定内存使用率升高的具体原因，采取修复措施。",
+          "risk": "若未及时处理，可能导致服务崩溃或性能下降。",
+          "requires_approval": true,
+          "repair": null,
+          "assistant_judgment": "conditional_check_not_verified_repair",
+          "reason": "只读核对可作为待办；不能据此确认配置修改/扩容适用性或承诺恢复。"
+        },
+        {
+          "action": "评估当前缓存容量是否足够，并考虑扩展缓存。",
+          "condition": "缓存淘汰警告和命中率下降同时发生。",
+          "expected_result": "确认是否需要扩大缓存以提升性能。",
+          "risk": "扩大缓存可能增加资源消耗，需权衡成本与收益。",
+          "requires_approval": true,
+          "repair": null,
+          "assistant_judgment": "conditional_check_not_verified_repair",
+          "reason": "只读核对可作为待办；不能据此确认配置修改/扩容适用性或承诺恢复。"
+        }
+      ]
+    },
+    {
+      "case_id": "eval_008",
+      "workflow": "single",
+      "report_sha256": "857403217d9f8bd3f928223d4a9ef4e771dcb2c55d87ba7c1e38dd1904ffbc48",
+      "run_id": "a4bbb078-607f-42d6-8a2b-5f578b1b857b",
+      "approved": false,
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "cache_hit_ratio (sample)=0.94 ratio @ 2026-10-01T09:55:00+00:00; cache_hit_ratio (sample)=0.42 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_244a7873172dddf696dbd985",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_39125b081869f41dc3ed7ecc",
+              "field_path": "value",
+              "value": 0.42,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.42"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "memory_used_ratio (sample)=0.58 ratio @ 2026-10-01T09:55:00+00:00; memory_used_ratio (sample)=1 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_103ec0ceb05298c154d18201",
+              "field_path": "value",
+              "value": 0.58,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.58"
+            },
+            {
+              "evidence_id": "EV_c08ece4b6b2257f38f0aa33e",
+              "field_path": "value",
+              "value": 1,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":1"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "保存来源支持所列样本数值、时间或日志原文；不外推持续状态。",
+          "assistant_judgment": "supported"
+        }
+      ],
+      "assessment": "仅取得指标便结束，原因和建议为空；未完成诊断。",
+      "strengths": [
+        "所列当前与故障前指标引用有效；未虚构根因或恢复结果。",
+        "完整性门禁正确输出partial。"
+      ],
+      "gaps": [
+        "没有实际查询日志或变更，仅将其列为缺口。",
+        "2次模型、1次工具后主动收尾，未耗尽预算。"
+      ],
+      "draft_actions": []
+    }
+  ]
+}

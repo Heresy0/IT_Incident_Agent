@@ -1,0 +1,10 @@
+{
+  "dataset_version": "curated-showcase-ticket-revision-v2",
+  "files": {
+    "evals/showcase_revision/manifest.json": "e335865b85f217cf235bd0073defe5b67082fccd288671f6c658d92342009cd8",
+    "evals/showcase_revision/rubric.json": "7e494e234e86574842c720d4fddd3ebf732af753f655d97ac629416e18ffbc1f",
+    "evals/showcase_revision/answers/show_101.json": "a5410997268d81243b8f8bf684b2264afeabe915cca9023984aa1e685491b276",
+    "fixtures/incident_showcase_revision/catalog.json": "d96795f6b8b02c77e2d0621347cd00520f4467b03186e90a264a5809df3b4c1d",
+    "fixtures/incident_showcase_revision/show_101.json": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76"
+  }
+}

@@ -150,8 +150,12 @@ class SelectedFinding(Contract):
     refs: list[ReferenceSelection] = Field(min_length=1, max_length=8)
 
 
+class OwnerReferenceSelection(ReferenceSelection):
+    """Separate model-facing domain; general fact references are not owner choices."""
+
+
 class EscalationSelection(Contract):
-    escalation_ref: ReferenceSelection | None = Field(default=None,
+    escalation_ref: OwnerReferenceSelection | None = Field(default=None,
         description="Choose a reference_options entry for the team field from a current get_service_owner observation. The server fills the team name. Use null if no owner was observed or no escalation is proposed; never write a team name.")
 
 

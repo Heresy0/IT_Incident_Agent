@@ -1,0 +1,176 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "show_001",
+    "title": "推送错误与历史扩容经验的适用性核查（合成）",
+    "symptoms": "10:03后 delivery 推送失败、queue 等待增长。监控项 delivery_error_rate、queue_depth、cpu_utilization、workers_active 可用。上周类似积压曾通过扩容恢复，值班人员希望判断本次是否仍适合扩容，并给出有条件的处理建议；不要把历史处理直接当成当前原因。",
+    "scope": {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "service_version": "4.2.0",
+      "start": "2026-10-11T10:00:00+00:00",
+      "end": "2026-10-11T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "delivery_error_rate-after",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "metric": "delivery_error_rate",
+      "value": 0.82,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_depth-after",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "metric": "queue_depth",
+      "value": 42,
+      "unit": "jobs",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "cpu_utilization-after",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "metric": "cpu_utilization",
+      "value": 0.29,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-after",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "metric": "workers_active",
+      "value": 4,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "dep-1",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "REMOTE_SCHEMA_REJECTED",
+      "message": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。"
+    },
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "ENCODER_SELECTED",
+      "message": "10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。"
+    },
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "res-1",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "PROCESS_READY",
+      "message": "四个worker持续消费并收到拒绝响应；cpu=29%，无进程退出记录。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-11T10:02:00+00:00",
+      "category": "configuration",
+      "version": "4.2.0",
+      "summary": "推送编码器从v1切换到v2；服务实例数保持4。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "aliases": [
+        "delivery-bridge"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "4.2.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:03后 delivery 推送失败、queue 等待增长。监控项 delivery_error_rate、queue_depth、cpu_utilization、workers_active 可用。上周类似积压曾通过扩容恢复，值班人员希望判断本次是否仍适合扩容，并给出有条件的处理建议；不要把历史处理直接当成当前原因。 delivery export error queue health",
+      "text": "delivery错误先区分远端拒绝和处理超时；扩容前核对负载及响应码；协议调整须确认双方兼容并审批。"
+    }
+  ],
+  "incidents": [
+    {
+      "service": "delivery-bridge",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "history",
+      "timestamp": "2026-10-11T10:10:00+00:00",
+      "versions": [
+        "4.2.0"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-15T08:00:00+00:00",
+      "search_text": "10:03后 delivery 推送失败、queue 等待增长。监控项 delivery_error_rate、queue_depth、cpu_utilization、workers_active 可用。上周类似积压曾通过扩容恢复，值班人员希望判断本次是否仍适合扩容，并给出有条件的处理建议；不要把历史处理直接当成当前原因。 delivery export error queue health",
+      "error_codes": [
+        "REQUEST_FAILED"
+      ],
+      "summary": "上周delivery积压由CPU持续95%且worker处理慢造成，未出现远端400拒绝。",
+      "resolution": "人工批准后增加worker容量，处理速率恢复；适用前提为CPU饱和和协议正确。"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "case_id": "eval_001",
+    "file": "eval_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_002",
+    "file": "eval_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_003",
+    "file": "eval_003.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_004",
+    "file": "eval_004.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_005",
+    "file": "eval_005.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_006",
+    "file": "eval_006.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_007",
+    "file": "eval_007.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_008",
+    "file": "eval_008.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_009",
+    "file": "eval_009.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "eval_010",
+    "file": "eval_010.json",
+    "visibility": "public_synthetic"
+  }
+]

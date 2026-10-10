@@ -1,0 +1,194 @@
+{
+  "analysis_type": "assistant_qualitative_review_not_formal_human_score",
+  "date": "2026-10-10",
+  "source_bundle_sha256": "43317583495fffe220b58ea3904bfee6b1e8ee38379a3e5306c8625d19003df3",
+  "provenance": {
+    "implementation_sha256_prefix": "11e895e2f331bf28",
+    "git_commit": "53da172c864a94dcea972a080d035dd7920ad4d2",
+    "working_tree_dirty": true,
+    "dataset_version": "targeted-synthetic-v1",
+    "dataset_freeze_sha256": "a007d431a832905e1403485173d4d371b35f5c724272bc16bca5eb53e0760130",
+    "fixture_sha256": {
+      "probe_001": "bf5990457f779ced68f04f1d0da6e5fcf5693bc095addb2358983f5f88aaa698",
+      "probe_002": "deff0acab534a1d3f894396084ebc6abb690c21849045b10652f0058a321584e"
+    },
+    "evaluation_code_sha256": {
+      "scripts/compare_incident.py": "28cfc6e6e731b50a8c7794a55718559840e54956e304fba575efcf778460bce0",
+      "scripts/compare_independent.py": "dbee2aedd38c46534325bf107abedc1fd77c3079863ea175b610eafc16ce5fe3",
+      "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+      "evals/independent/control.py": "4a5628ccd88d36069df4d0f80c4112a0ab82d545536714ecf4e2bdad561b6ee2",
+      "evals/independent/suite.py": "6d2ef90d7a5a9df3e9e0fcb65fa3e49dd313e326f78a0efd0f0154f9a48998e2",
+      "evals/independent/scoring.py": "52ec17db9d699c945086bd459ee933473192c0d9e111c3733aa4b5ec667da08e",
+      "evals/incident/comparison.py": "ea630c569b5a382aabf1f3fbed8ae399f46973b9b18559371792f1dec0b75169",
+      "evals/incident/acceptance.py": "88609f49bf6395a0156bcbb362037fa22fa26518b9fb0cc45335dbe8873d69a2",
+      "scripts/compare_targeted.py": "73eace0378617135d8e609a372b9d2e3fd6098daddf7f5c859f85ec4d4f39426",
+      "scripts/evaluate_targeted.py": "a703a858ee21f1a88d61f03f2ee269db9bb146463fe2e0316f6324b0ebb385db",
+      "evals/targeted/suite.py": "c229836b2210a06912414de32206bd3001f69355a9126a0d1860d463e4287526",
+      "evals/targeted/provider.py": "0df0d2829c6adeeb43367717cb2a4566753ea99478b986c394ca25443c7e79c3",
+      "evals/targeted/scoring.py": "0acb29bb719619118e2ac33884fb4399f1d36ecb4a75270d8dba1b097eb9cdcc"
+    }
+  },
+  "runs": [
+    {
+      "case_id": "probe_001",
+      "workflow": "single",
+      "run_id": "ca07ff36-b409-4997-811f-65e0f816c3bc",
+      "report_sha256": "fa98ae180c555a59f79a4f4e045266d7e9aa7f7c96edb2645d20363a884e4017",
+      "status": "partial",
+      "review_status": "not_performed",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "duration_ms": 12687,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "validation_failures": [],
+      "observed_sources": [
+        "get_service_metrics/cpu_utilization-after",
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_service_metrics/workers_active-after",
+        "get_service_metrics/cpu_utilization-before",
+        "get_service_metrics/delivery_error_rate-before",
+        "get_service_logs/res-1",
+        "get_recent_changes/change-1"
+      ],
+      "hypotheses_count": 0,
+      "actions_count": 0,
+      "diagnosis_calls": 0,
+      "reviewer_calls": 0
+    },
+    {
+      "case_id": "probe_001",
+      "workflow": "multi",
+      "run_id": "a323d46c-7227-4e46-8810-eb4cf5ed97af",
+      "report_sha256": "75b7d4d123837a9b78e2af4c2c2722620a8c477f18b162fabd7237f80fef9f0d",
+      "status": "partial",
+      "review_status": "not_performed",
+      "model_calls": 7,
+      "tool_calls": 2,
+      "duration_ms": 28406,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "REQUIRED_EVIDENCE_NEED",
+          "details": []
+        },
+        {
+          "role": "supervisor",
+          "reason": "UNEXPECTED_TASKS",
+          "details": [
+            {
+              "path": "tasks",
+              "instruction": "仅dispatch可以携带任务；request_info、diagnose、escalate和finish的tasks必须为空列表。保留实际决定，不执行冲突任务。"
+            }
+          ]
+        }
+      ],
+      "observed_sources": [
+        "get_service_metrics/delivery_error_rate-after",
+        "get_service_metrics/queue_depth-after",
+        "get_service_metrics/delivery_error_rate-before",
+        "get_service_metrics/queue_depth-before"
+      ],
+      "hypotheses_count": 0,
+      "actions_count": 0,
+      "diagnosis_calls": 0,
+      "reviewer_calls": 0
+    },
+    {
+      "case_id": "probe_002",
+      "workflow": "multi",
+      "run_id": "14d7a58a-e14f-4531-a0dc-ab8612d8f236",
+      "report_sha256": "567dede63aabc51dcc184af1d10fcd952cfb696ac9e2edab44144bec91d3c97f",
+      "status": "partial",
+      "review_status": "not_performed",
+      "model_calls": 9,
+      "tool_calls": 5,
+      "duration_ms": 39687,
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "REQUIRED_EVIDENCE_NEED",
+          "details": []
+        },
+        {
+          "role": "supervisor",
+          "reason": "UNEXPECTED_TASKS",
+          "details": [
+            {
+              "path": "tasks",
+              "instruction": "仅dispatch可以携带任务；request_info、diagnose、escalate和finish的tasks必须为空列表。保留实际决定，不执行冲突任务。"
+            }
+          ]
+        }
+      ],
+      "observed_sources": [
+        "get_service_metrics/export_error_rate-after",
+        "get_service_metrics/health_probe_success-after",
+        "get_service_metrics/export_error_rate-before",
+        "get_service_metrics/health_probe_success-before",
+        "get_service_logs/cfg-1",
+        "get_recent_changes/change-1"
+      ],
+      "hypotheses_count": 0,
+      "actions_count": 0,
+      "diagnosis_calls": 0,
+      "reviewer_calls": 0
+    },
+    {
+      "case_id": "probe_002",
+      "workflow": "single",
+      "run_id": "77c001c0-b0dd-4698-a8be-483e97cd7470",
+      "report_sha256": "627e9ccac3d07bacb7d5e6851af6329785e470f3895059664f085ccc11f88f1e",
+      "status": "partial",
+      "review_status": "not_performed",
+      "model_calls": 2,
+      "tool_calls": 1,
+      "duration_ms": 5859,
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "validation_failures": [],
+      "observed_sources": [
+        "get_service_metrics/dependency_latency_ms-after",
+        "get_service_metrics/export_error_rate-after",
+        "get_service_metrics/health_probe_success-after",
+        "get_service_metrics/dependency_latency_ms-before",
+        "get_service_metrics/export_error_rate-before",
+        "get_service_metrics/health_probe_success-before"
+      ],
+      "hypotheses_count": 0,
+      "actions_count": 0,
+      "diagnosis_calls": 0,
+      "reviewer_calls": 0
+    }
+  ],
+  "observations": [
+    "四条报告机械检查通过，但全部partial且没有公开H/A。正式语义评分待人工确认。",
+    "两条多Agent在Supervisor先触发REQUIRED_EVIDENCE_NEED，纠正后触发UNEXPECTED_TASKS，一次结构纠正额度耗尽；Diagnosis与Reviewer均未调用。",
+    "第一项校验原因同时覆盖核心问题not_required及blocking=false两种禁用情形；现有日志details为空，不能确认具体哪个字段。",
+    "历史误导案例：单Agent查指标、resource日志和配置变更，未读schema拒绝日志，且缺口提到本案未登记的pool_wait/db_cpu；多Agent查异常指标及scaling变更空结果，未取到拒绝或编码器日志。",
+    "范围冲突案例：多Agent取得当前身份日志及配置变更，比只查指标的单Agent取证更丰富，但未取得dependency写入拒绝/探针覆盖或旧实例日志，且成果留在任务与证据中而未形成正式报告。",
+    "两条链路均未调用知识检索，故本批没有验证历史检索后的交叉复核收益；不得因此强制检索或改题保证多Agent获胜。",
+    "当前结果主要暴露多Agent的协议推进稳定性与单Agent的提前收尾，未证明多Agent综合优势，也不能据此断言案例不适合多Agent。"
+  ],
+  "provider_error_observed": false,
+  "quota_error_observed": false,
+  "paid_model_calls": 22,
+  "synthetic_tool_attempts": 11,
+  "known_input_tokens": 116657,
+  "known_output_tokens": 7521,
+  "estimated_cost": null,
+  "additional_retests": 0,
+  "reserved_runs": 0,
+  "application_modified": false,
+  "execution_monitor": {
+    "script_sha256": "76875e528478b3cce19db9b7aa69bda51f72e2ead7687879d34b8904e0ab7000",
+    "behavior": "仅观察Provider非200错误并阻止后续请求；成功响应原样交还SDK，无额外请求，未输出凭据。"
+  },
+  "remaining": [
+    "正式人工评分",
+    "未运行的区分性取证类别与普通对照",
+    "默认保留集仍未诊断"
+  ],
+  "recommendation": "保留本批失败，不追加付费重跑。若后续授权修复，优先用免费响应重放处理Supervisor协议推进及既有证据的收尾交接；不改金标准、不降低核心证据要求。"
+}

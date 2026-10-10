@@ -1,0 +1,144 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_004",
+    "title": "独立工单 004",
+    "symptoms": "监控显示服务在线，但用户查询商品经常失败，需要解释矛盾。",
+    "scope": {
+      "service": "catalog-public",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "api_up-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "api_up",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "api_up-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "api_up",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.55,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_tls_failures-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "dependency_tls_failures",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_tls_failures-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "dependency_tls_failures",
+      "value": 32,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "CERTIFICATE_EXPIRED",
+      "message": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。"
+    }
+  ],
+  "changes": [],
+  "owners": [
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "catalog-public"
+      ],
+      "team": "Synthetic Ops 04",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "catalog-public",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "监控显示服务在线，但用户查询商品经常失败，需要解释矛盾。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

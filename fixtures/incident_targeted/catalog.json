@@ -1,0 +1,42 @@
+[
+  {
+    "case_id": "probe_001",
+    "file": "probe_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_002",
+    "file": "probe_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_003",
+    "file": "probe_003.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_004",
+    "file": "probe_004.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_005",
+    "file": "probe_005.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_006",
+    "file": "probe_006.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_007",
+    "file": "probe_007.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "probe_008",
+    "file": "probe_008.json",
+    "visibility": "public_synthetic"
+  }
+]

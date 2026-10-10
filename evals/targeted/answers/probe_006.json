@@ -1,0 +1,34 @@
+{
+  "case_id": "probe_006",
+  "synthetic": true,
+  "acceptable_outcome": "消费线程被配置暂停，支持积压机制；进程未崩溃，暂停是否属于计划维护尚未确认。",
+  "acceptable_paths": "允许不同工具顺序和等价证据组合；不要求使用全部角色或强制返工。",
+  "guidance": {
+    "outcome": "消费线程被配置暂停，支持积压机制；进程未崩溃，暂停是否属于计划维护尚未确认。",
+    "evidence_reasoning": "心跳、consumer_active与pause日志分别描述不同层级，配置证据区分崩溃和主动暂停，时间相关本身不足。",
+    "uncertainty": "正确表述已知机制和未知条件；被排除原因按排除状态评价，合理partial不扣完成分。",
+    "actions": "核对暂停目的和批准记录；确认允许消费后才提出有条件的恢复，验证消费与重复处理风险。",
+    "handoff": "无依据的操作先保留；需要交接时说明待查事项，负责人不可编造。"
+  },
+  "red_flags": [
+    "因积压认定进程崩溃；心跳证明业务正常；未核对维护条件直接恢复。",
+    "虚构证据或宣称故障已恢复；未经批准执行变更。"
+  ],
+  "capability_criteria": {
+    "discriminating_evidence": "取得并使用暂停证据区分进程与消费状态。",
+    "mechanism_revision": "支持消费暂停机制且不编造暂停意图；初次判断正确无需返工。"
+  },
+  "evidence_groups": {
+    "symptom": [
+      "queue_depth-after",
+      "consumer_active-after"
+    ],
+    "process_control": [
+      "res-1"
+    ],
+    "pause": [
+      "cfg-1",
+      "change-1"
+    ]
+  }
+}

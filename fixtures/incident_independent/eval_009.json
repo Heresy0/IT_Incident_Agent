@@ -1,0 +1,176 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_009",
+    "title": "独立工单 009",
+    "symptoms": "写入响应变慢，昨晚也发生过高CPU故障，今天发布后再次出现。",
+    "scope": {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "db_cpu-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "db_cpu",
+      "value": 22,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "db_cpu-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "db_cpu",
+      "value": 23,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "lock_wait_ms-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "lock_wait_ms",
+      "value": 1,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "lock_wait_ms-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "lock_wait_ms",
+      "value": 1900,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_latency-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_latency",
+      "value": 90,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_latency-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_latency",
+      "value": 2100,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "level": "WARN",
+      "error_code": "LOCK_WAIT",
+      "message": "写入事务等待同一长事务持有的行锁；持有事务起始09:58，至10:10仍未提交。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-01T10:02:00+00:00",
+      "category": "deployment",
+      "version": "3.1.0",
+      "summary": "部署版本3.1.0；没有事务终止或锁解除记录。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "ledger-writer"
+      ],
+      "team": "Synthetic Ops 09",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "写入响应变慢，昨晚也发生过高CPU故障，今天发布后再次出现。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": [
+    {
+      "service": "ledger-writer",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "history",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "versions": [
+        "3.1.0"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-20T10:00:00+00:00",
+      "error_codes": [],
+      "search_text": "写入响应变慢，昨晚也发生过高CPU故障，今天发布后再次出现。",
+      "text": "此前写入延迟由CPU饱和造成，数据库CPU达96%；当时运维调整容量后恢复。历史与当前必须分别判断。",
+      "resolution": "当时处理完成；不能推断本次适用。"
+    }
+  ]
+}

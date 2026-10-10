@@ -1,0 +1,163 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_003",
+    "title": "独立工单 003",
+    "symptoms": "批量导入任务耗时增加并失败，现象类似过去的CPU瓶颈。",
+    "scope": {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "worker_cpu-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "worker_cpu",
+      "value": 24,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "worker_cpu-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "worker_cpu",
+      "value": 25,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "disk_free_bytes-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "disk_free_bytes",
+      "value": 900000000,
+      "unit": "bytes",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "disk_free_bytes-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "disk_free_bytes",
+      "value": 0,
+      "unit": "bytes",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write_failures-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "write_failures",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write_failures-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "write_failures",
+      "value": 18,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "level": "ERROR",
+      "error_code": "NO_SPACE_LEFT",
+      "message": "临时文件写入返回ENOSPC；挂载卷可用空间为0。"
+    }
+  ],
+  "changes": [],
+  "owners": [
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "artifact-ingest"
+      ],
+      "team": "Synthetic Ops 03",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "批量导入任务耗时增加并失败，现象类似过去的CPU瓶颈。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": [
+    {
+      "service": "artifact-ingest",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "history",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "versions": [
+        "3.1.0"
+      ],
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-20T10:00:00+00:00",
+      "error_codes": [],
+      "search_text": "批量导入任务耗时增加并失败，现象类似过去的CPU瓶颈。",
+      "text": "过去相同版本的导入变慢由worker CPU饱和造成，扩容后恢复。这是已确认历史事件，不代表本次原因。",
+      "resolution": "当时处理完成；不能推断本次适用。"
+    }
+  ]
+}

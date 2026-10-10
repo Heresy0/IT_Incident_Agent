@@ -27,9 +27,9 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def capture(case_id, workflow, factory, principal, limits):
+def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider):
     """Use one existing harness for both paths; retain accounting/evidence on unexpected failure."""
-    provider = FixtureProvider(case_id, principal)
+    provider = provider_factory(case_id, principal)
     events = []
     def sink(event):
         events.append({**event, 'seq': len(events) + 1})

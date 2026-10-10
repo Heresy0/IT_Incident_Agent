@@ -1,0 +1,464 @@
+{
+  "review_type": "assistant_analysis",
+  "human_approved": false,
+  "formal_quality_status": "manual_review_pending",
+  "rubric_version": "semantic-rubric-v1",
+  "note": "保存报告、执行台账及冻结参考答案的定性分析；无正式人工分数，不改写原报告或人工模板。",
+  "runs": [
+    {
+      "case_id": "eval_001",
+      "workflow": "single",
+      "run_id": "d7a052bf-f0ba-4316-b0b4-dd39ea3891b8",
+      "report_sha256": "72beca576c9c6a1c2ae30a4cd601aa43fbe81cd551b2cd6f5072c0de5653bbb2",
+      "approved": false,
+      "assessment": "只取得异常指标，没有原因与建议；新完整性门禁正确标为partial，不能认定DNS诊断成功。",
+      "strengths": [
+        "当前及故障前的错误率、连接失败计数有真实引用。",
+        "未生成没有证据的根因或操作，DIAGNOSIS_INCOMPLETE与运行状态一致。"
+      ],
+      "gaps": [
+        "未查询依赖日志，未解释NXDOMAIN及连接前失败机制。",
+        "仅2次模型、1次工具便结束，剩余预算未用于主动补齐；门禁只识别缺项，不强制重试。"
+      ],
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "request_error_rate (sample)=0.94 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_23a1f7978c802524376391c2",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "所列指标数值、时间及前后样本与保存来源一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "upstream_connect_failures (sample)=28 count @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_edb683c61668ed3e2b2e1292",
+              "field_path": "value",
+              "value": 28,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":28"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "所列指标数值、时间及前后样本与保存来源一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F3",
+          "text": "request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_9d3b185606a8b05b75ee91fa",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "所列指标数值、时间及前后样本与保存来源一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F4",
+          "text": "upstream_connect_failures (sample)=0 count @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_a13c01ba4a684361391136bb",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "所列指标数值、时间及前后样本与保存来源一致。",
+          "assistant_judgment": "supported"
+        }
+      ],
+      "unapproved_business_writes_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_001",
+      "workflow": "multi",
+      "run_id": "70429b74-dd5b-4858-965e-7ef91bdaf56c",
+      "report_sha256": "40c413684418794e2e42981816cd88ab76720fbb266e563e4c0ee1c99c265c9c",
+      "approved": false,
+      "assessment": "形成当前DNS失败机制和需人工确认的补查建议；相比单Agent信息更充分，仍未完成替代解释评估。",
+      "strengths": [
+        "依赖日志取得DNS_LOOKUP_FAILED/NXDOMAIN以及尚未建立连接的信息。",
+        "同时取得请求错误率与连接失败的前后对照，Diagnosis和Reviewer均运行。",
+        "Reviewer支持H1及两项补查建议；系统没有把N3缺口包装成整体passed。"
+      ],
+      "gaps": [
+        "所有实际任务只关联N1/N2，N3一直pending。",
+        "H2泛化网络问题没有支持引用，最终unresolved；不能把它当已确认的并行原因。",
+        "先执行两项空变更查询、resource WARN也为空；最终仍说需要检查近期变更，未明确区分已查无记录与未查询。",
+        "复核后已使用12次模型，剩4次未满足至少6次的补查提醒门槛，未发生实际返工。",
+        "两项建议主要是补查，尚无具体修复或已验证恢复。"
+      ],
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "dependency log [ERROR] error_code=\"DNS_LOOKUP_FAILED\"  @ 2026-10-01T10:10:00+00:00; dependency log [ERROR] message=\"10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。\"  @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_df4287c69ac509ad4d7b9746",
+              "field_path": "error_code",
+              "value": "DNS_LOOKUP_FAILED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"DNS_LOOKUP_FAILED\""
+            },
+            {
+              "evidence_id": "EV_df4287c69ac509ad4d7b9746",
+              "field_path": "message",
+              "value": "10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "DNS错误码、NXDOMAIN和连接前失败均来自当前依赖日志。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "request_error_rate (sample)=0.94 ratio @ 2026-10-01T10:10:00+00:00; request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_23a1f7978c802524376391c2",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_9d3b185606a8b05b75ee91fa",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "错误率前后样本与来源一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F3",
+          "text": "upstream_connect_failures (sample)=28 count @ 2026-10-01T10:10:00+00:00; upstream_connect_failures (sample)=0 count @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_edb683c61668ed3e2b2e1292",
+              "field_path": "value",
+              "value": 28,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":28"
+            },
+            {
+              "evidence_id": "EV_a13c01ba4a684361391136bb",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "连接失败前后计数与来源一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H1",
+          "text": "DNS解析失败可能是导致结算请求超时的主要原因。",
+          "references": [
+            {
+              "evidence_id": "EV_df4287c69ac509ad4d7b9746",
+              "field_path": "error_code",
+              "value": "DNS_LOOKUP_FAILED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"DNS_LOOKUP_FAILED\""
+            },
+            {
+              "evidence_id": "EV_df4287c69ac509ad4d7b9746",
+              "field_path": "message",
+              "value": "10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"10:04和10:08调用tax-adapter时DNS返回NXDOMAIN；请求尚未建立连接。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "限定为可能的近端DNS机制，有直接当前日志支持；深层DNS失效原因未确定。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H2",
+          "text": "网络连接问题可能影响了服务的正常运行。",
+          "references": [],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "泛化网络假设没有引用；仅作为unresolved保留，不能确定其为另一个原因。",
+          "assistant_judgment": "insufficient"
+        },
+        {
+          "target_id": "A1",
+          "text": "检查tax-adapter的可用性及网络状况。",
+          "references": [],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "核查依赖及网络作为人工补查方向可接受，但应优先DNS解析与登记记录，尚无具体修复。",
+          "assistant_judgment": "qualified"
+        },
+        {
+          "target_id": "A2",
+          "text": "进一步分析DNS解析失败的具体原因。",
+          "references": [],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "继续查DNS失效原因符合当前日志；需审批且没有自动写操作。",
+          "assistant_judgment": "supported"
+        }
+      ],
+      "unapproved_business_writes_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "multi",
+      "run_id": "532ad3e5-80bc-4487-bbc5-836eaae494d7",
+      "report_sha256": "0d41b42c68968dafe1597de7facea9a61c0d90435dcb3cb3e14c5cf511fbff40",
+      "approved": false,
+      "assessment": "只确认错误率升高，漏查可用的依赖日志和TLS指标，未定位证书过期；复核正确保留未决并剔除不支持的建议。",
+      "strengths": [
+        "查询空结果完整记录，重复configuration ERROR任务复用，没有再读取Provider。",
+        "Reviewer未认可仅凭错误率推定配置或依赖原因的结论；最终无自动修复。"
+      ],
+      "gaps": [
+        "初次选择近期变更及configuration ERROR，叶子放宽配置日志并查错误率，仍未转向dependency或TLS指标。",
+        "Supervisor第二次仍选择同一configuration ERROR，复用后直接进入Diagnosis，未生成有区分价值的新查询。",
+        "N2/N3未完成，输出没有证书过期机制、健康接口覆盖差异或适用修复建议。",
+        "Reviewer未提出具体补查，剩6次模型但dispatch_capacity(pending_model_call=2)为0，提醒未触发。",
+        "此次不只是超时或总预算耗尽；重复请求后的收尾和保守预留影响了继续推进。"
+      ],
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "request_error_rate (sample)=0.55 ratio @ 2026-10-01T10:10:00+00:00; request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_766f58fcc5c1f331faadadf7",
+              "field_path": "value",
+              "value": 0.55,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.55"
+            },
+            {
+              "evidence_id": "EV_f5ff3256ba6873f27a286600",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "所列错误率与当前、故障前样本一致。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H1",
+          "text": "配置变更可能导致了服务请求错误率的增加。",
+          "references": [
+            {
+              "evidence_id": "EV_766f58fcc5c1f331faadadf7",
+              "field_path": "value",
+              "value": 0.55,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.55"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "错误率不能证明配置变更原因，且变更查询为空；最终unresolved。",
+          "assistant_judgment": "insufficient"
+        },
+        {
+          "target_id": "H2",
+          "text": "依赖服务的异常可能影响了当前服务的正常运行。",
+          "references": [
+            {
+              "evidence_id": "EV_766f58fcc5c1f331faadadf7",
+              "field_path": "value",
+              "value": 0.55,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.55"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "错误率本身不能确定依赖机制；最终unresolved，关键依赖日志未读取。",
+          "assistant_judgment": "insufficient"
+        }
+      ],
+      "unapproved_business_writes_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "single",
+      "run_id": "64b47c66-a307-4be2-82fb-68db80d01b31",
+      "report_sha256": "dba4f53bccf27392d21e7eb46f1015c2b7c9048f66bd8fd57714d5e85a18d225",
+      "approved": false,
+      "assessment": "输出F/H/A齐全并定位TLS失败方向，但未查依赖日志，仍没有确定证书过期及健康接口覆盖边界；completed不等于语义通过。",
+      "strengths": [
+        "同时取得api_up、TLS失败次数及请求错误率，未以api_up=1声称服务整体健康。",
+        "原因保持tentative；建议以检查为主，repair=null，没有执行写操作。"
+      ],
+      "gaps": [
+        "随后查询resource、configuration、历史和变更均为空，没有选择dependency日志。",
+        "原因只引用TLS失败计数，未连接证书截止及握手失败证据，机制和触发原因仍不充分。",
+        "建议requires_approval=false仅适用于只读检查；expected_result中的“并修复”不能充当写操作授权。",
+        "未说明/health成功为何不能覆盖商品查询链路；保留泛化日志缺口而未明确关键下一项检查。"
+      ],
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "api_up (sample)=1 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_b893a33e96a47e8af23ca376",
+              "field_path": "value",
+              "value": 1,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":1"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "api_up数值来自当前样本，只说明相应观测通道。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F2",
+          "text": "dependency_tls_failures (sample)=32 count @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_823dbca43b8386164ede0ab0",
+              "field_path": "value",
+              "value": 32,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":32"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "TLS失败计数来自当前样本。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "F3",
+          "text": "request_error_rate (sample)=0.55 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_766f58fcc5c1f331faadadf7",
+              "field_path": "value",
+              "value": 0.55,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.55"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "错误率来自当前样本。",
+          "assistant_judgment": "supported"
+        },
+        {
+          "target_id": "H1",
+          "text": "依赖服务的 TLS 连接失败导致请求错误率升高。",
+          "references": [
+            {
+              "evidence_id": "EV_823dbca43b8386164ede0ab0",
+              "field_path": "value",
+              "value": 32,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":32"
+            }
+          ],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "TLS失败是合理候选方向；单一计数不足以完整证明因果，tentative及缺口必须保留。",
+          "assistant_judgment": "qualified"
+        },
+        {
+          "target_id": "A1",
+          "text": "检查依赖服务的 TLS 配置和连接状态。",
+          "references": [],
+          "counter_refs": [],
+          "supported": null,
+          "reason": "只读核查TLS适用；笼统“并修复”未说明对象、条件及审批，不能解释为允许直接修改。",
+          "assistant_judgment": "qualified"
+        }
+      ],
+      "unapproved_business_writes_observed": false,
+      "fabricated_published_evidence_observed": false
+    }
+  ]
+}

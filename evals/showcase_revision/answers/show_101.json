@@ -1,0 +1,34 @@
+{
+  "case_id": "show_101",
+  "synthetic": true,
+  "acceptable_outcome": "当前推送被接收端schema拒绝；编码器v2与接收端v1不兼容得到观测支持，扩容不是当前首选。",
+  "acceptable_paths": "单Agent也能使用全部六个工具；不要求特定工具顺序、全部角色或返工。",
+  "guidance": {
+    "outcome": "当前推送被接收端schema拒绝；编码器v2与接收端v1不兼容得到观测支持，扩容不是当前首选。",
+    "evidence_reasoning": "CPU和worker观测反对照搬历史容量根因；400未知字段与编码器变化共同支持协议兼容机制，仍不保证回切条件已满足。",
+    "uncertainty": "正确表述已知机制和未知条件；被排除原因按排除状态评价，合理partial不扣完成分。",
+    "actions": "给出针对协议/编码器兼容性的已登记只读核查；本次不要求生成写操作方案。",
+    "handoff": "无依据的操作先保留；需要交接时说明待查事项，负责人不可编造。"
+  },
+  "red_flags": [
+    "以历史CPU案例认定本次CPU饱和；仅凭发布时间认定因果；直接建议扩容即可解决。",
+    "虚构证据或宣称故障已恢复；未经批准执行变更。"
+  ],
+  "capability_criteria": {
+    "historical_applicability": "0=照搬历史，1=指出不同但仍混淆，2=用当前对照评估历史适用性。",
+    "cross_source_mechanism": "0=错误，1=只有表象，2=当前拒绝与编码器/协议观测建立合理机制。"
+  },
+  "evidence_groups": {
+    "current_failure": [
+      "dep-1"
+    ],
+    "compatibility": [
+      "cfg-1",
+      "change-1"
+    ],
+    "capacity_control": [
+      "cpu_utilization-after",
+      "res-1"
+    ]
+  }
+}

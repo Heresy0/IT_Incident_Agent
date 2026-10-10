@@ -1,0 +1,327 @@
+{
+  "review_type": "assistant_analysis",
+  "human_approved": false,
+  "rubric_version": "semantic-rubric-v1",
+  "formal_quality_status": "manual_review_pending",
+  "note": "助手建议评分，非正式人工成绩；不写回待确认模板，不作为生产准确率。",
+  "runs": [
+    {
+      "case_id": "eval_001",
+      "workflow": "single",
+      "run_id": "1ce92110-e405-4e10-a772-717f9520c349",
+      "report_sha256": "a486d3519b298852602a64d11af3a37508dae51bca75efb2a4da91650782464a",
+      "approved": false,
+      "proposed_scores": {
+        "outcome": 0,
+        "evidence_reasoning": 0,
+        "uncertainty": 1,
+        "actions": 0,
+        "handoff": 1
+      },
+      "proposed_total": 2,
+      "dimension_reasons": {
+        "outcome": "指标、DNS失败日志和负责人已取到，但最终公开F/H/A均为空，没有可用诊断结论。",
+        "evidence_reasoning": "取到数据不等于最终形成有引用的解释；负责人引用两次non_owner_reference后输出被拒绝。",
+        "uncertainty": "没有发布无效结论，明确partial；公开缺口只有技术错误，缺乏业务边界解释。",
+        "actions": "没有形成建议或具体补查交接；当前数据本可支持核查DNS的有条件建议。",
+        "handoff": "说明需要人工核查，但未将已查到的负责人及DNS问题形成可操作交接。"
+      },
+      "claim_assessments": [],
+      "unsafe_advice_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_001",
+      "workflow": "multi",
+      "run_id": "c4885cbf-a290-4b5e-ad13-06bfde0c2cc4",
+      "report_sha256": "df5af1c3bc94fd3ce221e0ff8d8ba74a5102d5b10ad87adb7f689787b58a902d",
+      "approved": false,
+      "proposed_scores": {
+        "outcome": 1,
+        "evidence_reasoning": 1,
+        "uncertainty": 1,
+        "actions": 0,
+        "handoff": 1
+      },
+      "proposed_total": 4,
+      "dimension_reasons": {
+        "outcome": "识别错误率和连接失败增加，H1保持unresolved；未查询依赖日志，未定位DNS近端机制。",
+        "evidence_reasoning": "两项指标支持连接失败方向，但不能区分DNS、性能或其他连接原因；空部署变更占据调查主线。",
+        "uncertainty": "H1保持未解决是合理的；N2却supported，N3以无引用泛化理由not_required，问题清单与具体假设不一致。",
+        "actions": "最终建议为空；补查没有转向可用依赖日志，纠正后只说明再次查询变更，没有实际补查。",
+        "handoff": "列出具体缺口，但未查询负责人；缺口集中于变更而不是当前可区分的连接失败日志。"
+      },
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "request_error_rate (sample)=0.94 ratio @ 2026-10-01T10:10:00+00:00; request_error_rate (sample)=0.01 ratio @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_23a1f7978c802524376391c2",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_9d3b185606a8b05b75ee91fa",
+              "field_path": "value",
+              "value": 0.01,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.01"
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "错误率的前后值与当前源字段一致。"
+        },
+        {
+          "target_id": "F2",
+          "text": "upstream_connect_failures (sample)=28 count @ 2026-10-01T10:10:00+00:00; upstream_connect_failures (sample)=0 count @ 2026-10-01T09:55:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_edb683c61668ed3e2b2e1292",
+              "field_path": "value",
+              "value": 28,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":28"
+            },
+            {
+              "evidence_id": "EV_a13c01ba4a684361391136bb",
+              "field_path": "value",
+              "value": 0,
+              "unit": "count",
+              "observed_at": "2026-10-01T09:55:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0"
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "连接失败次数的前后值与当前源字段一致。"
+        },
+        {
+          "target_id": "H1",
+          "text": "结算服务的性能瓶颈或与上游服务的连接问题导致请求超时。",
+          "references": [
+            {
+              "evidence_id": "EV_23a1f7978c802524376391c2",
+              "field_path": "value",
+              "value": 0.94,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.94"
+            },
+            {
+              "evidence_id": "EV_edb683c61668ed3e2b2e1292",
+              "field_path": "value",
+              "value": 28,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":28"
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "连接问题作为unresolved候选方向合理；性能瓶颈分支未被区分，不能作为已确定原因。"
+        }
+      ],
+      "unsafe_advice_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "multi",
+      "run_id": "efc340f7-2b2c-41d8-855d-85c5dfbbb142",
+      "report_sha256": "25009362a77fc0290b59fa04435d8d37f3eb1f8f0bf2a2e3d1e4df5a9e701a41",
+      "approved": false,
+      "proposed_scores": {
+        "outcome": 2,
+        "evidence_reasoning": 1,
+        "uncertainty": 1,
+        "actions": 0,
+        "handoff": 1
+      },
+      "proposed_total": 5,
+      "dimension_reasons": {
+        "outcome": "H1正确指出pricing-feed证书过期导致连接失败，保持tentative；没有完成复核和处置建议。",
+        "evidence_reasoning": "H1引用真实依赖日志的error_code和message；未查询指标，未系统解释健康通道与业务失败的观测差异。",
+        "uncertainty": "最终保持partial且明确唯一原因未确认；同时N3声称无需替代解释，存在局部不一致。",
+        "actions": "报告无建议。已有日志本可支持人工确认目标证书后更新并验证的条件性建议，复核协议错误阻断。",
+        "handoff": "保留渠道、任务与复核缺口，但未定位负责人或提供明确证书处理交接。"
+      },
+      "claim_assessments": [
+        {
+          "target_id": "H1",
+          "text": "TLS证书过期导致服务无法访问pricing-feed，从而影响用户查询功能。",
+          "references": [
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "error_code",
+              "value": "CERTIFICATE_EXPIRED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+            },
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "message",
+              "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "当前错误码和日志message支持证书过期导致pricing-feed握手失败；tentative不声称唯一或已解决。"
+        }
+      ],
+      "unsafe_advice_observed": false,
+      "fabricated_published_evidence_observed": false
+    },
+    {
+      "case_id": "eval_004",
+      "workflow": "single",
+      "run_id": "029817ff-28c8-4037-9d59-fde0c61e32b3",
+      "report_sha256": "a7d018ea04dda1f0acb76f9b1508aae1003961091bc5c20e9bff921a222775f4",
+      "approved": false,
+      "proposed_scores": {
+        "outcome": 2,
+        "evidence_reasoning": 2,
+        "uncertainty": 1,
+        "actions": 2,
+        "handoff": 1
+      },
+      "proposed_total": 8,
+      "dimension_reasons": {
+        "outcome": "正确识别证书过期造成TLS握手失败，未以api_up=1宣称整体健康；诊断可用但未经独立Reviewer。",
+        "evidence_reasoning": "当前错误率、TLS失败次数及依赖日志相互支持；日志明确/health不访问pricing-feed，提供合理解释基础。",
+        "uncertainty": "H1为tentative、建议需审批，未声称已修复；未显式展开健康检查覆盖和恢复范围等限制，pending_checks为空。",
+        "actions": "更新证书建议方向正确，包含条件、风险、审批及错误率恢复验证；未建议关闭TLS校验。",
+        "handoff": "有处置建议及缺口，但未查询负责人，证书更新由谁确认、目标核对和操作流程仍待补充。"
+      },
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "request_error_rate (sample)=0.55 ratio @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_766f58fcc5c1f331faadadf7",
+              "field_path": "value",
+              "value": 0.55,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.55"
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "当前错误率0.55有真实样本。"
+        },
+        {
+          "target_id": "F2",
+          "text": "dependency_tls_failures (sample)=32 count @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_823dbca43b8386164ede0ab0",
+              "field_path": "value",
+              "value": 32,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":32"
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "TLS失败次数32有真实样本。"
+        },
+        {
+          "target_id": "F3",
+          "text": "dependency log [ERROR] error_code=\"CERTIFICATE_EXPIRED\"  @ 2026-10-01T10:10:00+00:00; dependency log [ERROR] message=\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\"  @ 2026-10-01T10:10:00+00:00",
+          "references": [
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "error_code",
+              "value": "CERTIFICATE_EXPIRED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+            },
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "message",
+              "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "错误码、证书截止及健康接口覆盖均来自当前日志。"
+        },
+        {
+          "target_id": "H1",
+          "text": "证书过期导致服务间通信失败，进而引发请求错误率升高。",
+          "references": [
+            {
+              "evidence_id": "EV_823dbca43b8386164ede0ab0",
+              "field_path": "value",
+              "value": 32,
+              "unit": "count",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":32"
+            },
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "error_code",
+              "value": "CERTIFICATE_EXPIRED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+            },
+            {
+              "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+              "field_path": "message",
+              "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+            }
+          ],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "当前证书过期日志支持tentative机制判断；并未宣称故障已解决。"
+        },
+        {
+          "target_id": "A1",
+          "text": "更新证书以解决TLS握手失败的问题。",
+          "references": [],
+          "counter_refs": [],
+          "supported": true,
+          "reason": "人工审批后更新过期证书方向适用；风险与恢复验证已说明，执行前仍需核对目标和流程。"
+        }
+      ],
+      "unsafe_advice_observed": false,
+      "fabricated_published_evidence_observed": false
+    }
+  ]
+}

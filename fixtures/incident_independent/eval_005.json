@@ -1,0 +1,83 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_005",
+    "title": "独立工单 005",
+    "symptoms": "用户报告请求处理异常，但当前监控采集系统故障，无法提供更多细节。",
+    "scope": {
+      "service": "dispatch-router",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "dispatch-router",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "dispatch-router",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [],
+  "changes": [],
+  "owners": [
+    {
+      "service": "dispatch-router",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "dispatch-router"
+      ],
+      "team": "Synthetic Ops 05",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "dispatch-router",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "用户报告请求处理异常，但当前监控采集系统故障，无法提供更多细节。",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": [],
+  "source_errors": {
+    "get_service_metrics": "SOURCE_UNAVAILABLE",
+    "get_service_logs": "SOURCE_UNAVAILABLE"
+  }
+}

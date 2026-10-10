@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-10",
+  "validation_type": "offline_protocol_replay_not_model_quality",
+  "implementation_sha256_prefix": "ba7f01ad1e477d7d",
+  "previous_live_implementation_sha256_prefix": "11e895e2f331bf28",
+  "paid_model_calls": 0,
+  "real_business_mutations": 0,
+  "live_retests": 0,
+  "git_commit_created": false,
+  "git_push_performed": false,
+  "new_protocol_tests": {
+    "total": 9,
+    "passed": 9
+  },
+  "full_regression": {
+    "total": 343,
+    "passed": 336,
+    "skipped": 7,
+    "failures": 0,
+    "errors": 0,
+    "duration_seconds": 40.247,
+    "skipped_reason": "Isolated PostgreSQL integration fixture not configured",
+    "command": ".venv/Scripts/python.exe -m unittest discover -s tests -t . -q"
+  },
+  "corrected_test_startup": "Initial discovery omitted -t . and caused test/application package name collisions; no business fix required.",
+  "offline_replays": [
+    {
+      "sequence": "core_ledger_error_then_non_dispatch_redundant_tasks",
+      "scripted_model_steps": 7,
+      "synthetic_tool_attempts": 2,
+      "structure_corrections": 1,
+      "diagnosis_calls": 1,
+      "reviewer_calls": 1
+    },
+    {
+      "sequence": "persistent_recoverable_supervisor_error",
+      "scripted_model_steps": 7,
+      "synthetic_tool_attempts": 2,
+      "structure_corrections": 1,
+      "protocol_finalization_routes": 1,
+      "diagnosis_calls": 1,
+      "reviewer_calls": 1
+    }
+  ],
+  "frozen_data": {
+    "targeted_files_verified": 19,
+    "independent_files_verified": 23,
+    "targeted_freeze_sha256": "a007d431a832905e1403485173d4d371b35f5c724272bc16bca5eb53e0760130",
+    "evaluation_code_unchanged_since_previous_live_batch": true,
+    "holdout_runs_added": 0,
+    "answers_changed": false
+  },
+  "source_sha256": {
+    "app/agents/contracts.py": "9a3c22553f85e2b45d81920722f7168c8362f9c59ad96df559964e17c5e7a4ba",
+    "app/agents/prompts.py": "356b8b661c7311ce44164ac13e67adbce75b5e8e083c347c7335a0236967398e",
+    "app/workflow/evidence_needs.py": "16dca5fe62a0ac8531c3fbd136109c3bf3ad90bb98417d1262c021a0be6fbd76",
+    "app/workflow/coordinator.py": "d47a3d7d9d17e525a7dc5885334fdf5e1f25b762a60c9f9d0be90b5ae2009588",
+    "app/workflow/graph.py": "b458ad21d8c102ecbdfbef7f01cd50824a39858b7227cda3b2890fcad47e7909",
+    "app/evidence/render.py": "98cbd7f5200cf384ce5aa29c1d5745743354a3bb332b21bd03641c16091d98d4",
+    "tests/workflow/test_supervisor_resilience.py": "ed6e5cc6fea3da58beceefd637d529b1aa0f6118173e67ad7878469a52c10eee",
+    "tests/workflow/test_live_protocol_regressions.py": "4da2c4fd516f64031acf86b7455366b07ef9f41fa3e0f92cc23bf932a85d07df"
+  },
+  "limits": [
+    "Offline responses test control behavior, not real model diagnosis quality.",
+    "No new live comparison or multi-agent advantage claim.",
+    "Existing one correction, budget caps and repair approval gates remain in force.",
+    "Single-agent implementation unchanged in this fix; incomplete diagnosis is still partial."
+  ]
+}

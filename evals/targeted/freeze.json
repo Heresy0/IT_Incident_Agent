@@ -1,0 +1,24 @@
+{
+  "dataset_version": "targeted-synthetic-v1",
+  "files": {
+    "evals/targeted/manifest.json": "3d556d3beadc3571bf9b001713cebcc8aa2d2ccbf0864d14e63781bf162c7de2",
+    "evals/targeted/rubric.json": "f4a6f919c1c0965059c03a9447fb8b23c5cc4a449d0d7aa468c8a21d752353f0",
+    "fixtures/incident_targeted/catalog.json": "545622b97d5c2afbb206df81339912b8e6c3e1be6fd33f1011b90a33e864dd9a",
+    "fixtures/incident_targeted/probe_001.json": "bf5990457f779ced68f04f1d0da6e5fcf5693bc095addb2358983f5f88aaa698",
+    "fixtures/incident_targeted/probe_002.json": "deff0acab534a1d3f894396084ebc6abb690c21849045b10652f0058a321584e",
+    "fixtures/incident_targeted/probe_003.json": "d1b3baf3467bcba821b2959d4475c25e56bcce8ea70128de022891dbabfc217f",
+    "fixtures/incident_targeted/probe_004.json": "a78baf251a846da6a7032eca0f2123dee7e1cfc7eec754eec85c218852f2caeb",
+    "fixtures/incident_targeted/probe_005.json": "61c822233479f30d5d7dcc909e7aa61fb2f71895a7c81ab35b9cb87242ed7fe3",
+    "fixtures/incident_targeted/probe_006.json": "541414df436bf2fa0ad54ff0373f564aa122353d605baf0259e9bfbfac3cb781",
+    "fixtures/incident_targeted/probe_007.json": "761c5491ff1c23e2836dbcd1cb22985d5bede875f5786f5e8796f070ec6b1331",
+    "fixtures/incident_targeted/probe_008.json": "82112b2e59208774de2c261fcd19822878ee0c2dd4a829052239a497a628db56",
+    "evals/targeted/answers/probe_001.json": "41aa2c189d470672abfbd5882d08de13553d82c3f042bad18d6e91c6089ed45e",
+    "evals/targeted/answers/probe_002.json": "1af23dfe8c4c2f42e21c3f4aa7af5b17f9927af744aad3f0c9c66d858e03fcf0",
+    "evals/targeted/answers/probe_003.json": "1041024d8a6beef5d485be1837d100f16fc4f102f90ce749da6311c6baad96e3",
+    "evals/targeted/answers/probe_004.json": "49bc97e53051bdd96644ccda1eace572160e81e48574d623c243532e2c162f4b",
+    "evals/targeted/answers/probe_005.json": "9c3cfb0919b31760d58ae74f932479406463e88fec9b593d9a8ad4f7acc02532",
+    "evals/targeted/answers/probe_006.json": "7b628023bec022f1fd387e09fc16de7fdf65e432065c93d690d5cfe7a19f3dd8",
+    "evals/targeted/answers/probe_007.json": "ce0a1ae9eb0a3691c79d03f239bfd2e4a655d0102d2d3463bef0032f955bce8b",
+    "evals/targeted/answers/probe_008.json": "bbf7378a2f5186ccabea6267a7a870f2ba77924b7ee7c5b79a44ce37865f76a1"
+  }
+}

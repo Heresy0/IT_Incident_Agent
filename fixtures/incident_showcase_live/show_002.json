@@ -1,0 +1,163 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "show_002",
+    "title": "绿色健康探针与导出失败的矛盾核查（合成）",
+    "symptoms": "10:04起 export 导出失败，但 /health 面板仍是绿色。监控项 export_error_rate、health_probe_success、dependency_latency_ms 可用。上周类似导出失败通过恢复存储服务解决。本次希望区分存储整体不可用与业务路径局部失败，评估是否适合沿用历史恢复方式并给出有条件的处理建议。",
+    "scope": {
+      "service": "asset-export",
+      "environment": "staging",
+      "service_version": "2.7.0",
+      "start": "2026-10-12T10:00:00+00:00",
+      "end": "2026-10-12T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "export_error_rate-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "export_error_rate",
+      "value": 0.91,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "health_probe_success-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "health_probe_success",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_latency_ms-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "dependency_latency_ms",
+      "value": 13,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "health-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "PROBE_OK",
+      "message": "GET /health只检查本地进程；GET storage:/metadata成功，未执行数据写入。"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "write-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "STORAGE_PERMISSION_DENIED",
+      "message": "POST /export写入bucket=staging-export时被拒绝；identity=export-reader；storage返回403。"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "IDENTITY_SELECTED",
+      "message": "10:03后/export使用identity=export-reader；读元数据探针仍成功。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-12T10:03:00+00:00",
+      "category": "configuration",
+      "version": "2.7.0",
+      "summary": "导出路由身份切换为export-reader；/health检查项未修改。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "aliases": [
+        "asset-export"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "2.7.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:04起 export 导出失败，但 /health 面板仍是绿色。监控项 export_error_rate、health_probe_success、dependency_latency_ms 可用。上周类似导出失败通过恢复存储服务解决。本次希望区分存储整体不可用与业务路径局部失败，评估是否适合沿用历史恢复方式并给出有条件的处理建议。 delivery export error queue health",
+      "text": "绿色本地健康探针和元数据读取不能代表业务写入成功。区分连接超时与403拒绝；核对业务路径使用的身份和最小写权限。修改身份或权限需要负责人审批，恢复后验证实际导出成功率，不只验证/health。"
+    }
+  ],
+  "incidents": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "curated-showcase-v1",
+      "visibility": "public_synthetic",
+      "id": "history",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "versions": [
+        "2.7.0"
+      ],
+      "search_text": "10:04起 export 导出失败，但 /health 面板仍是绿色。监控项 export_error_rate、health_probe_success、dependency_latency_ms 可用。上周类似导出失败通过恢复存储服务解决。本次希望区分存储整体不可用与业务路径局部失败，评估是否适合沿用历史恢复方式并给出有条件的处理建议。 delivery export error queue health",
+      "confirmed": true,
+      "validity": "active",
+      "confirmed_at": "2026-09-25T08:00:00+00:00",
+      "error_codes": [
+        "STORAGE_UNREACHABLE"
+      ],
+      "summary": "上周导出失败时读元数据和写入均连接超时；存储进程已停止。",
+      "resolution": "人工恢复存储进程后读写恢复；适用前提是传输连接失败和存储进程停止。"
+    }
+  ]
+}

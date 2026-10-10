@@ -1,0 +1,131 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "eval_006",
+    "title": "独立工单 006",
+    "symptoms": "10:05起导出暂时停止，有待处理任务，是否发生故障？",
+    "scope": {
+      "service": "batch-export",
+      "environment": "staging",
+      "service_version": "3.1.0",
+      "start": "2026-10-01T09:50:00+00:00",
+      "end": "2026-10-01T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "consumer_active-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "consumer_active",
+      "value": 1,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "consumer_active-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "consumer_active",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "pending_exports-before",
+      "timestamp": "2026-10-01T09:55:00+00:00",
+      "metric": "pending_exports",
+      "value": 0,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "pending_exports-after",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "metric": "pending_exports",
+      "value": 4,
+      "unit": "count",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "log-1",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "MAINTENANCE_PAUSE",
+      "message": "消费者按已批准维护计划于10:05暂停；窗口10:05至10:20，预计10:20后恢复。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-01T10:01:00+00:00",
+      "category": "configuration",
+      "version": "3.1.0",
+      "summary": "已批准维护窗口10:05至10:20；暂停batch-export消费者，保留队列，不清空任务。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "aliases": [
+        "batch-export"
+      ],
+      "team": "Synthetic Ops 06",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "batch-export",
+      "environment": "staging",
+      "data_version": "independent-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-01T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.1.0"
+      ],
+      "updated_at": "2026-10-01T09:50:00+00:00",
+      "search_text": "10:05起导出暂时停止，有待处理任务，是否发生故障？",
+      "text": "先核对当前观测与影响范围，区分现象、近端机制、触发原因和未知条件。写操作需人工审批，并在操作后验证业务结果；无证据时保留缺口。"
+    }
+  ],
+  "incidents": []
+}

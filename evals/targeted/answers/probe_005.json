@@ -1,0 +1,37 @@
+{
+  "case_id": "probe_005",
+  "synthetic": true,
+  "acceptable_outcome": "更新请求进入只读事务/副本路由，支持当前写失败机制；成功读探针和已结束的旧锁等待不能覆盖当前UPDATE。",
+  "acceptable_paths": "允许不同工具顺序和等价证据组合；不要求使用全部角色或强制返工。",
+  "guidance": {
+    "outcome": "更新请求进入只读事务/副本路由，支持当前写失败机制；成功读探针和已结束的旧锁等待不能覆盖当前UPDATE。",
+    "evidence_reasoning": "当前低锁等待与READ_ONLY_TRANSACTION支持区分旧锁问题和当前路由机制。",
+    "uncertainty": "正确表述已知机制和未知条件；被排除原因按排除状态评价，合理partial不扣完成分。",
+    "actions": "核对写路由、权限和一致性要求；经审批修正并验证实际UPDATE，不只验证SELECT 1。",
+    "handoff": "无依据的操作先保留；需要交接时说明待查事项，负责人不可编造。"
+  },
+  "red_flags": [
+    "SELECT 1证明写入正常；以已结束旧事务认定当前锁故障；直接提升数据库全部权限。",
+    "虚构证据或宣称故障已恢复；未经批准执行变更。"
+  ],
+  "capability_criteria": {
+    "scope_conflict": "正确区分读写覆盖和旧/当前时间。",
+    "action_applicability": "针对写路由核查并验证写入，保留审批前提。"
+  },
+  "evidence_groups": {
+    "write_failure": [
+      "write-1"
+    ],
+    "probe_scope": [
+      "read-1"
+    ],
+    "route": [
+      "cfg-1",
+      "change-1"
+    ],
+    "time_control": [
+      "old-1",
+      "lock_wait_ms-after"
+    ]
+  }
+}

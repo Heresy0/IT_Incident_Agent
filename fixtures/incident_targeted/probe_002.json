@@ -1,0 +1,193 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_002",
+    "title": "合成工单 002",
+    "symptoms": "10:04起 export 导出请求失败，但健康面板仍是绿色，用户希望确认是否为存储不可用。",
+    "scope": {
+      "service": "asset-export",
+      "environment": "staging",
+      "service_version": "2.7.0",
+      "start": "2026-10-12T09:50:00+00:00",
+      "end": "2026-10-12T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "export_error_rate-before",
+      "timestamp": "2026-10-12T09:55:00+00:00",
+      "metric": "export_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "export_error_rate-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "export_error_rate",
+      "value": 0.91,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "health_probe_success-before",
+      "timestamp": "2026-10-12T09:55:00+00:00",
+      "metric": "health_probe_success",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "health_probe_success-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "health_probe_success",
+      "value": 1,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_latency_ms-before",
+      "timestamp": "2026-10-12T09:55:00+00:00",
+      "metric": "dependency_latency_ms",
+      "value": 12,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dependency_latency_ms-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "dependency_latency_ms",
+      "value": 13,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "health-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "PROBE_OK",
+      "message": "GET /health只检查本地进程；GET storage:/metadata成功，未执行数据写入。"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "write-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "STORAGE_PERMISSION_DENIED",
+      "message": "POST /export写入bucket=staging-export时被拒绝；identity=export-reader；storage返回403。"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "old-1",
+      "timestamp": "2026-10-12T09:52:00+00:00",
+      "category": "resource",
+      "level": "ERROR",
+      "error_code": "DISK_FULL",
+      "message": "host=retired-runner；09:52旧导出目录写满；该runner已移出当前导出路由。"
+    },
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "IDENTITY_SELECTED",
+      "message": "10:03后/export使用identity=export-reader；读元数据探针仍成功。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-12T10:03:00+00:00",
+      "category": "configuration",
+      "version": "2.7.0",
+      "summary": "导出路由身份切换为export-reader；/health检查项未修改。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "aliases": [
+        "asset-export"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "asset-export",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "2.7.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:04起 export 导出请求失败，但健康面板仍是绿色，用户希望确认是否为存储不可用。 timeout queue error",
+      "text": "export业务写入和metadata只读探针权限不同；判断时核对接口、身份、实例及时间。身份变更由负责人审批，先确认所需最小权限。"
+    }
+  ],
+  "incidents": []
+}

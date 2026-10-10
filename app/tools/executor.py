@@ -8,6 +8,7 @@ from evidence.contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS,
                         ToolResult, ToolError, ReferenceOption, EvidenceRef)
 from providers.fixtures import ProviderError
 from pydantic import ValidationError
+from tools.query_coverage import covering_empty
 
 
 def reference_field_paths(payload, prefix=""):
@@ -27,6 +28,7 @@ class ToolExecutor:
     def __init__(self, provider, principal: Principal, scope, context: RunContext, role="investigation"):
         self.provider, self.principal, self.scope, self.context, self.role = provider, principal, scope, context, role
         self.seen = set()
+        self.check_results = {}
         self.evidence = {}
         self.references = {}
         self.last_query_profile = {}
@@ -70,8 +72,11 @@ class ToolExecutor:
         schemas = [{"type": "function", "function": {"name": n, "description": descriptions[n],
                 "parameters": TOOL_ARGS[n].model_json_schema()}} for n in sorted(allowed)]
         for schema in schemas:
-            if schema['function']['name'] == 'get_service_metrics' and capabilities:
-                schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(capabilities['registered_metrics'])
+            if schema['function']['name'] == 'get_service_metrics':
+                if capabilities:
+                    schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(capabilities['registered_metrics'])
+                elif definitions and self.role != 'single':
+                    schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(definitions)
             if (schema['function']['name'] == 'get_service_logs' and capabilities
                     and capabilities['registered_log_categories']):
                 schema['function']['parameters']['properties']['category']['enum'] = capabilities['registered_log_categories']
@@ -148,6 +153,24 @@ class ToolExecutor:
         if signature in self.seen:
             return self.rejected("DUPLICATE_TOOL")
         self.seen.add(signature)
+        empty = covering_empty(name, args.model_dump(mode='json'), self.check_results) if self.role != 'single' else None
+        if empty:
+            self.context.emit({'type': 'query_reused', 'role': self.role, 'name': name,
+                'reason': 'complete_empty_superset', 'source_args': empty['args'],
+                'requested_args': args.model_dump(mode='json')})
+            # The original ledger remains the source; this is not a provider read
+            # and does not turn an empty result into successful task coverage.
+            return ToolResult(status='empty')
+        result = self._query(name, args)
+        # Server-owned result ledger: failed/empty/truncated reads never become
+        # successful coverage just because a model finished its conversation.
+        self.check_results[signature] = {'tool': name, 'args': args.model_dump(mode='json'),
+            'status': result.status, 'truncated': result.truncated,
+            'evidence_ids': [e.evidence_id for e in result.evidence],
+            'error': result.error.code if result.error else None}
+        return result
+
+    def _query(self, name, args):
         for attempt in range(2):
             try:
                 self.context.reserve("tool")

@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-10",
+  "dataset_version": "targeted-synthetic-v1",
+  "application_fingerprint": "11e895e2f331bf28",
+  "application_changed_for_cases": false,
+  "dataset_structure": {
+    "dataset_version": "targeted-synthetic-v1",
+    "cases": 8,
+    "splits": {
+      "development": 5,
+      "holdout": 3
+    },
+    "provider_queries": 64,
+    "model_calls": 0,
+    "reserved_answers_parsed": false,
+    "quality_status": "not_evaluated"
+  },
+  "frozen_files": 19,
+  "previous_independent_frozen_files_unchanged": 23,
+  "new_tests": 10,
+  "full_free_regression": {
+    "total": 334,
+    "passed": 327,
+    "skipped_postgres_integration": 7
+  },
+  "scripted_pairs": 5,
+  "scripted_runs": 10,
+  "mechanical_passes": 10,
+  "scripted_model_steps": 44,
+  "synthetic_tool_attempts": 10,
+  "quality_status": "excluded_scripted",
+  "advantage_threshold_met": null,
+  "paid_calls": 0,
+  "live_service_writes": 0,
+  "reserved_diagnostic_runs": 0,
+  "artifact_relative": "output/targeted-suite-acceptance/28470828-fb8f-4507-9b99-4c893c291c48",
+  "bundle_sha256": "aa0931e7733df04e95813ad49df1a7498e9bf1508ad09843c707e076e6f8e15d",
+  "report_sha256": {
+    "c677f5bf-2601-4543-be96-58ffa0dbdfb6.json": "057ae2f28838c46ef006832db3d94deaae6922606f96f2f3a7974eba58b4b2a7",
+    "4598cb0b-c4b5-4088-a438-628e4655c8d9.json": "1b8fdfa3f95dbaa5f9fa2efd7d0b51c67fd289a0a07b929cde635bf091b7d831",
+    "e8944b0a-3989-4ef0-89ff-0dba92eac609.json": "9eb5d353f287f60051032be51fb1d53a59fb7fba6568f803bbd101b262200a73",
+    "42fe977e-41bf-4cbd-9763-9560952a2488.json": "c877c625d7ca6e20658d2b4606e107128b56a22401e831c5db5ce4e85f9c58de",
+    "207de564-b108-4792-886e-16b30be7c254.json": "21eca0eb9dd953ac265ebb483080b03f03fda162765b37d4fd8da70a40e8b72b",
+    "2caa8528-ef67-4d78-ae86-e081f783236f.json": "1906e1cfd988f709ce86c7d4410e7e48dbe33b23734cda98009b7de500b33af3",
+    "bc13a07e-4b8d-44df-aa8d-393f796c57b9.json": "4f64dc54ec218824f2b9fa5845b09f03a7584cb0811cd6aad5a33b2bd0d5c123",
+    "99564067-ba02-44e9-a089-0b1917bd6e24.json": "b3ceaaf573e27d605bf3318c8053cdbe7ed3ae2473b06c05587b69aa367d3627",
+    "c89e14a3-c1a9-4c27-8138-589712d39762.json": "adbdd92bd153630109ea0204166b9ebd47b6417656838db7084fa7de17674b8e",
+    "f4f57045-741b-4480-9b81-c77323d62c55.json": "923e80a81ad03c29e0239783559d1f0a86a46945b52366f67ded053f7b99e146"
+  },
+  "next_batch_plan": {
+    "cases": [
+      "probe_001",
+      "probe_002"
+    ],
+    "paired_runs": 4,
+    "maximum_model_calls": 64,
+    "maximum_tool_calls": 32,
+    "estimated_cost": null,
+    "authorized": false
+  },
+  "meaning": "数据、评分隔离、同预算入口与机械约束通过；模拟不证明多Agent诊断质量或优势。"
+}

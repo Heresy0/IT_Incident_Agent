@@ -1,0 +1,207 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_003",
+    "title": "合成工单 003",
+    "symptoms": "10:05起 pricing 请求超时，用户怀疑下游quote服务故障；需要区分下游慢与本地排队。",
+    "scope": {
+      "service": "pricing-router",
+      "environment": "staging",
+      "service_version": "3.4.0",
+      "start": "2026-10-13T09:50:00+00:00",
+      "end": "2026-10-13T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_timeout_rate-before",
+      "timestamp": "2026-10-13T09:55:00+00:00",
+      "metric": "request_timeout_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "request_timeout_rate-after",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "metric": "request_timeout_rate",
+      "value": 0.77,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_wait_ms-before",
+      "timestamp": "2026-10-13T09:55:00+00:00",
+      "metric": "queue_wait_ms",
+      "value": 4,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "queue_wait_ms-after",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "metric": "queue_wait_ms",
+      "value": 2100,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "upstream_probe_latency_ms-before",
+      "timestamp": "2026-10-13T09:55:00+00:00",
+      "metric": "upstream_probe_latency_ms",
+      "value": 10,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "upstream_probe_latency_ms-after",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "metric": "upstream_probe_latency_ms",
+      "value": 11,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "inflight_requests-before",
+      "timestamp": "2026-10-13T09:55:00+00:00",
+      "metric": "inflight_requests",
+      "value": 10,
+      "unit": "requests",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "inflight_requests-after",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "metric": "inflight_requests",
+      "value": 128,
+      "unit": "requests",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "dep-1",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "category": "dependency",
+      "level": "ERROR",
+      "error_code": "REQUEST_DEADLINE",
+      "message": "用户请求在本地队列达到deadline，未完成新的quote请求；quote只读探针返回200，耗时11ms。"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "res-1",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "category": "resource",
+      "level": "ERROR",
+      "error_code": "INFLIGHT_LIMIT_REACHED",
+      "message": "当前inflight=128，limit=128；其中retry_requests=118，original_requests=10；新请求等待调度。"
+    },
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "cfg-1",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "RETRY_POLICY_LOADED",
+      "message": "retry上限由2变为12，retry_interval_ms=0；09:55相同入口inflight=10。"
+    }
+  ],
+  "changes": [
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "change-1",
+      "timestamp": "2026-10-13T10:04:00+00:00",
+      "category": "configuration",
+      "version": "3.4.0",
+      "summary": "pricing重试策略调整；最大attempts 2 -> 12，取消重试间隔。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "aliases": [
+        "pricing-router"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "pricing-router",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-13T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "3.4.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "10:05起 pricing 请求超时，用户怀疑下游quote服务故障；需要区分下游慢与本地排队。 timeout queue error",
+      "text": "pricing超时应区分本地排队与下游响应；选择能区分机制的当前日志，重试占用需结合队列和策略。调整前核对幂等性与流量。"
+    }
+  ],
+  "incidents": []
+}

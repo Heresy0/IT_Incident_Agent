@@ -1,0 +1,109 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "probe_008",
+    "title": "合成工单 008",
+    "symptoms": "report任务失败率升高，错误详情无法打开；请判断原因和下一步。",
+    "scope": {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "start": "2026-10-18T09:50:00+00:00",
+      "end": "2026-10-18T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "task_failure_rate-before",
+      "timestamp": "2026-10-18T09:55:00+00:00",
+      "metric": "task_failure_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "task_failure_rate-after",
+      "timestamp": "2026-10-18T10:10:00+00:00",
+      "metric": "task_failure_rate",
+      "value": 0.64,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-before",
+      "timestamp": "2026-10-18T09:55:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "workers_active-after",
+      "timestamp": "2026-10-18T10:10:00+00:00",
+      "metric": "workers_active",
+      "value": 2,
+      "unit": "workers",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [],
+  "changes": [],
+  "owners": [
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-18T10:10:00+00:00",
+      "aliases": [
+        "report-dispatch"
+      ],
+      "team": "Synthetic Platform Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "report-dispatch",
+      "environment": "staging",
+      "data_version": "targeted-synthetic-v1",
+      "visibility": "public_synthetic",
+      "id": "runbook",
+      "timestamp": "2026-10-18T10:10:00+00:00",
+      "category": "resource",
+      "versions": [
+        "2.1.0"
+      ],
+      "updated_at": "2026-09-20T08:00:00+00:00",
+      "search_text": "report任务失败率升高，错误详情无法打开；请判断原因和下一步。 timeout queue error",
+      "text": "失败率能支持异常现象，不能单独识别原因；日志和变更不可获取时保留缺口，交接恢复观测，不自动重启。"
+    }
+  ],
+  "incidents": [],
+  "source_errors": {
+    "get_service_logs": "SOURCE_UNAVAILABLE",
+    "get_recent_changes": "SOURCE_UNAVAILABLE"
+  }
+}

@@ -6,6 +6,10 @@
 
 ## Agent 编排与 Harness 展示
 
+新增[定向真实对照与面试讲解](examples/showcase/curated-live-guide.md)：两个展示场景加一次工单修订，共6次真实运行、47次模型/16次合成工具。实际展示Reviewer拒绝为不充分候选背书，保留完整对照和原报告哈希；没有证明多Agent完整诊断质量领先，不能把目的性展示集当独立准确率测试。[配对记录](examples/showcase/curated-live-comparison.json)与[真实复核片段](examples/showcase/curated-review-evidence.json)可核查。
+
+面试展示入口：[五分钟讲解与追问](examples/showcase/interview-guide.md)。运行 `.\.venv\Scripts\python.exe scripts/demo_interview.py` 可生成历史经验核查、冲突证据与复核补查三个本地演示及展示页。真实LangGraph与工具执行器配合脚本角色响应和合成观测，付费调用为零；展示协作机制，不作为模型胜率结论。
+
 项目重点是**模型驱动的任务与工具选择，以及程序控制的权限、预算、证据和审批边界**。五角色使用同一底层模型的不同提示词；LangGraph 当前串行执行，没有 checkpoint 恢复。格式与引用正确不能保证因果判断正确。
 
 安装根目录依赖后，一条命令运行三条演示、六案例同预算模拟对照、五类 Harness 约束和模拟审批闭环：
@@ -22,7 +26,47 @@
 
 当前以已有 Worker 诊断、人工审批恢复及用户反馈入库成功作为业务闭环案例。接下来优先完善评测与展示，暂缓更多运维指标、服务管理页面和修复动作。
 
+针对上述对照暴露的“执行结束被误当作目标完成”问题，多 Agent 任务新增 `checks`（最多两项具体只读检查）、`execution_status` 和程序生成的 `completion`。检查仍经已有工具权限、登记和范围校验；初次取证由叶子 Agent 选择工具，复核补查复用既有执行流程。声明的检查未执行、失败、截断或所需指标缺少样本时，整份报告不能直接 `passed`，实际补查满足后可解除缺口。
+
+Diagnosis 和 Reviewer 现在同时接收工单症状、任务目标、实际检查和未满足项，复核须区分异常指标、近端机制、具体触发原因及建议条件。`checks_satisfied` 只证明声明的查询取得样本，不能证明因果关系或连续健康；未声明检查的兼容任务标为 `not_specified`，不声称程序已核验目标。单 Agent 原提示词保持不变，当前真实对照文件保留原始结果，优化后的模型质量仍需另行显式授权复测。实现和验证边界见 [任务检查与复核](examples/showcase/design.md#任务检查与复核)。
+
+随后经用户要求执行[优化后一次真实对照](examples/showcase/optimized-comparison.json)：沿用 case_003、qwen-turbo 及每条16模型/8工具上限。单 Agent 2模型/4工具、10.063秒、completed，必要取证4/4；多 Agent 3模型/0工具、8.157秒、failed，在取证角色没有调用工具后，重复调度被 `DUPLICATE_TASK` 门禁终止，必要取证0/4，尚未运行 Diagnosis/Reviewer。门禁识别缺口，但执行推进未成功；失败退出耗时不能当作效率提升。单 Agent 扩容建议的容量条件和审批标记仍有问题。总共5次付费模型调用，没有追加重测，不宣称多 Agent 质量提升；正式人工评分仍待确认。
+
+上述提前结束路径现已修复：叶子返回最终 JSON 时，若声明检查尚未执行且步骤、预算足够，循环内最多提醒一次实际调用工具，并为结果总结保留步骤。仍未调用工具则记录 `NO_TOOL_PROGRESS`；已有当前观测时转入诊断与复核，否则带明确缺口返回 partial，避免重复派发同一任务。已满足的检查可复用，空结果和失败查询不因这条纠正逻辑自动重查。7 项新增响应重放场景通过，完整免费回归257项中250通过、7项隔离数据库测试跳过，免费演示通过；未追加真实模型复测或业务写操作，历史对照成绩保持不变。
+
+随后按用户要求完成[修复后一次真实对照](examples/showcase/leaf-fix-comparison.json)：相同案例、模型、身份及预算，单 Agent 2模型/4工具、10.234秒、completed，必要取证4/4；多 Agent 15模型/5工具、44.718秒、partial/needs_information，必要取证2/4。执行提醒真实生效，多 Agent 实际查询变更并进入诊断复核，但 Supervisor 漏派 pool_usage/pool_wait，空依赖日志又占用查询与任务，Reviewer 未提出具体补查，最终保留缺口并剔除扩容建议。两条机械检查全部通过，不能据此称诊断完整。共17次付费模型请求、9次合成只读工具尝试，无追加重跑；仍未证明多 Agent 综合优势。助手分析另存 [辅助审阅](examples/showcase/leaf-fix-assistant-review.json)，正式人工评分待确认。
+
+针对本次调度缺口，进一步优化了检查选择与补查闭环：任务可声明 `expected_value`，候选机制传给后续角色；已覆盖检查在派发及同批任务执行前复用，完整空查询的更窄筛选不再访问 Provider，空结果仍保留缺口。Reviewer 可用 `request_evidence.target_id=A1` 补查建议条件，同时保持相关 H 的支持结论；有预算但只写 uncertain 缺口时，最多一次提醒选择具体检查或填写 `follow_up_reason`。一轮补查、权限和全局预算边界继续生效。新增11项免费场景通过，定向81项通过，完整268项中261通过、7项隔离数据库测试跳过，免费演示通过；本轮没有真实模型调用，尚未证明优化后质量提升。设计细节见 [检查选择与建议补查](examples/showcase/design.md#检查选择与建议补查)。
+
+随后经用户授权完成[检查选择优化后真实验证](examples/showcase/information-gain-comparison.json)：同一案例、模型、身份和预算，单 Agent 2模型/4工具、9.968秒、completed，取证4/4；多 Agent 12模型/3工具、48.109秒、completed/passed，取证3/4，实际执行一轮 Reviewer 请求的 db_cpu 补查、修订和二次复核。相比前组多 Agent 的15模型/5工具、取证2/4，检查选择与补查有所改善，但耗时未缩短，仍缺 POOL_ACQUIRE_TIMEOUT 日志，容量适用性也未完成。单 Agent 本次扩容建议的审批标记为 false；多 Agent 建议需审批，但内部 passed 不代表完整原因或修复条件已确认。A目标补查、复核提醒及查询/任务复用本次未触发，继续以免费测试为依据。共14次付费模型请求、7次合成只读工具尝试，没有追加重跑；[助手分析](examples/showcase/information-gain-assistant-review.json)与待确认的正式人工评分分开，仍未证明多 Agent 综合优于单 Agent。
+
+在上述真实验证后，按用户要求补齐共享证据需求：Supervisor、Investigation、Diagnosis、Reviewer 共用 `evidence_needs`，独立记录症状、机制与替代解释问题，不以局部任务完成证明整体取证充分。任务可通过 `need_ids` 关联问题，复核通过 `need_assessments` 单独评价全部问题；缺失评估保持 uncertain，关键问题未解决时报告为 partial。深层原因和人工前置条件可保留为明确限制，不强制巡检全部渠道，不读取运行时 gold。报告及事件包含问题状态、引用和理由。新增9项免费场景通过；完整回归277项中270通过、7项隔离PostgreSQL测试跳过，最终定向43项通过。单Agent基线保持，当前优化尚未进行真实模型复测，不宣称质量或成本提升。设计见[共享证据需求与完成门禁](examples/showcase/design.md#共享证据需求与完成门禁)。
+
+共享证据需求改造后，按用户要求执行[一次真实对照](examples/showcase/evidence-needs-comparison.json)：同一case_003与预算，单Agent5模型/6工具、21.391秒，实际取得4/4预设观测但负责人引用纠正后仍无效，最终partial/MODEL_OUTPUT_INVALID；多Agent8模型/2工具、36.547秒，取证3/4，Reviewer实际将N2从supported改回pending，重复空配置变更补查被拒绝，最终partial/REVIEW_INCOMPLETE。清单、任务关联和独立问题评估真实生效，但未完成诊断，也未证明调度与补查质量提升。共13次付费模型请求，不追加重跑；[助手分析](examples/showcase/evidence-needs-assistant-review.json)与待确认人工评分分开，历史成绩保留。
+
 ## 当前后端架构
+
+另有[多Agent专项能力测试集](evals/targeted/README.md)：历史经验误导、证据范围冲突、区分性取证各两个不同业务事件，并保留两例普通对照。开发/普通5例、保留3例，数据与规则冻结；复用原单/多Agent、六工具和同预算执行器，没有为案例调整应用提示词或门禁。评分保留假设的支持/排除/未知状态、建议条件及不可执行待确认项，专项与普通结果分别汇总。默认免费计划或模拟控制，付费入口每批最多两例且须明确授权；当前未证明多Agent质量优势。
+
+随后经用户授权完成[专项集首批真实对照](examples/showcase/targeted-first-comparison.json)：probe_001/probe_002各single/multi一次，共22次模型请求、11次合成工具尝试、124178已知Token；没有额度或认证错误。单Agent分别4模型/3工具、2模型/1工具，H/A为空而partial；多Agent分别7模型/2工具、9模型/5工具，均在Supervisor先REQUIRED_EVIDENCE_NEED、纠正后UNEXPECTED_TASKS，未进入Diagnosis/Reviewer而partial。四条机械检查通过，正式人工评分待确认；[助手审阅](examples/showcase/targeted-first-assistant-review.json)另存。无追加重跑、应用修改或保留集运行，未证明多Agent优势。
+
+评测现新增[独立合成测试集与评分说明](evals/independent/README.md)：保留旧6例开发回归，另有6例验证和4例默认禁用的最终保留案例。观测与参考答案分离，数据/规则以哈希冻结；语义评分允许不同取证路径，不以固定字段覆盖或内部复核通过代替正确率。`scripts/compare_independent.py`默认免费计划，真实批次需显式授权和预算。本次仅完成免费结构、运行与评分控制验证，没有新增真实诊断成绩。
+
+随后经用户授权完成[独立验证集首轮真实对照](examples/showcase/independent-comparison.json)：eval_001、eval_004各single/multi一次，共32次真实模型请求、15次合成工具尝试。eval_001单Agent取到DNS日志但负责人引用纠正失败，多Agent漏查依赖日志且未完成有效补查，两者partial；eval_004单Agent形成证书原因与需审批的更新建议，多Agent取到证书日志但叶子输出和复核协议错误导致partial。四份保存报告机械校验通过，正式人工评分待确认；[助手审阅](examples/showcase/independent-assistant-review.json)另存。保留集未释放，没有重跑或修改Agent行为；这两个小样本尚未证明多Agent综合优势。
+
+独立对照后的通用修正：查询执行完成与证据充分分开记录，完整空日志/变更/检索不再被标为未执行，仍保留查询范围限制且不生成事实引用；空指标继续保留缺样本门禁。新空查询会交回 Supervisor 判断是否需要另一条有价值的渠道。有效补查与关联 N 的已支持状态冲突时，仅将该 N 收紧为 uncertain 并记录事件，不增加结构纠正额度；被拒绝请求可在原预算内得到最多一次选择提醒。负责人使用独立引用契约和动态 `owner_options`。多 Agent 提示词去掉具体案例说明并合并重复规则。151项定向免费回归、验证集12条脚本运行的六项机械校验通过；数据冻结校验通过，0真实模型请求、0真实业务操作。单 Agent 原系统提示词保留，但共享负责人契约改变版本标识，后续对照须记录新基线；尚未证明漏查率、质量或成本改善。详见[查询推进与输出协议](examples/showcase/design.md#查询推进与输出协议)。
+
+随后经用户要求完成[通用协议修正后真实验证](examples/showcase/protocol-validation-comparison.json)：沿用eval_001、eval_004、qwen-turbo及每条16模型/8工具上限，各single/multi一次，共27次真实模型请求、16次合成工具尝试。DNS单Agent纠正负责人后输出有效观测但H/A为空；多Agent被request_info仍携带tasks的UNEXPECTED_TASKS终止。证书多Agent从空变更查询转向日志并形成获支持H，但建议和替代解释评估未完成；单Agent取证及证书更新建议合理，H为空。四条机械校验通过，无重跑或保留集运行；两条单Agent的completed不算完整诊断通过。[助手定性审阅](examples/showcase/protocol-validation-assistant-review.json)与正式人工评分分开，仍未证明多Agent综合优势。源码及冻结测试集在批次内保持一致。
+
+针对这批结果，后续修正了三项通用协议：叶子每轮请求刷新`check_completion`与`collection`，任务交接明确程序台账是查询执行状态依据、模型摘要尚未验证；Supervisor非dispatch携带tasks或dispatch缺少tasks的校验进入已有一次纠正流程，Schema同时表达动作分支；单/多Agent共用诊断完整性函数，缺少观测、原因假设或建议时保留已有内容并partial结束，状态核查仅要求观测。新增8项失败类型重建场景与172项相关免费回归通过，独立验证集12条脚本运行机械检查通过。没有新增真实模型调用，原始对照和冻结数据未修改；输入及完成门禁已变，后续配对需记录新源码指纹。实现见[实时查询状态与诊断完整性](examples/showcase/design.md#实时查询状态与诊断完整性)。
+
+修复后已完成[一次同预算真实对照](examples/showcase/live-ledger-comparison.json)：eval_001、eval_004各single/multi一次，共30次模型请求、15次合成工具尝试、146261个已知Token。DNS多Agent形成当前DNS机制和补查建议，仍因N3缺口partial；单Agent缺H/A，被新门禁正确标partial。证书单AgentF/H/A齐全但未查证书日志，只定位TLS方向；多Agent重复空配置日志请求后收尾，未定位证书原因。四条机械检查通过，无重跑或保留集运行；[助手分析](examples/showcase/live-ledger-assistant-review.json)与待确认人工评分分开。协议冲突本轮未出现，真实纠正分支未触发，仍未证明多Agent综合优势。
+
+最新通用修复增加一次有界调度推进：重复完整空查询且核心问题仍pending时可返回Supervisor选择新检查；准备诊断但关键问题未评估时可使用同一份一次提醒，要求关联need_ids并说明expected_value，也可据已有观测评估或明确停止理由。复核补查按程序先执行checks、叶子一次解释的实际路径估算预算，保留原总上限及收尾预留。新增8项控制场景、相关180项免费回归及独立验证集12条脚本控制机械检查通过，0付费调用；未修改案例或释放保留集，尚未证明真实模型质量提升。实现与限制见[有界调度推进与补查预算](examples/showcase/design.md#有界调度推进与补查预算)。
+
+随后完成[保留集首两例真实配对](examples/showcase/general-progress-holdout-comparison.json)：eval_007、eval_008各single/multi一次，源码`a08f8b27ef7f719b`，共25次模型请求、10次合成只读工具、134168个已知Token。四条均partial；single都只取得指标后结束，multi都取到WARN关键日志，但均漏查配置变更且最终建议为空。配额multi定位局部限流；缓存multi的过期/泄漏假设被Reviewer过度支持。六项机械检查均通过，新增调度推进机会未触发，复核提醒触发一次但补查重复被拒绝；未完成真实返工，不宣称综合质量领先。[助手定性分析](examples/showcase/general-progress-holdout-assistant-review.json)与正式人工评分分开，无重跑或真实业务写入。两例已释放，后续属于已见案例；另外两例未运行。本轮未修改Agent。
+
+诊断语义现已集中调整：H区分机制、触发原因和替代解释，A区分只读核查、人工变更和登记修复。完成条件允许已排除候选和明确的非关键未知，仍要求已复核观测、至少一个有支持的机制、有效下一步且无关键缺口。待确认建议单独显示、不能进入修复执行入口。新增10项免费控制场景，全量324项回归中317通过、7项数据库集成跳过；冻结验证集12条脚本机械核验、离线演示及模拟审批闭环通过。没有付费复测，不能宣称模型质量改善；共享契约改变了版本，历史结果保留。详见[诊断层级、建议类型与报告完成](examples/showcase/design.md#诊断层级建议类型与报告完成)。
 
 ```mermaid
 flowchart TD
@@ -89,6 +133,8 @@ $env:PYTHONIOENCODING='utf-8'
 数据库现有表名及旧只读运行 URL 保留兼容，避免破坏数据和现有页面。日志改为 `logs/incident.log`，指标使用 `it_incident_*`。Compose只声明本项目的 PostgreSQL，旧 Milvus 容器/卷及其他项目未操作。
 
 ## 交付与后续
+
+2026-10-10：[Supervisor 协议容错与证据保留](examples/showcase/supervisor-protocol-resilience.md)已实现，缩小调度契约、保留核心问题、审计冗余任务，并允许一次预算内的诊断与独立复核收尾。全量343项中336通过、7项隔离数据库集成跳过；本轮无付费验证，真实效果待独立授权复测。
 
 `docs/` 文档在本地维护，已加入 `.gitignore` 并停止 Git 跟踪；下列文档链接供本地阅读，Git 历史保留已提交版本。
 

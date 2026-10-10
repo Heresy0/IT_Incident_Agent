@@ -1,0 +1,12 @@
+{
+  "dataset_version": "curated-showcase-v1",
+  "files": {
+    "evals/showcase_live/manifest.json": "611e64f9146f73cd90dfcb7cda0a6cba4923796de92134db6ec47e70e6e0d269",
+    "evals/showcase_live/rubric.json": "c4aa9e2c6a82df2d83b9223a0f429baa069398e2ca94ea45a615036f636eb2d7",
+    "fixtures/incident_showcase_live/catalog.json": "7f05fcd37e69fdcbf2a4beb2e3e54c8048f588b88ee305dea5ae80f322654c13",
+    "fixtures/incident_showcase_live/show_001.json": "30caaa99d25d7cba5c46511908ede523365c3f53cb45a0d84a834413831d205c",
+    "fixtures/incident_showcase_live/show_002.json": "803eb421153db5fced9b2f4344400e148c53b6fd2ab00a787967eca92203aba2",
+    "evals/showcase_live/answers/show_001.json": "d8cec2863d078d9ce3e96840a05adfd74b36c0ded4ee691beb18ed5515eb2435",
+    "evals/showcase_live/answers/show_002.json": "df6ec5f48349388a6aec3caa405634d22baea429a26c414e7092dfb57da4718d"
+  }
+}

@@ -28,6 +28,29 @@ def resolve_owner(selected, registry):
     return team
 
 
+def owner_options(registry):
+    return [{'reference_id': rid, 'team': ref.value}
+            for rid, ref in sorted(registry.references.items())
+            if ref.field_path == 'team'
+            and observed_owner_team(registry.evidence.get(ref.evidence_id)) == ref.value
+            and observed_owner_team(registry.evidence.get(ref.evidence_id)) is not None]
+
+
+def owner_schema(schema, registry):
+    """Advertise only observed owner choices; runtime validation remains mandatory."""
+    result = schema.model_json_schema()
+    if 'escalation_ref' not in result.get('properties', {}):
+        return result
+    choices = owner_options(registry)
+    if choices:
+        result['$defs']['OwnerReferenceSelection']['properties']['reference_id']['enum'] = [
+            option['reference_id'] for option in choices]
+    else:
+        result['properties']['escalation_ref'] = {'type': 'null', 'default': None,
+            'description': '尚未观测到负责人；此字段只能为 null。'}
+    return result
+
+
 def parse_owner_selection(schema, content, registry):
     data = json.loads(content)
     # Old scripted/model inputs remain readable, but must match an observed owner

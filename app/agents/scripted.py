@@ -14,6 +14,14 @@ def latest_metrics(evidence):
             if "metric" in e["payload"]}
 
 
+def control_need_assessments(payload):
+    """Explicit fixture verdicts, excluded from autonomous model quality."""
+    ids = [e['evidence_id'] for e in payload['evidence'] if e['kind'] == 'observation'][-4:]
+    return [{'need_id': need['need_id'], 'verdict': 'supported' if ids else 'uncertain',
+             'evidence_ids': ids, 'reason': '脚本控制场景预设问题评估；不代表真实模型因果判断。'}
+            for need in payload.get('evidence_needs', [])]
+
+
 def new_control_variant(ticket):
     symptoms = ticket['symptoms'].casefold()
     return any(marker in symptoms for marker in ('intermittently', '401', 'settings update'))
@@ -100,6 +108,14 @@ class ScriptedRole:
                 result = {"action": "dispatch", "reason": "根据症状选择必要角色", "tasks": tasks}
             else:
                 result = {"action": "diagnose", "reason": "已完成初始取证，交由诊断和复核"}
+            verdicts = {a['need_id']: a for a in control_need_assessments(payload)}
+            result['evidence_needs'] = [{**need,
+                'status': 'supported' if verdicts[need['need_id']]['verdict'] == 'supported' else 'pending',
+                'evidence_ids': verdicts[need['need_id']]['evidence_ids'],
+                'reason': verdicts[need['need_id']]['reason']} for need in payload.get('evidence_needs', [])]
+            for task in result.get('tasks', []):
+                task['need_ids'] = ([challenge['need_id']] if challenge and challenge.get('need_id')
+                    else [need['need_id'] for need in payload.get('evidence_needs', [])])
         elif self.role == "diagnosis":
             result = self.diagnose(payload)
         else:
@@ -190,7 +206,7 @@ class ScriptedRole:
         assessments = [{"target_id": key, "verdict": "not_supported" if weak and key.startswith("H") else "supported",
             "reason": "历史线索与当前正常 DB CPU 矛盾" if weak and key.startswith("H") else "已核对当前来源与建议适用条件",
             "evidence_ids": ids} for key in targets]
-        result = {"assessments": assessments}
+        result = {"assessments": assessments, 'need_assessments': control_need_assessments(payload)}
         if weak:
             db = metrics["db_cpu"]
             scope = payload['check_scope']

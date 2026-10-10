@@ -10,7 +10,8 @@ from tools.executor import ToolExecutor
 from agents.investigation_prompt import SYSTEM
 from evidence.observations import FACT_RENDERING, source_statement, pool_control_gaps, log_control_gaps, gap_message
 from evidence.model_view import MODEL_VIEW_VERSION, result_view, fit_messages, substantive
-from evidence.ownership import OwnerSelectionError, observed_owner_team, parse_owner_selection, resolve_owner
+from evidence.ownership import OwnerSelectionError, observed_owner_team, parse_owner_selection, resolve_owner, owner_options, owner_schema
+from evidence.completion import diagnosis_gaps, required_sections
 
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
@@ -150,14 +151,25 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     def event(kind, **fields):
         context.emit({"type": kind, "role": role, "task_id": task_id,
                       "span_id": task_span, "parent_span_id": task_parent or context.root_span, **fields})
-    messages = [SystemMessage(content=system), HumanMessage(content=json.dumps({
+    model_input = {
         "ticket": ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
-        "output_schema": output_schema.model_json_schema(), "step_limit": max_steps,
+        "step_limit": max_steps,
         "read_only_capabilities": executor.capabilities(),
-        "objective": objective}, ensure_ascii=False))]
+        "objective": objective}
+    if role == 'single':
+        model_input['completion_requirements'] = {
+            'required_sections': required_sections(ticket.purpose),
+            'insufficient_evidence': '缺项时保留观测和具体信息缺口，以partial结束；不得编造原因或不适用的建议。'}
+    messages = [SystemMessage(content=system), HumanMessage(content='')]
     output, stop, repairs, call_ids = None, "", 0, set()
     failures = []
     coverage_gaps, gap_feedback_sent = [], False
+    task_feedback_sent = False
+    initial_tool_calls = context.counts['tool_calls']
+    required_checks = []
+    if role != 'single' and objective:
+        required_checks = [{'tool': c['tool'], 'args': executor.validate_args(c['tool'], c['args']).model_dump(mode='json')}
+                           for c in objective.get('required_checks', [])]
     permitted = {(c['tool'], executor.validate_args(c['tool'], c['args']).model_dump_json())
                  for c in (approved_checks or [])}
     checked, model_omitted = set(), False
@@ -202,6 +214,19 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     messages.append(HumanMessage(content="Only the final output remains within budget. Return diagnosis JSON, no tools; preserve gaps."))
                 collection = [{k: e[k] for k in ('name', 'status', 'query_profile', 'truncated', 'error')}
                               for e in events if e['type'] == 'tool_result' and e.get('role') == role]
+                current_objective = dict(objective) if objective is not None else None
+                if current_objective is not None:
+                    from workflow.task_checks import completion
+                    current_objective.update(required_checks=required_checks,
+                        check_completion=completion(required_checks, executor),
+                        collection=collection[-12:],
+                        query_state_source='server_read_ledger')
+                # Refresh after tool reads; an initial null-only contract must not
+                # hide a newly observed owner, including during correction turns.
+                messages[1] = HumanMessage(content=json.dumps({**model_input,
+                    'objective': current_objective, 'collection': collection[-12:],
+                    'output_schema': owner_schema(output_schema, executor),
+                    'owner_options': owner_options(executor)}, ensure_ascii=False))
                 messages, compacted = fit_messages(messages, executor, collection, limits.input_chars)
                 if compacted:
                     model_omitted = model_omitted or bool(compacted['omitted_evidence_count'])
@@ -295,6 +320,33 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     continue
                 try:
                     candidate, output_protocol = output_resolver(response.content, executor, allowed_kinds)
+                    if required_checks:
+                        from workflow.task_checks import completion
+                        task_coverage = completion(required_checks, executor)
+                        unexecuted = [c for c in task_coverage['checks'] if c['status'] == 'not_executed']
+                        if unexecuted:
+                            remaining_calls = limits.model_calls - limits.reserve_model_calls - context.counts['model_calls']
+                            # One tool-selecting response and one final interpretation
+                            # must both fit the existing step and shared call budgets.
+                            can_correct = (not task_feedback_sent and step < max_steps - 2
+                                           and remaining_calls >= 2 and context.can_research())
+                            if can_correct:
+                                task_feedback_sent = True
+                                event('task_execution_correction', step=step + 1,
+                                      pending_tools=[c['tool'] for c in unexecuted])
+                                messages.append(HumanMessage(content='声明的检查尚未执行。不能将输入中的检查缺口当作查询结果直接结束。'
+                                    '请在当前工单范围内实际调用已允许的只读工具，选择有价值的未执行检查；随后解释工具结果并返回最终 JSON。'
+                                    '不要重复已执行、失败或返回空结果的同一查询，不扩大权限或预算。待执行检查：'
+                                    + json.dumps([{'tool': c['tool'], 'args': c['args']} for c in unexecuted], ensure_ascii=False)))
+                                continue
+                            candidate = candidate.model_copy(update={'missing_information': list(dict.fromkeys([
+                                *task_coverage['missing_information'], *candidate.missing_information]))[:8]})
+                            if context.counts['tool_calls'] == initial_tool_calls:
+                                output, stop = candidate, 'NO_TOOL_PROGRESS'
+                                event('task_execution_stalled', code=stop,
+                                      correction_sent=task_feedback_sent,
+                                      pending_tools=[c['tool'] for c in unexecuted])
+                                break
                     has_hypotheses = bool(getattr(candidate, 'hypotheses', getattr(candidate, 'tentative_hypotheses', [])))
                     coverage_gaps = [*(pool_control_gaps(executor.evidence) if has_hypotheses else []),
                                      *log_control_gaps(executor)]
@@ -328,7 +380,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             + json.dumps(failure) + ". Available reference_options by evidence_id: "
                             + json.dumps(reference_options) + ". Return refs as [{\"reference_id\":\"an exact REF_ ID from the options\"}]. "
                             + "Do not copy field_path, value, unit, timestamp or quote; never prepend payload. "
-                            + "The server expands these fields. Omit unverifiable findings. No additional tool calls required."))
+                            + "The server expands these fields. Omit unverifiable findings. An empty query has no REF: "
+                            + "use findings=[] and state its filter/window limitation in missing_information; never use refs=[]. "
+                            + "escalation_ref must select owner_options or be null. No additional tool calls required."))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
                         break
@@ -338,8 +392,6 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 break
         if not stop:
             stop = "STEP_LIMIT"
-        if standalone:
-            context.stop_reason = stop
         if output is None:
             if role == "single":
                 from agents.contracts import DiagnosisDraft
@@ -354,7 +406,21 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
             output = output.model_copy(update={'missing_information': [
                 'Some evidence was omitted from the bounded model input; full snapshots remain in the audit report.',
                 *output.missing_information][:8]})
-        status = "completed" if stop == "FINISHED" and output.findings and not incomplete and not coverage_gaps else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED"} else "failed"
+        if role == 'single' and stop == 'FINISHED':
+            gaps = diagnosis_gaps(output, ticket.purpose)
+            if gaps:
+                stop = 'DIAGNOSIS_INCOMPLETE'
+                output = output.model_copy(update={'missing_information': list(dict.fromkeys([
+                    *output.missing_information, *gaps]))})
+                event('diagnosis_gate', code=stop, missing_information=gaps)
+        if standalone:
+            context.stop_reason = stop
+        empty_checks_completed = False
+        if required_checks:
+            from workflow.task_checks import completion
+            coverage = completion(required_checks, executor)
+            empty_checks_completed = coverage['status'] == 'checks_completed_empty'
+        status = "completed" if stop == "FINISHED" and (output.findings or empty_checks_completed) and not incomplete and not coverage_gaps else "partial" if executor.evidence or stop in {"FINISHED", "BUDGET_EXCEEDED", "STEP_LIMIT", "TIME_BUDGET_EXCEEDED", "NO_TOOL_PROGRESS", "DIAGNOSIS_INCOMPLETE"} else "failed"
         event("task_completed", status=status, reason=stop)
     return {"run_id": context.run_id, "task_id": task_id, "task_type": "incident_" + role, "incident_id": ticket.incident_id,
             "scope": ticket.scope.model_dump(mode="json"), "data_source": provider.name,
