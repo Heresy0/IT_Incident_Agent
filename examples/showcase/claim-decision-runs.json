@@ -1,0 +1,2676 @@
+{
+  "schema_version": "claim-decision-runs-v1",
+  "data": "synthetic observations; live qwen3.7-plus calls",
+  "semantic_scores": "pending_independent_review",
+  "holdout_released": false,
+  "historical_baseline": "diagnostic-audit-runs.json; source 6e92f8fc6db68a0b; descriptive comparison only",
+  "runs": [
+    {
+      "batch": "bounded-review",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "9f35686e3c07f680",
+      "model_settings": {
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "temperature": 0
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "0719b5a6-3483-4d1e-bcac-fed7dfa1c644",
+      "report_path": "output/claim-decision-comparison/bounded-review/08e146a6-3522-4c66-9d2a-1503090f7f47/report.json",
+      "report_sha256": "3cb9ac5a64e28b702359b9c974fad3307bca1cda3207c5acec32a76a50e9231b",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 10,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 52906,
+          "output_tokens": 7082,
+          "known_calls": 10,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 140438,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "近端故障机制为发出的请求包含接收端协议未定义的recipient_id字段，导致远程服务拒绝处理。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "持续的远程拒绝导致任务重试或堆积，引发queue_depth增长和delivery_error_rate升高。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_2236c4379a7ff58e856ba826",
+                  "field_path": "value",
+                  "value": 0.82,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":0.82"
+                },
+                {
+                  "evidence_id": "EV_f789a484039deb364f5cafed",
+                  "field_path": "value",
+                  "value": 42,
+                  "unit": "jobs",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":42"
+                }
+              ],
+              "reference_ids": [
+                "REF_75d32c9c71041b2ff9480be4",
+                "REF_332fb6b442ef70913465597d"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "上游服务或本地配置在10:03前后发生了变更，引入了不兼容的recipient_id字段。",
+              "basis": "unverified",
+              "essential": false,
+              "refs": [],
+              "reference_ids": [],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_IMPACT_LEVEL",
+          "details": [
+            {
+              "instruction": "mechanism关联机制/替代H；next_step关联A。仅触发未知放follow_ups，影响行动条件则明确关联A。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "INVALID_REWORK_TARGET",
+          "details": []
+        }
+      ]
+    },
+    {
+      "batch": "bounded-review",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "9f35686e3c07f680",
+      "model_settings": {
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "temperature": 0
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "f90339e9-4ab1-4281-af5a-6f657effec7b",
+      "report_path": "output/claim-decision-comparison/bounded-review/2dd0af9f-2f2e-4a1b-8074-8d26abaec6f9/report.json",
+      "report_sha256": "1c217a43265c80ce7356f79638d7279270633eba2b9d3c82f7b235ea95c75db6",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 15,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 76270,
+          "output_tokens": 8504,
+          "known_calls": 15,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 173719,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "本地配置的audience值(portal-preview)与上游认证服务期望值(portal-stage)不一致导致鉴权失败。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "config_summary.auth_audience",
+                  "value": "portal-preview",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"auth_audience\":\"portal-preview\""
+                },
+                {
+                  "evidence_id": "EV_72d4daf8f50f04119f80225e",
+                  "field_path": "message",
+                  "value": "认证依赖拒绝audience=portal-preview，期望audience=portal-stage。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_b74db9ccd01b7f4949072c02",
+                "REF_ca43351f7335893951d8de66"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "版本2.7.0的发布包或默认配置中错误地设置了audience值为portal-preview。",
+              "basis": "unverified",
+              "essential": false,
+              "refs": [],
+              "reference_ids": [],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [
+        {
+          "before_chars": 30361,
+          "after_chars": 26232,
+          "omitted_invalid_output_chars": 4173,
+          "source_rows_omitted": 0
+        }
+      ],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BOUNDARY_CONFLICT",
+          "details": [
+            {
+              "boundary_id": "B2",
+              "instruction": "若盲审未知在断言中被声称且仍未确认，关联断言不能supported；评估完整含义，不仅通过近端环节。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "bounded-review",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "9f35686e3c07f680",
+      "model_settings": {
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "temperature": 0
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "831409ee-2572-4973-b32f-5db4ac7d524c",
+      "report_path": "output/claim-decision-comparison/bounded-review/cd103da0-740f-47b1-b446-3a7834181f0d/report.json",
+      "report_sha256": "b3d440f3ffa0dfb121a52130650a551f83b6a6b8019f68e11e03632567c16561",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 6,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 19334,
+          "output_tokens": 1881,
+          "known_calls": 5,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 56563,
+        "termination_reason": "NETWORK_ERROR",
+        "errors": [
+          {
+            "code": "NETWORK_ERROR",
+            "provider": "model",
+            "message": "外部服务网络连接失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "bounded-review",
+      "case": "eval_004",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "9f35686e3c07f680",
+      "model_settings": {
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "temperature": 0
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "7fbdd237-5157-466e-a704-933bff7dfc62",
+      "report_path": "output/claim-decision-comparison/bounded-review/f613d0c6-df39-4eda-b55f-0f5948454c61/report.json",
+      "report_sha256": "e0333aa0b58ea2fc613a1cf06946166b2f05042fcce513a3da75a07de1637b57",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 15,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 75613,
+          "output_tokens": 8201,
+          "known_calls": 14,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 189250,
+        "termination_reason": "TIME_BUDGET_EXCEEDED",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "investigation"
+          },
+          {
+            "code": "TIME_BUDGET_EXCEEDED",
+            "provider": "workflow",
+            "message": "诊断执行失败，请根据运行 ID 查看日志。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "catalog-public 调用下游依赖 pricing-feed 时因对方证书过期导致 TLS 握手失败，进而引发用户查询商品请求的高比例失败。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "error_code",
+                  "value": "CERTIFICATE_EXPIRED",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+                },
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_af8326667a3400c437511a44",
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "pricing-feed 服务的 TLS 证书在 09:59 到期，时间点与错误率突增吻合，是故障触发的直接原因。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [
+        {
+          "before_chars": 29987,
+          "after_chars": 25964,
+          "omitted_invalid_output_chars": 4067,
+          "source_rows_omitted": 0
+        }
+      ],
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BOUNDARY_CONFLICT",
+          "details": [
+            {
+              "boundary_id": "B1",
+              "instruction": "若盲审未知在断言中被声称且仍未确认，关联断言不能supported；评估完整含义，不仅通过近端环节。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "compact-review",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b8d2b4a20678be81",
+      "model_settings": null,
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "b191b92e-48a1-4872-af4f-8971cd43bad0",
+      "report_path": "output/claim-decision-comparison/compact-review/41cb0d71-8d04-4584-9d27-eb051cd80b72/report.json",
+      "report_sha256": "34a0acd45a4fdef10808fc5f2d9cea4909bc303cf250ab5e60f77cfe8131073d",
+      "status": "completed",
+      "review_status": "passed",
+      "run_summary": {
+        "model_calls": 10,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 50669,
+          "output_tokens": 5858,
+          "known_calls": 10,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 121734,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "none",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "supported",
+          "level": "mechanism",
+          "cause": "近端机制为auth_audience配置值（portal-preview）与客户端令牌预期值（portal-stage）不一致，导致业务层拒绝请求。",
+          "claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "近端机制为auth_audience配置值（portal-preview）与客户端令牌预期值（portal-stage）不一致，导致业务层拒绝请求。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "config_summary.auth_audience",
+                  "value": "portal-preview",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"auth_audience\":\"portal-preview\""
+                },
+                {
+                  "evidence_id": "EV_967d205af464c4ae4ae68e97",
+                  "field_path": "message",
+                  "value": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_b74db9ccd01b7f4949072c02",
+                "REF_842c5e7bfbafa665c8c60950"
+              ],
+              "verdict": "supported",
+              "review_reason": "配置值portal-preview与日志中audience拒绝直接对应，支持不一致导致拒绝的推断。"
+            }
+          ],
+          "pending_claims": []
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "supported",
+          "level": "trigger",
+          "cause": "版本2.7.0的部署变更是触发配置不一致的直接原因。",
+          "claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "版本2.7.0的部署变更是触发配置不一致的直接原因。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "summary",
+                  "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_c6cd53f776ff4f004a9f7878"
+              ],
+              "verdict": "supported",
+              "review_reason": "变更记录明确指出部署导致audience修改，支持其为触发原因。"
+            }
+          ],
+          "pending_claims": []
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [
+        []
+      ],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "tasks.0.checks",
+              "type": "too_long"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "compact-review",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b8d2b4a20678be81",
+      "model_settings": null,
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "a20f9ce5-1bb3-4f2f-a548-c049fbeaaf6c",
+      "report_path": "output/claim-decision-comparison/compact-review/a577de7e-1c47-486d-99ca-8710b613c3d5/report.json",
+      "report_sha256": "c6f8054cc58160ed6019f4b7bd7ad558a7d21360ae74e7803c093b4ecd8106c2",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 16,
+        "web_calls": 0,
+        "tool_calls": 5,
+        "token_usage": {
+          "input_tokens": 66698,
+          "output_tokens": 5257,
+          "known_calls": 15,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 145937,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "编码器版本升级导致生成的 payload 包含下游未支持的 recipient_id 字段，引发协议校验失败。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                },
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9",
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "协议不匹配导致大量请求被拒绝，进而引起 delivery_error_rate 升高和 queue_depth 积压。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "error_code",
+                  "value": "REMOTE_SCHEMA_REJECTED",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"error_code\":\"REMOTE_SCHEMA_REJECTED\""
+                },
+                {
+                  "evidence_id": "EV_2236c4379a7ff58e856ba826",
+                  "field_path": "value",
+                  "value": 0.82,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":0.82"
+                },
+                {
+                  "evidence_id": "EV_f789a484039deb364f5cafed",
+                  "field_path": "value",
+                  "value": 42,
+                  "unit": "jobs",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":42"
+                }
+              ],
+              "reference_ids": [
+                "REF_4d0b29dda8ecff17ce02c441",
+                "REF_75d32c9c71041b2ff9480be4",
+                "REF_332fb6b442ef70913465597d"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "触发原因是本地主动进行的编码器版本升级配置变更。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "final-independent",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "586804bd-98ef-4225-8f60-44f8c9262612",
+      "report_path": "output/claim-decision-comparison/final-independent/365ff7a2-a402-4fd6-8150-a28b05817a91/586804bd-98ef-4225-8f60-44f8c9262612.json",
+      "report_sha256": "9d9c749b19fa2b99685de499db0abce51ddc72806c49754cd91ce35465fac742",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 14,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 70427,
+          "output_tokens": 7236,
+          "known_calls": 14,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 155047,
+        "termination_reason": "BUDGET_EXCEEDED",
+        "errors": [
+          {
+            "code": "BUDGET_EXCEEDED",
+            "provider": "workflow",
+            "message": "本次诊断已达到调用或时间预算。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "本地 auth_audience 配置变更导致身份网关生成的令牌或校验逻辑与客户端期望不符，从而返回 401。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "config_summary.auth_audience",
+                  "value": "portal-preview",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"auth_audience\":\"portal-preview\""
+                },
+                {
+                  "evidence_id": "EV_967d205af464c4ae4ae68e97",
+                  "field_path": "message",
+                  "value": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_b74db9ccd01b7f4949072c02",
+                "REF_842c5e7bfbafa665c8c60950"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "版本 2.7.0 的部署引入了错误的 audience 配置值。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "summary",
+                  "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_c6cd53f776ff4f004a9f7878"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "tasks.0.checks",
+              "type": "too_long"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_REQUIRED",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker",
+              "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "final-independent",
+      "case": "eval_002",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "4cce7595-f8e1-4ed3-9986-9f6c4c9691af",
+      "report_path": "output/claim-decision-comparison/final-independent/365ff7a2-a402-4fd6-8150-a28b05817a91/4cce7595-f8e1-4ed3-9986-9f6c4c9691af.json",
+      "report_sha256": "25e401c269848fb4e634d1d658c8b10ba3e77c9e787f28932e7c830df18f3246",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 7,
+        "token_usage": {
+          "input_tokens": 51605,
+          "output_tokens": 1444,
+          "known_calls": 8,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 71750,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "single"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "final-independent",
+      "case": "eval_004",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "6b30c806-621d-4e75-b89b-0671b7511d97",
+      "report_path": "output/claim-decision-comparison/final-independent/365ff7a2-a402-4fd6-8150-a28b05817a91/6b30c806-621d-4e75-b89b-0671b7511d97.json",
+      "report_sha256": "8b289e1e7a75e21ec1c9d3289a55f2f7e83ab9047e82741f540d4270a6303e14",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 45535,
+          "output_tokens": 5768,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 116844,
+        "termination_reason": "BUDGET_EXCEEDED",
+        "errors": [
+          {
+            "code": "BUDGET_EXCEEDED",
+            "provider": "workflow",
+            "message": "本次诊断已达到调用或时间预算。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "catalog-public 调用 pricing-feed 时因对方证书过期导致 TLS 握手失败，引发商品查询错误。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_823dbca43b8386164ede0ab0",
+                  "field_path": "value",
+                  "value": 32,
+                  "unit": "count",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"value\":32"
+                },
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "error_code",
+                  "value": "CERTIFICATE_EXPIRED",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+                }
+              ],
+              "reference_ids": [
+                "REF_3b89b0308b6ddd186cd1f69a",
+                "REF_af8326667a3400c437511a44"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "服务健康检查返回成功是因为其探测逻辑未包含对 pricing-feed 的连通性验证。",
+              "basis": "observed",
+              "essential": false,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "pricing-feed 服务端证书在 09:59 到期，导致随后连接被拒绝。",
+              "basis": "unverified",
+              "essential": false,
+              "refs": [],
+              "reference_ids": [],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "invalid_json",
+          "details": [
+            {
+              "path": "",
+              "type": "json_invalid"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "final-independent",
+      "case": "eval_004",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "1fd791df-5c01-4228-893f-6e4d36bc345b",
+      "report_path": "output/claim-decision-comparison/final-independent/365ff7a2-a402-4fd6-8150-a28b05817a91/1fd791df-5c01-4228-893f-6e4d36bc345b.json",
+      "report_sha256": "bf26e4109c56fff1ba6df4b13adfe3957f685439be6f4b4f37549d3e24c095f2",
+      "status": "completed",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 8,
+        "token_usage": {
+          "input_tokens": 58457,
+          "output_tokens": 2219,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 56422,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "证书过期时间（09:59）与错误率上升时间窗口一致。；健康检查不访问 pricing-feed，因此 api_up 保持为 1。",
+          "claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "证书过期时间（09:59）与错误率上升时间窗口一致。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "健康检查不访问 pricing-feed，因此 api_up 保持为 1。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                },
+                {
+                  "evidence_id": "EV_b893a33e96a47e8af23ca376",
+                  "field_path": "value",
+                  "value": 1,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"value\":1"
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279",
+                "REF_d7175d690eaddffe3242884e"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            }
+          ],
+          "pending_claims": []
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "final-showcase",
+      "case": "show_101",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "0451fce1-ea17-4911-84b1-e05af02d4934",
+      "report_path": "output/claim-decision-comparison/final-showcase/7829552e-5fb3-463e-8cb5-4c0740d988a4/0451fce1-ea17-4911-84b1-e05af02d4934.json",
+      "report_sha256": "d372879bd539fc5ff55f697f410bbeb03caf8600248227735340e62662279454",
+      "status": "completed",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 8,
+        "token_usage": {
+          "input_tokens": 59132,
+          "output_tokens": 2352,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 60594,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "10:02配置变更将encoder切换为v2，但接收端仍期望v1协议。；v2编码器发送的recipient_id字段在v1协议中不被识别，导致400错误。；高错误率导致队列积压，但CPU和worker数量正常，排除资源瓶颈。",
+          "claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "10:02配置变更将encoder切换为v2，但接收端仍期望v1协议。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_bf260104b83a1535e6a9a2b7",
+                  "field_path": "message",
+                  "value": "10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。\""
+                },
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_837bcffd33fdcd7414aec404",
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "v2编码器发送的recipient_id字段在v1协议中不被识别，导致400错误。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            },
+            {
+              "claim_id": "H1.C3",
+              "statement": "高错误率导致队列积压，但CPU和worker数量正常，排除资源瓶颈。",
+              "basis": "observed",
+              "essential": false,
+              "refs": [
+                {
+                  "evidence_id": "EV_2236c4379a7ff58e856ba826",
+                  "field_path": "value",
+                  "value": 0.82,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":0.82"
+                },
+                {
+                  "evidence_id": "EV_fb6433c03cb2534c50d07641",
+                  "field_path": "value",
+                  "value": 0.29,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":0.29"
+                }
+              ],
+              "reference_ids": [
+                "REF_75d32c9c71041b2ff9480be4",
+                "REF_154f7f10827c9f5247454a0d"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            }
+          ],
+          "pending_claims": []
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "final-showcase",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "11cd840a90cea7b3",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "multi_reviewer_request_timeout": 60,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "55570d01-ebd5-4b40-8e92-72081bc2ace3",
+      "report_path": "output/claim-decision-comparison/final-showcase/7829552e-5fb3-463e-8cb5-4c0740d988a4/55570d01-ebd5-4b40-8e92-72081bc2ace3.json",
+      "report_sha256": "73f45df615e47b4829971ec07c5e20e9ddb4580b0f2c778a522f901c6c66d975",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 60489,
+          "output_tokens": 6582,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 138453,
+        "termination_reason": "BUDGET_EXCEEDED",
+        "errors": [
+          {
+            "code": "BUDGET_EXCEEDED",
+            "provider": "workflow",
+            "message": "本次诊断已达到调用或时间预算。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "v2 编码器生成的请求载荷包含下游协议未定义的 recipient_id 字段。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "下游服务因 schema 校验失败返回 HTTP 400 UNKNOWN_FIELD 错误。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "10:02 的编码器版本切换操作触发了字段不兼容问题。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BOUNDARY_CONFLICT",
+          "details": [
+            {
+              "boundary_id": "B2",
+              "instruction": "若盲审未知在断言中被声称且仍未确认，关联断言不能supported；评估完整含义，不仅通过近端环节。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "independent",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "287c673b-44cc-4ccc-bea5-7f21806d0c1e",
+      "report_path": "output/claim-decision-comparison/independent/0cc426bb-b833-4544-95a3-98a986cace07/287c673b-44cc-4ccc-bea5-7f21806d0c1e.json",
+      "report_sha256": "41f02378d8a7e68d37a63e266a45d8043a160da5fc5f3038dfca0cc79becb2cf",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 29433,
+          "output_tokens": 2916,
+          "known_calls": 8,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 98609,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "服务端配置的 audience (portal-preview) 与客户端请求中的 audience 声明不一致导致认证拒绝。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "config_summary.auth_audience",
+                  "value": "portal-preview",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"auth_audience\":\"portal-preview\""
+                },
+                {
+                  "evidence_id": "EV_967d205af464c4ae4ae68e97",
+                  "field_path": "message",
+                  "value": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_b74db9ccd01b7f4949072c02",
+                "REF_842c5e7bfbafa665c8c60950"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "版本 2.7.0 发布时的配置变更触发了 audience 不匹配问题。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_33c0988017f4037d16ce7acd",
+                  "field_path": "summary",
+                  "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:02:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_c6cd53f776ff4f004a9f7878"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "independent",
+      "case": "eval_002",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "3f02a299-b771-47d3-aefb-e5bda8e0cfb9",
+      "report_path": "output/claim-decision-comparison/independent/0cc426bb-b833-4544-95a3-98a986cace07/3f02a299-b771-47d3-aefb-e5bda8e0cfb9.json",
+      "report_sha256": "12fe4292312dbfca07bf42ff119380dd19f779b7a2d9a1217f36f6560dd07a0b",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 5,
+        "token_usage": {
+          "input_tokens": 60780,
+          "output_tokens": 5357,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 111000,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "recommended_actions.0.repair",
+              "type": "value_error"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": "independent",
+      "case": "eval_004",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "408530fd-a92c-4ea7-ae37-459193994a2f",
+      "report_path": "output/claim-decision-comparison/independent/0cc426bb-b833-4544-95a3-98a986cace07/408530fd-a92c-4ea7-ae37-459193994a2f.json",
+      "report_sha256": "a0aec588846ece6ac924657c3a2493f82b282634f5703afa04a3bedfa38effee",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 36342,
+          "output_tokens": 3253,
+          "known_calls": 8,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 102110,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "catalog-public 调用依赖 pricing-feed 时因证书过期导致 TLS 连接失败，引发业务层查询错误。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_823dbca43b8386164ede0ab0",
+                  "field_path": "value",
+                  "value": 32,
+                  "unit": "count",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"value\":32"
+                },
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "error_code",
+                  "value": "CERTIFICATE_EXPIRED",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"error_code\":\"CERTIFICATE_EXPIRED\""
+                }
+              ],
+              "reference_ids": [
+                "REF_3b89b0308b6ddd186cd1f69a",
+                "REF_af8326667a3400c437511a44"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "健康检查端点 /health 不依赖 pricing-feed，因此服务整体存活状态未受影响，造成在线但失败的矛盾现象。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "pricing-feed 侧证书在 09:59 到期，触发时间与此吻合，但具体变更或续期失败原因未知。",
+              "basis": "unverified",
+              "essential": false,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "independent",
+      "case": "eval_004",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "1556d6bb-6f5b-4eef-8138-6d1be84b7c5f",
+      "report_path": "output/claim-decision-comparison/independent/0cc426bb-b833-4544-95a3-98a986cace07/1556d6bb-6f5b-4eef-8138-6d1be84b7c5f.json",
+      "report_sha256": "1d447716d519b9665e17a1704a6661edc6a5de55d397a4c5d2596bcb98f5088c",
+      "status": "completed",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 8,
+        "token_usage": {
+          "input_tokens": 53929,
+          "output_tokens": 1757,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 48406,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "pricing-feed的TLS证书在09:59过期，导致后续请求握手失败。；/health端点不检查pricing-feed依赖状态，因此返回200。",
+          "claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "pricing-feed的TLS证书在09:59过期，导致后续请求握手失败。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "/health端点不检查pricing-feed依赖状态，因此返回200。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_cb37a819acc50bae3647f3a6",
+                  "field_path": "message",
+                  "value": "到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。",
+                  "unit": "",
+                  "observed_at": "2026-10-01T10:10:00Z",
+                  "data_version": "independent-synthetic-v1",
+                  "quote": "\"message\":\"到pricing-feed的TLS握手失败，证书有效期截止09:59；/health返回200不访问pricing-feed。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_dbebedf2500249e3c4644279"
+              ],
+              "verdict": "not_performed",
+              "review_reason": ""
+            }
+          ],
+          "pending_claims": []
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "showcase",
+      "case": "show_101",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": null,
+      "run_id": "ac0ba74b-01e9-430b-bd55-d5bb6e753d96",
+      "report_path": "output/claim-decision-comparison/showcase/7bc7f686-e9b2-4e2d-bfa3-bb892f8dcc3e/ac0ba74b-01e9-430b-bd55-d5bb6e753d96.json",
+      "report_sha256": "b80363caf2d90df4dbf4278e56cf9319ff0072227eb32f1149877059e44ee92b",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 8,
+        "token_usage": {
+          "input_tokens": 54301,
+          "output_tokens": 1650,
+          "known_calls": 8,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 75453,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "single"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "semantic_materiality_verified_by_program": null
+      },
+      "claim_projection": [],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "showcase",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": {
+        "temperature": 0,
+        "max_tokens": 2200,
+        "max_retries": 1,
+        "request_timeout": 30,
+        "enable_thinking": false,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "61b6f4b5-5020-457b-a2fb-e2a3804d6810",
+      "report_path": "output/claim-decision-comparison/showcase/7bc7f686-e9b2-4e2d-bfa3-bb892f8dcc3e/61b6f4b5-5020-457b-a2fb-e2a3804d6810.json",
+      "report_sha256": "1d9b839db02cde4f603c0986ea27c27a428868645cbe7c23449812d05a7afbbd",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 51193,
+          "output_tokens": 5079,
+          "known_calls": 11,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 141891,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": true,
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "编码器版本升级至 v2 导致生成的请求载荷中包含下游协议不支持的 recipient_id 字段。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "下游服务严格校验载荷结构，拒绝包含未知字段的请求并返回 HTTP 400 错误。",
+              "basis": "observed",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "error_code",
+                  "value": "REMOTE_SCHEMA_REJECTED",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"error_code\":\"REMOTE_SCHEMA_REJECTED\""
+                },
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_4d0b29dda8ecff17ce02c441",
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "10:02 的编码器配置变更是触发故障的直接原因。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    },
+    {
+      "batch": "timeout-retry",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "source_version": "b2ea1a4e52e5d122",
+      "model_settings": null,
+      "workflow_version": "incident_graph_v7_claims_and_decisions",
+      "run_id": "ed2f5b83-f9b9-4881-95c3-93a908c45c57",
+      "report_path": "output/claim-decision-comparison/timeout-retry/b5f4ecc3-fcd9-4aba-9054-a8a9caed55c7/report.json",
+      "report_sha256": "de3d2514f4bcf1bafb26199331f1e940c2cf8788f944378de3b76f3728985655",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 13,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 62420,
+          "output_tokens": 5728,
+          "known_calls": 13,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 126937,
+        "termination_reason": "BUDGET_EXCEEDED",
+        "errors": [
+          {
+            "code": "BUDGET_EXCEEDED",
+            "provider": "workflow",
+            "message": "本次诊断已达到调用或时间预算。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "mechanical_pass": null,
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "semantic_materiality_verified_by_program": false
+      },
+      "claim_projection": [
+        {
+          "hypothesis_id": "H1",
+          "status": "tentative",
+          "level": "mechanism",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H1.C1",
+              "statement": "编码器升级至 v2 后构造的请求包含下游未定义的 recipient_id 字段，导致批量被拒。",
+              "basis": "inferred",
+              "essential": true,
+              "refs": [
+                {
+                  "evidence_id": "EV_eee7a79367a6794047e7d232",
+                  "field_path": "summary",
+                  "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:02:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+                },
+                {
+                  "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+                  "field_path": "message",
+                  "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+                  "unit": "",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+                }
+              ],
+              "reference_ids": [
+                "REF_7261db6e78c133f1d99cb2c9",
+                "REF_f86a2e030a07e389708e8021"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            },
+            {
+              "claim_id": "H1.C2",
+              "statement": "本地资源充足（CPU 0.29），排除了因性能瓶颈导致的处理延迟或超时。",
+              "basis": "observed",
+              "essential": false,
+              "refs": [
+                {
+                  "evidence_id": "EV_fb6433c03cb2534c50d07641",
+                  "field_path": "value",
+                  "value": 0.29,
+                  "unit": "ratio",
+                  "observed_at": "2026-10-11T10:10:00Z",
+                  "data_version": "curated-showcase-ticket-revision-v2",
+                  "quote": "\"value\":0.29"
+                }
+              ],
+              "reference_ids": [
+                "REF_154f7f10827c9f5247454a0d"
+              ],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        },
+        {
+          "hypothesis_id": "H2",
+          "status": "tentative",
+          "level": "trigger",
+          "cause": "尚无获得逐项支持的断言。",
+          "claims": [],
+          "pending_claims": [
+            {
+              "claim_id": "H2.C1",
+              "statement": "配置变更触发了协议不匹配，但尚不清楚为何在发布时未通过兼容性校验或灰度验证。",
+              "basis": "unverified",
+              "essential": false,
+              "refs": [],
+              "reference_ids": [],
+              "verdict": "not_performed",
+              "review_reason": "尚未逐项复核。"
+            }
+          ]
+        }
+      ],
+      "blocking_request": null,
+      "follow_ups": [],
+      "boundary_reviews": [],
+      "review_compactions": [],
+      "validation_failures": []
+    }
+  ]
+}

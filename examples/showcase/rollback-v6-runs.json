@@ -1,0 +1,329 @@
+{
+  "source_version": "6e92f8fc6db68a0b",
+  "workflow_version": "incident_graph_v6_blocker_audit",
+  "model": "qwen3.7-plus",
+  "data_source": "synthetic_fixture",
+  "regression": {
+    "total": 426,
+    "passed": 419,
+    "skipped": 7,
+    "seconds": 57.46
+  },
+  "limits": {
+    "model_calls": 16,
+    "tool_calls": 8,
+    "seconds": 180,
+    "request_timeout": 30
+  },
+  "runs": [
+    {
+      "case_id": "show_101",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "6e92f8fc6db68a0b",
+      "model": "qwen3.7-plus",
+      "report_file": "output/rollback/live/22050a3b-c0ed-4b0a-9f34-caa5538f6b53/show_101.json",
+      "report_sha256": "fdc4b4d8b1070da33cc8462afee64b98dde9b0e3d8b06e8b5519944d20bbd81b",
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 66285,
+          "output_tokens": 7234,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 147734,
+        "termination_reason": "REWORK_NOT_EXECUTED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        }
+      ],
+      "diagnostic_audit": {
+        "version": "diagnostic_audit_v1",
+        "partial_origin": "review_or_evidence_limitations",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "query_ledger": [
+          {
+            "tool": "get_service_metrics",
+            "args": {
+              "start": "2026-10-11T10:00:00Z",
+              "end": "2026-10-11T10:20:00Z",
+              "metrics": [
+                "delivery_error_rate",
+                "queue_depth"
+              ],
+              "granularity": "1m"
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_2236c4379a7ff58e856ba826",
+              "EV_f789a484039deb364f5cafed"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1"
+            ],
+            "goal": "验证工单所述现象（推送失败、队列积压）在当前观测窗口内的指标表现，确认故障存在性及时间范围一致性。",
+            "expected_value": "若 delivery_error_rate 在 10:03 后显著升高且 queue_depth 同步增长，则支持工单所述现象；若指标平稳，则需重新评估故障范围或告警真实性。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-11T10:00:00Z",
+              "end": "2026-10-11T10:20:00Z",
+              "category": "dependency",
+              "level": null,
+              "error_code": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_fe2730e8ec4cfc625e8d6672"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N2",
+              "N3"
+            ],
+            "goal": "获取服务日志以识别近端故障机制，重点查看依赖交互（HTTP 400/UNKNOWN_FIELD）及本地配置加载情况。",
+            "expected_value": "若 dependency 日志中出现大量包含 UNKNOWN_FIELD recipient_id 的 HTTP 400 记录，支持请求格式错误或下游校验变更机制；若 configuration 日志显示配置加载错误或版本不匹配，则支持本地配置问题。无相关日志则需考虑资源或其他替代机制。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-11T10:00:00Z",
+              "end": "2026-10-11T10:20:00Z",
+              "category": "configuration",
+              "level": null,
+              "error_code": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_bf260104b83a1535e6a9a2b7"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N2",
+              "N3"
+            ],
+            "goal": "获取服务日志以识别近端故障机制，重点查看依赖交互（HTTP 400/UNKNOWN_FIELD）及本地配置加载情况。",
+            "expected_value": "若 dependency 日志中出现大量包含 UNKNOWN_FIELD recipient_id 的 HTTP 400 记录，支持请求格式错误或下游校验变更机制；若 configuration 日志显示配置加载错误或版本不匹配，则支持本地配置问题。无相关日志则需考虑资源或其他替代机制。"
+          }
+        ],
+        "gaps": [],
+        "review_consistency_issues": [
+          {
+            "code": "REVIEW_BLOCKER_SCOPE",
+            "model_call_index": 10
+          }
+        ],
+        "overblocking_suspected_need_ids": [],
+        "termination_reason": "REWORK_NOT_EXECUTED",
+        "meaning": "分类依据查询台账和复核契约；查空、预算停止不证明渠道缺失。因果正确性与缺口必要性仍需语义评估；不自动更改完成状态。"
+      },
+      "semantic_quality": "not_independently_scored"
+    },
+    {
+      "case_id": "eval_002",
+      "status": "completed",
+      "review_status": "passed",
+      "source_version": "6e92f8fc6db68a0b",
+      "model": "qwen3.7-plus",
+      "report_file": "output/rollback/live/f45dee5d-056b-4a77-889f-9a30c713d3ef/eval_002.json",
+      "report_sha256": "c3127ddc564475fa71221794e5a80691579ddd069b13d3ec46f3938e2c11e354",
+      "run_summary": {
+        "model_calls": 10,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 49094,
+          "output_tokens": 4954,
+          "known_calls": 10,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 105016,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "tasks.0.checks",
+              "type": "too_long"
+            }
+          ]
+        }
+      ],
+      "diagnostic_audit": {
+        "version": "diagnostic_audit_v1",
+        "partial_origin": "none",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "query_ledger": [
+          {
+            "tool": "get_recent_changes",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_33c0988017f4037d16ce7acd"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N2"
+            ],
+            "goal": "获取工单时间窗口内的变更及依赖交互日志，确认401错误的具体来源和模式。",
+            "expected_value": "确认是否有配置变更，以及日志中是否记录上游认证服务拒绝请求或本地鉴权组件报错。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": "dependency",
+              "level": null,
+              "error_code": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_967d205af464c4ae4ae68e97"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N2"
+            ],
+            "goal": "获取工单时间窗口内的变更及依赖交互日志，确认401错误的具体来源和模式。",
+            "expected_value": "确认是否有配置变更，以及日志中是否记录上游认证服务拒绝请求或本地鉴权组件报错。"
+          },
+          {
+            "tool": "get_service_metrics",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "metrics": [
+                "dependency_error_rate",
+                "request_error_rate"
+              ],
+              "granularity": "1m"
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_e6c8137db2ff75ffb3631462",
+              "EV_a9920c72b42b6f8de207327b",
+              "EV_ee6d39a0b90b88740cb94bd4",
+              "EV_7867d57f5416663525c277b9"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1"
+            ],
+            "goal": "获取工单时间窗口内的错误率指标，量化影响范围。",
+            "expected_value": "确认错误率是否在版本发布后显著上升，并与日志中的错误时间点吻合。"
+          }
+        ],
+        "gaps": [
+          {
+            "need_id": "N3",
+            "purpose": "alternative",
+            "blocking": false,
+            "category": "nonblocking_limitation",
+            "query_checks": [],
+            "blocker": null,
+            "reason": "缺乏其他替代机制（如密钥轮换、时钟漂移）的排除证据，但当前机制已有强支持，故不阻塞主诊断。",
+            "semantic_necessity_verified_by_program": false,
+            "category_basis": "review_state"
+          }
+        ],
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": [],
+        "termination_reason": "FINISHED",
+        "meaning": "分类依据查询台账和复核契约；查空、预算停止不证明渠道缺失。因果正确性与缺口必要性仍需语义评估；不自动更改完成状态。"
+      },
+      "semantic_quality": "not_independently_scored"
+    }
+  ],
+  "harness_failures": [
+    {
+      "case_id": "eval_002",
+      "reason": "python_mode_validation_of_json_datetime",
+      "report_saved": false,
+      "workflow_status": null,
+      "model_calls": null,
+      "quality_score": null,
+      "log": "output/rollback/rollback-live.log",
+      "log_sha256": "93510ea51ade43f72a298f66d3913df105063819493c320a46c8a2aff9c1c6bd"
+    }
+  ],
+  "independent_semantic_review": "pending",
+  "assistant_review": [
+    {
+      "case_id": "eval_002",
+      "finding": "Supported H1 asserts client/upstream token audience is expected to be portal-stage; selected references show local configuration and audience rejection, not the actual current token audience. Completion is not a semantic quality pass."
+    },
+    {
+      "case_id": "show_101",
+      "finding": "Protocol mismatch has current observations; wording that a local configuration change caused it is stronger than current encoder selection without the corresponding change record. Rework was not executed."
+    }
+  ],
+  "note": "Exact source restoration; these repeated regression cases do not establish an optimal version or generalization."
+}

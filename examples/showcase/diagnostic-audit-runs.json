@@ -1,0 +1,1422 @@
+{
+  "schema_version": "diagnostic-audit-runs-v1",
+  "semantic_scores": "pending_independent_review",
+  "data": "synthetic observations; live model calls; no production recovery",
+  "runs": [
+    {
+      "phase": "before_json_mode",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-showcase/1906ef0d-4d26-4bc7-969a-c6e685d760cd/9495917f-87fc-43af-bfcf-478f1afdd232.json",
+      "report_sha256": "fe0600ab9d199bbf6a12210774679138c68899e4e78912ed8225a56b4a8f2dac",
+      "source_version": "e305ebd9dcb6dfc4",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 6,
+        "tool_calls": 2,
+        "duration_ms": 51329,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 30601,
+          "output_tokens": 2336,
+          "known_calls": 6,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "WINDOW_DENIED",
+              "instruction": "任务检查必须使用目标角色的已登记只读工具，并遵守工单范围；无法查询的目标保留信息缺口。"
+            }
+          ]
+        }
+      ],
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "unexplained_blocker",
+          "blocking": true,
+          "category_basis": null,
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "unexplained_blocker",
+          "blocking": true,
+          "category_basis": null,
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "unexplained_blocker",
+          "blocking": true,
+          "category_basis": null,
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "before_json_mode",
+      "case": "show_101",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-showcase/1906ef0d-4d26-4bc7-969a-c6e685d760cd/ecbbb9eb-d7c5-460c-a71a-eb6a9e89955e.json",
+      "report_sha256": "9c1f7dc0cd31c5ce163ebd24962ca2aeef90c1a2fec127e0dd41f53aca23fd0d",
+      "source_version": "e305ebd9dcb6dfc4",
+      "workflow_version": null,
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 10,
+        "tool_calls": 8,
+        "duration_ms": 98000,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 71242,
+          "output_tokens": 4474,
+          "known_calls": 10,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "invalid_json",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "review_consistency_issues": null,
+        "overblocking_suspected_need_ids": null
+      },
+      "gap_categories": [],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "before_json_mode",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-auth/79b609d0-37f4-4fec-8289-550fed2dca3b/723d0732-cc3a-4313-9cbc-8f3dc04f804e.json",
+      "report_sha256": "963abd70fe00065dc0d098ac9dabd495d9aee65eba990a5d1caac207f4d577ad",
+      "source_version": "e305ebd9dcb6dfc4",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 13,
+        "tool_calls": 4,
+        "duration_ms": 146047,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 69637,
+          "output_tokens": 6966,
+          "known_calls": 13,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_CHECK_REQUIRED",
+          "details": []
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_CHECK_REQUIRED",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [
+          {
+            "code": "REVIEW_BLOCKER_CHECK_REQUIRED",
+            "model_call_index": 12
+          },
+          {
+            "code": "REVIEW_BLOCKER_CHECK_REQUIRED",
+            "model_call_index": 13
+          }
+        ],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "本地配置验证失败：服务配置的audience值与上游签发的令牌不匹配，导致签名校验通过后的受众检查拒绝请求。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_967d205af464c4ae4ae68e97",
+              "field_path": "message",
+              "value": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\""
+            },
+            {
+              "evidence_id": "EV_e6c8137db2ff75ffb3631462",
+              "field_path": "value",
+              "value": 0.0,
+              "unit": "ratio",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"value\":0.0"
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [],
+          "status": "tentative",
+          "level": "mechanism",
+          "evidence_explanation": "日志明确指出请求因audience字段被拒绝且依赖连接成功，支持本地配置验证逻辑触发拒绝的机制。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "发布变更触发：版本2.7.0部署时将auth_audience由portal-stage修改为portal-preview，导致与新环境或旧令牌不兼容。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "summary",
+              "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+            },
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "config_summary.auth_audience",
+              "value": "portal-preview",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"auth_audience\":\"portal-preview\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "确认portal-preview是否为预期的目标受众值"
+          ],
+          "status": "tentative",
+          "level": "trigger",
+          "evidence_explanation": "变更记录显示配置值在故障开始时发生变动，解释了故障触发的时间点，但未确认该变更是否为预期行为或误操作。"
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "核查当前生效的auth_audience配置值及对应的令牌签发方预期受众。",
+          "condition": "无",
+          "expected_result": "确认配置值portal-preview是否与身份提供商签发的令牌audience声明一致。",
+          "risk": "无风险，仅读取配置和文档。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "not_performed",
+          "review_reason": "尚未复核。",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "phase": "before_json_mode",
+      "case": "eval_002",
+      "workflow": "single",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-auth/79b609d0-37f4-4fec-8289-550fed2dca3b/d91a0c0f-f407-4217-86a9-5d3db32f52c8.json",
+      "report_sha256": "ce7bc62d87ef077e48ef3c4717c4187ca65af9e342308da692c5d168932d9362",
+      "source_version": "e305ebd9dcb6dfc4",
+      "workflow_version": null,
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 10,
+        "tool_calls": 7,
+        "duration_ms": 72500,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 63025,
+          "output_tokens": 3150,
+          "known_calls": 10,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "invalid_json",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": null,
+        "next_step_status": null,
+        "investigation_status": null,
+        "review_consistency_issues": null,
+        "overblocking_suspected_need_ids": null
+      },
+      "gap_categories": [],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "before_json_mode_trace",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-trace-report.json",
+      "report_sha256": "4f708c3deea93f2250d13d8d93efa21f4a8ae0fee8d9879c8d236324a22fc710",
+      "source_version": "d1e88400efef5dcd",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 16,
+        "tool_calls": 4,
+        "duration_ms": 191891,
+        "termination_reason": "TIME_BUDGET_EXCEEDED",
+        "token_usage": {
+          "input_tokens": 79265,
+          "output_tokens": 8969,
+          "known_calls": 16,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": null,
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N3",
+          "category": "unexplained_blocker",
+          "blocking": true,
+          "category_basis": null,
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 1,
+      "output_modes": 0,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "本地配置的 audience (portal-preview) 与上游签发 Token 中的 audience (portal-stage) 不匹配，导致签名校验后的业务逻辑拒绝请求。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_72d4daf8f50f04119f80225e",
+              "field_path": "error_code",
+              "value": "AUDIENCE_REJECTED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"AUDIENCE_REJECTED\""
+            },
+            {
+              "evidence_id": "EV_72d4daf8f50f04119f80225e",
+              "field_path": "message",
+              "value": "认证依赖拒绝audience=portal-preview，期望audience=portal-stage。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\""
+            },
+            {
+              "evidence_id": "EV_967d205af464c4ae4ae68e97",
+              "field_path": "error_code",
+              "value": "AUTH_REACHABLE",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"AUTH_REACHABLE\""
+            },
+            {
+              "evidence_id": "EV_967d205af464c4ae4ae68e97",
+              "field_path": "message",
+              "value": "认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "确认上游认证服务在 staging 环境的当前 audience 配置或签发样本"
+          ],
+          "status": "tentative",
+          "level": "mechanism",
+          "evidence_explanation": "EV_72d4daf8f50f04119f80225e 和 EV_967d205af464c4ae4ae68e97 直接记录了拒绝原因及期望/实际值差异，支持该机制。尚缺上游为何仍签发旧 audience 的触发证据。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "新版本 2.7.0 部署触发了配置变更，但上游认证服务未同步更新其签发的 Token audience 值。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "config_summary.auth_audience",
+              "value": "portal-preview",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"auth_audience\":\"portal-preview\""
+            },
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "summary",
+              "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "检查上游认证服务配置变更记录"
+          ],
+          "status": "tentative",
+          "level": "trigger",
+          "evidence_explanation": "EV_33c0988017f4037d16ce7acd 证实了部署与配置变更的时间关联。但为何上游未同步变更属于外部状态，当前日志仅记录本地视角，需人工核实上游配置。"
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "人工核实上游认证服务在 staging 环境当前签发的 Token 中 audience 字段的实际值，或其配置中的预期 audience 值。",
+          "condition": "需要访问上游认证服务的控制台或拦截一个有效的登录请求以解码 Token payload。",
+          "expected_result": "若上游仍签发 portal-stage，则确认为上下游配置不一致；若上游已改为 portal-preview，则需排查本地加载延迟或其他过滤逻辑。",
+          "risk": "无直接风险，仅为只读核实。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "not_performed",
+          "review_reason": "尚未复核。",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "phase": "separate_json_finalization",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/232b22d6-18eb-426a-bed3-4c900698fe06/report.json",
+      "report_sha256": "2a5bd6ddd9610708d89f3680051bc226e3c78af265b9832ef63bc63c9d3b457a",
+      "source_version": "d6e1c30af4e9eb4c",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 13,
+        "tool_calls": 4,
+        "duration_ms": 151625,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 72213,
+          "output_tokens": 7218,
+          "known_calls": 13,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        }
+      ],
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [
+          {
+            "code": "REVIEW_BLOCKER_SCOPE",
+            "model_call_index": 12
+          },
+          {
+            "code": "REVIEW_BLOCKER_SCOPE",
+            "model_call_index": 13
+          }
+        ],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 3,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "本地配置错误：应用加载了错误的audience值（portal-preview），与依赖侧期望值（portal-stage）不一致，导致鉴权失败。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_72d4daf8f50f04119f80225e",
+              "field_path": "error_code",
+              "value": "AUDIENCE_REJECTED",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"AUDIENCE_REJECTED\""
+            },
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "config_summary.auth_audience",
+              "value": "portal-preview",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"auth_audience\":\"portal-preview\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [],
+          "status": "tentative",
+          "level": "mechanism",
+          "evidence_explanation": "EV_72d4daf8f50f04119f80225e明确记录依赖拒绝audience=portal-preview并期望portal-stage；EV_33c0988017f4037d16ce7acd证实部署变更引入了该值。依赖连接正常且签名有效，排除了网络或依赖不可用。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "发布流程中配置值未针对staging环境正确适配，将preview环境的值误用于staging。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "summary",
+              "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "核查2.7.0版本在staging环境的配置注入来源"
+          ],
+          "status": "tentative",
+          "level": "trigger",
+          "evidence_explanation": "现象紧随版本2.7.0部署出现，且配置值明显与环境预期不符。当前观测支持配置错误机制，但触发原因（为何配置值错误）需人工核查发布清单或配置源。"
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "人工核实2.7.0版本在staging环境的配置注入来源，确认auth_audience为何被设为portal-preview。",
+          "condition": "无",
+          "expected_result": "确认配置错误的具体来源（如配置文件、环境变量或CI/CD参数），以便修正。",
+          "risk": "无风险，仅为只读核实。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "not_performed",
+          "review_reason": "尚未复核。",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "phase": "constrained_planning_and_review",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/3c31c634-6b33-4076-9447-168f49fee106/report.json",
+      "report_sha256": "c80d10c7228566acfd55dcef4c154586392aa8127eff9daff29983a6fa18efa2",
+      "source_version": "6e92f8fc6db68a0b",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "needs_information",
+      "run_summary": {
+        "model_calls": 14,
+        "tool_calls": 4,
+        "duration_ms": 143860,
+        "termination_reason": "REVIEW_INCOMPLETE",
+        "token_usage": {
+          "input_tokens": 74661,
+          "output_tokens": 6716,
+          "known_calls": 14,
+          "status": "known"
+        }
+      },
+      "validation_failures": [],
+      "audit": {
+        "partial_origin": "unfinished_investigation",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N4",
+          "category": "investigation_incomplete",
+          "blocking": true,
+          "category_basis": "query_ledger",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 4,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "本地 encoder 版本(v2)与下游协议(v1)不一致，导致发送了包含 recipient_id 的无效载荷被拒绝。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_bf260104b83a1535e6a9a2b7",
+              "field_path": "message",
+              "value": "10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。",
+              "unit": "",
+              "observed_at": "2026-10-11T10:10:00Z",
+              "data_version": "curated-showcase-ticket-revision-v2",
+              "quote": "\"message\":\"10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。\""
+            },
+            {
+              "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+              "field_path": "message",
+              "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+              "unit": "",
+              "observed_at": "2026-10-11T10:10:00Z",
+              "data_version": "curated-showcase-ticket-revision-v2",
+              "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "确认触发 encoder 切换到 v2 的具体变更事件（部署或配置热加载）。"
+          ],
+          "status": "supported",
+          "level": "mechanism",
+          "evidence_explanation": "EV_bf260104b83a1535e6a9a2b7 证实 encoder 切换与 probe 结果不匹配，EV_fe2730e8ec4cfc625e8d6672 证实由此引发的远程拒绝错误。尚缺触发 encoder 切换的具体变更来源。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "是什么触发了 encoder 在 10:02 切换到 v2？",
+          "support_refs": [],
+          "counter_refs": [],
+          "pending_checks": [
+            "查询 get_recent_changes 以获取 10:02 附近的 deployment 或 configuration 记录。"
+          ],
+          "status": "unresolved",
+          "level": "trigger",
+          "evidence_explanation": "机制已明确但触发源未知。需查阅变更记录以区分是自动部署、配置更新还是其他操作。"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "查询 10:00-10:20 窗口内的最近变更，确认 encoder 版本切换的来源。",
+          "condition": "无",
+          "expected_result": "识别出导致 encoder 变为 v2 的具体部署或配置变更事件。",
+          "risk": "只读查询，无风险。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": null
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "pending_actions": []
+    },
+    {
+      "phase": "constrained_planning_and_review",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/47684e91-667f-48d1-9bd8-2f244d56771e/report.json",
+      "report_sha256": "fc889db313cd614d3f0407ce1bd9c9903cacdc89d215965da729672ad1458a0c",
+      "source_version": "6e92f8fc6db68a0b",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 6,
+        "tool_calls": 2,
+        "duration_ms": 57359,
+        "termination_reason": "TIMEOUT",
+        "token_usage": {
+          "input_tokens": 19533,
+          "output_tokens": 1480,
+          "known_calls": 5,
+          "status": "partial_or_unknown"
+        }
+      },
+      "validation_failures": [],
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 2,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "account_arrearage",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/4f2df6f9-ba57-4d88-a4a3-1aac055de90d/report.json",
+      "report_sha256": "e399f02e96847c353d220b7af350cc28fffefa8351a2e8ece52f2b634b2518ee",
+      "source_version": "ee0d5c4ed6e8cdfe",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "failed",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 1,
+        "tool_calls": 0,
+        "duration_ms": 1188,
+        "termination_reason": "MODEL_ERROR",
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "known_calls": 0,
+          "status": "partial_or_unknown"
+        }
+      },
+      "validation_failures": [],
+      "audit": {
+        "partial_origin": "review_or_evidence_limitations",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "not_declared",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "json_with_tools",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/6f2d4cb7-1e68-4207-8853-35d28dc51333/report.json",
+      "report_sha256": "f863bbd1376e4082d2942bbb7e114d8b78877b29013e7cb879089141a72717f2",
+      "source_version": "e153e4ade2bf8f53",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "needs_information",
+      "run_summary": {
+        "model_calls": 15,
+        "tool_calls": 3,
+        "duration_ms": 166547,
+        "termination_reason": "REWORK_LIMIT",
+        "token_usage": {
+          "input_tokens": 80918,
+          "output_tokens": 7851,
+          "known_calls": 15,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N3",
+          "category": "unresolved_review",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 1,
+      "output_modes": 0,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "v2 编码器生成的 payload 包含接收端协议不支持的 recipient_id 字段，导致远程拒绝。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_fe2730e8ec4cfc625e8d6672",
+              "field_path": "message",
+              "value": "endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。",
+              "unit": "",
+              "observed_at": "2026-10-11T10:10:00Z",
+              "data_version": "curated-showcase-ticket-revision-v2",
+              "quote": "\"message\":\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [],
+          "status": "supported",
+          "level": "mechanism",
+          "evidence_explanation": "日志 EV_fe2730e8ec4cfc625e8d6672 明确记录 UNKNOWN_FIELD 错误，解释了推送失败的直接机制。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "故障窗口内的编码器版本切换（v1->v2）引入了不兼容的字段格式。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_eee7a79367a6794047e7d232",
+              "field_path": "summary",
+              "value": "推送编码器从v1切换到v2；服务实例数保持4。",
+              "unit": "",
+              "observed_at": "2026-10-11T10:02:00Z",
+              "data_version": "curated-showcase-ticket-revision-v2",
+              "quote": "\"summary\":\"推送编码器从v1切换到v2；服务实例数保持4。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "确认 v2 编码器是否默认包含 recipient_id 字段"
+          ],
+          "status": "unresolved",
+          "level": "trigger",
+          "evidence_explanation": "变更记录 EV_eee7a79367a6794047e7d232 显示在故障发生前进行了编码器升级，时间上吻合。"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "核查 v2 编码器生成的请求体结构，确认 recipient_id 字段的来源及必要性。",
+          "condition": "无",
+          "expected_result": "明确是编码器缺陷还是上游协议未同步更新。",
+          "risk": "无",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "pending_actions": []
+    },
+    {
+      "phase": "separate_json_finalization",
+      "case": "show_101",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/8415b45b-042f-4c6c-877a-2b041634d827/report.json",
+      "report_sha256": "23083baea302b79c7b74bd80388d1be8cd0defd59c657f63b3be1e448d6206e8",
+      "source_version": "d6e1c30af4e9eb4c",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 7,
+        "tool_calls": 2,
+        "duration_ms": 71094,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "token_usage": {
+          "input_tokens": 33772,
+          "output_tokens": 3320,
+          "known_calls": 7,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "WINDOW_DENIED",
+              "instruction": "任务检查必须使用目标角色的已登记只读工具，并遵守工单范围；无法查询的目标保留信息缺口。"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_NEED_CHECK",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "next_check",
+              "code": "TOOL_DENIED"
+            }
+          ]
+        }
+      ],
+      "audit": {
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 2,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "phase": "json_with_tools",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/902c90df-4de2-4b50-aba6-b81005fcbd0f/report.json",
+      "report_sha256": "05a05ad6f4ad30dc3825af01d7e08278eaf8b1225e0d0df0e835121d9a12825b",
+      "source_version": "e153e4ade2bf8f53",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "needs_information",
+      "run_summary": {
+        "model_calls": 15,
+        "tool_calls": 4,
+        "duration_ms": 126500,
+        "termination_reason": "REVIEW_INCOMPLETE",
+        "token_usage": {
+          "input_tokens": 75081,
+          "output_tokens": 5643,
+          "known_calls": 15,
+          "status": "known"
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        }
+      ],
+      "audit": {
+        "partial_origin": "review_or_evidence_limitations",
+        "mechanism_status": "supported",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N3",
+          "category": "nonblocking_limitation",
+          "blocking": false,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "本地配置错误：auth_audience被错误设置为portal-preview，导致签名校验时被上游拒绝。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "config_summary.auth_audience",
+              "value": "portal-preview",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"auth_audience\":\"portal-preview\""
+            },
+            {
+              "evidence_id": "EV_72d4daf8f50f04119f80225e",
+              "field_path": "message",
+              "value": "认证依赖拒绝audience=portal-preview，期望audience=portal-stage。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"message\":\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [],
+          "status": "supported",
+          "level": "mechanism",
+          "evidence_explanation": "EV_33c0988017f4037d16ce7acd确认配置变更，EV_72d4daf8f50f04119f80225e确认上游因该值拒绝请求。尚缺触发此配置变更的具体原因（如发布脚本错误或手动误操作）。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "发布流程或人工操作失误导致staging环境加载了preview环境的配置值。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "summary",
+              "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [
+            "核查发布流水线配置或变更审批记录以确认触发源"
+          ],
+          "status": "unresolved",
+          "level": "trigger",
+          "evidence_explanation": "现有观测仅证实配置值错误，未记录变更发起者或自动化流程日志，无法区分是代码包自带错误配置还是部署时注入错误。"
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "将identity-gateway的auth_audience配置回滚为portal-stage并重启服务。",
+          "condition": "确认portal-stage为当前staging环境认证依赖的正确受众值。",
+          "expected_result": "登录请求不再因audience不匹配被拒绝，错误率恢复至基线水平。",
+          "risk": "若portal-stage值已失效，回滚可能导致持续失败；需先通过manual_check核实。",
+          "requires_approval": true,
+          "kind": "manual_change",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "uncertain",
+          "review_reason": "回滚操作依赖“portal-stage为正确值”这一前提，当前观测未直接验证该环境下的有效受众值，需人工确认。",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "phase": "constrained_planning_and_review",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/e6e8e791-6bfc-4c31-8a4e-1cafd6b548ab/report.json",
+      "report_sha256": "78ee7477506d35ce6262a7c65e9fd3d174e868fe6fd51a675de452d4a38baa4c",
+      "source_version": "6e92f8fc6db68a0b",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "partial",
+      "review_status": "needs_information",
+      "run_summary": {
+        "model_calls": 8,
+        "tool_calls": 2,
+        "duration_ms": 73766,
+        "termination_reason": "REWORK_NOT_EXECUTED",
+        "token_usage": {
+          "input_tokens": 35643,
+          "output_tokens": 3349,
+          "known_calls": 8,
+          "status": "known"
+        }
+      },
+      "validation_failures": [],
+      "audit": {
+        "partial_origin": "review_or_evidence_limitations",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [],
+      "rework_rounds": 0,
+      "output_modes": 1,
+      "published_hypotheses": [
+        {
+          "hypothesis_id": "H1",
+          "cause": "新版本部署错误地将auth_audience配置指向portal-preview，而客户端仍使用portal-stage令牌，导致受众校验失败返回401。",
+          "support_refs": [
+            {
+              "evidence_id": "EV_33c0988017f4037d16ce7acd",
+              "field_path": "summary",
+              "value": "版本2.7.0部署后audience从portal-stage改为portal-preview。",
+              "unit": "",
+              "observed_at": "2026-10-01T10:02:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"summary\":\"版本2.7.0部署后audience从portal-stage改为portal-preview。\""
+            },
+            {
+              "evidence_id": "EV_967d205af464c4ae4ae68e97",
+              "field_path": "error_code",
+              "value": "AUTH_REACHABLE",
+              "unit": "",
+              "observed_at": "2026-10-01T10:10:00Z",
+              "data_version": "independent-synthetic-v1",
+              "quote": "\"error_code\":\"AUTH_REACHABLE\""
+            }
+          ],
+          "counter_refs": [],
+          "pending_checks": [],
+          "status": "supported",
+          "level": "mechanism",
+          "evidence_explanation": "变更日志证实配置值改变，依赖日志确认签名通过但因audience字段被拒，直接支持配置错误导致校验失败的机制。"
+        },
+        {
+          "hypothesis_id": "H2",
+          "cause": "为何在发布流程中允许将staging环境的受众配置更改为preview值尚不明确。",
+          "support_refs": [],
+          "counter_refs": [],
+          "pending_checks": [
+            "核查发布审批记录或配置变更工单"
+          ],
+          "status": "unresolved",
+          "level": "trigger",
+          "evidence_explanation": "当前观测仅显示配置已变更及后果，未包含发布审批记录或配置管理策略，无法确定触发变更的具体原因。"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "人工核实staging环境预期的auth_audience配置值，并检查是否有其他环境受到类似配置漂移影响。",
+          "condition": "需访问配置管理系统或联系发布负责人获取预期基线。",
+          "expected_result": "确认portal-stage为正确值，并识别是否需回滚或修正配置。",
+          "risk": "无直接系统风险，仅为信息核实。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "pending_actions": []
+    },
+    {
+      "phase": "account_arrearage",
+      "case": "eval_002",
+      "workflow": "multi",
+      "model": "qwen3.7-plus",
+      "report_path": "output/diagnostic-audit-final/f90ae945-bcc5-4419-964d-b5225800f3cd/report.json",
+      "report_sha256": "a37f142908ca671330a881fdab6e27918d0ae3fe90a47cdd17a7e7c16370eb36",
+      "source_version": "ee0d5c4ed6e8cdfe",
+      "workflow_version": "incident_graph_v6_blocker_audit",
+      "status": "failed",
+      "review_status": "not_performed",
+      "run_summary": {
+        "model_calls": 1,
+        "tool_calls": 0,
+        "duration_ms": 1188,
+        "termination_reason": "MODEL_ERROR",
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "known_calls": 0,
+          "status": "partial_or_unknown"
+        }
+      },
+      "validation_failures": [],
+      "audit": {
+        "partial_origin": "review_or_evidence_limitations",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "not_declared",
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": []
+      },
+      "gap_categories": [
+        {
+          "need_id": "N1",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N2",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        },
+        {
+          "need_id": "N3",
+          "category": "review_not_completed",
+          "blocking": true,
+          "category_basis": "review_state",
+          "semantic_necessity_verified_by_program": false
+        }
+      ],
+      "rework_rounds": 0,
+      "output_modes": 0,
+      "published_hypotheses": [],
+      "published_actions": [],
+      "pending_actions": []
+    }
+  ],
+  "supplemental_probes": [
+    {
+      "kind": "json_tool_smoke",
+      "path": "output/diagnostic-audit-json-mode-smoke.json",
+      "attempts": 2,
+      "passed": true
+    },
+    {
+      "kind": "arrearage_reproduction",
+      "path": "output/diagnostic-audit-json-mode-error.json",
+      "attempts": 1,
+      "passed": false
+    },
+    {
+      "kind": "account_recharge_check",
+      "path": "output/diagnostic-audit-account-check.json",
+      "attempts": 1,
+      "passed": true
+    },
+    {
+      "kind": "tool_mode_trace_1",
+      "attempts": 3,
+      "quality_run": false
+    },
+    {
+      "kind": "tool_mode_trace_2",
+      "attempts": 2,
+      "quality_run": false
+    }
+  ]
+}

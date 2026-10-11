@@ -5,10 +5,11 @@ def review_policy():
     return {
         'version': 'diagnosis_readiness_v2',
         'cause_levels': ['mechanism', 'trigger', 'alternative'],
-        'action_kinds': ['read_only_check', 'manual_change', 'registered_repair'],
+        'action_kinds': ['read_only_check', 'manual_check', 'manual_change', 'registered_repair'],
         'completion': '复核观测、至少一个有支持的机制及一个有效下一步；排除候选原因是调查结果。',
         'limitations': '触发原因未知可保留；会改变机制或下一步的关键歧义仍阻塞。',
-        'read_only_advice': '核查建议只需有依据、范围合法，不要求预先取得它将要查询的结果。',
+        'blockers': '阻塞未知须指明受影响F/H/A、缺失观测及改变判断的结果；N2不包含深层触发原因。查询状态由程序台账确认，不自动证明缺口必要性。',
+        'read_only_advice': '核查建议须有依据、范围合法且增加新覆盖；复用已有结果，不要求预先取得新查询结果。',
         'changes': '支持有条件建议不等于条件已满足、获批或执行。未支持的修改只展示为待确认项。',
     }
 

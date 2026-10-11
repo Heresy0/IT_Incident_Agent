@@ -1,6 +1,6 @@
 {
   "api_key": "",
-  "model": "qwen-turbo",
+  "model": "qwen3.7-plus",
   "tenant_id": "default_tenant",
   "user_id": "default_user",
   "thread_id": "default",

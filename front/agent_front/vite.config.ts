@@ -1,14 +1,17 @@
 import { fileURLToPath, URL } from 'node:url'
+import { existsSync, readFileSync } from 'node:fs'
+import { parseEnv } from 'node:util'
 
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   // Backend settings stay in the dev server; only VITE_* is exposed to browser code.
-  const env = loadEnv(mode, fileURLToPath(new URL('../..', import.meta.url)), '')
+  const envPath = fileURLToPath(new URL('../../.env', import.meta.url))
+  const env = existsSync(envPath) ? parseEnv(readFileSync(envPath, 'utf-8')) : {}
   const target = process.env.INCIDENT_API_TARGET || env.INCIDENT_API_TARGET
-    || `http://127.0.0.1:${env.PORT || '8003'}`
+    || `http://127.0.0.1:${process.env.PORT || env.PORT || '8003'}`
   return {
   plugins: [vue()],
   server: {

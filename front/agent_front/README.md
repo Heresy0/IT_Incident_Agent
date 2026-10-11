@@ -15,7 +15,7 @@ cd D:\code\it_incident_agent
 
 页面：http://127.0.0.1:5174/。开发服务器仅绑定127.0.0.1，端口被占用时退出，不自动换端口。
 
-开发代理读取根目录的 .env.local/.env 中 PORT，默认连接8003；当前本机配置为8002。可通过 INCIDENT_API_TARGET 指定地址。配置变化后重启前端。/api、/health、/docs、/openapi.json 由开发服务器代理，模型 Key 和根目录后端配置不传给浏览器。
+开发代理读取根目录的 .env 中 PORT，默认连接8003；当前本机配置为8002。可通过 INCIDENT_API_TARGET 指定地址。配置变化后重启前端。/api、/health、/docs、/openapi.json 由开发服务器代理，模型 Key 和根目录后端配置不传给浏览器。
 
 依赖未安装时在本目录执行 npm ci；已有 node_modules 可直接启动。本轮未安装新依赖。
 

@@ -42,6 +42,26 @@ def render_collaboration(result):
         labels = {'reviewed': '报告已复核', 'reviewed_with_limitations': '报告已复核，保留所列限制',
                   'incomplete': '诊断仍有关键缺口'}
         lines.extend([labels[readiness['report_status']] + '；' + readiness['meaning'], ''])
+    audit = result.get('diagnostic_audit')
+    if audit:
+        labels = {'investigation_incomplete': '有效检查尚未执行', 'retrieval_failed': '实际查询失败',
+            'incomplete_sample': '样本不完整', 'external_input_required': '需补充外部信息',
+            'selected_scope_insufficient': '所选查询范围内证据不足', 'unresolved_review': '复核仍未确定',
+            'unexplained_blocker': '阻塞理由尚未形成可核验契约', 'nonblocking_limitation': '非阻塞限制',
+            'review_not_completed': '尚未完成有效复核'}
+        states = {'supported': '有证据支持', 'unconfirmed': '尚未确认', 'not_declared': '未声明可核验检查',
+            'incomplete': '声明检查尚未完成', 'declared_queries_completed': '声明的查询已完成'}
+        lines.extend(['诊断、调查与停止原因：',
+            f"- 机制：{states[audit['mechanism_status']]}；下一步：{states[audit['next_step_status']]}；调查：{states[audit['investigation_status']]}。",
+            f"- 停止原因：{audit['termination_reason']}。"])
+        for gap in audit['gaps']:
+            lines.append(f"- {gap['need_id']}：{labels[gap['category']]}；{gap['reason']}")
+            if gap['blocker']:
+                blocker = gap['blocker']
+                lines.append(f"  - 影响目标：{blocker['affected_targets']}；待补：{blocker['missing_observation']}；判断变化：{blocker['decision_impact']}")
+        if audit['overblocking_suspected_need_ids']:
+            lines.append('- 需要人工核对阻塞与已支持结论是否矛盾：' + '、'.join(audit['overblocking_suspected_need_ids']))
+        lines.extend(['- ' + audit['meaning'], ''])
     if result.get("execution_mode") == "scripted_control_only":
         lines.extend(["这是脚本控制演示，复核与调度也是测试替身，不代表真实模型诊断质量。", ""])
     lines.append("观测（无独立 Reviewer，语义待核查）：" if single else "已复核观测：")
@@ -71,7 +91,7 @@ def render_collaboration(result):
         if not output['recommended_actions']:
             lines.append('- 尚无经过复核的处理建议。')
     for action in output["recommended_actions"]:
-        kinds = {'read_only_check': '只读核查', 'manual_change': '有条件的人工变更',
+        kinds = {'read_only_check': '只读核查', 'manual_check': '人工只读核实', 'manual_change': '有条件的人工变更',
                  'registered_repair': '登记修复候选', 'unspecified': '未分类（兼容旧输出）'}
         lines.append(f"- [{kinds[action.get('kind', 'unspecified')]}] {action['action']}；条件：{action['condition']}；验证：{action['expected_result']}；风险：{action['risk']}；需批准：{action['requires_approval']}")
         lines.extend('  - 提议只读检查：' + check['tool'] for check in action.get('checks', []))
@@ -80,6 +100,9 @@ def render_collaboration(result):
         for action in result['pending_actions']:
             lines.append(f"- {action['target_id']} [{action['kind']}] {action['action']}；条件：{action['condition']}；风险：{action['risk']}；验证：{action['expected_result']}")
             lines.append('  - 复核：' + action['review_reason'])
+    if result.get('rejected_actions'):
+        lines.extend(['', '未发布的建议（程序拒绝，未执行）：'])
+        lines.extend(f"- [{action['code']}] {action['action']}" for action in result['rejected_actions'])
     lines.extend(["", "协作过程："])
     for task in result["task_results"]:
         lines.append(f"- {task['role']}: {task['goal']} → {task['status']}（模型 {task['model_calls']} / 工具 {task['tool_calls']}）")

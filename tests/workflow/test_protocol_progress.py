@@ -154,25 +154,35 @@ class ProtocolProgressTests(unittest.TestCase):
         self.assertEqual(result['evidence_needs'][1]['status'], 'supported', 'Only the second review closes the need')
         self.assertEqual(result['run_summary']['tool_calls'], 3)
 
-    def test_denied_duplicate_request_gets_one_normal_budget_alternative(self):
+    def test_duplicate_hint_preserves_gap_and_supervisor_selects_alternative(self):
         provider = FixtureProvider('case_003', P)
         models = action_models(provider, invalid='A1')
         def duplicate(response, messages, calls):
             data = json.loads(response.content)
             if calls == 1:
                 data['request_evidence']['checks'][0]['args']['metrics'] = ['db_cpu']
-            if calls == 2:
-                self.assertIn('DUPLICATE_TOOL', messages[-1].content)
             return json_response(data)
         models['reviewer'] = AlterOutput(models['reviewer'], duplicate)
+        def replan(response, messages, calls):
+            value = json.loads(response.content)
+            payload = json.loads(messages[1].content)['input']
+            if payload['phase'] == 'rework':
+                self.assertEqual(payload['pending_challenge']['checks'], [])
+                self.assertEqual(payload['pending_challenge']['hint_status'][0]['code'], 'DUPLICATE_TOOL')
+                value.update(action='dispatch', tasks=[{'role': 'investigation', 'goal': '补齐当前池压力',
+                    'checks': [{'tool': 'get_service_metrics', 'args': {
+                        **provider.ticket().scope.model_dump(mode='json', include={'start', 'end'}),
+                        'metrics': ['pool_usage', 'pool_wait']}}], 'expected_value': '核查建议适用条件'}])
+            return json_response(value)
+        models['supervisor'] = AlterOutput(models['supervisor'], replan)
         result = collaborate(models, provider, P)
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['rework_rounds'], result['repairs']), (1, 0))
-        self.assertEqual(sum(e['type'] == 'review_follow_up_correction' for e in result['events']), 1)
-        self.assertEqual(sum(e['type'] == 'rework_denied' for e in result['events']), 1)
+        self.assertEqual(sum(e['type'] == 'review_follow_up_correction' for e in result['events']), 0)
+        self.assertEqual(sum(e['type'] == 'review_hint_ignored' for e in result['events']), 1)
         self.assertEqual(result['run_summary']['tool_calls'], 3)
 
-    def test_invalid_scope_cannot_reopen_need_or_execute_rework(self):
+    def test_invalid_hint_scope_is_discarded_without_executing_rework(self):
         provider = FixtureProvider('case_003', P)
         models = action_models(provider, invalid='A1')
         def invalid(response, messages, calls):
@@ -186,7 +196,7 @@ class ProtocolProgressTests(unittest.TestCase):
             reserve_model_calls=3, reserve_seconds=20))
         self.assertEqual((result['status'], result['rework_rounds']), ('partial', 0))
         self.assertEqual(result['run_summary']['tool_calls'], 2)
-        self.assertFalse(any(e['type'] == 'review_need_reopened' for e in result['events']))
+        self.assertTrue(any(e['type'] == 'review_hint_ignored' for e in result['events']))
         self.assertTrue(any(e['type'] == 'rework_denied' for e in result['events']))
 
 

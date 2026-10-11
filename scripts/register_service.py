@@ -105,9 +105,8 @@ def main(argv=None):
         else:
             path = args.file
             if path is None:
-                from dotenv import load_dotenv
-                load_dotenv(ROOT / '.env.local', override=False)
-                load_dotenv(ROOT / '.env', override=False)
+                from config.incident import load_environment
+                load_environment()
                 path = Path(os.getenv('INCIDENT_SERVICES_FILE') or ROOT / 'services.local.json')
                 if not path.is_absolute():
                     path = ROOT / path

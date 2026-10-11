@@ -81,6 +81,33 @@ class ToolExecutor:
         schemas = [{"type": "function", "function": {"name": n, "description": descriptions[n],
                 "parameters": TOOL_ARGS[n].model_json_schema()}} for n in sorted(allowed)]
         for schema in schemas:
+            if self.role != 'single' and schema['function']['name'] in {
+                    'get_service_metrics', 'get_service_logs', 'get_recent_changes'}:
+                schema['function']['description'] += (
+                    ' Target is the ticket service ' + self.scope.service + ' in ' + self.scope.environment
+                    + '. Logs may record its dependency interactions, but this tool cannot read a remote '
+                    'service\'s own configuration, deployment history or raw requests. '
+                    'Do not describe a ticket-service query as a remote-service check.')
+            if schema['function']['name'] == 'get_service_logs' and self.role != 'single':
+                schema['function']['description'] = (
+                    'Read registered logs in the ticket window. Category describes the emitting boundary, '
+                    'not the suspected root cause: dependency includes remote request outcomes '
+                    '(HTTP rejection, authentication, protocol errors, timeouts); configuration covers '
+                    'local configuration/load/validation; resource covers process/capacity/queue pressure. '
+                    'A suspected configuration cause can produce dependency logs. Prefer an unfiltered '
+                    'read until actual level/error_code fields are observed. Empty only covers this category '
+                    'and filter, never other categories. At most 50 records. '
+                    'Target is ticket service ' + self.scope.service + '; dependency records describe '
+                    'its interactions, not access to the remote service\'s internal state.')
+                schema['function']['parameters']['properties']['error_code']['description'] = (
+                    '精确匹配error_code，不搜索正文；未从来源字段确认时省略。受限查空后重新评估过滤。')
+                # Model suggestions should discover actual source fields before
+                # proposing exact filters. The public tool validator remains
+                # compatible; this is the current role's observed vocabulary.
+                logs = [e.payload for e in self.evidence.values() if 'message' in e.payload]
+                for field in ('level', 'error_code'):
+                    values = sorted({row[field] for row in logs if row.get(field) is not None})
+                    schema['function']['parameters']['properties'][field]['enum'] = [None, *values]
             if schema['function']['name'] == 'get_service_metrics':
                 if capabilities:
                     schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(capabilities['registered_metrics'])
@@ -157,7 +184,7 @@ class ToolExecutor:
             return self.rejected(exc.code)
         # Validated filters and query window; no credentials, identity or free text.
         self.last_query_profile = {key: value for key, value in args.model_dump(mode="json").items()
-                                   if key in {"metrics", "granularity", "category", "level", "start", "end"}}
+                                   if key in {"metrics", "granularity", "category", "level", "error_code", "start", "end"}}
         signature = (name, args.model_dump_json())
         if signature in self.seen:
             return self.rejected("DUPLICATE_TOOL")

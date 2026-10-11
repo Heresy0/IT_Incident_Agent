@@ -26,6 +26,18 @@ class EvidenceNeed(Contract):
         description='Whether this unresolved question changes the current diagnosis or next step. Symptom/mechanism always block; null preserves the conservative default. Explain a nonblocking limitation in reason.')
 
 
+class ReviewBlocker(Contract):
+    cause_level: Literal['observation', 'mechanism', 'trigger', 'alternative', 'action_condition']
+    affected_targets: list[str] = Field(min_length=1, max_length=4,
+        description='Actual F/H/A targets whose verdict would change with this observation.')
+    missing_observation: str = Field(min_length=1, max_length=300)
+    decision_impact: str = Field(min_length=1, max_length=300,
+        description='Which possible result changes which conclusion or next step?')
+    resolution: Literal['scoped_check', 'external_source', 'not_planned']
+    target_role: Role = 'investigation'
+    checks: list[ReadOnlyCheck] = Field(default_factory=list, max_length=2)
+
+
 class NeedAssessment(Contract):
     need_id: str = Field(pattern=r'^N[1-6]$')
     verdict: Literal['supported', 'uncertain', 'not_required']
@@ -33,6 +45,8 @@ class NeedAssessment(Contract):
     reason: str = Field(min_length=1, max_length=400)
     blocking: bool | None = Field(default=None,
         description='Independently assess materiality; null retains the existing setting. Symptom/mechanism cannot be nonblocking.')
+    blocker: ReviewBlocker | None = Field(default=None,
+        description='Required for a blocking uncertain question in the live workflow. External source means another service not readable by the scoped tools, not an empty query.')
 
 
 class TaskRequest(Contract):
@@ -124,7 +138,7 @@ class RecommendedAction(Contract):
     expected_result: str = Field(min_length=1, max_length=300)
     risk: str = Field(min_length=1, max_length=300)
     requires_approval: bool
-    kind: Literal['read_only_check', 'manual_change', 'registered_repair', 'unspecified'] = Field(default='unspecified',
+    kind: Literal['read_only_check', 'manual_check', 'manual_change', 'registered_repair', 'unspecified'] = Field(default='unspecified',
         description='Separate investigation from changes. Unspecified is the legacy default, never inferred from action prose.')
     checks: list[ReadOnlyCheck] = Field(default_factory=list, max_length=2,
         description='Executable scoped read-only proposals for read_only_check; never automatically executed or approved by this report.')
@@ -145,6 +159,7 @@ class DiagnosisDraft(Contract):
     recommended_actions: list[RecommendedAction]
     missing_information: list[str]
     escalation_team: str | None
+    rejected_actions: list[dict[str, str]] = Field(default_factory=list)
 
 
 class Assessment(Contract):
@@ -155,17 +170,19 @@ class Assessment(Contract):
 
 
 class EvidenceRequest(Contract):
-    hypothesis_id: str = Field(pattern=r"^H[1-4]$")
+    hypothesis_id: str | None = Field(default=None, pattern=r"^H[1-4]$")
     need_id: str | None = Field(default=None, pattern=r'^N[1-6]$')
     target_id: str | None = Field(default=None, pattern=r'^[HA][1-4]$',
         description='Disputed H or A target. Defaults to hypothesis_id. An A target may need applicability checks while its related H remains supported.')
-    evidence_ids: list[str] = Field(min_length=1, max_length=8)
+    evidence_ids: list[str] = Field(default_factory=list, max_length=8)
     missing_observation: str = Field(min_length=1, max_length=400)
-    proposed_check: str = Field(min_length=1, max_length=400)
-    expected_value: str = Field(min_length=1, max_length=400)
+    proposed_check: str = Field(default='', max_length=400,
+        description='Optional investigation hint, not an executable instruction.')
+    expected_value: str = Field(default='', max_length=400,
+        description='Optional evidence acceptance condition; Supervisor designs the concrete check.')
     target_role: Role = "investigation"
     checks: list[ReadOnlyCheck] = Field(default_factory=list, max_length=2,
-        description='One or two executable read-only checks. Empty means a human-only proposal, never automatic rework.')
+        description='Optional read-only hints. Supervisor may replace these; only its validated plan authorizes rework.')
 
 
 class ReviewDecision(Contract):
@@ -176,3 +193,14 @@ class ReviewDecision(Contract):
     missing_information: list[str] = Field(default_factory=list, max_length=8)
     follow_up_reason: str | None = Field(default=None, min_length=1, max_length=400,
         description='When an H/A is uncertain and no evidence request is made, explain why no useful scoped read-only check is available or appropriate.')
+
+
+class ObservedClaim(Contract):
+    statement: str = Field(min_length=1, max_length=500)
+    refs: list[ReferenceSelection] = Field(min_length=1, max_length=8)
+
+
+class ObservationReview(Contract):
+    directly_supported: list[ObservedClaim] = Field(default_factory=list, max_length=4)
+    unverified_causes: list[str] = Field(default_factory=list, max_length=4,
+        description='Specific causal explanations not established by these observations; keep them separate from observed failure mechanisms.')

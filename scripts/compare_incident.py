@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'app'))
 sys.path.insert(0, str(ROOT))
 from api.auth import Principal
+from config.incident import DEFAULT_MODEL, IncidentConfig
 from runtime.context import Limits, RunContext, ExecutionError
 from workflow.coordinator import Collaboration
 from agents.contracts import DiagnosisDraft
@@ -70,7 +71,7 @@ def parse_args(argv=None):
     parser.add_argument('--cases', nargs='+', help='Explicit development case IDs; free default selects all six')
     parser.add_argument('--model-budget', type=int)
     parser.add_argument('--tool-budget', type=int)
-    parser.add_argument('--model', default='qwen-turbo')
+    parser.add_argument('--model', help='Override MODEL from the shared project configuration')
     parser.add_argument('--output', type=Path, default=ROOT / 'output/incident-comparison')
     args = parser.parse_args(argv)
     known = json.loads((ROOT / 'evals/incident/manifest.json').read_text(encoding='utf-8'))['cases']
@@ -90,23 +91,25 @@ def parse_args(argv=None):
 
 def main(argv=None):
     parser, args = parse_args(argv)
+    runtime_config = IncidentConfig.from_file()
+    args.model = args.model or runtime_config.model
     limits = Limits(model_calls=args.model_budget, tool_calls=args.tool_budget, reserve_model_calls=3, reserve_seconds=20)
-    configuration = {'cases': args.cases, 'limits': asdict(limits), 'model': args.model if args.live else 'scripted',
-        'execution_mode': 'live' if args.live else 'scripted_control_only',
-        'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30}}
+    configuration = {'cases': args.cases, 'limits': asdict(limits), 'model': 'scripted' if args.fake else args.model,
+        'execution_mode': 'live' if args.live else 'scripted_control_only' if args.fake else 'plan_only',
+        'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30,
+            **({'enable_thinking': False, 'response_format': {'type': 'json_object'}}
+               if args.model == DEFAULT_MODEL or args.model.startswith(DEFAULT_MODEL + '-') else {})}}
     if not args.live and not args.fake:
         print(json.dumps({'plan_only': True, 'configuration': configuration, 'paired_runs': 2 * len(args.cases),
             'maximum_model_calls': 2 * len(args.cases) * limits.model_calls,
             'maximum_tool_calls': 2 * len(args.cases) * limits.tool_calls, 'estimated_cost': None,
-            'note': 'No model/credential loaded. Live requires explicit case selection, budgets and --execute-live.'}, ensure_ascii=False, indent=2))
+            'note': 'Configuration read locally; no model request or authentication performed. Live requires explicit case selection, budgets and --execute-live.'}, ensure_ascii=False, indent=2))
         return 0
     if args.live:
-        from dotenv import load_dotenv
         from fastapi import HTTPException
         from fastapi.security import HTTPAuthorizationCredentials
         from api.auth import get_current_principal
-        load_dotenv(ROOT / '.env.local', override=False)
-        key, token = os.getenv('DASHSCOPE_API_KEY', ''), os.getenv('INCIDENT_BEARER_TOKEN', '')
+        key, token = runtime_config.api_key, os.getenv('INCIDENT_BEARER_TOKEN', '')
         if not key or key == 'test-only' or not token:
             parser.error('This project needs a configured model key and registered bearer identity; no request sent')
         try:

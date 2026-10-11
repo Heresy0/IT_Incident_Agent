@@ -23,17 +23,19 @@ cd D:\code\it_incident_agent
 cd D:\code\it_incident_agent
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-if (-not (Test-Path .env.local)) { Copy-Item .env.local.example .env.local }
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 .\.venv\Scripts\python.exe scripts/setup_demo_auth.py
 ```
 
 requirements.txt 为67个锁定的 IT 运行包，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。本轮使用现有独立环境完成验证，未强制卸载额外包或重新创建环境。
 
-Python 构建配置 `pyproject.toml` 复用同一锁定依赖，只打包 `app/` 下的 IT 模块及数据库迁移。`.env.example` 和 `.env.local.example` 均为当前 IT 模板，前端地址覆盖使用 `INCIDENT_API_TARGET`；未设置时按 `PORT` 自动连接。已有真实环境、身份与登记文件不会被模板覆盖。
+Python 构建配置 `pyproject.toml` 复用同一锁定依赖，只打包 `app/` 下的 IT 模块及数据库迁移。`.env.example` 为统一的 IT 配置模板，前端地址覆盖使用 `INCIDENT_API_TARGET`；未设置时按 `PORT` 自动连接。已有真实环境、身份与登记文件不会被模板覆盖。
 
-免费脚本模式无需模型 Key。显式执行真实模型时，在本项目 .env.local 配置 DASHSCOPE_API_KEY、MODEL=qwen-turbo 和 INCIDENT_BEARER_TOKEN。身份初始化脚本不会覆盖现有 .auth.local.json 和 .demo-credentials.local.json；不要把它们提交到 Git。
+免费脚本模式无需模型 Key。显式执行真实模型时，在本项目 .env 配置 DASHSCOPE_API_KEY、MODEL=qwen3.7-plus 和 INCIDENT_BEARER_TOKEN。默认模型为 qwen3.7-plus，使用 DashScope 多模态接口处理文本与工具调用，并关闭思考模式以保持现有调用时限和输出协议。身份初始化脚本不会覆盖现有 .auth.local.json 和 .demo-credentials.local.json；不要把它们提交到 Git。
 
-config.json 和真实 .env.local 原样保留；运行配置仅使用模型、Key和 PostgreSQL DSN。旧研究开关、记忆字段和向量配置不会恢复研究功能。
+运行配置统一读取 `.env`，`config.json` 作为兼容回退；运行配置仅使用模型、Key和 PostgreSQL DSN。旧研究开关、记忆字段和向量配置不会恢复研究功能。
+
+后端与真实模型 CLI 共用配置读取逻辑：进程环境变量优先于根目录 `.env`，再回退到 `config.json` 和代码默认值。CLI 的 `--model` 可显式覆盖模型；评测计划显示相同的模型配置，但不会初始化模型、验证身份或发送请求。`CONFIG_PATH` 可指定兼容 JSON 文件。修改配置后重启后端及前端开发服务器。
 
 ## 免费 CLI
 
@@ -226,7 +228,7 @@ cd D:\code\it_incident_agent
 
 用户反馈服务故障无需先提供索引任务 ID，可描述症状、发生时间与影响范围。当前六个工具查询登记观测和知识，不直接查询索引任务；具体任务是否成功仍由业务页面或人工确认。
 
-前端代理从根目录 .env.local/.env 读取后端 PORT，当前本机为8002，缺省为8003；也可用 INCIDENT_API_TARGET 指定地址。修改代理配置后重启前端。工单页面已提供已登记重启目标的修复提案、审批、显式执行和进度；普通用户不能审批或执行，状态核查不能创建真实修复。新增修复能力读取接口需重启后端加载。界面、构建与限制见[前端说明](front/agent_front/README.md)。
+前端代理从根目录 .env 读取后端 PORT，当前本机为8002，缺省为8003；也可用 INCIDENT_API_TARGET 指定地址。修改代理配置后重启前端。工单页面已提供已登记重启目标的修复提案、审批、显式执行和进度；普通用户不能审批或执行，状态核查不能创建真实修复。新增修复能力读取接口需重启后端加载。界面、构建与限制见[前端说明](front/agent_front/README.md)。
 
 前后端按 Ctrl+C 停止；数据库仅停止本项目服务并保留数据：
 

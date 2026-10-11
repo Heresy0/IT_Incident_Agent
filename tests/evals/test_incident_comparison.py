@@ -146,8 +146,10 @@ class ComparisonTests(unittest.TestCase):
                 result = capture('case_004', flow, factory, P, LIMITS)
                 self.assertEqual(result['status'], 'completed')
 
-    def test_plan_and_invalid_live_never_load_models_or_credentials(self):
-        with patch('dotenv.load_dotenv', side_effect=AssertionError('Credential read')):
+    def test_plan_and_invalid_live_never_initialize_models_or_authenticate(self):
+        with patch('agents.models.build_model', side_effect=AssertionError('Model initialized')), \
+             patch('agents.models.build_roles', side_effect=AssertionError('Model initialized')), \
+             patch('api.auth.get_current_principal', side_effect=AssertionError('Identity checked')):
             with redirect_stdout(io.StringIO()) as output:
                 self.assertEqual(main(['--plan', '--cases', 'case_004']), 0)
             self.assertTrue(json.loads(output.getvalue())['plan_only'])

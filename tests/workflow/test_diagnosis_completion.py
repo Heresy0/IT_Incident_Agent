@@ -170,4 +170,4 @@ class DiagnosisCompletionTests(unittest.TestCase):
         payload = json.loads(diagnosis.history[0][1].content)['input']
         self.assertEqual(payload['completion_requirements']['required_sections'],
                          ['findings', 'hypotheses', 'recommended_actions'])
-        self.assertIn('purpose=diagnosis', diagnosis.history[0][0].content)
+        self.assertEqual(payload['ticket']['purpose'], 'diagnosis')

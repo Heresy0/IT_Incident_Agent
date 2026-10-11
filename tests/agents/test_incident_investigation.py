@@ -165,13 +165,15 @@ class IncidentInvestigationTests(unittest.TestCase):
         final = {"findings": [{"statement": "Registered owner is Checkout on-call",
                                "refs": [{"reference_id": option.reference_id}]}]}
         def sdk_response(message, reason):
+            message = {**message, "content": [{"text": message["content"]}]}
             return {"status_code": 200, "request_id": "offline-sdk-probe", "usage": {"input_tokens": 2, "output_tokens": 3, "total_tokens": 5},
                     "output": {"choices": [{"message": message, "finish_reason": reason}]}}
         replies = [sdk_response({"role": "assistant", "content": "", "tool_calls": [{"id": "sdk-1", "type": "function",
                     "function": {"name": "get_service_owner", "arguments": '{"alias":"checkout-api"}'}}]}, "tool_calls"),
                    sdk_response({"role": "assistant", "content": json.dumps(final)}, "stop")]
-        with patch("dashscope.Generation.call", side_effect=replies) as sdk:
-            result = self.run_model(build_model("test-only"))
+        with patch("dashscope.MultiModalConversation.call", side_effect=replies) as sdk:
+            result = self.run_model(build_model("test-only"), objective={'required_checks': [
+                {'tool': 'get_service_owner', 'args': {'alias': 'checkout-api'}}]})
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["output_protocol"], "reference_selection_v2")
         self.assertEqual(result["output"]["findings"][0]["refs"][0]["value"], "Checkout on-call")
@@ -180,17 +182,48 @@ class IncidentInvestigationTests(unittest.TestCase):
         self.assertEqual(result["run_summary"]["token_usage"], {"input_tokens": 4, "output_tokens": 6, "known_calls": 2, "status": "known"})
         self.assertEqual(sdk.call_count, 2)
         self.assertEqual(sdk.call_args_list[0].kwargs["request_timeout"], 30)
+        self.assertEqual(sdk.call_args_list[0].kwargs["model"], "qwen3.7-plus")
+        self.assertFalse(sdk.call_args_list[0].kwargs["enable_thinking"])
+        self.assertEqual(sdk.call_args_list[0].kwargs["response_format"], {"type": "json_object"})
+        self.assertTrue(all(isinstance(m["content"], list) for m in sdk.call_args_list[1].kwargs["messages"]))
         self.assertEqual(len(sdk.call_args_list[0].kwargs["tools"]), 4)
+        self.assertNotIn('tools', sdk.call_args_list[1].kwargs)
         self.assertTrue(any(m["role"] == "tool" for m in sdk.call_args_list[1].kwargs["messages"]))
+
+    def test_native_json_correction_removes_tools_within_existing_repair_budget(self):
+        ex = executor()
+        source = ex.execute('get_service_owner', {'alias': 'checkout-api'}).evidence[0]
+        ref = next(o.reference_id for o in source.reference_options if o.field_path == 'team')
+        content = json.dumps({'findings': [{'statement': '负责人观测', 'refs': [{'reference_id': ref}]}]})
+        def reply(text='', tools=None):
+            return {'status_code': 200, 'request_id': 'offline-correction', 'usage': {}, 'output': {'choices': [{
+                'finish_reason': 'tool_calls' if tools else 'stop',
+                'message': {'role': 'assistant', 'content': [{'text': text}], **({'tool_calls': tools} if tools else {})}}]}}
+        replies = [reply(tools=[{'id': 'c1', 'type': 'function', 'function': {
+            'name': 'get_service_owner', 'arguments': '{"alias":"checkout-api"}'}}]),
+            reply('```json\n' + content + '\n```'), reply(content)]
+        with patch('dashscope.MultiModalConversation.call', side_effect=replies) as sdk:
+            result = self.run_model(build_model('test-only'))
+        self.assertEqual(result['status'], 'completed')
+        self.assertEqual(result['repairs'], 1)
+        self.assertEqual(result['run_summary']['model_calls'], 3)
+        self.assertIn('tools', sdk.call_args_list[1].kwargs)
+        self.assertNotIn('tools', sdk.call_args_list[2].kwargs)
 
     def test_sdk_timeout_is_counted_once_no_hidden_retry(self):
         from requests.exceptions import Timeout
-        with patch("dashscope.Generation.call", side_effect=Timeout("TEST_SECRET_CANARY")) as sdk:
+        with patch("dashscope.MultiModalConversation.call", side_effect=Timeout("TEST_SECRET_CANARY")) as sdk:
             result = self.run_model(build_model("test-only"))
         self.assertEqual(sdk.call_count, 1)
         self.assertEqual(result["run_summary"]["model_calls"], 1)
         self.assertEqual(result["run_summary"]["termination_reason"], "TIMEOUT")
         self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
+
+    def test_explicit_legacy_model_retains_text_endpoint(self):
+        from dashscope import Generation
+        model = build_model("test-only", "qwen-turbo").chat
+        self.assertIs(model.client, Generation)
+        self.assertNotIn("enable_thinking", model.model_kwargs)
 
     def test_late_tool_result_is_not_evidence(self):
         ex = executor()
@@ -216,7 +249,7 @@ class IncidentInvestigationTests(unittest.TestCase):
         from scripts.investigate_incident import main
         for env in ({"DASHSCOPE_API_KEY": "", "INCIDENT_BEARER_TOKEN": ""},
                     {"DASHSCOPE_API_KEY": "test-placeholder", "INCIDENT_BEARER_TOKEN": ""}):
-            with patch.dict(os.environ, env), patch("scripts.investigate_incident.load_dotenv"), \
+            with patch.dict(os.environ, env), patch("config.incident.load_environment"), \
                  patch("agents.models.build_model") as build, redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit):
                     main(["--live", "--probe"])

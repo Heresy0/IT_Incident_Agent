@@ -78,7 +78,7 @@ class IncidentConvergenceTests(unittest.TestCase):
         with patch('config.incident.load_dotenv'), patch.dict(os.environ, {}, clear=True):
             config = IncidentConfig.from_file('unused')
             self.assertEqual(config.api_key, '')
-            self.assertEqual(config.model, 'qwen-turbo')
+            self.assertEqual(config.model, 'qwen3.7-plus')
             self.assertNotIn('postgresql://', repr(config))
         code = '''
 import builtins

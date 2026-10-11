@@ -118,9 +118,8 @@ def main():
     parser.add_argument('--tenant')
     parser.add_argument('--output', type=Path, default=ROOT / 'output' / 'registered-service-probe.json')
     args = parser.parse_args()
-    from dotenv import load_dotenv
-    load_dotenv(ROOT / '.env.local', override=True)
-    load_dotenv(ROOT / '.env', override=False)
+    from config.incident import load_environment
+    load_environment()
     os.chdir(ROOT)
     if args.services_file:
         os.environ['INCIDENT_SERVICES_FILE'] = str(args.services_file.resolve())

@@ -1,0 +1,4336 @@
+{
+  "review_type": "execution_projection",
+  "formal_semantic_review": "pending",
+  "estimated_cost": null,
+  "runs": [
+    {
+      "batch": "agent-improvement-baseline",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "2e7457d7-1572-428a-8ee7-73a7ed6440e4",
+      "report_sha256": "d81175abad705889d7d184cca879cd5817d8fbfb94282a4e4965afcdebd43b86",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-baseline\\67b587e4-1ee7-4d2d-af13-78c3f2216093\\2e7457d7-1572-428a-8ee7-73a7ed6440e4.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v3_coverage_rework_planning",
+      "implementation": "848eec66c399222a",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 10,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 55985,
+        "output_tokens": 3593,
+        "known_calls": 10,
+        "status": "known"
+      },
+      "duration_ms": 39516,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 4,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "repairs": 1,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REQUIRED_EVIDENCE_NEED",
+          "details": [
+            {
+              "need_id": "N1",
+              "path": "need_assessments.0.blocking",
+              "code": "REQUIRED_EVIDENCE_NEED",
+              "actual": false,
+              "allowed": [
+                true,
+                null
+              ],
+              "instruction": "症状与机制是核心问题，不可关闭阻塞；证据不足时保持uncertain并交接缺口。"
+            },
+            {
+              "need_id": "N2",
+              "path": "need_assessments.1.blocking",
+              "code": "REQUIRED_EVIDENCE_NEED",
+              "actual": false,
+              "allowed": [
+                true,
+                null
+              ],
+              "instruction": "症状与机制是核心问题，不可关闭阻塞；证据不足时保持uncertain并交接缺口。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "INVALID_REWORK_TARGET",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "配置变更可能与推送失败有关，因为推送编码器的版本切换可能导致了兼容性问题。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [],
+      "limitations": [
+        "reviewer业务校验未通过（INVALID_REWORK_TARGET）；全运行的一次纠正额度已用尽，已有观测与有效草稿保留，未通过结果不作为已复核结论。",
+        "尚未获取与 HTTP400 UNKNOWN_FIELD recipient_id 相关的具体日志条目。",
+        "尚未验证配置变更与推送失败之间的直接因果关系。",
+        "协作尚有缺口：MODEL_OUTPUT_INVALID；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-baseline",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "3e93b741-782c-4a8e-8f61-dfda4c4c6455",
+      "report_sha256": "02f0c2127e2d476da5ed69e8c36cdd05c697f90585858d6b46cdaa3e4ccac974",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-baseline\\67b587e4-1ee7-4d2d-af13-78c3f2216093\\3e93b741-782c-4a8e-8f61-dfda4c4c6455.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "848eec66c399222a",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 5,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 28812,
+        "output_tokens": 1729,
+        "known_calls": 5,
+        "status": "known"
+      },
+      "duration_ms": 19437,
+      "role_model_calls": {
+        "single": 5
+      },
+      "repairs": 1,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "SingleAgent stopped: MODEL_OUTPUT_INVALID; evidence requires human review."
+      ]
+    },
+    {
+      "batch": "agent-improvement-blind-plus",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "683aa5c2-edc2-4638-9e7e-8b3a4f35b15c",
+      "report_sha256": "2891527bbc369df91e1c57173f21a56be66fd2b4f475c6f81a1ef5a94753513f",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-blind-plus\\8657e02a-e4fc-494c-ac87-7b38ff4fd0a9\\683aa5c2-edc2-4638-9e7e-8b3a4f35b15c.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "1ff15eb949e5a545",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 21528,
+        "output_tokens": 1077,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 31812,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "推送失败由协议版本错配引发：发送端已升级 encoder=v2 并写入 recipient_id 字段，但接收端仍按 v1 schema 解析，导致 UNKNOWN_FIELD 拒绝",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查接收端服务是否已部署支持 v2 schema 的版本",
+          "condition": "当前 delivery-bridge 发送端已启用 encoder=v2，但依赖方返回 UNKNOWN_FIELD",
+          "expected_result": "接收端服务日志或版本信息显示 v2 schema 已就绪，或确认存在部署延迟/遗漏",
+          "risk": "若接收端未就绪而强制重试，将重复触发 400 错误并加剧队列积压",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "接收端服务（如 target-delivery-gateway）的实际部署版本与 schema 支持状态",
+        "接收端是否已收到 v2 schema 协议通告或完成兼容性验证"
+      ]
+    },
+    {
+      "batch": "agent-improvement-blind-plus",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "96269371-27d5-4412-9439-12007b7c29c5",
+      "report_sha256": "26100e86efe7a3865f244878a5ab69c8ec1bfd953b5ca27f12c77e081b7711b9",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-blind-plus\\8657e02a-e4fc-494c-ac87-7b38ff4fd0a9\\96269371-27d5-4412-9439-12007b7c29c5.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "implementation": "1ff15eb949e5a545",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 7,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 25843,
+        "output_tokens": 3111,
+        "known_calls": 6,
+        "status": "partial_or_unknown"
+      },
+      "duration_ms": 108281,
+      "role_model_calls": {
+        "supervisor": 1,
+        "investigation": 3,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": true,
+      "observation_reviews": [
+        {
+          "revision": 1,
+          "review": {
+            "directly_supported": [
+              {
+                "statement": "在2026-10-11T10:10:00Z观测到delivery_error_rate达0.82（82%），显著高于正常基线（通常<0.01）。",
+                "evidence_ids": [
+                  "EV_2236c4379a7ff58e856ba826"
+                ]
+              },
+              {
+                "statement": "同一时刻queue_depth为42 jobs，表明下游消费阻塞导致任务积压。",
+                "evidence_ids": [
+                  "EV_f789a484039deb364f5cafed"
+                ]
+              },
+              {
+                "statement": "依赖调用失败日志明确记录error_code为REMOTE_SCHEMA_REJECTED，指向协议不兼容。",
+                "evidence_ids": [
+                  "EV_fe2730e8ec4cfc625e8d6672"
+                ]
+              },
+              {
+                "statement": "错误消息指出接收端返回HTTP 400 UNKNOWN_FIELD，且具体字段recipient_id未被当前协议识别。",
+                "evidence_ids": [
+                  "EV_fe2730e8ec4cfc625e8d6672"
+                ]
+              }
+            ],
+            "unverified_causes": [
+              "recipient_id字段是否因近期上游服务升级被移除或重命名",
+              "delivery-bridge是否意外启用了新协议版本而未同步下游契约",
+              "staging环境是否存在残留的旧版schema校验中间件",
+              "该错误是否仅影响部分recipient类型（如email vs sms）而未被全量覆盖"
+            ]
+          }
+        }
+      ],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "本地 delivery-bridge 向下游服务发送了含 recipient_id 字段的请求，但该字段已从远端 API Schema 中移除或尚未发布，导致 400 UNKNOWN_FIELD 拒绝。",
+          "level": "mechanism",
+          "status": "supported"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查 delivery-bridge 最近是否引入 recipient_id 字段的请求构造逻辑，或是否接收并透传了含该字段的上游 payload。",
+          "condition": "当前仅知错误发生在依赖调用层，但未知 recipient_id 来源（本地硬编码、配置注入、还是上游携带）。",
+          "expected_result": "定位 recipient_id 字段生成位置：若来自本地代码/模板，则属配置或发布缺陷；若来自上游，则需检查输入契约兼容性。",
+          "risk": "无变更风险，纯只读代码/配置路径分析。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：存在合理替代解释（如上游透传脏数据、staging 中间件残留校验），但当前无证据支持或排除；日志未体现上游 payload 来源或中间件行为。",
+        "recipient_id 字段的实际来源（本地构造 or 上游透传）未通过日志或变更记录确认。",
+        "当前 staging 环境所对接的下游服务协议版本未查证，无法判断是远端已变更还是本地未同步。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-blind-transfer",
+      "case_id": "eval_002",
+      "workflow": "single",
+      "run_id": "ba662e6e-6ec6-48a9-9a01-d792a6602355",
+      "report_sha256": "2e0e6b6f2ac9fce8becdcb20acc743fe559592a9991813224fe247c703688bed",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-blind-transfer\\06023aab-4a45-43ee-8d16-64484201bcf1\\ba662e6e-6ec6-48a9-9a01-d792a6602355.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "1ff15eb949e5a545",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 5,
+      "token_usage": {
+        "input_tokens": 22975,
+        "output_tokens": 1514,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 39484,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "search_runbooks",
+          "status": "empty",
+          "query_profile": {
+            "category": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "identity-gateway 的 auth_audience 配置被错误更新为 portal-preview，而下游认证服务仅接受 portal-stage，导致所有登录请求因 audience 不匹配返回 401。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "将 identity-gateway 的 auth_audience 配置回滚至 portal-stage。",
+          "condition": "当前 auth_audience 配置为 portal-preview，且下游认证服务未同步支持该 audience。",
+          "expected_result": "登录请求返回 200，请求错误率回落至基线水平（<2%）。",
+          "risk": "若下游认证服务已实际启用 portal-preview audience 支持，则回滚将导致新集成功能不可用；需确认依赖方配置状态。",
+          "requires_approval": true,
+          "kind": "manual_change",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "下游认证服务当前实际支持的 audience 列表（例如通过其 /health 或 /config 端点获取）",
+        "identity-gateway 配置中是否还存在其他 audience 相关字段（如 issuer、jwks_uri）被同步修改"
+      ]
+    },
+    {
+      "batch": "agent-improvement-blind-transfer",
+      "case_id": "eval_002",
+      "workflow": "multi",
+      "run_id": "d4be81a5-8a70-4d1b-ab0a-92bdec3deb01",
+      "report_sha256": "e383c598573b314b23b3105e4d64d4ba81104de22b3ff3dad7ecbcdcd679bc1c",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-blind-transfer\\06023aab-4a45-43ee-8d16-64484201bcf1\\d4be81a5-8a70-4d1b-ab0a-92bdec3deb01.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "implementation": "1ff15eb949e5a545",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "BUDGET_EXCEEDED",
+      "model_calls": 7,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 41030,
+        "output_tokens": 3948,
+        "known_calls": 7,
+        "status": "known"
+      },
+      "duration_ms": 98766,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 4
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": true,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "EVIDENCE_NEED_NO_CURRENT_SUPPORT",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "deployment"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：现有 INFO 日志（EV_967d...）提及 audience 被拒绝，但未观测到 ERROR 级日志或 401 状态码字段，现象与响应码的因果链尚未闭合。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未取得变更记录，无法判断新版本是否引入破坏性改动，进而评估候选机制合理性。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未查询认证依赖服务的配置变更，无法评估‘下游策略收紧’这一替代解释的可能性。",
+        "协作尚有缺口：BUDGET_EXCEEDED；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-grounded-plus",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "28ba40a6-76a5-490a-aefd-109de756f614",
+      "report_sha256": "5f2362855d431ab2d9b4dded856afcf2bfd3bf284e0292f40978b475cbe46044",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-grounded-plus\\f046ddb4-2264-415c-887b-5b6906b83bbf\\28ba40a6-76a5-490a-aefd-109de756f614.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "implementation": "4636da06c56bde66",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "NEEDS_INFORMATION",
+      "model_calls": 10,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 53330,
+        "output_tokens": 5114,
+        "known_calls": 10,
+        "status": "known"
+      },
+      "duration_ms": 127094,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 4,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": true,
+      "observation_reviews": [
+        {
+          "revision": 1,
+          "review": {
+            "directly_supported": [
+              {
+                "statement": "delivery_error_rate (sample)=0.82 ratio @ 2026-10-11T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_75d32c9c71041b2ff9480be4"
+                  }
+                ]
+              },
+              {
+                "statement": "queue_depth (sample)=42 jobs @ 2026-10-11T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_332fb6b442ef70913465597d"
+                  }
+                ]
+              },
+              {
+                "statement": "workers_active (sample)=4 workers @ 2026-10-11T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_ae118ee3d841d508f54deaee"
+                  }
+                ]
+              },
+              {
+                "statement": "dependency log [ERROR] error_code=\"REMOTE_SCHEMA_REJECTED\"  @ 2026-10-11T10:10:00+00:00; dependency log [ERROR] message=\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\"  @ 2026-10-11T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_4d0b29dda8ecff17ce02c441"
+                  },
+                  {
+                    "reference_id": "REF_f86a2e030a07e389708e8021"
+                  }
+                ]
+              }
+            ],
+            "unverified_causes": [
+              "recipient_id 字段是否因近期上游服务协议变更而废弃",
+              "delivery-bridge 是否仍向下游发送该字段（需检查序列化逻辑或请求 payload 日志）",
+              "下游服务是否已完成 schema 升级但未同步通知 delivery-bridge 团队",
+              "是否存在 staging 环境特有的配置覆盖（如字段白名单/映射规则）导致该字段未被剔除"
+            ]
+          }
+        }
+      ],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_REWORK_DISPATCH",
+          "details": [
+            {
+              "code": "DUPLICATE_TOOL",
+              "instruction": "补查没有新增覆盖；换有价值的新查询，或保留缺口收尾。"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": "UNKNOWN_FIELD"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "下游服务协议变更（如recipient_id字段弃用），导致delivery-bridge发出的请求被400拒绝，触发错误率飙升与队列积压。",
+          "level": "mechanism",
+          "status": "unresolved"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查delivery-bridge服务在故障窗口内是否发生过配置或部署变更，尤其涉及请求体构造逻辑（如recipient_id字段写入开关、协议版本升级）。",
+          "condition": "当前仅知下游拒绝，未知本服务是否主动发送了recipient_id；若近期有相关变更，则可能为适配滞后或误发。",
+          "expected_result": "定位到具体变更项（如配置键、代码提交、模板版本），判断其是否引入或保留了已弃用字段。",
+          "risk": "只读查询，无运行时影响。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration"
+              }
+            },
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "deployment"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "delivery-bridge 在故障时刻发出的实际请求体内容（特别是 recipient_id 字段是否存在）无法通过当前只读日志能力获取，因 staging 环境 dependency INFO 日志默认不记录完整 payload。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：关键因果环节‘本服务是否发送 recipient_id’缺乏可观测手段：ERROR 日志仅反映拒绝结果，INFO 日志在 staging 环境受脱敏策略限制，不记录 payload 字段；无其他 registered logs 或 metrics 可间接推断该字段存在性。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：替代解释如 staging 环境字段映射规则异常、临时依赖 mock 返回错误等未被排除；当前仅有一条 dependency ERROR 日志，缺乏多实例或对照环境证据。",
+        "下游服务（接收端）在相同时间窗口的协议变更公告或发布记录。",
+        "delivery-bridge当前实际发出的请求体样本，以确认recipient_id字段是否存在及取值方式。",
+        "H1: message 明确指出 recipient_id 不被识别，支持‘下游拒绝导致错误率飙升’的近端机制；但未验证 delivery-bridge 是否实际发送该字段，也无证据表明该字段已被下游正式弃用或变更已发布。",
+        "尚无经过复核的故障机制；触发原因或被排除的候选不能代替机制。",
+        "仍有影响当前判断的候选机制待核实。",
+        "协作尚有缺口：NEEDS_INFORMATION；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-grounded-plus",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "2bce61a3-d635-4a5b-9926-282af6a68b96",
+      "report_sha256": "bb8ecb99e7612482da73385123750e77401c92900355b8b44dcf477166defb24",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-grounded-plus\\f046ddb4-2264-415c-887b-5b6906b83bbf\\2bce61a3-d635-4a5b-9926-282af6a68b96.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "4636da06c56bde66",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 5,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 26904,
+        "output_tokens": 1224,
+        "known_calls": 5,
+        "status": "known"
+      },
+      "duration_ms": 35062,
+      "role_model_calls": {
+        "single": 5
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "encoder v2 与接收端 v1 schema 不兼容，导致 payload 解析失败并返回 HTTP 400 UNKNOWN_FIELD recipient_id",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "验证接收端 schema 是否已同步升级至 v2，或临时回退 encoder 至 v1",
+          "condition": "当前 error_rate > 80% 且日志确认 encoder/schema 版本错配",
+          "expected_result": "delivery_error_rate 回落至接近 0%，queue_depth 快速清空",
+          "risk": "若接收端尚未就绪，强制使用 v2 encoder 将持续触发 400 错误；回退操作需协调发布流程",
+          "requires_approval": true,
+          "kind": "manual_change",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "接收端服务当前实际 schema 版本（v1/v2）及部署状态",
+        "HTTP 400 UNKNOWN_FIELD 的完整请求/响应载荷样本（用于确认 recipient_id 字段是否确在 v2 中新增或重命名）",
+        "dependency 类日志中是否存在与接收端连通性、超时或响应结构异常的记录"
+      ]
+    },
+    {
+      "batch": "agent-improvement-grounded-transfer",
+      "case_id": "eval_002",
+      "workflow": "multi",
+      "run_id": "09ac5a9b-4232-447c-a465-d87a9d5e995e",
+      "report_sha256": "4b2ebb4ced105760d1114a15f3382a247ed4341f87707be7ffc621d8388d0e0f",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-grounded-transfer\\e6014cb8-dfe3-4b61-8229-4427cfe371cb\\09ac5a9b-4232-447c-a465-d87a9d5e995e.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v5_blind_review",
+      "implementation": "4636da06c56bde66",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 12,
+      "tool_calls": 5,
+      "token_usage": {
+        "input_tokens": 72831,
+        "output_tokens": 6489,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "duration_ms": 162062,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 6,
+        "diagnosis": 1,
+        "reviewer": 2
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": true,
+      "observation_reviews": [
+        {
+          "revision": 1,
+          "review": {
+            "directly_supported": [
+              {
+                "statement": "dependency log [INFO] error_code=\"AUTH_REACHABLE\"  @ 2026-10-01T10:10:00+00:00; dependency log [INFO] message=\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\"  @ 2026-10-01T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_d12a4fddf0b080a56eb4098c"
+                  },
+                  {
+                    "reference_id": "REF_842c5e7bfbafa665c8c60950"
+                  }
+                ]
+              },
+              {
+                "statement": "request_error_rate (sample)=0.02 ratio @ 2026-10-01T09:55:00+00:00; request_error_rate (sample)=0.72 ratio @ 2026-10-01T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_9e3bbfbada597684e4f7263e"
+                  },
+                  {
+                    "reference_id": "REF_221094c6e7b170c591fa45a6"
+                  }
+                ]
+              },
+              {
+                "statement": "deployment change config_summary.auth_audience=\"portal-preview\"  @ 2026-10-01T10:02:00+00:00; deployment change summary=\"版本2.7.0部署后audience从portal-stage改为portal-preview。\"  @ 2026-10-01T10:02:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_b74db9ccd01b7f4949072c02"
+                  },
+                  {
+                    "reference_id": "REF_c6cd53f776ff4f004a9f7878"
+                  }
+                ]
+              },
+              {
+                "statement": "configuration log [ERROR] error_code=\"AUDIENCE_REJECTED\"  @ 2026-10-01T10:10:00+00:00; configuration log [ERROR] message=\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\"  @ 2026-10-01T10:10:00+00:00",
+                "refs": [
+                  {
+                    "reference_id": "REF_1a8b2ec28668d9d1b4949a66"
+                  },
+                  {
+                    "reference_id": "REF_ca43351f7335893951d8de66"
+                  }
+                ]
+              }
+            ],
+            "unverified_causes": [
+              "identity-gateway未同步更新其下游认证服务所接受的audience白名单",
+              "portal-preview环境尚未在认证依赖侧完成准入配置",
+              "新版本中auth_audience配置未经过跨服务契约验证即发布"
+            ]
+          }
+        }
+      ],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "deployment"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "identity-gateway 向认证服务发送了 audience=portal-preview 的 token，而认证服务策略仅允许 portal-stage，因此显式拒绝请求（AUDIENCE_REJECTED）。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "v2.7.0 版本中 auth_audience 的变更未同步更新认证依赖的 audience 白名单，属跨服务配置未对齐。",
+          "level": "trigger",
+          "status": "unresolved"
+        }
+      ],
+      "actions": [
+        {
+          "action": "确认认证依赖当前允许的 audience 列表，验证是否仍仅包含 portal-stage。",
+          "condition": "认证依赖的 audience 策略配置不可由 identity-gateway 侧直接读取，需人工或其所属团队核实。",
+          "expected_result": "获得认证依赖侧权威的 audience 白名单（如配置文件、管理界面或文档），明确 portal-preview 是否缺失。",
+          "risk": "低：仅信息核查，不涉及任何变更或访问敏感凭证。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：机制（H1）已支持，但触发原因（H2）缺认证依赖侧白名单状态证据；当前证据能解释‘为何失败’，不能确认‘为何未对齐’，存在合理替代解释（如准入流程未完成），需进一步验证。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：存在合理替代解释（如 portal-preview 尚未在认证依赖侧完成准入配置），但当前证据未提供认证依赖自身策略日志或配置快照，无法区分 H2 与其它未对齐场景，故无法排除。",
+        "H2: EV_33c0988017f4037d16ce7acd 确认 auth_audience 变更为 portal-preview，但无任何观测表明认证依赖侧是否同步更新白名单；该触发原因存在缺口，未被当前证据证实或证伪。",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-grounded-transfer",
+      "case_id": "eval_002",
+      "workflow": "single",
+      "run_id": "14f241de-15d6-4a67-aa55-37493ba1a700",
+      "report_sha256": "a869a540b04648339cbb8e2ad6992ee6c8df856d8e757593875d8e9fbd5fe2fd",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-grounded-transfer\\e6014cb8-dfe3-4b61-8229-4427cfe371cb\\14f241de-15d6-4a67-aa55-37493ba1a700.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "4636da06c56bde66",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 5,
+      "token_usage": {
+        "input_tokens": 22975,
+        "output_tokens": 1509,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 38719,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "search_runbooks",
+          "status": "empty",
+          "query_profile": {
+            "category": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "identity-gateway 配置中 auth_audience 被错误设为 portal-preview，而认证依赖仅接受 portal-stage，导致所有登录请求被拒绝并返回 401。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "将 identity-gateway 的 auth_audience 配置恢复为 portal-stage。",
+          "condition": "当前配置 auth_audience=portal-preview 与认证依赖策略不匹配，且已确认为 401 根因。",
+          "expected_result": "登录请求恢复正常，request_error_rate 回落至基线水平（~0.02）。",
+          "risk": "若 staging 环境实际应使用 portal-preview，则恢复后可能引发其他环境一致性问题；需同步确认依赖方策略是否已更新。",
+          "requires_approval": true,
+          "kind": "manual_change",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "认证依赖服务（如 auth-provider）当前接受的 audience 白名单配置，用于确认其策略是否已变更。",
+        "staging 环境中 portal-preview 和 portal-stage 的部署范围与语义定义，以判断配置变更是否属预期行为。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "a8a320e7-ac3a-4b79-839c-d790d37fa14c",
+      "report_sha256": "3e31e5bbf2c860b798a663447d2f6c7025546bcf7b1664475ad227fd6828b299",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus\\3ca1f797-663b-4c14-919b-83bba0bb192a\\a8a320e7-ac3a-4b79-839c-d790d37fa14c.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 20445,
+        "output_tokens": 1296,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 34484,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "推送编码器升级至 v2 后，接收端仍按 v1 schema 解析，导致字段校验失败（如 recipient_id 被识别为 UNKNOWN_FIELD），触发 HTTP 400 错误并阻塞队列。",
+          "level": "mechanism",
+          "status": "tentative"
+        },
+        {
+          "cause": "编码器切换是本次故障的触发事件，而非长期配置漂移；变更发生于故障起始后 2 分钟内（用户报告 10:03 后失败），时间关联紧密。",
+          "level": "trigger",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查 dependency 类别 ERROR 日志中是否存在 'UNKNOWN_FIELD recipient_id' 消息，确认是否为字段解析失败的直接证据。",
+          "condition": "当前仅在 configuration 类别中观测到 encoder/schema 不匹配提示，尚未捕获实际失败请求的错误响应日志。",
+          "expected_result": "若命中，则证实编码器升级导致接收端字段校验失败；若未命中，则需排查 encoder=v2 是否被错误应用或接收端缓存了旧 schema。",
+          "risk": "低：只读日志查询，不影响服务运行。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "dependency",
+                "level": "ERROR",
+                "error_code": "HTTP_400"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到包含 'UNKNOWN_FIELD recipient_id' 的 ERROR 级日志；dependency 类别日志尚未查询",
+        "未确认 encoder=v2 切换是否经过接收端兼容性验证",
+        "未获取接收端当前实际返回的 schema 版本（仅日志提及 probe 返回 v1）"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "e6d465ba-15c1-40c7-b460-78835ca9b3f1",
+      "report_sha256": "a54ea2dcb6c819b878ddf5430e71909f57a00715e1ccf84a94eb678795648f06",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus\\3ca1f797-663b-4c14-919b-83bba0bb192a\\e6d465ba-15c1-40c7-b460-78835ca9b3f1.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 7,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 40320,
+        "output_tokens": 4647,
+        "known_calls": 7,
+        "status": "known"
+      },
+      "duration_ms": 113187,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 2,
+        "diagnosis": 2,
+        "reviewer": 1
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "下游服务协议变更（如recipient_id字段已弃用或重命名），导致delivery-bridge发出的请求因字段不兼容被远程拒绝，触发批量失败与队列堆积。",
+          "level": "mechanism",
+          "status": "supported"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查最近是否有下游服务部署或OpenAPI schema变更，确认是否在10:03前引入recipient_id字段不兼容。",
+          "condition": "当前仅观测到拒绝现象，未定位变更源头；若存在近期下游发布，则可建立时间关联并验证协议一致性。",
+          "expected_result": "获取10:00–10:03窗口内下游服务的部署/配置变更记录，含service_alias、timestamp、change_type、version或schema_hash。",
+          "risk": "无变更风险；仅读取变更历史，不触发任何服务行为。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:03:00Z",
+                "category": "deployment"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未检查是否存在并发 AUTH_FAILED 或 TIMEOUT 等替代错误码；当前仅见 REMOTE_SCHEMA_REJECTED，但未排除其为次要现象或日志采样偏差。",
+        "尚未获取含原始请求载荷（request_body/serialized_payload）的dependency日志样本，无法确认recipient_id是否真实发送、或是否被中间层（如API网关）改写/过滤。",
+        "未核查最近是否有下游服务版本升级或OpenAPI schema变更事件，缺乏变更时间锚点与协议兼容性依据。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus-compact",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "6447d63e-456e-4df1-b76c-91963bf9f815",
+      "report_sha256": "4de91567fccaca77ac6c21f35ca1517ded2f049dbcff0fc47da2315df5e86070",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus-compact\\3ec2b47e-bf48-47ad-b404-5b61d8e787b9\\6447d63e-456e-4df1-b76c-91963bf9f815.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "4df07acc169a9b0d",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 21474,
+        "output_tokens": 1061,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 30235,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "编码器版本不匹配：发送端使用 encoder=v2，但接收端仍按 v1 schema 解析，导致 recipient_id 字段被识别为 UNKNOWN_FIELD，触发 HTTP 400 错误。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "验证接收端 schema 版本是否已同步升级至 v2",
+          "condition": "当前 encoder=v2 已启用，但接收端 probe 仍返回 v1，存在 schema 不一致风险。",
+          "expected_result": "接收端 probe 返回 v2 schema，或明确支持 v2 encoder 的兼容模式。",
+          "risk": "若强行回退 encoder 可能中断其他依赖 v2 的功能；若忽略可能导致持续 400 错误。",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "接收端服务的当前 schema 版本及 probe 响应原始内容（非日志摘要）",
+        "delivery-bridge 是否记录了含 UNKNOWN_FIELD 的具体错误日志（如 dependency 或 resource 类别下 ERROR 级别记录）",
+        "v2 encoder 启用后首次失败请求的完整 payload 结构与接收端实际解析日志"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus-compact",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "bb564809-ac36-41eb-98b5-3030d110ee15",
+      "report_sha256": "35dce96eb47838623daf84da78c57763319a47eba314278586b905e4594667b1",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus-compact\\3ec2b47e-bf48-47ad-b404-5b61d8e787b9\\bb564809-ac36-41eb-98b5-3030d110ee15.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "4df07acc169a9b0d",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 6,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 32962,
+        "output_tokens": 3682,
+        "known_calls": 6,
+        "status": "known"
+      },
+      "duration_ms": 90313,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 2,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:03:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "下游服务已移除recipient_id字段，而delivery-bridge仍按旧协议发送该字段，触发远程Schema校验失败（REMOTE_SCHEMA_REJECTED）。",
+          "level": "mechanism",
+          "status": "supported"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查delivery-bridge当前实际调用的下游API端点协议版本及字段定义，确认recipient_id是否已被废弃或重命名。",
+          "condition": "当前仅依赖日志中的error message推断字段问题，缺乏对本地出站请求结构或所用OpenAPI/Swagger契约的直接观测。",
+          "expected_result": "明确识别出当前代码/配置中是否硬编码或动态生成recipient_id字段，及其与下游最新协议的匹配状态。",
+          "risk": "无变更风险；纯只读信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未排查其他可能替代解释，如：本地配置误注入 recipient_id、中间代理重写字段、或下游临时灰度策略；当前日志仅显示结果，未覆盖请求原始 payload 或协议版本比对。",
+        "delivery-bridge服务当前加载的下游API契约（如OpenAPI spec）版本及内容",
+        "最近一次成功推送请求中实际发出的JSON payload结构（尤其是否含recipient_id字段）",
+        "下游服务公开文档或变更日志中关于recipient_id字段的弃用声明"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus-final",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "070e59d0-a36f-4c39-80eb-2beb6d3faa4e",
+      "report_sha256": "26976266b6ccdef4597ea56bcde1d6f0b0b4264b55d1328b80cdc66d922440fb",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus-final\\cb6554be-ec70-49f2-93bd-20116295a9bf\\070e59d0-a36f-4c39-80eb-2beb6d3faa4e.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": null,
+      "implementation": "2cbcdace3cf28e5f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 20466,
+        "output_tokens": 896,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 25485,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "编码器升级至 v2 后，接收端仍按 v1 解析请求体，导致 recipient_id 字段被识别为 UNKNOWN_FIELD，触发 HTTP 400 错误。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "验证接收端 schema 是否已同步升级至 v2 兼容版本",
+          "condition": "当前仅观测到发送端 encoder=v2 和接收端 probe=v1，尚未确认接收端是否部署 v2 schema 或存在缓存延迟",
+          "expected_result": "接收端 probe 返回 v2，或 error_rate 回落至基线以下",
+          "risk": "若强制回滚编码器，可能影响其他已适配 v2 的下游服务；若忽略，错误将持续",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "接收端当前实际部署的 schema 版本（非 probe 返回值）",
+        "HTTP 400 UNKNOWN_FIELD 错误在日志中的原始 occurrence 记录（当前未查询 dependency 或 resource 类别日志）",
+        "workers_active 和 cpu_utilization 指标未观测，无法排除资源瓶颈对错误传播的放大作用"
+      ]
+    },
+    {
+      "batch": "agent-improvement-plus-final",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "d6291b6c-7c87-455b-9c3e-4eb7a433c384",
+      "report_sha256": "b166f9d429d003ea2d5780970130766bb09d52e13f56f69c86d218c872a1375f",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-plus-final\\cb6554be-ec70-49f2-93bd-20116295a9bf\\d6291b6c-7c87-455b-9c3e-4eb7a433c384.json",
+      "execution_mode": "live",
+      "model": "qwen-plus",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "2cbcdace3cf28e5f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "BUDGET_EXCEEDED",
+      "model_calls": 8,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 43550,
+        "output_tokens": 3026,
+        "known_calls": 8,
+        "status": "known"
+      },
+      "duration_ms": 77953,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 6
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:03:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "deployment"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：当前 evidence 确认了依赖调用被拒（REMOTE_SCHEMA_REJECTED），但未定位根本机制：是下游服务主动移除了 recipient_id 字段（协议变更），还是 delivery-bridge 错误地传入了已弃用字段（本地逻辑缺陷）？需检查近期变更以区分。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：存在合理替代解释：若 delivery-bridge 在近期配置中错误启用了新字段策略（如强制校验 recipient_id），而下游尚未同步升级，则会触发此错误；该解释与下游单方面变更同等可能。当前无配置变更观测，无法排除。",
+        "协作尚有缺口：BUDGET_EXCEEDED；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round1",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "8bfa4567-a033-40a2-a3ce-dd000d5ef1c0",
+      "report_sha256": "b20a593ea63dd541510dd5ff64fa8fb74f77f0a5e5bcd6eb4258f804309bda0d",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round1\\d986d6b4-0fe7-4434-9b18-2d0fbb9b66c3\\8bfa4567-a033-40a2-a3ce-dd000d5ef1c0.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "2cf63dacbea39a02",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 21467,
+        "output_tokens": 989,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 13297,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "推送编码器版本不匹配导致HTTP400错误。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "检查接收端是否支持新的推送编码器版本v2。",
+          "condition": "如果接收端仍然返回v1，可能需要更新接收端配置。",
+          "expected_result": "确认接收端是否兼容v2编码器。",
+          "risk": "如果接收端不兼容v2编码器，可能导致进一步的推送失败。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": null
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到接收端的配置详情以确认其是否兼容v2编码器。",
+        "未观测到具体的HTTP400错误的详细信息以进一步分析原因。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round1",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "abf4d590-ae28-4bd1-bcdd-33087a243409",
+      "report_sha256": "edb21a9838411bd418e1e3773a02bcfc5ce1d6697088b980ab59d8ed57af13b2",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round1\\d986d6b4-0fe7-4434-9b18-2d0fbb9b66c3\\abf4d590-ae28-4bd1-bcdd-33087a243409.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "2cf63dacbea39a02",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "NEEDS_INFORMATION",
+      "model_calls": 2,
+      "tool_calls": 0,
+      "token_usage": {
+        "input_tokens": 11678,
+        "output_tokens": 656,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 7563,
+      "role_model_calls": {
+        "supervisor": 2
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "UNKNOWN_OR_DUPLICATE_EVIDENCE",
+          "details": []
+        }
+      ],
+      "queries": [],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "EV_1",
+        "EV_2",
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：证据编号 EV_1 和 EV_2 无法确认或重复，需重新获取有效证据。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "协作尚有缺口：NEEDS_INFORMATION；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round2",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "060de488-4678-4600-b7f3-1de1e4fec23c",
+      "report_sha256": "c749e4fce1e0fb677b4480cc721fec4e7008edbabb942e2460ddbc342f601434",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round2\\90d6ac94-65d2-4fbe-984f-c79a40203818\\060de488-4678-4600-b7f3-1de1e4fec23c.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "9224bf6a97e3a98f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 12,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 62796,
+        "output_tokens": 3379,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "duration_ms": 38985,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 7,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": "UNKNOWN_FIELD"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "delivery_error_rate 升高可能由于推送逻辑中对 recipient_id 的校验异常，导致部分请求被拒绝。",
+          "level": "mechanism",
+          "status": "unresolved"
+        },
+        {
+          "cause": "HTTP400 错误可能是由于客户端发送的请求中包含无效的 recipient_id 字段，而服务端未正确处理该情况。",
+          "level": "trigger",
+          "status": "refuted"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查是否有与 recipient_id 字段校验相关的配置变更或近期更新。",
+          "condition": "需要确认是否存在相关配置变更或更新，以判断其是否可能导致字段校验异常。",
+          "expected_result": "确定是否有配置变更或更新与 recipient_id 字段校验有关。",
+          "risk": "若配置变更或更新不正确，可能导致服务异常。",
+          "requires_approval": true,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "复核缺口未补查：预算或调度额度不足；需要核查是否有与 recipient_id 字段校验相关的配置变更或近期更新。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未观测到与 recipient_id 校验相关的具体证据，需进一步核查。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：未提供足够的替代解释来区分当前机制与其他可能性。",
+        "证据需求N4（是否存在与 recipient_id 字段校验相关的配置变更或近期更新？）：尚未核查是否有与 recipient_id 字段校验相关的配置变更或近期更新。",
+        "未找到与 HTTP400 UNKNOWN_FIELD recipient_id 相关的日志记录，无法进一步验证具体原因。",
+        "未执行更广泛的日志查询以覆盖其他可能的错误代码或日志级别。",
+        "H1: 当前观测支持 delivery_error_rate 升高，但未直接观测到 recipient_id 校验异常的具体证据。",
+        "H2: 未在日志中找到与 HTTP400 UNKNOWN_FIELD recipient_id 相关的记录，无法验证此假设。",
+        "尚无经过复核的故障机制；触发原因或被排除的候选不能代替机制。",
+        "仍有影响当前判断的候选机制待核实。",
+        "Unobserved controls: logs:configuration:WARN/INFO.",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round2",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "63a6473f-47a6-4df7-9d5b-30d0273455d8",
+      "report_sha256": "d0c3355189aa5c3b24ef348416603b3f14349e13dd272e1c28a9235c2296162f",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round2\\90d6ac94-65d2-4fbe-984f-c79a40203818\\63a6473f-47a6-4df7-9d5b-30d0273455d8.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "9224bf6a97e3a98f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "model_calls": 2,
+      "tool_calls": 1,
+      "token_usage": {
+        "input_tokens": 9720,
+        "output_tokens": 721,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 8547,
+      "role_model_calls": {
+        "single": 2
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [
+        {
+          "action": "检查与 delivery_error_rate 相关的配置或依赖项，以确定是否由于配置错误导致推送失败。",
+          "condition": "delivery_error_rate 显著升高，且存在 HTTP400 错误代码。",
+          "expected_result": "识别并修复配置问题，降低 delivery_error_rate。",
+          "risk": "可能需要重新配置服务，影响当前运行。",
+          "requires_approval": true,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": null
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到与 HTTP400 错误相关的具体日志信息。",
+        "未观测到与 delivery_error_rate 升高相关的具体配置变更记录。",
+        "故障诊断尚未形成有当前证据支持的原因假设；仅复核观测不能完成诊断。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round3",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "258632ed-f937-4f5e-9e66-26cb3e7acd82",
+      "report_sha256": "2852123d22936828f6eb29db07aa59c40aabbefb47f78f7f1c29798c9139ad3d",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round3\\334f403c-7daf-433e-9552-109f9238df18\\258632ed-f937-4f5e-9e66-26cb3e7acd82.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "11c1c1c7c37327b5",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "model_calls": 2,
+      "tool_calls": 1,
+      "token_usage": {
+        "input_tokens": 9720,
+        "output_tokens": 486,
+        "known_calls": 2,
+        "status": "known"
+      },
+      "duration_ms": 6922,
+      "role_model_calls": {
+        "single": 2
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "故障诊断尚未形成有当前证据支持的原因假设；仅复核观测不能完成诊断。",
+        "故障诊断尚未形成处理建议；需要说明适用条件、预期验证、风险和人工审批要求。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round3",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "dab3c9fc-896a-4b91-ab62-519f73802e11",
+      "report_sha256": "65d0288ba789a4064367e2aa98dfbf3d018fc78e67e2ff4c9191a7e97012bf13",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round3\\334f403c-7daf-433e-9552-109f9238df18\\dab3c9fc-896a-4b91-ab62-519f73802e11.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "11c1c1c7c37327b5",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 7,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 42422,
+        "output_tokens": 2317,
+        "known_calls": 7,
+        "status": "known"
+      },
+      "duration_ms": 26375,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 3,
+        "diagnosis": 2
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_INVALID",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": "HTTP400"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "diagnosis业务校验未通过（READ_ONLY_ACTION_INVALID）；本阶段的纠正额度已用尽，已有观测与有效草稿保留，未通过结果不作为已复核结论。",
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：关键问题仍未完成评估；预算/限次范围内未形成有效的新补查计划，带限制进入诊断，不视为已取证充分。尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：关键问题仍未完成评估；预算/限次范围内未形成有效的新补查计划，带限制进入诊断，不视为已取证充分。尚未获取接收端字段验证规则的详细信息。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：关键问题仍未完成评估；预算/限次范围内未形成有效的新补查计划，带限制进入诊断，不视为已取证充分。尚未取证或评估；查询完成不能自动解决这个问题。",
+        "协作尚有缺口：MODEL_OUTPUT_INVALID；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round4",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "43ccd210-6a7e-494d-846c-488760f83080",
+      "report_sha256": "40e1cc57974796552f6faf10713e26ebab36cd84fe2ca914e26717a365c7cfd5",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round4\\05546f5f-552d-479f-8608-9e3fb03265bb\\43ccd210-6a7e-494d-846c-488760f83080.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "c947a64743976446",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 10,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 53949,
+        "output_tokens": 1897,
+        "known_calls": 10,
+        "status": "known"
+      },
+      "duration_ms": 26328,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 7
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "findings.1.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "additional_needs.0.purpose",
+              "type": "literal_error",
+              "actual": "<redacted>",
+              "allowed": [
+                "trigger",
+                "action_condition"
+              ]
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "协作尚有缺口：MODEL_OUTPUT_INVALID；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round4",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "ee38ffd0-9fb1-48c1-9b1a-32a5a05054d0",
+      "report_sha256": "c4596e8240f1e8be9b049ede4aa241e85296641a4e6c2bc2183fe50e76499bbe",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round4\\05546f5f-552d-479f-8608-9e3fb03265bb\\ee38ffd0-9fb1-48c1-9b1a-32a5a05054d0.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "c947a64743976446",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 3,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 15432,
+        "output_tokens": 951,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 11438,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "payload encoder 版本不兼容导致 HTTP400 错误。",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "检查 payload encoder 的版本兼容性，并确保接收端支持 v2。",
+          "condition": "当前观测到 delivery_error_rate 高且存在 encoder 版本不兼容的日志。",
+          "expected_result": "确认 encoder 版本兼容性后，delivery_error_rate 可能降低。",
+          "risk": "如果 encoder 版本不兼容，可能导致进一步的推送失败。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": "ENCODER_SELECTED"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到接收端 schema probe 支持 v2 的具体配置或变更记录。",
+        "未观测到其他可能影响推送机制的配置变更。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round5",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "93405f75-6a8a-4f97-9059-323835c30d95",
+      "report_sha256": "93047b5ce294a472f72d0051704713c7b79bf3c43b5324e41db61f18894ab080",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round5\\02966ad2-c9dd-49eb-af9e-7197e1f2f052\\93405f75-6a8a-4f97-9059-323835c30d95.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "001c1b3e1f7b4eb2",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "model_calls": 3,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 15432,
+        "output_tokens": 692,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 9703,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [
+        {
+          "action": "检查配置变更以确认是否与 encoder 版本不兼容有关。",
+          "condition": "需要进一步验证配置变更与错误之间的关联性。",
+          "expected_result": "确定配置变更是否导致了兼容性问题。",
+          "risk": "如果配置变更与错误无关，可能需要重新评估其他潜在原因。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_recent_changes",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration"
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到具体的配置变更记录以确认 encoder 版本变更的详细信息。",
+        "未观测到接收端 schema 的具体版本信息以验证兼容性问题。",
+        "故障诊断尚未形成有当前证据支持的原因假设；仅复核观测不能完成诊断。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round5",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "c6b16c39-0f6a-4d7e-9457-6ef930dbd811",
+      "report_sha256": "362a05d278b25482d577ca30982f0830031d16b17296eee921f38026440e07f0",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round5\\02966ad2-c9dd-49eb-af9e-7197e1f2f052\\c6b16c39-0f6a-4d7e-9457-6ef930dbd811.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "001c1b3e1f7b4eb2",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 9,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 39486,
+        "output_tokens": 1810,
+        "known_calls": 9,
+        "status": "known"
+      },
+      "duration_ms": 23313,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 7
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "TOOL_DENIED",
+              "instruction": "任务检查必须使用目标角色的已登记只读工具，并遵守工单范围；无法查询的目标保留信息缺口。"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "supervisor业务校验未通过（INVALID_TASK_CHECK）；本阶段的纠正额度已用尽，已有观测与有效草稿保留，未通过结果不作为已复核结论。",
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "协作尚有缺口：MODEL_OUTPUT_INVALID；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round6",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "4a894508-4bf0-4d27-b18a-2e827b816441",
+      "report_sha256": "3f8b3c13405ac6a398f85ae4120dd5bd56aad8eae477bd23687a9710eb00f4a2",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round6\\44252486-5c8d-42a7-b9de-57a51853b9b1\\4a894508-4bf0-4d27-b18a-2e827b816441.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "completed",
+      "review_status": "not_performed",
+      "termination_reason": "FINISHED",
+      "model_calls": 3,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 15432,
+        "output_tokens": 885,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 12594,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "编码器版本不匹配导致的推送失败和队列积压",
+          "level": "mechanism",
+          "status": "tentative"
+        }
+      ],
+      "actions": [
+        {
+          "action": "检查接收端对 payload encoder=v2 的兼容性，并验证 schema 是否更新以支持 v2。",
+          "condition": "如果接收端未适配 v2 编码器，将导致推送失败和队列积压。",
+          "expected_result": "确认接收端是否已适配 v2 编码器并修复 schema 不匹配问题。",
+          "risk": "若未及时适配，可能持续引发推送失败和队列积压。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": null
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "尚未获取接收端 schema 更新记录或兼容性验证结果。",
+        "未确认是否有其他配置变更影响了编码器适配性。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round6",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "9c6a344b-3900-409d-82d4-72d3f800993f",
+      "report_sha256": "0e1e0cad821b1e875e246c005c63321e48ff88b321b3213695beee1a2576ee5b",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round6\\44252486-5c8d-42a7-b9de-57a51853b9b1\\9c6a344b-3900-409d-82d4-72d3f800993f.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 14,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 76037,
+        "output_tokens": 4393,
+        "known_calls": 14,
+        "status": "known"
+      },
+      "duration_ms": 49954,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 9,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": "UNKNOWN_FIELD"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "delivery_error_rate 上升和 queue_depth 增长可能与 HTTP400 错误有关，可能是由于 recipient_id 参数异常导致的推送失败。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "服务配置可能未更新以支持新的 payload encoder=v2，导致与接收端协议不匹配。",
+          "level": "mechanism",
+          "status": "supported"
+        }
+      ],
+      "actions": [],
+      "limitations": [
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚无足够证据排除其他合理替代解释，需进一步验证。",
+        "需要进一步确认 recipient_id 字段在协议中的定义和使用情况。",
+        "需要检查发送端是否在请求中正确传递了 recipient_id 字段。",
+        "A1: 需要人工核实接收端对encoder=v2的支持情况，目前缺乏相关证据。",
+        "尚无经过复核的有效下一步；可以是有依据的只读核查或有条件的处理建议。",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round7",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "721ffac2-7cd3-404e-9719-1808e26578a6",
+      "report_sha256": "b01aadf08351bffd520e09dba4d61b53233265149a134e28957ae0a61c7d213d",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round7\\8c1e7662-9c1c-4e1e-bf92-6c44d4aef5bb\\721ffac2-7cd3-404e-9719-1808e26578a6.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "2cbcdace3cf28e5f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 12,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 58649,
+        "output_tokens": 3874,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "duration_ms": 43953,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 8,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [
+        {
+          "action": "核查服务日志中是否存在 HTTP400 错误或相关字段异常，如 recipient_id 的无效性。",
+          "code": "READ_ONLY_ACTION_ALREADY_COVERED"
+        }
+      ],
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "<extra>",
+              "type": "extra_forbidden"
+            },
+            {
+              "path": "<extra>",
+              "type": "extra_forbidden"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "delivery_error_rate",
+              "queue_depth"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": "UNKNOWN_FIELD"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "delivery_error_rate 的异常值可能与 HTTP400 UNKNOWN_FIELD recipient_id 错误有关，但尚未获取相关日志确认具体原因。",
+          "level": "mechanism",
+          "status": "unresolved"
+        },
+        {
+          "cause": "queue_depth 的增长可能是由于处理能力不足或任务分配问题，但缺乏 workers_active 和 cpu_utilization 的数据支持分析。",
+          "level": "mechanism",
+          "status": "unresolved"
+        }
+      ],
+      "actions": [],
+      "limitations": [
+        "复核缺口未补查：预算或调度额度不足；需要获取服务日志中是否存在 HTTP400 错误或相关字段异常的观测数据以验证 H1。",
+        "故障诊断尚未形成处理建议；需要说明适用条件、预期验证、风险和人工审批要求。",
+        "任务目标未满足：获取 workers_active 和 cpu_utilization 的观测数据，以全面评估系统负载情况。；get_service_metrics：尚未执行；不能据此认定任务目标已满足。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：HTTP400 错误相关字段异常的观测尚未完成，无法确认其对现象的解释力。",
+        "尚未获取 workers_active 和 cpu_utilization 的观测数据，无法全面评估系统负载情况。",
+        "未查询相关日志以确认 HTTP400 错误的具体原因。",
+        "核查建议未发布（READ_ONLY_ACTION_ALREADY_COVERED）：核查服务日志中是否存在 HTTP400 错误或相关字段异常，如 recipient_id 的无效性。；未执行，也不作为有效下一步。",
+        "获取 workers_active 和 cpu_utilization 的观测数据以评估系统负载情况。",
+        "获取服务日志中是否存在 HTTP400 错误或相关字段异常的观测数据。",
+        "H1: delivery_error_rate 异常可能与 HTTP400 UNKNOWN_FIELD recipient_id 错误有关，但未获取相关日志确认具体原因。",
+        "H2: queue_depth 增长可能与处理能力不足或任务分配问题有关，但缺乏 workers_active 和 cpu_utilization 的数据支持分析。",
+        "尚无经过复核的故障机制；触发原因或被排除的候选不能代替机制。",
+        "仍有影响当前判断的候选机制待核实。",
+        "尚无经过复核的有效下一步；可以是有依据的只读核查或有条件的处理建议。",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round7",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "870fa076-5770-4bfe-a4f4-4d8da791b82a",
+      "report_sha256": "4b6605f46b18359d5013605b883579141101dbc610300d4f98cde65baaaca793",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round7\\8c1e7662-9c1c-4e1e-bf92-6c44d4aef5bb\\870fa076-5770-4bfe-a4f4-4d8da791b82a.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "2cbcdace3cf28e5f",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "model_calls": 3,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 15432,
+        "output_tokens": 840,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 11578,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 0,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [
+        {
+          "action": "检查配置变更是否导致了接收端schema不匹配的问题。",
+          "condition": "需要进一步验证配置变更与接收端schema之间的兼容性。",
+          "expected_result": "确认配置变更是否导致了接收端schema不匹配的问题。",
+          "risk": "如果配置变更与接收端schema不兼容，可能需要回滚或更新接收端以适应新的配置。",
+          "requires_approval": false,
+          "kind": "read_only_check",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-11T10:00:00Z",
+                "end": "2026-10-11T10:20:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": null
+              }
+            }
+          ],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "未观测到具体的配置变更记录，无法直接验证配置变更与接收端schema不匹配的关系。",
+        "未观测到接收端schema的具体版本信息，无法直接验证其与新配置的兼容性。",
+        "故障诊断尚未形成有当前证据支持的原因假设；仅复核观测不能完成诊断。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-round8",
+      "case_id": "show_101",
+      "workflow": "single",
+      "run_id": "eb9ece4c-e996-4d2b-bf53-097804fa782c",
+      "report_sha256": "ec9d26fabea7f28eb95393a1d570c136339b1decf3c35a623d850df9a6addf8e",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round8\\92653f55-8402-41c9-b58d-9eeb4ebb69a1\\eb9ece4c-e996-4d2b-bf53-097804fa782c.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "4df07acc169a9b0d",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 4,
+      "tool_calls": 2,
+      "token_usage": {
+        "input_tokens": 22340,
+        "output_tokens": 1606,
+        "known_calls": 4,
+        "status": "known"
+      },
+      "duration_ms": 18750,
+      "role_model_calls": {
+        "single": 4
+      },
+      "repairs": 1,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "SingleAgent stopped: MODEL_OUTPUT_INVALID; evidence requires human review."
+      ]
+    },
+    {
+      "batch": "agent-improvement-round8",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "run_id": "eba96a41-f0eb-497e-b6d9-6875f828be23",
+      "report_sha256": "d4d16cd68ffbdf1236b911580431b2e28017048e573a24dd5fc101f4d9f56df8",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-round8\\92653f55-8402-41c9-b58d-9eeb4ebb69a1\\eba96a41-f0eb-497e-b6d9-6875f828be23.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "4df07acc169a9b0d",
+      "dataset_version": "curated-showcase-ticket-revision-v2",
+      "fixture_sha256": "781bf7135644f202f62e0b81af1f7faab4f7227f90b8e3e348442e4b30694f76",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 11,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 62746,
+        "output_tokens": 3710,
+        "known_calls": 11,
+        "status": "known"
+      },
+      "duration_ms": 44907,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 7,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "metrics": [
+              "cpu_utilization",
+              "delivery_error_rate",
+              "queue_depth",
+              "workers_active"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-11T10:00:00Z",
+            "end": "2026-10-11T10:20:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "配置变更导致协议不兼容，接收端拒绝处理 recipient_id 字段，引发 HTTP 400 错误。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "接收端协议更新后不再支持 recipient_id 字段，导致推送失败。",
+          "level": "trigger",
+          "status": "unresolved"
+        }
+      ],
+      "actions": [
+        {
+          "action": "核查接收端协议文档，确认 recipient_id 是否仍被支持。",
+          "condition": "需要外部协议文档访问权限或对接方协助。",
+          "expected_result": "确认 recipient_id 是否在当前协议中有效。",
+          "risk": "若协议已更新，可能需要调整推送逻辑。",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "limitations": [
+        "任务目标未满足：分析候选故障机制，特别是配置或依赖问题是否可能造成推送失败。；get_service_logs：尚未执行；不能据此认定任务目标已满足。",
+        "get_service_logs：尚未执行；不能据此认定任务目标已满足。",
+        "H2: 接收端错误信息表明字段不被识别，但尚无法确认是否为近期协议变更所致。",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-transfer",
+      "case_id": "eval_005",
+      "workflow": "single",
+      "run_id": "0eeb9b4e-5a64-4362-8ca0-55de15ab7fc4",
+      "report_sha256": "da1c85fdbe3b74b5622761463ed9b2024b04f058ea713da95fd929f3c482b802",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-transfer\\412828f9-7c2b-4f50-8910-333f0ad35d57\\0eeb9b4e-5a64-4362-8ca0-55de15ab7fc4.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "4712f902c09f55a14af2b7c78f0929f12548e39e14b007491556c83e29c27e7a",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "DIAGNOSIS_INCOMPLETE",
+      "model_calls": 3,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 14993,
+        "output_tokens": 792,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 9500,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 1,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            },
+            {
+              "path": "findings.1.refs",
+              "type": "too_short"
+            },
+            {
+              "path": "findings.2.refs",
+              "type": "too_short"
+            },
+            {
+              "path": "findings.3.refs",
+              "type": "too_short"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_metrics",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "resource",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "search_incidents",
+          "status": "empty",
+          "query_profile": {
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "未观测到与请求处理异常相关的服务指标数据。",
+        "未观测到与请求处理异常相关的服务日志记录。",
+        "未发现最近的配置、部署或扩展变更记录。",
+        "未找到与当前症状匹配的已知事件或问题记录。",
+        "故障诊断缺少可复核的当前观测。",
+        "故障诊断尚未形成有当前证据支持的原因假设；仅复核观测不能完成诊断。",
+        "故障诊断尚未形成处理建议；需要说明适用条件、预期验证、风险和人工审批要求。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-transfer",
+      "case_id": "eval_002",
+      "workflow": "single",
+      "run_id": "937e84b6-2a95-4b3a-af4d-d9de39fe6824",
+      "report_sha256": "f489f83b462f4835f4db7eea27b061616bbd2eb3fa4e153e5dbff1c944bb89ee",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-transfer\\412828f9-7c2b-4f50-8910-333f0ad35d57\\937e84b6-2a95-4b3a-af4d-d9de39fe6824.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": null,
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "MODEL_OUTPUT_INVALID",
+      "model_calls": 3,
+      "tool_calls": 3,
+      "token_usage": {
+        "input_tokens": 16704,
+        "output_tokens": 1655,
+        "known_calls": 3,
+        "status": "known"
+      },
+      "duration_ms": 16594,
+      "role_model_calls": {
+        "single": 3
+      },
+      "repairs": 1,
+      "repair_counts": null,
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        },
+        {
+          "role": "single",
+          "reason": "invalid_output_type",
+          "details": []
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "SingleAgent stopped: MODEL_OUTPUT_INVALID; evidence requires human review."
+      ]
+    },
+    {
+      "batch": "agent-improvement-transfer",
+      "case_id": "eval_002",
+      "workflow": "multi",
+      "run_id": "b92e9b89-dd86-4e38-917b-31849e7ddbff",
+      "report_sha256": "2e8a4bff2e9621ed6a4733de2baa27fec61a56d502da2d86347fff27de5052fc",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-transfer\\412828f9-7c2b-4f50-8910-333f0ad35d57\\b92e9b89-dd86-4e38-917b-31849e7ddbff.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "dc9c64cb4353953cea9428608ff33bce0bed1f733c7d05af0a9c49a1157b4700",
+      "status": "partial",
+      "review_status": "needs_information",
+      "termination_reason": "REVIEW_INCOMPLETE",
+      "model_calls": 12,
+      "tool_calls": 5,
+      "token_usage": {
+        "input_tokens": 68807,
+        "output_tokens": 4575,
+        "known_calls": 12,
+        "status": "known"
+      },
+      "duration_ms": 49406,
+      "role_model_calls": {
+        "supervisor": 3,
+        "investigation": 7,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "repairs": 1,
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": true,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "need_updates.0.next_check.args",
+              "type": "missing"
+            },
+            {
+              "path": "need_updates.1.next_check.args",
+              "type": "missing"
+            }
+          ]
+        }
+      ],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": "WARN",
+            "error_code": null
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [
+        {
+          "cause": "认证依赖的TLS连接成功，但请求因audience字段被拒绝可能导致了401错误。",
+          "level": "mechanism",
+          "status": "supported"
+        }
+      ],
+      "actions": [],
+      "limitations": [
+        "调度输出未通过协议校验，已保留原证据问题并转入诊断与独立复核；未执行失败决定中的任务。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：候选故障机制部分支持，但缺乏更具体的配置变更或警告日志证据。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未明确替代解释是否能改变判断，需进一步验证。",
+        "未观测到与401错误直接相关的其他日志记录。",
+        "未观测到具体的错误代码或更详细的错误信息。",
+        "未找到与配置变更相关的日志或记录，无法完全确认故障机制。",
+        "A1: 需要进一步人工核实audience字段的配置或权限设置以确认原因。",
+        "尚无经过复核的有效下一步；可以是有依据的只读核查或有条件的处理建议。",
+        "协作尚有缺口：REVIEW_INCOMPLETE；需要补充信息或人工升级。"
+      ]
+    },
+    {
+      "batch": "agent-improvement-transfer",
+      "case_id": "eval_005",
+      "workflow": "multi",
+      "run_id": "f76b0d65-e05b-4f45-913b-70f9efb1f386",
+      "report_sha256": "196b1844c2809d9661e8bf4733763de3c8c3e698d5fdd9ac4bfa5a2536b3525b",
+      "report_file": "D:\\code\\it_incident_agent\\output\\agent-improvement-transfer\\412828f9-7c2b-4f50-8910-333f0ad35d57\\f76b0d65-e05b-4f45-913b-70f9efb1f386.json",
+      "execution_mode": "live",
+      "model": "qwen-turbo",
+      "workflow_version": "incident_graph_v4_review_protocol",
+      "implementation": "356fbc8dab613158",
+      "dataset_version": "independent-synthetic-v1",
+      "fixture_sha256": "4712f902c09f55a14af2b7c78f0929f12548e39e14b007491556c83e29c27e7a",
+      "status": "partial",
+      "review_status": "not_performed",
+      "termination_reason": "NEEDS_INFORMATION",
+      "model_calls": 8,
+      "tool_calls": 4,
+      "token_usage": {
+        "input_tokens": 37783,
+        "output_tokens": 1978,
+        "known_calls": 8,
+        "status": "known"
+      },
+      "duration_ms": 24625,
+      "role_model_calls": {
+        "supervisor": 2,
+        "investigation": 6
+      },
+      "repairs": 0,
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "mechanical_checks": {
+        "event_sequence": true,
+        "step_accounting": true,
+        "snapshot_integrity": true,
+        "references_valid": true,
+        "diagnosis_contract": true,
+        "within_budget": true
+      },
+      "mechanical_pass": true,
+      "rework_rounds": 0,
+      "protocol_finalization_used": false,
+      "blind_review_enabled": false,
+      "observation_reviews": [],
+      "rejected_actions": [],
+      "validation_failures": [],
+      "queries": [
+        {
+          "name": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_recent_changes",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "truncated": false
+        },
+        {
+          "name": "get_service_metrics",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-01T09:50:00Z",
+            "end": "2026-10-01T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "truncated": false
+        }
+      ],
+      "hypotheses": [],
+      "actions": [],
+      "limitations": [
+        "任务目标未满足：确认工单所述现象是否有当前观测支持，时间和范围是否一致。；get_service_logs：查询失败；不能据此认定任务目标已满足。",
+        "任务目标未满足：确认工单所述现象是否有当前观测支持，时间和范围是否一致。；get_service_metrics：查询失败；不能据此认定任务目标已满足。",
+        "任务目标未满足：评估候选故障机制是否能解释现象，并识别关键因果环节的观测或缺口。；get_service_logs：查询失败；不能据此认定任务目标已满足。",
+        "复用查询限制：确认工单所述现象是否有当前观测支持，时间和范围是否一致。；get_service_logs：查询失败；不能据此认定任务目标已满足。",
+        "复用查询限制：确认工单所述现象是否有当前观测支持，时间和范围是否一致。；get_service_metrics：查询失败；不能据此认定任务目标已满足。",
+        "复用查询限制：评估候选故障机制是否能解释现象，并识别关键因果环节的观测或缺口。；get_service_logs：查询失败；不能据此认定任务目标已满足。",
+        "证据需求N1（工单所述现象有哪些当前观测支持，时间和范围是否一致？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N2（候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "证据需求N3（哪些合理的替代解释会改变判断，现有对照能区分到什么程度？）：尚未取证或评估；查询完成不能自动解决这个问题。",
+        "协作尚有缺口：NEEDS_INFORMATION；需要补充信息或人工升级。"
+      ]
+    }
+  ],
+  "totals": {
+    "runs": 36,
+    "model_calls": 228,
+    "tool_calls": 104
+  },
+  "note": "All selected runs retained. Completed/partial and valid protocols do not prove diagnostic correctness."
+}

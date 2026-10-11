@@ -140,7 +140,8 @@ class IncidentRepairTests(unittest.TestCase):
         self.assertEqual(result['rework_rounds'],0)
         self.assertEqual(result['repairs'],0)
         self.assertEqual(result['run_summary']['tool_calls'],3)
-        self.assertTrue(any(e['type']=='rework_denied' and e['code']=='READ_ONLY_CHECK_REQUIRED' for e in result['events']))
+        self.assertTrue(result['reviews'][0]['review']['request_evidence'])
+        self.assertTrue(any(d['action']=='request_info' for d in result['scheduling_decisions']))
         self.assertIn('Increase the pool size', '\n'.join(result['output']['missing_information']))
 
     def test_reviewer_checks_use_tool_role_identity_and_window_preflight(self):
@@ -161,7 +162,8 @@ class IncidentRepairTests(unittest.TestCase):
                 result=collaborate(models,FixtureProvider('case_003',P),P)
                 self.assertEqual(result['rework_rounds'],0)
                 self.assertEqual(result['run_summary']['tool_calls'],3)
-                self.assertTrue(any(e['type']=='rework_denied' and e['code']==code for e in result['events']))
+                self.assertTrue(any(e['type']=='review_hint_ignored' and e['code']==code for e in result['events']))
+                self.assertTrue(result['reviews'][0]['review']['request_evidence'])
 
     def test_rework_model_cannot_replace_approved_checks_with_other_allowed_tool(self):
         models=scripted_models()

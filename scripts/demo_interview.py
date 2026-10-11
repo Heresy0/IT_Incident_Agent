@@ -33,7 +33,7 @@ SCENARIOS = (
      'watch': 'metadata探针未覆盖写入；当前403与旧runner磁盘错误来自不同路径和范围。'},
     {'key': 'rework', 'case': 'case_003', 'name': '复核驱动的定向补查',
      'question': '初稿被历史数据库CPU故障误导，流程能否发现并修正？',
-     'capability': 'Reviewer 质疑 → 精确只读检查 → Supervisor 有限派单 → 补查证据 → Diagnosis 修订 → 再复核。',
+     'capability': 'Reviewer 指出缺口 → Supervisor 规划具体只读检查 → 补查证据 → Diagnosis 修订 → 再复核。',
      'watch': '比较初稿和修订稿；一次补查有真实工具尝试和新增证据，不只是多写一段反思。'},
 )
 

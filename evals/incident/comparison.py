@@ -7,6 +7,7 @@ from .acceptance import assess, ROOT
 from evidence.contracts import Evidence, Finding, InvestigationOutput
 from agents.contracts import DiagnosisDraft
 from agents.investigation import validate_output
+from agents.protocol import corrections_within_policy
 
 SCORER_VERSION = "incident-comparison-v1"
 
@@ -22,6 +23,9 @@ def targets(report):
 def score_report(report, gold):
     # Reuse the existing snapshot/hash/field/accounting checker, selecting its common checks.
     projected = {**report, "output": {k: report["output"][k] for k in ("findings", "missing_information", "escalation_team")}}
+    # The collaboration report aggregates many stage limitations. The legacy
+    # leaf contract caps eight; DiagnosisDraft below validates the full report.
+    projected['output']['missing_information'] = projected['output']['missing_information'][:8]
     legacy = assess(projected, gold)
     checks = {k: legacy["checks"][k] for k in ("event_sequence", "step_accounting", "snapshot_integrity", "references_valid")}
     all_refs_valid = False
@@ -37,7 +41,7 @@ def score_report(report, gold):
         pass
     summary = report["run_summary"]
     checks.update(diagnosis_contract=all_refs_valid, within_budget=summary["model_calls"] <= summary["limits"]["model_calls"]
-        and summary["tool_calls"] <= summary["limits"]["tool_calls"] and report["repairs"] <= 1)
+        and summary["tool_calls"] <= summary["limits"]["tool_calls"] and corrections_within_policy(report))
     tools = [e for e in report["events"] if e["type"] == "tool_result"]
     return {"case_id": report["incident_id"], "run_id": report["run_id"], "workflow": report["workflow"],
         "execution_mode": report["execution_mode"], "status": report["status"], "business_result": report["business_result"],

@@ -12,8 +12,7 @@ class AppSettings(BaseSettings):
     config_path: str = str(Path(__file__).resolve().parents[2] / "config.json")
 
     model_config = SettingsConfigDict(
-        env_file=(str(Path(__file__).resolve().parents[2] / ".env"),
-                  str(Path(__file__).resolve().parents[2] / ".env.local")),
+        env_file=str(Path(__file__).resolve().parents[2] / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )

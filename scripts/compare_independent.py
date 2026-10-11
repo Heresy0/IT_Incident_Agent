@@ -11,6 +11,7 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'app'), str(ROOT)]
 from api.auth import Principal
+from config.incident import DEFAULT_MODEL, IncidentConfig
 from runtime.context import Limits
 from evals.common import implementation_version, write_json
 from evals.independent.provider import IndependentProvider
@@ -34,7 +35,7 @@ def parse_args(argv=None, *, suite=None):
     parser.add_argument('--execute-live', action='store_true')
     parser.add_argument('--model-budget', type=int)
     parser.add_argument('--tool-budget', type=int)
-    parser.add_argument('--model', default='qwen-turbo')
+    parser.add_argument('--model', help='Override MODEL from the shared project configuration')
     parser.add_argument('--output', type=Path, default=ROOT / 'output/independent-comparison')
     args = parser.parse_args(argv)
     if args.execute_live and not args.live:
@@ -63,12 +64,16 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
     if args.check:
         print(json.dumps(suite.check_suite(), ensure_ascii=False, indent=2))
         return 0
+    runtime_config = IncidentConfig.from_file()
+    args.model = args.model or runtime_config.model
     limits = Limits(model_calls=args.model_budget, tool_calls=args.tool_budget,
                     reserve_model_calls=3, reserve_seconds=20)
     config = {'cases': args.cases, 'split': args.split, 'release_holdout': args.release_holdout,
               'limits': asdict(limits), 'model': 'scripted' if args.fake else args.model,
               'execution_mode': 'live' if args.live else 'scripted_control_only' if args.fake else 'plan_only',
-              'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30}}
+              'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30,
+                  **({'enable_thinking': False, 'response_format': {'type': 'json_object'}}
+                     if args.model == DEFAULT_MODEL or args.model.startswith(DEFAULT_MODEL + '-') else {})}}
     plan = {'plan_only': not (args.live or args.fake), 'dataset_version': lock['dataset_version'],
             'configuration': config, 'paired_runs': 2 * len(args.cases),
             'maximum_model_calls': 2 * len(args.cases) * limits.model_calls,
@@ -78,13 +83,11 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
         print(json.dumps(plan, ensure_ascii=False, indent=2))
         return 0
     if args.live:
-        from dotenv import load_dotenv
         from fastapi import HTTPException
         from fastapi.security import HTTPAuthorizationCredentials
         from api.auth import get_current_principal
         from providers.fixtures import ProviderError
-        load_dotenv(ROOT / '.env.local', override=False)
-        key, token = os.getenv('DASHSCOPE_API_KEY', ''), os.getenv('INCIDENT_BEARER_TOKEN', '')
+        key, token = runtime_config.api_key, os.getenv('INCIDENT_BEARER_TOKEN', '')
         if not key or key == 'test-only' or not token:
             parser.error('Model key and registered bearer identity required; no request sent')
         try:

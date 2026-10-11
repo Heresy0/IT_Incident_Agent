@@ -12,6 +12,7 @@ from evidence.observations import FACT_RENDERING, source_statement, pool_control
 from evidence.model_view import MODEL_VIEW_VERSION, result_view, fit_messages, substantive
 from evidence.ownership import OwnerSelectionError, observed_owner_team, parse_owner_selection, resolve_owner, owner_options, owner_schema
 from evidence.completion import diagnosis_gaps, required_sections
+from agents.protocol import bind_reference_ids
 
 INCIDENT_LIMITS = Limits(reserve_model_calls=3, reserve_seconds=20)
 
@@ -23,17 +24,63 @@ class ReferenceValidationError(ValueError):
         super().__init__(reason)
 
 
-def validation_details(exc):
+SAFE_STATUS_WORDS = frozenset({
+    'pending', 'supported', 'not_supported', 'uncertain', 'not_required',
+    'unavailable', 'deferred', 'tentative', 'unresolved', 'completed', 'partial',
+    'failed', 'passed', 'needs_information', 'not_performed', 'dispatch',
+    'diagnose', 'request_info', 'escalate', 'finish', 'investigation', 'knowledge',
+})
+
+
+def literal_options(schema, location):
+    """Read expected literals from a trusted contract, never exception text."""
+    document = schema.model_json_schema()
+
+    def expand(node):
+        if '$ref' in node:
+            node = document['$defs'][node['$ref'].rsplit('/', 1)[-1]]
+        if 'anyOf' in node:
+            return [part for branch in node['anyOf'] for part in expand(branch)]
+        return [node]
+
+    nodes = [document]
+    for part in location:
+        nodes = [child for node in nodes for expanded in expand(node)
+                 if (child := (expanded.get('items') if isinstance(part, int)
+                               else expanded.get('properties', {}).get(part))) is not None]
+    return list(dict.fromkeys(value for node in nodes for expanded in expand(node)
+        for value in expanded.get('enum', [expanded['const']] if 'const' in expanded else [])
+        if isinstance(value, str)))
+
+
+def validation_details(exc, schema=None):
     if isinstance(exc, json.JSONDecodeError):
         return {"reason": "invalid_json", "details": []}
     if isinstance(exc, ValidationError):
         fields = {"findings", "statement", "refs", "evidence_id", "field_path", "value", "unit",
                   "observed_at", "data_version", "quote", "reference_id", "tentative_hypotheses",
-                  "missing_information", "escalation_team", "escalation_ref", "reference_id"}
-        errors = exc.errors(include_input=False, include_context=False, include_url=False)[:5]
+                  "missing_information", "escalation_team", "escalation_ref", "reference_id",
+                  "assessments", "need_assessments", "verdict", "target_id", "need_id",
+                  "reason", "evidence_ids", "blocking", "request_evidence", "follow_up_reason",
+                  "hypothesis_id", "target_role", "missing_observation", "proposed_check",
+                  "expected_value", "checks", "tool", "args", "tasks", "role", "goal",
+                  "action", "evidence_needs", "need_updates", "additional_needs", "status",
+                  "question", "purpose", "next_check", "need_ids", "hypotheses", "cause",
+                  "support_refs", "counter_refs", "pending_checks", "level", "evidence_explanation",
+                  "recommended_actions", "condition", "expected_result", "risk", "requires_approval",
+                  "kind", "repair"}
+        errors = exc.errors(include_input=True, include_context=False, include_url=False)[:5]
+        details = []
+        for error in errors:
+            item = {"path": ".".join(str(p) if isinstance(p, int) or p in fields else "<extra>"
+                                     for p in error['loc']), "type": error['type']}
+            if schema is not None and error['type'] == 'literal_error':
+                actual = error.get('input')
+                item['actual'] = actual if isinstance(actual, str) and actual in SAFE_STATUS_WORDS else '<redacted>'
+                item['allowed'] = literal_options(schema, error['loc'])
+            details.append(item)
         return {"reason": "invalid_json" if any(e["type"] == "json_invalid" for e in errors) else "schema_mismatch",
-                "details": [{"path": ".".join(str(p) if isinstance(p, int) or p in fields else "<extra>" for p in e["loc"]),
-                             "type": e["type"]} for e in errors]}
+                "details": details}
     if isinstance(exc, (ReferenceValidationError, OwnerSelectionError)):
         return {"reason": "reference_mismatch", "details": [{"path": exc.path, "type": exc.reason}]}
     return {"reason": "invalid_output_type", "details": []}
@@ -155,6 +202,8 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     else:
         system = SYSTEM
     system = system_prompt or system
+    output_model = model
+    native_json = getattr(model, 'json_output', False)
     model = model.bind_tools(executor.schemas())
     task_id = str(uuid4())
     def event(kind, **fields):
@@ -174,6 +223,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     failures = []
     coverage_gaps, gap_feedback_sent = [], False
     task_feedback_sent = False
+    output_correction = False
     initial_tool_calls = context.counts['tool_calls']
     required_checks = []
     if role != 'single' and objective:
@@ -224,22 +274,36 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                               if e['type'] == 'tool_result' and e.get('role') == role]]
                 current_objective = dict(objective) if objective is not None else None
                 if current_objective is not None:
-                    from workflow.task_checks import completion
+                    from workflow.task_checks import completion, log_query_feedback
                     current_objective.update(required_checks=required_checks,
                         check_completion=completion(required_checks, executor),
+                        log_query_feedback=log_query_feedback(executor) if role == 'investigation' else [],
                         collection=collection[-12:],
                         query_state_source='server_read_ledger')
                 # Refresh after tool reads; an initial null-only contract must not
                 # hide a newly observed owner, including during correction turns.
                 messages[1] = HumanMessage(content=json.dumps({**model_input,
                     'objective': current_objective, 'collection': collection[-12:],
-                    'output_schema': owner_schema(output_schema, executor),
+                    'output_schema': (owner_schema(output_schema, executor) if role == 'single'
+                                      else bind_reference_ids(owner_schema(output_schema, executor), executor)),
                     'owner_options': owner_options(executor)}, ensure_ascii=False))
                 messages, compacted = fit_messages(messages, executor, collection, limits.input_chars)
                 if compacted:
                     model_omitted = model_omitted or bool(compacted['omitted_evidence_count'])
                     event('model_input_compacted', **compacted)
-                response = invoke_chat_model(model, messages, role, terminal=terminal)
+                # Native JSON mode can be bypassed while tool definitions remain
+                # attached. Separate reading from interpretation without adding a
+                # call or treating completed queries as a completed diagnosis.
+                checks_complete = bool(required_checks and current_objective
+                    and all(c['query_complete'] for c in current_objective['check_completion']['checks']))
+                final_json = native_json and (terminal or step == max_steps - 1 or output_correction
+                    or (checks_complete and not gap_feedback_sent))
+                if final_json:
+                    messages.append(HumanMessage(content='This turn only interprets the recorded observations. '
+                        'Return the output JSON; tools are unavailable. Preserve uncertainty, failed checks and missing observations.'))
+                    event('output_mode', mode='json_without_tools', step=step + 1)
+                response = invoke_chat_model(output_model if final_json else model, messages, role, terminal=terminal)
+                output_correction = False
                 # A blocking SDK call is not cancelled by an outer timer. Discard late responses.
                 if time.monotonic() - context.started >= limits.seconds - (0 if terminal else limits.reserve_seconds):
                     stop = "TIME_BUDGET_EXCEEDED"
@@ -262,7 +326,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                         selected = call.get("name")
                         name = selected if selected in allowed_tools else "denied"
                         event("tool_selected", name=name, step=step + 1)
-                    if step == max_steps - 1 or terminal:
+                    if step == max_steps - 1 or terminal or final_json:
                         stop = "STEP_LIMIT"
                         break
                     for call in calls:
@@ -380,6 +444,7 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     event("validation_failure", node=role, **failure)
                     if step < max_steps - 1 and context.claim_repair(repair_state):
                         repairs += 1
+                        output_correction = True
                         event("validation_repair", node=role)
                         reference_options = {eid: [o.model_dump() for o in e.reference_options if substantive(o.field_path)]
                                              for eid, e in executor.evidence.items()}

@@ -16,8 +16,8 @@ def is_blocking(need):
 def initial_needs(ticket):
     questions = [('symptom', '工单所述现象有哪些当前观测支持，时间和范围是否一致？')]
     if ticket.purpose == 'diagnosis':
-        questions += [('mechanism', '候选故障机制如何解释现象，关键因果环节有哪些观测或缺口？'),
-                      ('alternative', '哪些合理的替代解释会改变判断，现有对照能区分到什么程度？')]
+        questions += [('mechanism', '当前观测支持哪个近端故障机制，能否解释现象？为何开始发生应另列触发问题，不混入此项。'),
+                      ('alternative', '哪些合理的替代机制会改变当前机制判断或下一步，现有对照能区分到什么程度？仅触发来源未知应另列trigger。')]
     return {f'N{n}': EvidenceNeed(need_id=f'N{n}', question=question, purpose=purpose,
             reason='尚未取证或评估；查询完成不能自动解决这个问题。')
             for n, (purpose, question) in enumerate(questions, 1)}
@@ -47,7 +47,9 @@ def update_needs(previous, proposed, evidence, executors, purpose):
             except ExecutionError as exc:
                 raise ProtocolError('INVALID_NEED_CHECK', [{'need_id': need.need_id,
                     'path': 'next_check', 'code': exc.code,
-                    'instruction': '下一项检查须使用已登记且在工单范围内的只读能力；不可查询时省略检查并说明缺口。'}]) from None
+                    'role': need.role,
+                    'allowed_tools': [s['function']['name'] for s in executors[need.role].schemas()],
+                    'instruction': '显式给role并从read_only_tools[role]选择；start/end保持ticket.scope内。不可查询时next_check=null并说明缺口。'}]) from None
             normalized_checks[need.need_id] = need.next_check.model_copy(
                 update={'args': args.model_dump(mode='json')})
         if need.need_id in previous and need.purpose != previous[need.need_id].purpose:
@@ -116,19 +118,30 @@ def apply_need_updates(previous, updates, additions, evidence, executors, purpos
 def validate_assessments(needs, assessments, evidence):
     ids = [a.need_id for a in assessments]
     if len(ids) != len(set(ids)) or not set(ids) <= set(needs):
-        raise ProtocolError('REVIEW_NEED_COVERAGE')
+        raise ProtocolError('REVIEW_NEED_COVERAGE', [{'path': 'need_assessments.need_id',
+            'allowed': list(needs),
+            'instruction': '只评估已有N编号，每个编号至多一次；缺证据使用uncertain。'}])
     result = []
-    for assessment in assessments:
+    violations = []
+    for index, assessment in enumerate(assessments):
         check_ids(assessment.evidence_ids, evidence)
         need = needs[assessment.need_id]
         if assessment.blocking is False and need.purpose in {'symptom', 'mechanism'}:
-            raise ProtocolError('REQUIRED_EVIDENCE_NEED')
+            violations.append({'need_id': need.need_id,
+                'path': f'need_assessments.{index}.blocking', 'code': 'REQUIRED_EVIDENCE_NEED',
+                'actual': False, 'allowed': [True, None],
+                'instruction': '症状与机制是核心问题，不可关闭阻塞；证据不足时保持uncertain并交接缺口。'})
         if assessment.verdict == 'not_required' and need.purpose in {'symptom', 'mechanism'}:
-            raise ProtocolError('REQUIRED_EVIDENCE_NEED')
+            violations.append({'need_id': need.need_id,
+                'path': f'need_assessments.{index}.verdict', 'code': 'REQUIRED_EVIDENCE_NEED',
+                'actual': 'not_required', 'allowed': ['supported', 'uncertain'],
+                'instruction': '症状与机制必须评估；有当前证据才supported，否则uncertain，不得为通过而编造支持。'})
         if assessment.verdict == 'supported' and not current_support(assessment.evidence_ids, evidence):
             assessment = assessment.model_copy(update={'verdict': 'uncertain',
                 'reason': '程序门禁：关键证据问题没有当前观测引用，历史线索或任务完成不足以支持。'})
         result.append(assessment)
+    if violations:
+        raise ProtocolError('REQUIRED_EVIDENCE_NEED', violations)
     for need_id in needs:
         if need_id not in ids:
             result.append(NeedAssessment(need_id=need_id, verdict='uncertain',

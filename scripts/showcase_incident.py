@@ -33,7 +33,7 @@ CONTROLS = {
     'references': [
         'tests.workflow.test_diagnosis_references.DiagnosisReferenceTests.test_persistent_invalid_reference_stops_after_one_repair_with_public_error_location'],
     'structure': [
-        'tests.workflow.test_incident_collaboration.IncidentCollaborationTests.test_schema_repair_allowance_is_shared_across_leaf_and_reviewer'],
+        'tests.workflow.test_incident_collaboration.IncidentCollaborationTests.test_reviewer_has_own_bounded_correction_after_leaf_failure'],
     'retry_and_dedup': [
         'tests.tools.test_incident_tools.IncidentToolsTests.test_retry_count_error_sanitization_and_limit',
         'tests.tools.test_incident_tools.IncidentToolsTests.test_duplicate_no_double_count_and_snapshot_immutability'],
@@ -128,7 +128,10 @@ def main(argv=None):
         gold = json.loads((ROOT / 'evals/incident/gold' / f'{case}.json').read_text(encoding='utf-8'))
         checks = score_report(report, gold)
         if key == 'bounded_failure':
-            expected = report['status'] == 'partial' and report['run_summary']['termination_reason'] == 'BUDGET_EXCEEDED' and report['rework_rounds'] == 0
+            expected = (report['status'] == 'partial'
+                and report['run_summary']['termination_reason'] == 'REVIEW_INCOMPLETE'
+                and any(e['type'] == 'rework_denied' and e['code'] == 'BUDGET_EXCEEDED' for e in report['events'])
+                and report['rework_rounds'] == 0)
         else:
             expected = report['status'] == 'completed' and report['review_status'] == 'passed' and report['rework_rounds'] == (1 if key == 'rework' else 0)
         if key == 'rework':

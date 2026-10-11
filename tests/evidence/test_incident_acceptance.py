@@ -58,13 +58,15 @@ class IncidentAcceptanceTests(unittest.TestCase):
 
     def test_query_profiles_only_contain_validated_filters_and_window(self):
         ex = executor()
-        ex.execute("get_service_logs", {**window(ex), "category": "dependency", "error_code": "PRIVATE_CODE"})
-        self.assertEqual(set(ex.last_query_profile), {'start', 'end', 'category', 'level'})
+        ex.execute("get_service_logs", {**window(ex), "category": "dependency", "error_code": "UNKNOWN_FIELD"})
+        self.assertEqual(set(ex.last_query_profile), {'start', 'end', 'category', 'level', 'error_code'})
         self.assertEqual(ex.last_query_profile['category'], 'dependency')
         self.assertIsNone(ex.last_query_profile['level'])
         self.assertEqual(datetime.fromisoformat(ex.last_query_profile['start']), ex.scope.start)
         self.assertEqual(datetime.fromisoformat(ex.last_query_profile['end']), ex.scope.end)
-        self.assertNotIn('error_code', ex.last_query_profile)
+        self.assertEqual(ex.last_query_profile['error_code'], 'UNKNOWN_FIELD')
+        ex.execute("get_service_logs", {**window(ex), "category": "dependency"})
+        self.assertIsNone(ex.last_query_profile['error_code'])
         ex.execute("get_service_owner", {"alias": "TEST_SECRET_CANARY"})
         self.assertEqual(ex.last_query_profile, {})
         ex.execute("get_service_logs", {**window(ex), "category": "TEST_SECRET_CANARY"})

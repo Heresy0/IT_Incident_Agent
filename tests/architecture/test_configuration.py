@@ -1,0 +1,70 @@
+"""Configuration precedence and shared CLI resolution; no network requests."""
+import io
+import json
+import os
+from contextlib import redirect_stdout
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import unittest
+from unittest.mock import patch
+
+from config.incident import IncidentConfig, DEFAULT_MODEL
+from config.settings import AppSettings
+
+
+class ConfigurationTests(unittest.TestCase):
+    def setUp(self):
+        directory = self.enterContext(TemporaryDirectory())
+        self.root = Path(directory)
+        self.enterContext(patch('config.incident.PROJECT_ROOT', self.root))
+        self.enterContext(patch.dict(os.environ, {}, clear=True))
+        (self.root / 'config.json').write_text(json.dumps({
+            'model': 'json-model', 'api_key': 'json-canary', 'postgres_dsn': 'json-dsn'}), encoding='utf-8')
+
+    def test_env_overrides_json_and_local_file_is_ignored(self):
+        (self.root / '.env').write_text('MODEL=env-model\nDASHSCOPE_API_KEY=env-canary\nPOSTGRES_DSN=env-dsn\n', encoding='utf-8')
+        (self.root / '.env.local').write_text('MODEL=obsolete-model\nDASHSCOPE_API_KEY=obsolete-canary\n', encoding='utf-8')
+        config = IncidentConfig.from_file()
+        self.assertEqual((config.model, config.api_key, config.postgres_dsn), ('env-model', 'env-canary', 'env-dsn'))
+        self.assertNotIn('canary', repr(config))
+        self.assertNotIn('env-dsn', repr(config))
+
+    def test_process_overrides_env_and_config_path_is_shared(self):
+        alternate = self.root / 'alternate.json'
+        alternate.write_text('{"model":"alternate-model"}', encoding='utf-8')
+        (self.root / '.env').write_text(f'CONFIG_PATH={alternate.as_posix()}\nMODEL=file-model\n', encoding='utf-8')
+        os.environ['MODEL'] = 'process-model'
+        self.assertEqual(IncidentConfig.from_file().model, 'process-model')
+        del os.environ['MODEL']
+        (self.root / '.env').write_text(f'CONFIG_PATH={alternate.as_posix()}\n', encoding='utf-8')
+        self.assertEqual(IncidentConfig.from_file().model, 'alternate-model')
+
+    def test_missing_files_use_defaults(self):
+        (self.root / 'config.json').unlink()
+        self.assertEqual(IncidentConfig.from_file().model, DEFAULT_MODEL)
+
+    def test_both_comparison_plans_follow_env_and_explicit_model_override(self):
+        from scripts.compare_incident import main as incident_main
+        from scripts.compare_independent import main as independent_main
+        (self.root / '.env').write_text('MODEL=configured-model\nDASHSCOPE_API_KEY=env-secret-canary\n', encoding='utf-8')
+        for main in (incident_main, independent_main):
+            for args, expected in (([], 'configured-model'), (['--model', 'explicit-model'], 'explicit-model')):
+                with self.subTest(main=main.__module__, args=args), redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(main(['--plan', *args]), 0)
+                text = output.getvalue()
+                plan = json.loads(text)
+                # Development plans report their intended model even before live execution.
+                self.assertEqual(plan['configuration']['model'], expected)
+                self.assertNotIn('canary', text)
+
+    def test_app_settings_use_the_same_env_and_process_precedence(self):
+        env_file = self.root / '.env'
+        env_file.write_text('PORT=8123\n', encoding='utf-8')
+        (self.root / '.env.local').write_text('PORT=8999\n', encoding='utf-8')
+        self.assertEqual(AppSettings(_env_file=env_file).port, 8123)
+        os.environ['PORT'] = '8456'
+        self.assertEqual(AppSettings(_env_file=env_file).port, 8456)
+
+
+if __name__ == '__main__':
+    unittest.main()

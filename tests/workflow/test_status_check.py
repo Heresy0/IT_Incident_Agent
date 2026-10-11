@@ -104,10 +104,10 @@ class StatusCheckTests(unittest.TestCase):
         c.models['reviewer'] = Reviewer()
         with activate(c.context):
             review = c.ask('reviewer', ReviewDecision, c.reviewer_input(), terminal=True, validate=c.validate_review)
-        self.assertIsNone(review.request_evidence)
-        self.assertIn('METRIC_NOT_REGISTERED', review.missing_information[0])
-        self.assertIn('queue_depth', review.missing_information[0])
-        self.assertNotIn('human changes', review.missing_information[0])
+        self.assertIsNotNone(review.request_evidence)
+        self.assertEqual(review.request_evidence.checks, [])
+        self.assertEqual(c.review_hint_status, [{'tool': 'get_service_metrics', 'code': 'METRIC_NOT_REGISTERED'}])
+        self.assertEqual(review.request_evidence.missing_observation, '缺少 CPU 指标')
         self.assertEqual(c.context.counts['tool_calls'], 0)
         data = json.loads(captured[0][1].content)
         checks = data['output_schema']['$defs']['ReadOnlyCheck']['oneOf']

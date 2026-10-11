@@ -12,13 +12,12 @@ class ProbeModel:
 
 
 def probe():
-    from langchain_community.chat_models import ChatTongyi
+    from agents.models import build_model
     from pydantic import BaseModel
     class ProbeArgs(BaseModel):
         pass
     # Binding is local serialization, no provider request.
-    bound = ChatTongyi(model="qwen-turbo", dashscope_api_key="test-only", max_retries=1,
-                      model_kwargs={"request_timeout": 30}).bind_tools([ProbeArgs])
+    bound = build_model("test-only").chat.bind_tools([ProbeArgs])
     assert len(bound.kwargs["tools"]) == 1
     events = []
     context = RunContext(limits=Limits(reserve_model_calls=3, reserve_seconds=20), emit=events.append)

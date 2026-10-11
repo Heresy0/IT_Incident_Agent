@@ -56,12 +56,12 @@ def expand_diagnosis(selection, registry):
         validate_selected_refs(finding.refs, registry, f'findings.{index}.refs', allowed_ids)
     capabilities = getattr(getattr(registry, 'provider', None), 'repair_capabilities', [])
     actions = []
-    for action in selection.recommended_actions:
+    for action_index, action in enumerate(selection.recommended_actions):
         if action.kind == 'read_only_check':
             if action.repair is not None or not action.checks:
                 raise ProtocolError('READ_ONLY_ACTION_INVALID')
             checks = []
-            for check in action.checks:
+            for check_index, check in enumerate(action.checks):
                 # Use the same registered tools and scope checks as actual execution.
                 executors = getattr(registry, 'executors', None)
                 executor = (executors['knowledge'] if check.tool in {'search_runbooks', 'search_incidents'}
@@ -71,9 +71,20 @@ def expand_diagnosis(selection, registry):
                 except ExecutionError as exc:
                     raise ProtocolError('READ_ONLY_ACTION_INVALID', [{'code': exc.code,
                         'instruction': '核查建议必须使用登记工具并遵守角色及工单范围。'}]) from None
+                if executors:
+                    from workflow.task_checks import adds_information
+                    proposal = {'tool': check.tool, 'args': args.model_dump(mode='json')}
+                    if not adds_information([proposal], executor):
+                        raise ProtocolError('READ_ONLY_ACTION_ALREADY_COVERED', [{
+                            'path': f'recommended_actions.{action_index}.checks.{check_index}',
+                            'code': 'READ_ONLY_ACTION_ALREADY_COVERED',
+                            'instruction': '此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。'
+                                '换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。'}])
                 checks.append(check.model_copy(update={'args': args.model_dump(mode='json')}))
             action = action.model_copy(update={'checks': checks})
         elif action.checks:
+            raise ProtocolError('ACTION_KIND_MISMATCH')
+        if action.kind == 'manual_check' and action.repair is not None:
             raise ProtocolError('ACTION_KIND_MISMATCH')
         if action.kind in {'manual_change', 'registered_repair'} and not action.requires_approval:
             raise ProtocolError('CHANGE_APPROVAL_REQUIRED')
@@ -103,3 +114,25 @@ def expand_diagnosis(selection, registry):
         evidence_explanation=h.evidence_explanation) for n, h in enumerate(selection.hypotheses, 1)]
     return DiagnosisDraft(findings=facts.findings, hypotheses=hypotheses, recommended_actions=actions,
                           missing_information=selection.missing_information, escalation_team=resolve_owner(selection.escalation_ref, registry))
+
+
+def preserve_diagnosis(selection, registry):
+    """Quarantine invalid read-only advice after correction, retain valid claims.
+
+    Invalid references, ownership and repair capabilities remain fatal. No
+    rejected proposal is converted, approved or executed by this projection.
+    """
+    draft = expand_diagnosis(selection.model_copy(update={'recommended_actions': []}), registry)
+    actions, rejected = [], []
+    for action in selection.recommended_actions:
+        try:
+            checked = expand_diagnosis(selection.model_copy(update={'recommended_actions': [action]}), registry)
+            actions.extend(checked.recommended_actions)
+        except ProtocolError as exc:
+            if exc.code not in {'READ_ONLY_ACTION_ALREADY_COVERED', 'READ_ONLY_ACTION_INVALID', 'ACTION_KIND_MISMATCH'}:
+                raise
+            rejected.append({'action': action.action, 'code': exc.code})
+    gaps = [*draft.missing_information,
+            *[f"核查建议未发布（{r['code']}）：{r['action']}；未执行，也不作为有效下一步。" for r in rejected]]
+    return draft.model_copy(update={'recommended_actions': actions, 'rejected_actions': rejected,
+                                     'missing_information': gaps})

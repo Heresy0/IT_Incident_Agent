@@ -1,0 +1,169 @@
+{
+  "review_type": "assistant_assisted_analysis",
+  "formal_human_approved": false,
+  "semantic_accuracy": null,
+  "notes": [
+    "不是正式人工评分，不据此计算整体准确率。",
+    "多Agent最终partial保留有效观测与下一步；保守不等于调查充分。",
+    "show_101的停止理由中默认脱敏政策没有当前证据，不能将INFO查空升级为渠道政策。",
+    "eval_002的N2混入未确认触发原因，造成机制和下一步已支持仍partial；这是剩余过度阻塞问题。"
+  ],
+  "runs": [
+    {
+      "run_id": "28ba40a6-76a5-490a-aefd-109de756f614",
+      "report_sha256": "5f2362855d431ab2d9b4dded856afcf2bfd3bf284e0292f40978b475cbe46044",
+      "case_id": "show_101",
+      "workflow": "multi",
+      "implementation": "4636da06c56bde66",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "delivery_error_rate (sample)=0.82 ratio @ 2026-10-11T10:10:00+00:00; queue_depth (sample)=42 jobs @ 2026-10-11T10:10:00+00:00; workers_active (sample)=4 workers @ 2026-10-11T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F2",
+          "text": "dependency log [ERROR] error_code=\"REMOTE_SCHEMA_REJECTED\"  @ 2026-10-11T10:10:00+00:00; dependency log [ERROR] message=\"endpoint=/deliver；接收端返回400 UNKNOWN_FIELD；字段recipient_id在当前协议中不被识别。\"  @ 2026-10-11T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "H1",
+          "text": "下游服务协议变更（如recipient_id字段弃用），导致delivery-bridge发出的请求被400拒绝，触发错误率飙升与队列积压。",
+          "assessment": "insufficient",
+          "reason": "日志直接支持字段拒绝，不支持下游已变更或废弃字段；最终保留unresolved是合理收紧。"
+        },
+        {
+          "target_id": "A1",
+          "text": "核查delivery-bridge服务在故障窗口内是否发生过配置或部署变更，尤其涉及请求体构造逻辑（如recipient_id字段写入开关、协议版本升级）。",
+          "assessment": "qualified",
+          "reason": "工具目标是工单服务，查询配置/部署有价值；检查尚未执行，不能把弃用字段当作已知前提。"
+        }
+      ]
+    },
+    {
+      "run_id": "2bce61a3-d635-4a5b-9926-282af6a68b96",
+      "report_sha256": "bb8ecb99e7612482da73385123750e77401c92900355b8b44dcf477166defb24",
+      "case_id": "show_101",
+      "workflow": "single",
+      "implementation": "4636da06c56bde66",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "delivery_error_rate (sample)=0.82 ratio @ 2026-10-11T10:10:00+00:00; queue_depth (sample)=42 jobs @ 2026-10-11T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F2",
+          "text": "configuration log [INFO] message=\"10:02起新请求使用payload encoder=v2；接收端schema probe仍返回v1。\"  @ 2026-10-11T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F3",
+          "text": "cpu_utilization (sample)=0.29 ratio @ 2026-10-11T10:10:00+00:00; workers_active (sample)=4 workers @ 2026-10-11T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F4",
+          "text": "configuration change summary=\"推送编码器从v1切换到v2；服务实例数保持4。\"  @ 2026-10-11T10:02:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "H1",
+          "text": "encoder v2 与接收端 v1 schema 不兼容，导致 payload 解析失败并返回 HTTP 400 UNKNOWN_FIELD recipient_id",
+          "assessment": "qualified",
+          "reason": "encoder/schema版本差异与业务拒绝支持兼容性候选，未做受控干预或恢复验证。"
+        },
+        {
+          "target_id": "A1",
+          "text": "验证接收端 schema 是否已同步升级至 v2，或临时回退 encoder 至 v1",
+          "assessment": "qualified",
+          "reason": "变更需审批，但回退兼容性及其他使用v2功能的影响仍须人工确认。"
+        }
+      ]
+    },
+    {
+      "run_id": "09ac5a9b-4232-447c-a465-d87a9d5e995e",
+      "report_sha256": "4b2ebb4ced105760d1114a15f3382a247ed4341f87707be7ffc621d8388d0e0f",
+      "case_id": "eval_002",
+      "workflow": "multi",
+      "implementation": "4636da06c56bde66",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "deployment change config_summary.auth_audience=\"portal-preview\"  @ 2026-10-01T10:02:00+00:00; configuration log [ERROR] error_code=\"AUDIENCE_REJECTED\"  @ 2026-10-01T10:10:00+00:00; configuration log [ERROR] message=\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\"  @ 2026-10-01T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "H1",
+          "text": "identity-gateway 向认证服务发送了 audience=portal-preview 的 token，而认证服务策略仅允许 portal-stage，因此显式拒绝请求（AUDIENCE_REJECTED）。",
+          "assessment": "qualified",
+          "reason": "audience不匹配有直接消息支持；仅允许portal-stage不能外推为完整白名单唯一值。"
+        },
+        {
+          "target_id": "H2",
+          "text": "v2.7.0 版本中 auth_audience 的变更未同步更新认证依赖的 audience 白名单，属跨服务配置未对齐。",
+          "assessment": "insufficient",
+          "reason": "部署变更已观测，但跨服务为何未对齐未证实；unresolved合理。"
+        },
+        {
+          "target_id": "A1",
+          "text": "确认认证依赖当前允许的 audience 列表，验证是否仍仅包含 portal-stage。",
+          "assessment": "supported",
+          "reason": "人工只读核实依赖白名单填补实际工具范围缺口，不要求结果预先取得。"
+        }
+      ]
+    },
+    {
+      "run_id": "14f241de-15d6-4a67-aa55-37493ba1a700",
+      "report_sha256": "a869a540b04648339cbb8e2ad6992ee6c8df856d8e757593875d8e9fbd5fe2fd",
+      "case_id": "eval_002",
+      "workflow": "single",
+      "implementation": "4636da06c56bde66",
+      "claim_assessments": [
+        {
+          "target_id": "F1",
+          "text": "configuration log [ERROR] error_code=\"AUDIENCE_REJECTED\"  @ 2026-10-01T10:10:00+00:00; configuration log [ERROR] message=\"认证依赖拒绝audience=portal-preview，期望audience=portal-stage。\"  @ 2026-10-01T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F2",
+          "text": "dependency log [INFO] error_code=\"AUTH_REACHABLE\"  @ 2026-10-01T10:10:00+00:00; dependency log [INFO] message=\"认证依赖TLS连接成功；签名校验成功，请求因audience字段被拒绝。\"  @ 2026-10-01T10:10:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F3",
+          "text": "request_error_rate (sample)=0.72 ratio @ 2026-10-01T10:10:00+00:00; request_error_rate (sample)=0.02 ratio @ 2026-10-01T09:55:00+00:00; dependency_error_rate (sample)=0.0 ratio @ 2026-10-01T10:10:00+00:00; dependency_error_rate (sample)=0.0 ratio @ 2026-10-01T09:55:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "F4",
+          "text": "deployment change config_summary.auth_audience=\"portal-preview\"  @ 2026-10-01T10:02:00+00:00; deployment change summary=\"版本2.7.0部署后audience从portal-stage改为portal-preview。\"  @ 2026-10-01T10:02:00+00:00",
+          "assessment": "supported",
+          "reason": "服务端文字与实际来源字段、值、单位和时间一致；不额外推断因果。"
+        },
+        {
+          "target_id": "H1",
+          "text": "identity-gateway 配置中 auth_audience 被错误设为 portal-preview，而认证依赖仅接受 portal-stage，导致所有登录请求被拒绝并返回 401。",
+          "assessment": "qualified",
+          "reason": "配置与拒绝消息支持audience不匹配；所有请求被拒绝的说法超过72%错误率样本。"
+        },
+        {
+          "target_id": "A1",
+          "text": "将 identity-gateway 的 auth_audience 配置恢复为 portal-stage。",
+          "assessment": "insufficient",
+          "reason": "条件宣称已确认为401根因，与tentative假设强度不一致；虽需审批，仍有过度结论。"
+        }
+      ]
+    }
+  ]
+}

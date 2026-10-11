@@ -19,7 +19,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
-!.env.local.example
 .auth.local.json
 .demo-credentials.local.json
 services.local.json

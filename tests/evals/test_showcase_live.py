@@ -40,9 +40,11 @@ class ShowcaseLiveTests(unittest.TestCase):
                 self.assertEqual(raised.exception.code, 2)
         self.assertEqual(suite.verify_freeze()['dataset_version'], 'curated-showcase-v1')
 
-    def test_plan_does_not_capture_or_load_credentials(self):
+    def test_plan_does_not_capture_or_initialize_models(self):
         with patch.object(compare_independent, 'capture') as capture, \
-                patch('dotenv.load_dotenv', side_effect=AssertionError('Plan loaded credentials')), \
+                patch('agents.models.build_roles', side_effect=AssertionError('Plan initialized model')), \
+                patch('agents.models.build_model', side_effect=AssertionError('Plan initialized model')), \
+                patch('api.auth.get_current_principal', side_effect=AssertionError('Plan checked identity')), \
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(compare_showcase_live.main([]), 0)
         capture.assert_not_called()

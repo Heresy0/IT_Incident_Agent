@@ -1,6 +1,12 @@
 # Agent 编排与 Harness 项目展示
 
-当前支持[Investigation / Knowledge 并行取证](parallel-collection.md)：同轮独立任务分叉、受共享预算约束、汇总后诊断，复核补查保持顺序。免费串并行演示使用人工延迟和相同脚本响应，验证调度行为；此前真实对照保留原版本属性。
+2026-10-11 已[回退至 v6 诊断审计版本](rollback-v6.md)。后续[断言逐项复核与补查决策影响](claim-decision-review.md)实验已撤回，文档和[运行记录](claim-decision-runs.json)继续保留作为历史，不能代表当前启用的功能。
+
+2026-10-11 新增[多 Agent 改进与真实验证](agent-improvement.md)：角色工具契约、分阶段纠正、建议隔离、上下文去重及先看原始观测的两阶段复核。所有真实迭代保留失败与版本，谨慎 partial 和内部 passed 均按实际证据审阅。
+
+当前支持[调查覆盖与复核缺口调度](coverage-rework-planning.md)：Reviewer 指出缺口，Supervisor 判断并规划补查；取证退出记录关键问题的覆盖与限制。此前真实对照仍对应原版本。
+
+支持[Investigation / Knowledge 并行取证](parallel-collection.md)：同轮独立任务分叉、受共享预算约束、汇总后诊断，复核补查保持顺序。免费串并行演示使用人工延迟和相同脚本响应，验证调度行为；此前真实对照保留原版本属性。
 
 最新[定向真实对照及面试话术](curated-live-guide.md)：两个展示案例与一个修订版，6次真实运行，47模型/16合成工具。保留每轮结果、版本和报告哈希。真实Reviewer将没有直接业务错误证据的具体候选保留为unresolved，展示独立复核对发布的影响；本批未证明整体诊断优势。参见[全部配对](curated-live-comparison.json)、[助手辅助分析](curated-live-assistant-review.json)、[草稿—复核—发布证据](curated-review-evidence.json)。
 
@@ -38,7 +44,7 @@ python scripts/showcase_incident.py
 | --- | --- | --- | --- |
 | 正常诊断，case_001 | 6 / 2 | completed / passed | Supervisor 选择 Investigation；工具结果进入证据目录，诊断引用当前观测 |
 | 复核补查，case_003 | 12 / 5 | completed / passed | 初稿受历史 DB CPU 线索误导；Reviewer 要求当前池指标和日志；执行一次补查后改为连接池候选 |
-| 预算不足，case_003 | 8 / 3 | partial / needs_information | 保留终结预算完成复核，拒绝负担不起的补查，以 BUDGET_EXCEEDED 停止 |
+| 预算不足，case_003 | 8 / 3 | partial / needs_information | 保留终结预算完成复核，记录 BUDGET_EXCEEDED 补查拒绝，以 REVIEW_INCOMPLETE 收尾 |
 
 三条演示的六项机械检查分别通过：事件序列、调用计数、快照完整性、引用有效性、诊断契约和预算。复核补查必须发生新工具执行，并有两次复核；仅出现补查任务名称不算成功。
 

@@ -89,12 +89,20 @@ class RunContext:
                 self.emit_callback(event)
             record_event(event)
 
-    def claim_repair(self, state):
-        """The one structural correction belongs to the entire run."""
+    def claim_repair(self, state, *, reviewer=False):
+        """One collection correction and one reserved for collaboration review.
+
+        Eligibility never adds model calls. Standalone/parallel collection
+        continue sharing one allowance; all calls use the original budget.
+        """
         with self.lock:
-            if state['repairs'] >= 1:
+            reviewed = state.get('reviewer_repairs', 0)
+            used = reviewed if reviewer else state['repairs'] - reviewed
+            if used >= 1:
                 return False
             state['repairs'] += 1
+            if reviewer:
+                state['reviewer_repairs'] = reviewed + 1
             return True
 
     def add_usage(self, usage):

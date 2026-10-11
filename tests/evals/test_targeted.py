@@ -98,7 +98,7 @@ class TargetedTests(unittest.TestCase):
         plan = json.loads(out.getvalue())
         self.assertTrue(plan['plan_only'])
         self.assertEqual(plan['paired_runs'], 10)
-        self.assertEqual(plan['configuration']['model'], 'qwen-turbo')
+        self.assertEqual(plan['configuration']['model'], 'qwen3.7-plus')
         for args in (['--fake', '--split', 'holdout'], ['--live'],
                      ['--live', '--execute-live', '--cases', 'probe_001', 'probe_002', 'probe_003',
                       '--model-budget', '16', '--tool-budget', '8']):

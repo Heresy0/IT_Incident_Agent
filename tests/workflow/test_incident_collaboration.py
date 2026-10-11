@@ -127,6 +127,31 @@ class IncidentCollaborationTests(unittest.TestCase):
         self.assertEqual(len(review_input["collection"]), 5)
         self.assertTrue(all("truncated" in row and "query_profile" in row for row in review_input["collection"]))
 
+    def test_log_error_filter_reaches_role_inputs_and_audit_collection(self):
+        models = scripted_models()
+
+        def filter_logs(response, messages, calls):
+            tool_calls = copy.deepcopy(response.tool_calls)
+            for call in tool_calls:
+                if call['name'] == 'get_service_logs':
+                    call['args']['error_code'] = 'UPSTREAM_UNREACHABLE'
+            return response.model_copy(update={'tool_calls': tool_calls})
+
+        models['investigation'] = AlterOutput(models['investigation'], filter_logs)
+        result = self.run_case(models=models)
+        # A narrower read can leave the declared broad check incomplete; this
+        # test checks faithful filter transport, not semantic completeness.
+        self.assertTrue(result['reviews'])
+        collections = [[e for e in result['events'] if e['type'] == 'tool_result']]
+        for role in ('supervisor', 'diagnosis', 'reviewer'):
+            payload = json.loads(models[role].histories[-1][1].content)['input']
+            collections.append(payload['collection'])
+        for collection in collections:
+            log = next(row for row in collection if row['name'] == 'get_service_logs')
+            self.assertEqual(log['status'], 'ok')
+            self.assertEqual(log['query_profile']['error_code'], 'UPSTREAM_UNREACHABLE')
+            self.assertEqual(log['query_profile']['category'], 'dependency')
+
     def test_supervisor_cannot_finish_before_review(self):
         models = scripted_models()
         models["supervisor"] = AlterOutput(models["supervisor"], lambda *_:
@@ -214,21 +239,23 @@ class IncidentCollaborationTests(unittest.TestCase):
         result = self.run_case("case_003", limits=Limits(model_calls=8, tool_calls=5,
             reserve_model_calls=3, reserve_seconds=20))
         self.assertEqual(result["status"], "partial")
-        self.assertEqual(result["run_summary"]["termination_reason"], "BUDGET_EXCEEDED")
+        self.assertEqual(result["run_summary"]["termination_reason"], "REVIEW_INCOMPLETE")
+        self.assertTrue(any(e['type'] == 'rework_denied' and e['code'] == 'BUDGET_EXCEEDED' for e in result['events']))
         self.assertEqual(len(result["reviews"]), 1)
         self.assertEqual(result["rework_rounds"], 0)
         self.assertEqual(result["run_summary"]["model_calls"], 8)
         self.assertEqual(result["output"]["hypotheses"][0]["status"], "refuted")
 
-    def test_schema_repair_allowance_is_shared_across_leaf_and_reviewer(self):
+    def test_reviewer_has_own_bounded_correction_after_leaf_failure(self):
         def broken_final(response, _, calls):
             return AIMessage(content="invalid JSON") if calls == 2 else response
         models = scripted_models()
         models["investigation"] = AlterOutput(models["investigation"], broken_final)
         models["reviewer"] = AlterOutput(models["reviewer"], lambda *_: AIMessage(content="invalid JSON"))
         result = self.run_case(models=models)
-        self.assertEqual(result["repairs"], 1)
-        self.assertEqual(sum(e["type"] == "validation_repair" for e in result["events"]), 1)
+        self.assertEqual(result["repairs"], 2)
+        self.assertEqual(result['repair_counts'], {'collection': 1, 'reviewer': 1})
+        self.assertEqual(sum(e["type"] == "validation_repair" for e in result["events"]), 2)
         self.assertEqual(result["run_summary"]["termination_reason"], "MODEL_OUTPUT_INVALID")
         self.assertEqual(result["output"]["findings"], [])
 

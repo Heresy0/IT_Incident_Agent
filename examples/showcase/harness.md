@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 权限与范围 | 未开放工具、额外身份参数、扩张时间窗口或服务范围被拒绝 | `tests/tools/test_incident_tools.py`：`test_role_unknown_tools_and_extra_fields`、`test_window_timezone_service_and_scope_expansion` |
 | 证据引用 | 假引用最多纠正一次，仍错误则 partial，不进入可信结论 | `tests/workflow/test_diagnosis_references.py`：`test_persistent_invalid_reference_stops_after_one_repair_with_public_error_location` |
-| 结构输出 | 叶角色与 Reviewer 共用结构修复额度，不能逐角色无限修复 | `tests/workflow/test_incident_collaboration.py`：`test_schema_repair_allowance_is_shared_across_leaf_and_reviewer` |
+| 结构输出 | 取证与诊断共享一次纠正，Reviewer另有一次，全部计入原总预算 | `tests/workflow/test_incident_collaboration.py`：`test_reviewer_has_own_bounded_correction_after_leaf_failure`；`tests/workflow/test_review_protocol.py`：预算与计数回归 |
 | 重试与去重 | 工具超时最多两次尝试，每次计费预算；相同查询拒绝重复，快照不受外部修改 | `tests/tools/test_incident_tools.py`：`test_retry_count_error_sanitization_and_limit`、`test_duplicate_no_double_count_and_snapshot_immutability` |
 | 调用预算 | 保留终结额度完成复核，补查预算不足即停止，不增加上限 | `tests/workflow/test_incident_collaboration.py`：`test_small_budget_keeps_review_and_refuses_unaffordable_rework` |
 

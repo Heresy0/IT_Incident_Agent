@@ -99,8 +99,17 @@ class ScriptedRole:
         if self.role == "supervisor":
             challenge = payload["pending_challenge"]
             if challenge:
-                result = {"action": "dispatch", "reason": "补查有区分价值的当前观测", "tasks": [{
-                    "role": challenge["target_role"], "goal": challenge["proposed_check"], "evidence_ids": challenge["evidence_ids"]}]}
+                # Replay control: hints are optional; this is not live model reasoning.
+                checks = challenge['checks']
+                if checks:
+                    result = {"action": "dispatch", "reason": "调度者核对后规划补查", "tasks": [{
+                        "role": challenge["target_role"],
+                        "goal": challenge["proposed_check"] or challenge['missing_observation'],
+                        "checks": checks, 'expected_value': challenge['expected_value'] or challenge['missing_observation'],
+                        "evidence_ids": challenge["evidence_ids"]}]}
+                else:
+                    result = {'action': 'request_info', 'reason': '脚本调度者没有预设替代查询，保留缺口',
+                              'missing_information': [challenge['missing_observation'], challenge['proposed_check']]}
             elif not payload["tasks"]:
                 tasks = [{"role": "investigation", "goal": "取得与症状有关的当前观测"}]
                 if "waiting" in payload["ticket"]["symptoms"].casefold():

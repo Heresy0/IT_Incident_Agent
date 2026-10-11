@@ -126,7 +126,8 @@ class GeneralProgressTests(unittest.TestCase):
                 result = collaborate(models, FixtureProvider('case_001', P), P,
                     limits=Limits(model_calls=cap, tool_calls=3, reserve_model_calls=3, reserve_seconds=20))
                 self.assertEqual(result['status'], 'partial')
-                self.assertTrue(all(n['status'] == 'pending' for n in result['evidence_needs']))
+                self.assertTrue(all(n['status'] == 'deferred' for n in result['evidence_needs']))
+                self.assertTrue(result['collection_exits'][0]['limited'])
                 self.assertEqual(result['run_summary']['model_calls'], expected)
                 self.assertEqual(sum(e['type'] == 'collection_follow_up' for e in result['events']), int(cap == 16))
 

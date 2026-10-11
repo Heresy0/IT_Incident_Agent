@@ -36,7 +36,7 @@ flowchart TD
     T --> S
     S -->|形成诊断| D[Diagnosis 证据与假设]
     D --> R[Reviewer 逐项复核]
-    R -->|最多一次具体只读补查| S
+    R -->|证据缺口 交由调度者规划一次补查| S
     R --> F[报告 建议或信息缺口]
     F --> A[人工提案与 operator 审批]
     A --> E[登记执行器与恢复验证]
@@ -45,8 +45,12 @@ flowchart TD
 
 - 五个业务角色使用同一基础模型的不同提示词与局部消息历史，由 LangGraph 节点编排。Investigation / Knowledge 同轮独立任务可并行，诊断、复核及定向补查顺序执行。
 - 六个只读工具：指标、日志、变更、负责人、手册检索、已确认历史工单检索。执行前检查身份、角色、服务、环境、版本与时间范围。
-- RunContext 原子计数并约束模型、工具及时间预算；分支持有独立台账，汇总证据并保留失败缺口。严格输出契约、服务端来源引用、查询去重、任务检查与单次结构修复构成 Harness。
-- 默认最多16次模型请求、24次工具尝试、180秒，预留3次模型/20秒收尾；最多4次调度、6个任务、1轮补查、1次结构修复。实际额度由已授权请求决定。
+- 取证按症状、机制与合理替代解释的问题覆盖决定收尾，聚焦查询不代替完整性；未解决问题在限次或预算耗尽时明确保留。Reviewer 提交证据缺口，Supervisor 可替换查询提示并规划具体补查，执行器只执行通过权限、去重和预算检查的调度计划。
+- RunContext 原子计数并约束模型、工具及时间预算；分支持有独立台账，汇总证据并保留失败缺口。严格输出契约、服务端来源引用、查询去重、任务检查与有界结构纠正构成 Harness。
+- 默认最多16次模型请求、24次工具尝试、180秒，预留3次模型/20秒收尾；最多4次调度、6个任务、1轮补查。取证与诊断共享1次结构纠正，Reviewer另有1次，均消耗原模型总预算；单Agent仍最多1次。实际额度由已授权请求决定。
+- 真实多Agent复核先独立读取观测范围，再核验草稿，两个阶段均计入原预算并保留审计记录。实施与完整真实迭代见[改进记录](examples/showcase/agent-improvement.md)。
+- 阻塞复核须说明缺失观测、影响目标和判断变化；报告分开记录查询执行、机制支持与停止原因，合法补查交给调度者规划。实施及真实失败轨迹见[诊断审计记录](examples/showcase/diagnostic-audit.md)。
+- 当前已回退至 `incident_graph_v6_blocker_audit`，撤回后续逐项断言、盲审边界映射与决策分支契约。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查继续保留。回退依据和验证见[版本回退记录](examples/showcase/rollback-v6.md)；被撤回的实验见[断言与决策影响历史记录](examples/showcase/claim-decision-review.md)。
 - 工单与运行按服务端身份隔离，PostgreSQL 保存结果、事件与修复阶段，SSE 支持续读。JSON 日志位于 `logs/incident.log`，指标位于 `/metrics`。
 - 登记服务可接入 Prometheus/Loki 与私有确认历史；未登记渠道明确返回缺口。提供知识库 Worker、API、PostgreSQL、Redis 的配置示例，数据库与缓存示例目前只有运维日志。
 - 修复独立于诊断：Agent 候选或人工提案 → 绑定证据、工单版本及配置 → operator 审批 → 单次执行 → 有界恢复验证。当前默认执行器只支持精确登记 Docker 容器的重启，拒绝任意脚本、Shell、扩缩容与回滚。
@@ -77,6 +81,7 @@ flowchart TD
 
 - [五分钟讲解与追问](examples/showcase/interview-guide.md)、[编排与 Harness 设计](examples/showcase/design.md)、[Harness 证据](examples/showcase/harness.md)。
 - [并行取证与免费验证](examples/showcase/parallel-collection.md)、[完整公开展示入口](examples/showcase/README.md)。
+- [调查覆盖与复核缺口调度](examples/showcase/coverage-rework-planning.md)：当前补查职责、覆盖退出、预算及免费验证。
 - [定向真实模型对照](examples/showcase/curated-live-guide.md)：保留失败、partial、版本及报告哈希。当前结果未证明多 Agent 整体诊断质量领先。
 - [历史开发说明](examples/showcase/development-history.md)：集中保留此前实施过程、真实对照和验收限制，不用旧阶段结果替代当前验证。
 - [本次清理与收尾](examples/showcase/cleanup-closeout.md)：删除项、历史归档、打包与免费验证结果。
