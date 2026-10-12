@@ -95,6 +95,7 @@ flowchart TD
 
 ## 验证与面试材料
 
+- [离线分类统计](evals/run-statistics.md)：分别统计协议错误、查询与计划执行缺口、耗时、调用和成本；通过原报告哈希绑定的人类评价统计关键漏查、错误结论、无依据建议、复核误拦与有效交接。入口 `scripts/summarize_runs.py` 不调用模型，输出 JSON 汇总、Markdown 报表与评价模板。
 - [五分钟讲解与追问](examples/showcase/interview-guide.md)、[编排与 Harness 设计](examples/showcase/design.md)、[Harness 证据](examples/showcase/harness.md)。
 - [并行取证与免费验证](examples/showcase/parallel-collection.md)、[完整公开展示入口](examples/showcase/README.md)。
 - [调查覆盖与复核缺口调度](examples/showcase/coverage-rework-planning.md)：当前补查职责、覆盖退出、预算及免费验证。
