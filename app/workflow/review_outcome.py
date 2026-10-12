@@ -35,30 +35,41 @@ def readiness_gaps(draft, review, purpose):
     return gaps
 
 
-def nonblocking_trigger_request(draft, review, needs):
+def nonblocking_trigger_request(draft, review, needs, *, conservative=False):
     """A target-only trigger gap is optional only after independent readiness."""
     request = review.request_evidence
     if request is None:
         return False
     target_id = request.target_id or request.hypothesis_id
     target = next((h for h in draft.hypotheses if h.hypothesis_id == target_id), None)
-    if target is None or target.level != 'trigger':
+    verdicts = {a.target_id: a.verdict for a in review.assessments}
+    action = next((a for n, a in enumerate(draft.recommended_actions, 1) if f'A{n}' == target_id), None)
+    future_check = (conservative and action is not None and action.kind in {'manual_check', 'read_only_check'}
+                    and verdicts.get(target_id) == 'supported')
+    if not future_check and (target is None or target.level != 'trigger' or verdicts.get(target_id) != 'uncertain'):
         return False
     if request.need_id is not None and needs[request.need_id].purpose != 'trigger':
-        return False
-    verdicts = {a.target_id: a.verdict for a in review.assessments}
-    if verdicts.get(target_id) != 'uncertain' or any(
+        if not conservative or is_material_need(needs[request.need_id]):
+            return False
+    if any(
             key.startswith('A') and value == 'uncertain' for key, value in verdicts.items()):
         return False
     # A gap linked to a mechanism or an action condition is not a pure trigger
     # limitation, even if the request itself names a trigger hypothesis.
     for assessment in review.need_assessments:
+        if conservative and not is_material_need(needs[assessment.need_id]):
+            continue
         if assessment.blocker and any(
                 not key.startswith('H') or next((h.level for h in draft.hypotheses
                     if h.hypothesis_id == key), None) != 'trigger'
                 for key in assessment.blocker.affected_targets):
             return False
     return True
+
+
+def is_material_need(need):
+    from workflow.evidence_needs import is_blocking
+    return need.status not in {'supported', 'not_required'} and is_blocking(need)
 
 
 def action_projection(draft, review):

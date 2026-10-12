@@ -49,6 +49,7 @@ def build_graph(coordinator):
         return node
 
     def finish(state):
+        c.check_diagnostic_pack_exit('finalization')
         c.context.stop_reason = c.stop
         c.event('workflow_completed', status=c.status(), reason=c.stop)
         return snapshot()

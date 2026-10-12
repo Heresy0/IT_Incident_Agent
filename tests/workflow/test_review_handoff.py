@@ -107,6 +107,7 @@ class ReviewHandoffTests(unittest.TestCase):
 
     def test_explicit_legacy_scope_mismatch_still_rejected(self):
         c = self.prepared()
+        c.review_protection = 'strict_v1'
         data = c.review.model_dump(mode='json')
         data['need_assessments'][1].update(verdict='uncertain', blocker={
             'cause_level': 'trigger', 'affected_targets': ['H1'],
@@ -118,6 +119,7 @@ class ReviewHandoffTests(unittest.TestCase):
 
     def test_blocking_question_cannot_use_only_trigger_and_already_supported_next_step(self):
         c = self.prepared()
+        c.review_protection = 'strict_v1'
         c.draft = c.draft.model_copy(update={'hypotheses': [
             h.model_copy(update={'level': 'trigger'}) for h in c.draft.hypotheses]})
         data = c.review.model_dump(mode='json')

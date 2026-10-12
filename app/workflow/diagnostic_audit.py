@@ -12,7 +12,9 @@ from agents.contracts import EvidenceRequest
 VERSION = 'diagnostic_audit_v1'
 
 
-def validate_blockers(needs, review, executors, *, required=False, targets=None):
+def validate_blockers(needs, review, executors, *, required=False, targets=None, conservative=False, event=None):
+    if conservative:
+        review = normalize_blocker_scope(needs, review, executors, targets, event)
     verdicts = {a.target_id: a.verdict for a in review.assessments}
     for assessment in review.need_assessments:
         need = needs[assessment.need_id]
@@ -34,7 +36,13 @@ def validate_blockers(needs, review, executors, *, required=False, targets=None)
             key.startswith('H') and targets[key].level == 'trigger'
             or key.startswith('A') and verdicts[key] == 'supported'
             for key in blocker.affected_targets)
+        if conservative:
+            trigger_only = targets is not None and limitation_targets(blocker, targets, verdicts)
         if need.purpose in {'mechanism', 'alternative'} and (blocker.cause_level == 'trigger' or trigger_only):
+            if conservative and targets is not None and limitation_targets(blocker, targets, verdicts):
+                # A misplaced trigger edge is retained as a limitation. Core
+                # uncertainty still blocks through the unchanged need ledger.
+                continue
             raise ProtocolError('REVIEW_BLOCKER_SCOPE', [{'need_id': need.need_id,
                 'path': 'need_assessments.blocker.affected_targets',
                 'instruction': '此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。'}])
@@ -54,6 +62,80 @@ def validate_blockers(needs, review, executors, *, required=False, targets=None)
         elif blocker.checks:
             raise ProtocolError('REVIEW_BLOCKER_CHANNEL_CONFLICT')
     return review
+
+
+def limitation_targets(blocker, targets, verdicts):
+    return all(
+        key.startswith('H') and targets[key].level == 'trigger'
+        or key.startswith('A') and verdicts[key] == 'supported'
+            and targets[key].kind in {'manual_check', 'read_only_check'}
+        for key in blocker.affected_targets)
+
+
+def normalize_blocker_scope(needs, review, executors, targets, event):
+    """Validate all edges/hints first; relax only structurally harmless scope.
+
+    Never promotes a verdict, clears a core need or approves a change. Supported
+    changes are not supported information-gathering tasks and remain protected.
+    """
+    if targets is None:
+        return review
+    verdicts = {a.target_id: a.verdict for a in review.assessments}
+    # An optional/normalized blocker must not conceal an unsafe query, unknown
+    # target or malformed resolution merely because it no longer blocks exit.
+    for assessment in review.need_assessments:
+        blocker = assessment.blocker
+        if blocker is None:
+            continue
+        if (len(set(blocker.affected_targets)) != len(blocker.affected_targets)
+                or not set(blocker.affected_targets) <= set(verdicts)
+                or not set(blocker.affected_targets) <= set(targets)):
+            raise ProtocolError('REVIEW_BLOCKER_TARGET')
+        if blocker.resolution == 'scoped_check':
+            if not blocker.checks:
+                raise ProtocolError('REVIEW_BLOCKER_CHECK_REQUIRED')
+            for check in blocker.checks:
+                try:
+                    executors[blocker.target_role].validate_args(check.tool, check.args)
+                except ExecutionError as exc:
+                    raise ProtocolError('INVALID_BLOCKER_CHECK', [{'need_id': assessment.need_id, 'code': exc.code}]) from None
+        elif blocker.checks:
+            raise ProtocolError('REVIEW_BLOCKER_CHANNEL_CONFLICT')
+    normalized = []
+    categories = {'symptom': 'observation', 'mechanism': 'mechanism',
+                  'alternative': 'alternative', 'trigger': 'trigger', 'action_condition': 'action_condition'}
+    for assessment in review.need_assessments:
+        blocker = assessment.blocker
+        need = needs[assessment.need_id]
+        if (blocker is None or assessment.verdict != 'uncertain'
+                or not is_blocking(need.model_copy(update={} if assessment.blocking is None else {'blocking': assessment.blocking}))):
+            normalized.append(assessment)
+            continue
+        limitation_only = limitation_targets(blocker, targets, verdicts)
+        if need.purpose in {'mechanism', 'alternative'} and limitation_only:
+            # Preserve the whole original gap/targets. The alternative question
+            # remains uncertain but nonblocking; a core question stays blocking.
+            update = {'blocking': False} if need.purpose == 'alternative' else {}
+            assessment = assessment.model_copy(update=update)
+            if event:
+                event('review_scope_limitation', 'reviewer', need_id=need.need_id,
+                      original=blocker.model_dump(mode='json'),
+                      missing_observation=blocker.missing_observation,
+                      core_blocking_retained=need.purpose == 'mechanism', verdicts_changed=False,
+                      execution_authorized=False)
+        elif blocker.cause_level != categories[need.purpose]:
+            # Question ownership supplies metadata; an unknown material target
+            # still blocks even if the model used a trigger category by mistake.
+            original = blocker
+            assessment = assessment.model_copy(update={'blocker': blocker.model_copy(
+                update={'cause_level': categories[need.purpose]})})
+            if event:
+                event('review_scope_reclassified', 'reviewer', need_id=need.need_id,
+                      original=original.model_dump(mode='json'),
+                      cause_level=categories[need.purpose], verdicts_changed=False,
+                      execution_authorized=False)
+        normalized.append(assessment)
+    return review.model_copy(update={'need_assessments': normalized})
 
 
 def blocker_follow_up(needs, review, executors):

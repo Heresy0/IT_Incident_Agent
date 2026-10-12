@@ -40,6 +40,16 @@ class PackExperimentTests(unittest.TestCase):
         report = next(r for r in self.reports if r['experiment_case'] == 'source_unavailable' and r['experiment_arm'] == 'pack')
         logs = [e for e in report['events'] if e['type'] == 'tool_result' and e['name'] == 'get_service_logs']
         self.assertEqual(len(logs), 1)
+        for cid in ('source_unavailable', 'truncated_business_logs', 'dense_business_logs', 'small_budget'):
+            self.assertTrue(self.pairs[cid]['pack']['pack_blocking_check_ids'])
+            self.assertEqual(self.pairs[cid]['pack']['pack_exit_decision'], 'partial')
+        self.assertEqual(self.pairs['empty_business_logs']['pack']['pack_blocking_check_ids'], [])
+
+    def test_state_summary_does_not_introduce_input_budget_rejection_in_dense_control(self):
+        pair = self.pairs['dense_business_logs']
+        self.assertEqual(pair['pack']['input_budget_rejections'], 0)
+        report = next(r for r in self.reports if r['experiment_case'] == 'dense_business_logs' and r['experiment_arm'] == 'pack')
+        self.assertLessEqual(pair['pack']['input_chars_max'], report['run_summary']['limits']['input_chars'])
 
     def test_status_check_and_missing_registration_keep_baseline_observations(self):
         for cid in ('status_only', 'unregistered_service'):

@@ -2,6 +2,7 @@
 import hashlib
 import json
 import time
+from copy import deepcopy
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from agents.contracts import TaskRequest
@@ -9,6 +10,8 @@ from runtime.context import ExecutionError
 from workflow.task_checks import completion
 
 POLICY = 'service_baseline_reads_experiment_v1'
+STATE_POLICY = 'diagnostic_pack_read_ledger_v2'
+EXIT_POLICY = 'diagnostic_pack_exit_v1'
 UNAVAILABLE = {'SOURCE_NOT_CONFIGURED', 'LOG_CATEGORY_NOT_REGISTERED', 'METRIC_NOT_REGISTERED'}
 
 
@@ -67,6 +70,7 @@ def collect(c):
         return  # No automatic replay, including failed or deferred reads.
     summary = {'policy': POLICY, 'pack_id': pack.pack_id, 'fingerprint': pack.fingerprint,
                'status': 'preflight',
+               'state_policy': STATE_POLICY, 'revision': 0,
                'goal_verified': False, 'mechanism_confirmed': False,
                'checks': [], 'handoff': [], 'model_calls': 0, 'tool_calls': 0}
     c.diagnostic_pack_result = summary
@@ -135,15 +139,128 @@ def collect(c):
             state, error, evidence_ids = row['status'], row['error'], row['evidence_ids']
         summary['checks'].append({'check_id': entry.check_id, **check, 'status': state,
                                   'error': error, 'evidence_ids': evidence_ids})
-        if state != 'satisfied':
-            labels = {'not_executed': '未执行（预算或限次不足）', 'unavailable': '渠道未登记',
-                      'failed': '查询失败', 'truncated': '样本截断', 'empty': '所选窗口内无匹配记录',
-                      'missing_samples': '对照样本不足'}
-            gap = f'基础取证{entry.check_id}：{labels.get(state, state)}。请{pack.handoff_role}{entry.human_check}；保持工单服务与时间范围，不将缺失或空结果当作健康。'
-            summary['handoff'].append(gap)
-            c.extra_gaps.append(gap)
-    if summary['status'] == 'collected' and summary['handoff']:
-        summary['status'] = 'collected_with_gaps'
+    refresh(c)
     c.event('diagnostic_pack_completed', pack_id=pack.pack_id, status=summary['status'],
             check_statuses=[r['status'] for r in summary['checks']],
             model_calls=0, tool_calls=summary['tool_calls'], goal_verified=False)
+
+
+def refresh(c):
+    """Derive current coverage from scoped executor reads, never model verdicts.
+
+    A later complete covering read can discharge a previous failure. Narrower,
+    filtered, differently sampled or unrelated reads cannot erase its gap.
+    Recomputing this view never executes a read or grants a retry.
+    """
+    summary = c.diagnostic_pack_result
+    if summary is None or summary['status'] in {'preflight', 'invalid_configuration', 'skipped_status_check'}:
+        return summary
+    pack, executor = c.diagnostic_pack, c.executors['investigation']
+    rows, handoff, blocking_gaps = [], [], []
+    for entry, previous in zip(pack.checks, summary['checks'], strict=True):
+        check = {key: previous[key] for key in ('tool', 'args')}
+        if previous['status'] == 'unavailable':
+            row = {**check, 'status': 'unavailable', 'error': previous['error'],
+                   'evidence_ids': [], 'query_complete': False}
+        else:
+            row = completion([check], executor)['checks'][0]
+        # Empty event queries are complete within their scope. Empty metric
+        # queries lack the registered samples; neither state proves health.
+        blocking = row['status'] not in {'satisfied', 'empty'} or (
+            row['status'] == 'empty' and row['tool'] == 'get_service_metrics')
+        rows.append({**row, 'check_id': entry.check_id, 'blocking': blocking})
+        if row['status'] != 'satisfied':
+            labels = {'not_executed': '尚未执行', 'unavailable': '渠道未登记',
+                      'failed': '查询失败', 'truncated': '样本截断', 'empty': '所选窗口内无匹配记录',
+                      'missing_samples': '对照样本不足'}
+            handoff.append(f'基础取证{entry.check_id}：{labels.get(row["status"], row["status"])}。'
+                f'请{pack.handoff_role}{entry.human_check}；保持工单服务与时间范围，不将缺失或空结果当作健康。')
+            if blocking:
+                blocking_gaps.append(handoff[-1])
+    blocking_ids = [r['check_id'] for r in rows if r['blocking']]
+    coverage = 'checks_incomplete' if blocking_ids else 'checks_completed_empty' if handoff else 'checks_satisfied'
+    status = summary['status']
+    if status in {'collected', 'collected_with_gaps'}:
+        status = 'collected_with_gaps' if handoff else 'collected'
+    current = {'checks': rows, 'handoff': handoff, 'blocking_check_ids': blocking_ids, 'blocking_gaps': blocking_gaps,
+               'coverage_status': coverage, 'status': status}
+    if any(summary.get(key) != value for key, value in current.items()):
+        old_handoff = set(summary['handoff'])
+        c.extra_gaps[:] = [gap for gap in c.extra_gaps if gap not in old_handoff]
+        c.extra_gaps.extend(handoff)
+        summary.update(current)
+        summary['revision'] += 1
+        c.event('diagnostic_pack_state_updated', pack_id=pack.pack_id, revision=summary['revision'],
+                check_statuses=[r['status'] for r in rows], blocking_check_ids=blocking_ids)
+    return summary
+
+
+def state_input(c):
+    """A small mechanical view for planning and independent interpretation."""
+    summary = refresh(c)
+    if summary is None:
+        return {}
+    view = {key: deepcopy(summary.get(key)) for key in ('revision', 'handoff')}
+    # Scoped args, evidence IDs and payloads already appear in task_results /
+    # collection / evidence. Avoid repeating these catalogs in role inputs.
+    view['checks'] = [{key: deepcopy(row.get(key)) for key in
+                      ('check_id', 'tool', 'status', 'blocking')}
+                     for row in summary['checks']]
+    return {'diagnostic_pack_state': view,
+        'diagnostic_pack_state_meaning': '查询覆盖不等于机制确认；完整空查询只说明该范围无匹配，不能证明健康。'}
+
+
+def check_exit(c, stage):
+    """Record and enforce exit conditions separately from evidence state.
+
+    Incomplete collection still permits interpretation of existing observations;
+    it cannot become a completed report because a model says it is supported.
+    Never promotes a failed/partial workflow, authorizes reads or changes scope.
+    """
+    if c.diagnostic_pack is None:
+        return None
+    if stage not in {'diagnosis_entry', 'review_completion', 'finalization'}:
+        raise ValueError('Unregistered diagnostic pack exit stage')
+    summary = refresh(c)
+    applicable = c.ticket.purpose == 'diagnosis'
+    rows = summary['checks'] if summary else []
+    blocking_ids = ([r['check_id'] for r in rows if r.get('blocking', True)]
+                    if rows else [entry.check_id for entry in c.diagnostic_pack.checks]) if applicable else []
+    configuration_valid = bool(summary and summary['status'] not in {'preflight', 'invalid_configuration'})
+    observations = any(e.kind == 'observation' for e in c.evidence.values())
+    conditions = {'configuration_valid': configuration_valid,
+                  'baseline_collection_complete': not blocking_ids,
+                  'observations_available': observations}
+    can_enter = not applicable or (configuration_valid and observations)
+    if stage == 'diagnosis_entry':
+        allowed = can_enter
+        decision = ('not_applicable' if not applicable else 'handoff_required' if not allowed else
+                    'continue_with_limitations' if (blocking_ids or summary['handoff']) else 'ready_for_interpretation')
+        if applicable and not allowed and not c.stop:
+            c.stop = 'NEEDS_INFORMATION'
+    else:
+        conditions.update(draft_present=c.draft is not None, independent_review_present=c.review is not None,
+                          diagnosis_sections_complete=bool(c.draft) and not c.diagnosis_completion_gaps(),
+                          reviewed_gaps_clear=bool(c.draft and c.review) and not c.reviewed_gaps(),
+                          workflow_allows_completion=c.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'})
+        allowed = all(conditions.values()) if applicable else c.status() == 'completed'
+        if applicable and not allowed and c.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'}:
+            c.stop = 'DIAGNOSTIC_PACK_INCOMPLETE' if blocking_ids or not configuration_valid else 'REVIEW_INCOMPLETE'
+            conditions['workflow_allows_completion'] = False
+        decision = 'complete' if allowed else c.status()
+    snapshot = {'stage': stage, 'applicable': applicable,
+                'evidence_state_revision': summary.get('revision', 0) if summary else 0,
+                'draft_revision': len(c.drafts), 'review_count': len(c.reviews),
+                'conditions': conditions, 'blocking_check_ids': blocking_ids,
+                'limitations': deepcopy(summary['handoff']) if summary else [],
+                'can_enter_diagnosis': can_enter, 'can_mark_completed': allowed if stage != 'diagnosis_entry' else None,
+                'allowed': allowed, 'decision': decision,
+                'termination_reason': c.stop}
+    if c.diagnostic_pack_exit is None:
+        c.diagnostic_pack_exit = {'policy': EXIT_POLICY, 'latest': None, 'history': []}
+    ledger = c.diagnostic_pack_exit
+    if ledger['latest'] != snapshot:
+        ledger['latest'] = deepcopy(snapshot)
+        ledger['history'].append(deepcopy(snapshot))
+        c.event('diagnostic_pack_exit_checked', **deepcopy(snapshot))
+    return snapshot

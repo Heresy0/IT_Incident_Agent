@@ -113,6 +113,7 @@ class ReviewMaterialityTests(unittest.TestCase):
     def test_trigger_blocker_is_advertised_out_of_scope_and_still_rejected_at_runtime(self):
         c = Collaboration(planned_models(), FixtureProvider('case_001', P), P)
         c.run()
+        c.review_protection = 'strict_v1'
         c.draft = c.draft.model_copy(update={'hypotheses': [
             h.model_copy(update={'level': 'trigger'}) for h in c.draft.hypotheses]})
         schema = reviewer_schema(ReviewDecision.model_json_schema(), c.evidence_needs, c.targets())

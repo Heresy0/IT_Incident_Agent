@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'app'), str(ROOT)]
 from evals.diagnostic_packs.experiment import cases, digest, run_controls, METHOD
 from evals.common import write_json, implementation_version
+from evals.diagnostic_packs.reporting import control_markdown
 
 
 def main(argv=None):
@@ -50,14 +51,7 @@ def main(argv=None):
     result['source_version'] = source
     result['registration_sha256'] = hashlib.sha256((ROOT / 'examples/diagnostic-packs.example.json').read_bytes()).hexdigest()
     write_json(directory / 'summary.json', result)
-    lines = ['# 诊断包受控取证实验', '',
-             f"源码：{source}；{result['cases']} 个控制场景、{result['runs']} 次图运行；付费调用 0。", '',
-             '| 场景 | 基线检查状态 | 诊断包检查状态 | 额外工具调用 | 诊断包状态 | 输入门禁（基线/包） |',
-             '| --- | --- | --- | --- | --- | --- |']
-    for pair in result['pairs']:
-        lines.append(f"| {pair['case_id']} | {pair['baseline']['query_statuses']} | {pair['pack']['query_statuses']} | {pair['extra_tool_calls']} | {pair['pack']['pack_status']} | {pair['baseline']['input_budget_rejections']}/{pair['pack']['input_budget_rejections']} |")
-    lines += ['', '## 解释限制', ''] + ['- ' + text for text in result['limitations']]
-    (directory / 'summary.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    (directory / 'summary.md').write_text(control_markdown(result), encoding='utf-8')
     print(directory / 'summary.md')
     return 0
 

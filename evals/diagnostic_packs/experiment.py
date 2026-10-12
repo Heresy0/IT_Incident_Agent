@@ -183,6 +183,8 @@ def run_case(case, enabled):
            'observed_metrics': metrics, 'pack_status': report.get('diagnostic_pack', {}).get('status', 'disabled_or_unregistered'),
            'observations_count': len(report['evidence']),
            'pack_handoff': report.get('diagnostic_pack', {}).get('handoff', []),
+           'pack_exit_decision': report.get('diagnostic_pack_exit', {}).get('latest', {}).get('decision'),
+           'pack_blocking_check_ids': report.get('diagnostic_pack_exit', {}).get('latest', {}).get('blocking_check_ids', []),
            'goal_verified': False, 'semantic_quality': 'excluded_scripted'}
     return report, row
 

@@ -87,7 +87,7 @@ def diagnosis_schema(schema, *, canonical_checks=False):
     return schema
 
 
-def reviewer_schema(schema, needs, targets):
+def reviewer_schema(schema, needs, targets, *, conservative=False):
     schema = deepcopy(schema)
     core = [n.need_id for n in needs.values() if n.purpose in {'symptom', 'mechanism'}]
     schema['$defs']['NeedAssessment']['allOf'] = [{
@@ -100,7 +100,7 @@ def reviewer_schema(schema, needs, targets):
         need_ids = [n.need_id for n in needs.values() if n.purpose == purpose]
         eligible = [key for key, target in targets.items()
                     if not (key.startswith('H') and target.level == 'trigger')]
-        if need_ids:
+        if need_ids and not conservative:
             schema['$defs']['NeedAssessment']['allOf'].append({
                 'if': {'properties': {'need_id': {'enum': need_ids}}, 'required': ['need_id']},
                 'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'}, {
