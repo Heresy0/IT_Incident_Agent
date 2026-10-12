@@ -89,8 +89,8 @@ class RunContext:
                 self.emit_callback(event)
             record_event(event)
 
-    def claim_repair(self, state, *, reviewer=False):
-        """One collection correction and one reserved for collaboration review.
+    def claim_repair(self, state, *, reviewer=False, review_stage=None):
+        """One collection correction; optionally one per registered review stage.
 
         Eligibility never adds model calls. Standalone/parallel collection
         continue sharing one allowance; all calls use the original budget.
@@ -98,7 +98,14 @@ class RunContext:
         with self.lock:
             reviewed = state.get('reviewer_repairs', 0)
             used = reviewed if reviewer else state['repairs'] - reviewed
-            if used >= 1:
+            if reviewer and review_stage is not None:
+                if review_stage not in {'ObservationReview', 'ReviewDecision'}:
+                    raise ValueError('unregistered review correction stage')
+                stages = state.setdefault('reviewer_stage_repairs', {})
+                if reviewed >= 2 or stages.get(review_stage, 0) >= 1:
+                    return False
+                stages[review_stage] = stages.get(review_stage, 0) + 1
+            elif used >= 1:
                 return False
             state['repairs'] += 1
             if reviewer:

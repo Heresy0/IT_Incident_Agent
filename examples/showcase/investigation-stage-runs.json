@@ -1,0 +1,483 @@
+{
+  "source_version": "0c82a0fca77dc586",
+  "model": "qwen3.7-flash",
+  "plan": {
+    "source_version": "0c82a0fca77dc586",
+    "model": "qwen3.7-flash",
+    "cases": [
+      "fresh_001",
+      "fresh_003"
+    ],
+    "arms": [
+      "agent",
+      "programmatic"
+    ],
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "attempts_per_arm_case": 1,
+    "maximum_model_calls": 128,
+    "read_only": true,
+    "estimated_cost": null,
+    "dataset_freeze_sha256": "730eed6ca155de1068197e8673432e1edc9a0720e73c7e36ee284c7d5b43b134"
+  },
+  "regression": {
+    "total": 454,
+    "passed": 447,
+    "skipped": 7,
+    "seconds": 61.464
+  },
+  "model_calls": 32,
+  "tool_calls": 12,
+  "estimated_cost": null,
+  "semantic_review": "assistant assessment, not independent human review; fixed-order single runs, Supervisor plans vary, no statistical quality claim.",
+  "default_changed": false,
+  "runs": [
+    {
+      "case_id": "fresh_001",
+      "arm": "agent",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "0c82a0fca77dc586",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 13,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 50933,
+          "output_tokens": 7519,
+          "known_calls": 13,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 73187,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/62aae63b-ac68-48af-801b-9cc68ac5a042/fresh_001-agent.json",
+      "report_sha256": "8e2d1bbecbcc3397f0da56f51475889cf5f6d175a9e07da17be9930e7d64885e",
+      "investigation_model_calls": 3,
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "TOOL_DENIED",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        },
+        {
+          "role": "knowledge",
+          "reason": "reference_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs.0.reference_id",
+              "type": "unknown_reference"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_REQUIRED",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker",
+              "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_REWORK_DISPATCH",
+          "details": [
+            {
+              "code": "DUPLICATE_TOOL",
+              "instruction": "补查没有新增覆盖；换有价值的新查询，或保留缺口收尾。"
+            }
+          ]
+        }
+      ],
+      "queried": [
+        {
+          "tool": "get_service_logs",
+          "category": "dependency",
+          "metrics": null,
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_recent_changes",
+          "category": null,
+          "metrics": null,
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "search_incidents",
+          "category": null,
+          "metrics": null,
+          "status": "empty",
+          "error": null
+        },
+        {
+          "tool": "search_runbooks",
+          "category": null,
+          "metrics": null,
+          "status": "empty",
+          "error": null
+        }
+      ],
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "agent",
+        "parallel_batches": 1,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      }
+    },
+    {
+      "case_id": "fresh_001",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "0c82a0fca77dc586",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 8,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 45403,
+          "output_tokens": 6272,
+          "known_calls": 8,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 64718,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/62aae63b-ac68-48af-801b-9cc68ac5a042/fresh_001-programmatic.json",
+      "report_sha256": "fb210b41925fba80d97631858d18f8773f2a9484044e9856be8f197890837a6d",
+      "investigation_model_calls": 0,
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "assessments.1.<extra>",
+              "type": "extra_forbidden"
+            },
+            {
+              "path": "assessments.1.<extra>",
+              "type": "extra_forbidden"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_REWORK_DISPATCH",
+          "details": [
+            {
+              "code": "DUPLICATE_TOOL",
+              "instruction": "补查没有新增覆盖；换有价值的新查询，或保留缺口收尾。"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_REWORK_DISPATCH",
+          "details": [
+            {
+              "code": "DUPLICATE_TOOL",
+              "instruction": "补查没有新增覆盖；换有价值的新查询，或保留缺口收尾。"
+            }
+          ]
+        }
+      ],
+      "queried": [
+        {
+          "tool": "get_service_metrics",
+          "category": null,
+          "metrics": [
+            "request_error_rate"
+          ],
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_recent_changes",
+          "category": null,
+          "metrics": null,
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "category": "dependency",
+          "metrics": null,
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "category": "configuration",
+          "metrics": null,
+          "status": "empty",
+          "error": null
+        }
+      ],
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      }
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "agent",
+      "status": "partial",
+      "review_status": "not_performed",
+      "source_version": "0c82a0fca77dc586",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 3,
+        "web_calls": 0,
+        "tool_calls": 0,
+        "token_usage": {
+          "input_tokens": 12107,
+          "output_tokens": 1273,
+          "known_calls": 3,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 14406,
+        "termination_reason": "NO_TOOL_PROGRESS",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/62aae63b-ac68-48af-801b-9cc68ac5a042/fresh_003-agent.json",
+      "report_sha256": "58ba8db66749680e6d90f696387289aef155b93db4ab85e0f4bc9c684f52555c",
+      "investigation_model_calls": 2,
+      "validation_failures": [],
+      "queried": [
+        {
+          "tool": "get_service_metrics",
+          "category": null,
+          "metrics": [
+            "request_error_rate",
+            "request_latency_ms"
+          ],
+          "status": "not_executed",
+          "error": null
+        }
+      ],
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "agent",
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      }
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "not_performed",
+      "source_version": "0c82a0fca77dc586",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 8,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 45725,
+          "output_tokens": 6818,
+          "known_calls": 8,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 66265,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/62aae63b-ac68-48af-801b-9cc68ac5a042/fresh_003-programmatic.json",
+      "report_sha256": "ba453171a0346a972bcc5f982b49a4f9dde13a70b59d907d1c48ac9e6db72f04",
+      "investigation_model_calls": 0,
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "<extra>.3.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REQUIRED_EVIDENCE_NEED",
+          "details": [
+            {
+              "need_id": "N1",
+              "path": "need_assessments.0.blocking",
+              "code": "REQUIRED_EVIDENCE_NEED",
+              "actual": false,
+              "allowed": [
+                true,
+                null
+              ],
+              "instruction": "症状与机制是核心问题，不可关闭阻塞；证据不足时保持uncertain并交接缺口。"
+            }
+          ]
+        }
+      ],
+      "queried": [
+        {
+          "tool": "get_service_metrics",
+          "category": null,
+          "metrics": [
+            "request_error_rate",
+            "request_latency_ms"
+          ],
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "category": "dependency",
+          "metrics": null,
+          "status": "failed",
+          "error": "SOURCE_UNAVAILABLE"
+        },
+        {
+          "tool": "get_recent_changes",
+          "category": null,
+          "metrics": null,
+          "status": "satisfied",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "category": "configuration",
+          "metrics": null,
+          "status": "failed",
+          "error": "SOURCE_UNAVAILABLE"
+        }
+      ],
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      }
+    }
+  ]
+}

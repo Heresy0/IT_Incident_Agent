@@ -1,0 +1,185 @@
+{
+  "final_source_version": "6c6e485929f3f2cc",
+  "regression": {
+    "total": 450,
+    "passed": 443,
+    "skipped": 7,
+    "seconds": 60.812
+  },
+  "method": "Bounded workflow change, synthetic same-case runs, no independent human scoring. Candidate timeout retained separately from final no-tool-progress failure.",
+  "model_calls": 24,
+  "tool_calls": 4,
+  "estimated_cost": null,
+  "runs": [
+    {
+      "model": "qwen3.7-flash",
+      "source_version": "ad3b319aadc88f62",
+      "status": "partial",
+      "review_status": "not_performed",
+      "contract_valid": true,
+      "report_file": "output/compatible-model-verification/2f9ecffb-3ae1-4b22-865d-7a45bee56794/fresh_001.json",
+      "report_sha256": "f96a1255b68f8caf9350b7aedb474fa6cbb8c94896963b85fc40af2da681f739",
+      "run_summary": {
+        "model_calls": 21,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 91971,
+          "output_tokens": 12141,
+          "known_calls": 20,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 162188,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_REQUIRED",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker",
+              "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "smoke": {
+        "status": "not_repeated",
+        "reason": "Real compatible tool roundtrip already verified; this run tests workflow correction only."
+      },
+      "stage": "candidate_before_prompt_alignment",
+      "workflow_version": "incident_graph_v11_bounded_additional_rework",
+      "rework_rounds": 2,
+      "draft_revisions": 3,
+      "completed_review_revisions": 2,
+      "additional_authorization": [
+        {
+          "run_id": "00ee3c2e-abbf-460d-8ff2-0031f394b77e",
+          "trace_id": "00ee3c2e-abbf-460d-8ff2-0031f394b77e",
+          "timestamp": 1791799286.724879,
+          "type": "additional_rework_authorized",
+          "role": "supervisor",
+          "span_id": "c1b8defc-6cff-4850-be9d-7a52a56b28cc",
+          "parent_span_id": "4c85ef72-8426-4596-a139-8f486c73cd35",
+          "need_id": "N2",
+          "target_id": "H1",
+          "maximum_total_reworks": 2,
+          "total_budget_changed": false,
+          "seq": 150
+        }
+      ]
+    },
+    {
+      "model": "qwen3.7-flash",
+      "source_version": "6c6e485929f3f2cc",
+      "status": "partial",
+      "review_status": "not_performed",
+      "contract_valid": true,
+      "report_file": "output/compatible-model-verification/eff38ce0-2c7b-4cb6-a554-afe5aa735602/fresh_001.json",
+      "report_sha256": "f7c5c7530dece41f62ae6df4b80ff355b4b320294ccbe284706503fe05ab7dd5",
+      "run_summary": {
+        "model_calls": 3,
+        "web_calls": 0,
+        "tool_calls": 0,
+        "token_usage": {
+          "input_tokens": 12192,
+          "output_tokens": 1086,
+          "known_calls": 3,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 12391,
+        "termination_reason": "NO_TOOL_PROGRESS",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [],
+      "smoke": {
+        "status": "not_repeated",
+        "reason": "Real compatible tool roundtrip already verified; this run tests workflow correction only."
+      },
+      "stage": "final",
+      "workflow_version": "incident_graph_v11_bounded_additional_rework",
+      "rework_rounds": 0,
+      "draft_revisions": 0,
+      "completed_review_revisions": 0,
+      "additional_authorization": []
+    }
+  ]
+}

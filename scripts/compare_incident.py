@@ -28,7 +28,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider):
+def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider, investigation_mode='agent', reviewer_repair_mode='shared'):
     """Use one existing harness for both paths; retain accounting/evidence on unexpected failure."""
     provider = provider_factory(case_id, principal)
     events = []
@@ -43,7 +43,8 @@ def capture(case_id, workflow, factory, principal, limits, *, provider_factory=F
             # The loop's own executor is shared so error reports keep its snapshots too.
             result = single_agent(model, provider, principal, limits=limits, context=context, event_log=events, executor=executor)
         else:
-            coordinator = Collaboration(model, provider, principal, limits=limits, context=context, event_log=events)
+            coordinator = Collaboration(model, provider, principal, limits=limits, context=context, event_log=events,
+                                        investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode)
             evidence = coordinator.evidence
             result = coordinator.run()
     except Exception as exc:

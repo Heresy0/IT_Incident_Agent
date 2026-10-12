@@ -1,0 +1,79 @@
+{
+  "model": "qwen3.7-flash",
+  "source_version": "385ef22fa32d4984",
+  "status": "partial",
+  "review_status": "needs_information",
+  "contract_valid": true,
+  "report_file": "output/compatible-model-verification/052eb744-fb2d-41a1-82ed-e22c5fef89d6/fresh_001.json",
+  "report_sha256": "a00af9d0bc52ce9babe6ec8f49b10264614c2c451df0d4dded81a3344bec51c9",
+  "run_summary": {
+    "model_calls": 11,
+    "web_calls": 0,
+    "tool_calls": 1,
+    "token_usage": {
+      "input_tokens": 42564,
+      "output_tokens": 4423,
+      "known_calls": 11,
+      "status": "known"
+    },
+    "provider_http_attempts": "unknown_for_model_and_embedding",
+    "estimated_cost": null,
+    "duration_ms": 55875,
+    "termination_reason": "INVALID_REWORK_DISPATCH",
+    "errors": [
+      {
+        "code": "INVALID_REWORK_DISPATCH",
+        "provider": "workflow",
+        "message": "诊断执行失败，请根据运行 ID 查看日志。",
+        "retryable": false,
+        "node": "supervisor"
+      }
+    ],
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    }
+  },
+  "validation_failures": [
+    {
+      "role": "investigation",
+      "reason": "schema_mismatch",
+      "details": [
+        {
+          "path": "findings.0.refs",
+          "type": "too_short"
+        }
+      ]
+    },
+    {
+      "role": "diagnosis",
+      "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+      "details": [
+        {
+          "path": "recommended_actions.0.checks.0",
+          "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+        }
+      ]
+    }
+  ],
+  "smoke": {
+    "status": "not_repeated",
+    "reason": "Real compatible tool roundtrip already verified; this run tests workflow correction only."
+  },
+  "assessment": {
+    "reviewer": "assistant_not_independent_human",
+    "empty_refs_recurred": true,
+    "empty_refs_corrected": true,
+    "required_change_query_executed": false,
+    "workflow_complete": false,
+    "correction_kept_tools": "No json_without_tools output_mode on corrected pending-read step; code route retains tools. Model nevertheless returned output without executing the check."
+  }
+}

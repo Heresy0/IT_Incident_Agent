@@ -1,0 +1,107 @@
+{
+  "model": "qwen3.7-flash",
+  "source_version": "72d50bfde1a38593",
+  "status": "partial",
+  "review_status": "needs_information",
+  "contract_valid": true,
+  "report_file": "output/compatible-model-verification/f69cabb9-a991-4508-b491-ec90297b1cc8/fresh_001.json",
+  "report_sha256": "9702c350d684e9e01330ddb3370f331312a8bea45464e06ead7f80484167cf67",
+  "run_summary": {
+    "model_calls": 17,
+    "web_calls": 0,
+    "tool_calls": 3,
+    "token_usage": {
+      "input_tokens": 72529,
+      "output_tokens": 10400,
+      "known_calls": 17,
+      "status": "known"
+    },
+    "provider_http_attempts": "unknown_for_model_and_embedding",
+    "estimated_cost": null,
+    "duration_ms": 118484,
+    "termination_reason": "REWORK_LIMIT",
+    "errors": [],
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    }
+  },
+  "validation_failures": [
+    {
+      "role": "investigation",
+      "reason": "schema_mismatch",
+      "details": [
+        {
+          "path": "findings.0.refs",
+          "type": "too_short"
+        }
+      ]
+    },
+    {
+      "role": "diagnosis",
+      "reason": "READ_ONLY_ACTION_INVALID",
+      "details": [
+        {
+          "code": "INVALID_ARGUMENTS",
+          "instruction": "核查建议必须使用登记工具并遵守角色及工单范围。"
+        }
+      ]
+    },
+    {
+      "role": "reviewer",
+      "reason": "schema_mismatch",
+      "details": [
+        {
+          "path": "<extra>.3.refs",
+          "type": "too_short"
+        }
+      ]
+    },
+    {
+      "role": "diagnosis",
+      "reason": "READ_ONLY_ACTION_INVALID",
+      "details": [
+        {
+          "code": "INVALID_ARGUMENTS",
+          "instruction": "核查建议必须使用登记工具并遵守角色及工单范围。"
+        }
+      ]
+    }
+  ],
+  "smoke": {
+    "status": "not_repeated",
+    "reason": "Real compatible tool roundtrip already verified; this run tests workflow correction only."
+  },
+  "workflow_version": "incident_graph_v10_pending_rework",
+  "rework_rounds": 1,
+  "diagnosis_revisions": 2,
+  "review_revisions": 2,
+  "reused_checks": [
+    [
+      {
+        "tool": "get_service_logs",
+        "args": {
+          "start": "2026-10-12T09:50:00Z",
+          "end": "2026-10-12T10:15:00Z",
+          "category": "configuration",
+          "level": "ERROR",
+          "error_code": null
+        }
+      }
+    ]
+  ],
+  "regression": {
+    "total": 446,
+    "passed": 439,
+    "skipped": 7,
+    "seconds": 68.283
+  },
+  "assessment": "Previously validated pending configuration log check was actually executed and rereviewed; empty result, resource evidence still missing, REWORK_LIMIT. One live sample, not independent human scoring."
+}

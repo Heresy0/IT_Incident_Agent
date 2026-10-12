@@ -2,6 +2,7 @@
 from copy import deepcopy
 
 REPAIR_POLICY = 'collection_one_review_one_v1'
+REVIEW_STAGE_POLICY = 'collection_one_review_stages_one_v2'
 
 
 def compact_schema(schema):
@@ -152,11 +153,17 @@ def review_contract_view(schema):
 
 def corrections_within_policy(report):
     """Historical reports keep their cap; new counts must match repair events."""
-    if report.get('repair_policy') != REPAIR_POLICY:
+    if report.get('repair_policy') not in {REPAIR_POLICY, REVIEW_STAGE_POLICY}:
         return report['repairs'] <= 1
     counts = report.get('repair_counts', {})
     events = [e for e in report['events'] if e['type'] == 'validation_repair']
     actual = {'collection': sum(e.get('role', e.get('node')) != 'reviewer' for e in events),
               'reviewer': sum(e.get('role', e.get('node')) == 'reviewer' for e in events)}
+    if report.get('repair_policy') == REVIEW_STAGE_POLICY:
+        stages = {name: sum(e.get('review_stage') == name for e in events if e.get('role', e.get('node')) == 'reviewer')
+                  for name in ('ObservationReview', 'ReviewDecision')}
+        return (counts == actual and type(counts.get('collection')) is int and 0 <= counts['collection'] <= 1
+                and type(counts.get('reviewer')) is int and counts['reviewer'] == sum(stages.values())
+                and all(v <= 1 for v in stages.values()) and report['repairs'] == sum(counts.values()))
     return (counts == actual and all(type(v) is int and 0 <= v <= 1 for v in counts.values())
             and report['repairs'] == sum(counts.values()))

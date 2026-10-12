@@ -1,0 +1,53 @@
+{
+  "model": "qwen3.7-flash",
+  "source_version": "385ef22fa32d4984",
+  "status": "partial",
+  "review_status": "not_performed",
+  "contract_valid": true,
+  "report_file": "output/compatible-model-verification/435b6907-baee-4f1c-a1e2-a48dc798f6a8/fresh_001.json",
+  "report_sha256": "bfd611a24b4f610ed3bc2ea33a79503eccc0da53cc34b9943c22d0faaea12cbe",
+  "run_summary": {
+    "model_calls": 8,
+    "web_calls": 0,
+    "tool_calls": 3,
+    "token_usage": {
+      "input_tokens": 35302,
+      "output_tokens": 2876,
+      "known_calls": 8,
+      "status": "known"
+    },
+    "provider_http_attempts": "unknown_for_model_and_embedding",
+    "estimated_cost": null,
+    "duration_ms": 36078,
+    "termination_reason": "DUPLICATE_TASK",
+    "errors": [
+      {
+        "code": "DUPLICATE_TASK",
+        "provider": "workflow",
+        "message": "诊断执行失败，请根据运行 ID 查看日志。",
+        "retryable": false,
+        "node": "supervisor"
+      }
+    ],
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    }
+  },
+  "validation_failures": [],
+  "smoke": {
+    "status": "not_repeated",
+    "reason": "Real compatible tool roundtrip already verified; this run tests workflow correction only."
+  },
+  "baseline_commit": "59d8233",
+  "baseline_report": "examples/showcase/changed-model-verification-runs.json",
+  "correction_path_exercised_in_live": false,
+  "assessment": "No validation failures in this one run, but DUPLICATE_TASK before diagnosis. Target correction path established by three HTTP boundary tests, not by this live sample."
+}

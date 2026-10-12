@@ -247,7 +247,7 @@ class IncidentInvestigationTests(unittest.TestCase):
         original = ex.provider.query
         def late(*args):
             rows = original(*args)
-            ex.context.started -= 200
+            ex.context.started -= ex.context.limits.seconds + 1
             return rows
         with patch.object(ex.provider, "query", side_effect=late):
             result = ex.execute("get_service_owner", {"alias": "checkout-api"})

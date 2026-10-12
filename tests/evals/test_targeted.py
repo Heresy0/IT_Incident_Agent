@@ -94,7 +94,7 @@ class TargetedTests(unittest.TestCase):
             return original(path, *args, **kwargs)
         with patch.object(Path, 'read_text', guard), patch('scripts.compare_independent.capture', side_effect=AssertionError('No runs')), \
              redirect_stdout(io.StringIO()) as out:
-            self.assertEqual(main([]), 0)
+            self.assertEqual(main(['--model', 'qwen3.7-plus']), 0)
         plan = json.loads(out.getvalue())
         self.assertTrue(plan['plan_only'])
         self.assertEqual(plan['paired_runs'], 10)

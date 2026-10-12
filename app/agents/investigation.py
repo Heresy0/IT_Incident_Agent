@@ -296,7 +296,13 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 # call or treating completed queries as a completed diagnosis.
                 checks_complete = bool(required_checks and current_objective
                     and all(c['query_complete'] for c in current_objective['check_completion']['checks']))
-                final_json = native_json and (terminal or step == max_steps - 1 or output_correction
+                unexecuted_checks = ([c for c in current_objective['check_completion']['checks']
+                                      if c['status'] == 'not_executed'] if required_checks and current_objective else [])
+                # Preserve a tool turn when correction still needs an actual read.
+                can_read_pending = bool(unexecuted_checks and step < max_steps - 1
+                    and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
+                    and context.can_research())
+                final_json = native_json and (terminal or step == max_steps - 1 or (output_correction and not can_read_pending)
                     or (checks_complete and not gap_feedback_sent))
                 if final_json:
                     messages.append(HumanMessage(content='This turn only interprets the recorded observations. '
@@ -454,7 +460,13 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             + "Do not copy field_path, value, unit, timestamp or quote; never prepend payload. "
                             + "The server expands these fields. Omit unverifiable findings. An empty query has no REF: "
                             + "use findings=[] and state its filter/window limitation in missing_information; never use refs=[]. "
-                            + "escalation_ref must select owner_options or be null. No additional tool calls required."))
+                            + "escalation_ref must select owner_options or be null. "
+                            + ('Required checks have not been executed. Use the permitted tools before reporting their results: '
+                               + json.dumps([{'tool': c['tool'], 'args': c['args']} for c in unexecuted_checks], ensure_ascii=False)
+                               if unexecuted_checks and step < max_steps - 2
+                               and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
+                               and context.can_research()
+                               else 'Correct only the recorded observations; preserve missing checks as gaps.')))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
                         break

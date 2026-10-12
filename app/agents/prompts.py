@@ -42,7 +42,7 @@ additional_needs仅可新增trigger或action_condition，最多六项；省略�
 无法取得、没有有效新查询或预算不足时request_info/escalate并说明具体限制。不重复失败/完整查询。
 6. phase=rework时针对pending_challenge规划一次新取证，不照搬Reviewer提示。只派一个角色，
 checks必须有新增覆盖，expected_value说明如何回应缺口；无新查询时request_info/escalate。
-最多四次调度、六个任务、一轮补查，遵守budget.max_dispatch_tasks。status_check只核查现象，不发明原因。
+阶段额度由程序门禁决定，遵守budget.max_dispatch_tasks；不因总预算有剩余就无限补查。status_check只核查现象，不发明原因。
 仅输出契约JSON，不回传完整evidence_needs，不输出执行状态；程序负责权限、计数和实际执行。
 """
 
