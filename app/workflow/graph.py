@@ -10,7 +10,7 @@ from langgraph.graph import StateGraph, START, END
 from runtime.context import ExecutionError
 from evidence.diagnosis import ProtocolError
 
-WORKFLOW_VERSION = 'incident_graph_v13_question_owned_review_trigger_handoff'
+WORKFLOW_VERSION = 'incident_graph_v15_review_materiality_action_outcomes'
 
 
 class IncidentState(TypedDict, total=False):

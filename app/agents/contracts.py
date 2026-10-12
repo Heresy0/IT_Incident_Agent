@@ -6,6 +6,12 @@ from repairs.contracts import RepairIntent
 
 Role = Literal["investigation", "knowledge"]
 
+# Query proposals promise information, never a particular cause or recovery.
+CHECK_EXPECTED_RESULTS = {
+    'read_only_check': '取得登记查询的实际结果，判断哪些候选原因得到支持或反证；查询失败或证据不足时保留缺口。',
+    'manual_check': '取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。',
+}
+
 
 class ReadOnlyCheck(Contract):
     tool: Literal['get_service_metrics', 'get_service_logs', 'get_recent_changes',
@@ -135,7 +141,8 @@ class Hypothesis(Contract):
 class RecommendedAction(Contract):
     action: str = Field(min_length=1, max_length=500)
     condition: str = Field(min_length=1, max_length=300)
-    expected_result: str = Field(min_length=1, max_length=300)
+    expected_result: str = Field(min_length=1, max_length=300,
+        description='For checks: information to obtain and how different outcomes affect the decision; do not assert an unverified cause or a predetermined result. For changes: conditional effect, not proof that prerequisites hold or recovery is guaranteed.')
     risk: str = Field(min_length=1, max_length=300)
     requires_approval: bool
     kind: Literal['read_only_check', 'manual_check', 'manual_change', 'registered_repair', 'unspecified'] = Field(default='unspecified',

@@ -1,0 +1,698 @@
+{
+  "baseline_commit": "bc54595",
+  "final_source_version": "ede99438fdef6bc2",
+  "model": "qwen3.7-flash",
+  "regression": {
+    "total": 477,
+    "passed": 470,
+    "skipped_db_integration": 7,
+    "duration_seconds": 72.956,
+    "log": "output/collection-boundaries-final-regression.log"
+  },
+  "verification_scope": "Real vendor models on frozen synthetic observations. Reference criteria not passed to models. Author assessment, not independent human review.",
+  "selection_policy": "Three initial cases once; after parameter error feedback gained tool name and field path, repeat only affected fresh_003 once. Preserve all failures; do not pool versions into accuracy.",
+  "total_model_calls": 36,
+  "total_tool_calls": 13,
+  "estimated_cost": null,
+  "records": [
+    {
+      "case_id": "fresh_001",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "not_performed",
+      "source_version": "105cb16273dfca72",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 43453,
+          "output_tokens": 8142,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 78328,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/b2cd3b20-cdd8-4a91-b50e-c91bddfa14be/fresh_001-programmatic.json",
+      "report_sha256": "ea49e4d5a180525ff31aa1c2c88e4a90d4782235e4e672f319483cef294d458a",
+      "investigation_model_calls": 0,
+      "knowledge_model_calls": 0,
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "knowledge_mode": "programmatic",
+        "supervisor_planning_only": true,
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      },
+      "repair_policy": "supervisor_diagnosis_reviewer_one_v3",
+      "repair_counts": {
+        "supervisor": 0,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_INVALID",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "instruction": "核查建议必须使用登记工具并遵守角色及工单范围。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker.affected_targets",
+              "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker.affected_targets",
+              "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+            }
+          ]
+        }
+      ],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "unconfirmed",
+      "published_hypotheses": [
+        {
+          "cause": "本地持久化卷空间耗尽导致写入阻塞/失败",
+          "level": "mechanism",
+          "status": "tentative"
+        },
+        {
+          "cause": "近期部署触发了异常的数据写入模式或日志膨胀",
+          "level": "trigger",
+          "status": "tentative"
+        },
+        {
+          "cause": "上游依赖或网络层面的间歇性故障",
+          "level": "alternative",
+          "status": "tentative"
+        }
+      ],
+      "published_actions": [],
+      "knowledge_tasks": 0,
+      "queries": [
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "resource",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ],
+      "draft_count": 2,
+      "review_count": 1,
+      "rework_rounds": 1
+    },
+    {
+      "case_id": "fresh_002",
+      "arm": "programmatic",
+      "status": "completed",
+      "review_status": "passed",
+      "source_version": "105cb16273dfca72",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 4,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 21592,
+          "output_tokens": 3380,
+          "known_calls": 4,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 34140,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/b2cd3b20-cdd8-4a91-b50e-c91bddfa14be/fresh_002-programmatic.json",
+      "report_sha256": "724a8147ae1e3745027361eb2c4ef131fa444d1f11ff12ce33b2fc03899e43ea",
+      "investigation_model_calls": 0,
+      "knowledge_model_calls": 0,
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "knowledge_mode": "programmatic",
+        "supervisor_planning_only": true,
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      },
+      "repair_policy": "supervisor_diagnosis_reviewer_one_v3",
+      "repair_counts": {
+        "supervisor": 0,
+        "diagnosis": 0,
+        "reviewer": 0
+      },
+      "validation_failures": [],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "supported",
+      "next_step_status": "supported",
+      "published_hypotheses": [
+        {
+          "cause": "远端物流状态服务证书过期导致TLS握手失败，引发拉取物流状态请求被拒。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "远端服务在10:00左右进行了证书轮换或更新操作。",
+          "level": "trigger",
+          "status": "unresolved"
+        },
+        {
+          "cause": "本地配置错误或网络中间件拦截导致连接异常。",
+          "level": "alternative",
+          "status": "refuted"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "联系远端物流状态服务负责人，确认证书过期情况及后续轮换计划。",
+          "condition": "需要人工核实外部系统状态。",
+          "expected_result": "确认为远端单方面变更导致的暂时性中断，并获取预计恢复时间。",
+          "risk": "无本地系统风险，仅涉及沟通成本。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "knowledge_tasks": 0,
+      "queries": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 1,
+      "rework_rounds": 0
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "105cb16273dfca72",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 11,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 65644,
+          "output_tokens": 8599,
+          "known_calls": 11,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 83484,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/b2cd3b20-cdd8-4a91-b50e-c91bddfa14be/fresh_003-programmatic.json",
+      "report_sha256": "e18311b0be7302a3e21a44e1cc7f4ba3aab2015a70759bdf73b670aa507e9336",
+      "investigation_model_calls": 0,
+      "knowledge_model_calls": 0,
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "knowledge_mode": "programmatic",
+        "supervisor_planning_only": true,
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      },
+      "repair_policy": "supervisor_diagnosis_reviewer_one_v3",
+      "repair_counts": {
+        "supervisor": 1,
+        "diagnosis": 1,
+        "reviewer": 1
+      },
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker.affected_targets",
+              "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        }
+      ],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "unconfirmed",
+      "published_hypotheses": [
+        {
+          "cause": "应用内部逻辑或配置问题导致处理阻塞或异常",
+          "level": "mechanism",
+          "status": "unresolved"
+        },
+        {
+          "cause": "特定业务样本或触发条件导致偶发超时",
+          "level": "alternative",
+          "status": "unresolved"
+        },
+        {
+          "cause": "基础设施层资源争用或网络波动",
+          "level": "alternative",
+          "status": "unresolved"
+        }
+      ],
+      "published_actions": [],
+      "knowledge_tasks": 0,
+      "queries": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "request_latency_ms"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T10:04:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "error",
+          "error": {
+            "code": "SOURCE_UNAVAILABLE",
+            "retryable": false
+          }
+        }
+      ],
+      "draft_count": 2,
+      "review_count": 2,
+      "rework_rounds": 1
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "ede99438fdef6bc2",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 71482,
+          "output_tokens": 9495,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 99266,
+        "termination_reason": "REWORK_LIMIT",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/1dfc4106-9818-4200-9fdd-6a65abcd2f5b/fresh_003-programmatic.json",
+      "report_sha256": "f2505a8833173d2277d61faa7c7cb67dfe87f24312042d1a4f11e440167635b1",
+      "investigation_model_calls": 0,
+      "knowledge_model_calls": 0,
+      "collection_execution": {
+        "mode": "parallel_when_independent",
+        "investigation_mode": "programmatic",
+        "knowledge_mode": "programmatic",
+        "supervisor_planning_only": true,
+        "parallel_batches": 0,
+        "max_parallel_roles": 2,
+        "rework_parallel": false
+      },
+      "repair_policy": "supervisor_diagnosis_reviewer_one_v3",
+      "repair_counts": {
+        "supervisor": 1,
+        "diagnosis": 1,
+        "reviewer": 0
+      },
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "path": "tasks.0.checks.0.args",
+              "tool": "get_service_logs",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "phase": "final_targeted",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "supported",
+      "published_hypotheses": [
+        {
+          "cause": "应用层资源耗尽（如连接池满、线程阻塞）导致处理超时和请求失败。",
+          "level": "mechanism",
+          "status": "unresolved"
+        },
+        {
+          "cause": "外部依赖服务响应变慢或不可用，导致本地调用超时。",
+          "level": "alternative",
+          "status": "unresolved"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "人工核实 catalog-preview 服务在故障时间窗口的资源与依赖日志。",
+          "condition": "当前自动日志查询因 SOURCE_UNAVAILABLE 失败，需由具备权限的人工介入查看原始日志。",
+          "expected_result": "确认是否存在 'Connection pool exhausted' 等内部异常或远端拒绝/超时记录。",
+          "risk": "无系统变更风险，仅为只读核查。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "knowledge_tasks": 0,
+      "queries": [
+        {
+          "role": "investigation",
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "request_latency_ms"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "resource",
+            "level": null,
+            "error_code": null
+          },
+          "status": "error",
+          "error": {
+            "code": "SOURCE_UNAVAILABLE",
+            "retryable": false
+          }
+        },
+        {
+          "role": "investigation",
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "error",
+          "error": {
+            "code": "SOURCE_UNAVAILABLE",
+            "retryable": false
+          }
+        }
+      ],
+      "draft_count": 3,
+      "review_count": 3,
+      "rework_rounds": 2
+    }
+  ],
+  "assessment": {
+    "execution_boundary_verified_by_control_tests": true,
+    "semantic_quality_improvement_proven": false,
+    "knowledge_program_execution_observed_in_live_cases": false,
+    "knowledge_program_execution_verified_in_default_parallel_graph_tests": true,
+    "two_task_rework_correction_observed_live": false,
+    "two_task_rework_correction_verified_in_graph_controls": true,
+    "independent_supervisor_and_diagnosis_corrections_observed_live": true,
+    "final_fresh_003": "Logs unavailable; possible mechanisms remain unresolved; supported manual log acquisition step, partial at existing two-round rework cap without execution errors.",
+    "remaining_issues": [
+      "Reviewer scope errors still occur.",
+      "Suggestions can presuppose an unverified remote change.",
+      "Supervisor/Diagnosis can still generate invalid parameters or redundant suggestions.",
+      "Two rework rounds were used on unavailable logs in the final case."
+    ],
+    "interpretation": "The structural implementation is verified, but small runs with different plans do not prove improved overall diagnosis quality or attribute the final recovery solely to the feedback change."
+  }
+}

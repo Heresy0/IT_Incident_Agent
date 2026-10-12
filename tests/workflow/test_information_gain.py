@@ -77,8 +77,8 @@ class QueryReuseTests(unittest.TestCase):
 
     def test_single_version_tracks_shared_diagnosis_contract_and_tools_remain_unchanged(self):
         result = single_agent(ScriptedSingle(), self.provider, P)
-        # Adding manual_check changes the shared schema, not SINGLE_SYSTEM.
-        self.assertEqual(result['prompt_version'], '0635387fa8d2')
+        # Clarifying action outcomes changes the shared schema, not SINGLE_SYSTEM.
+        self.assertEqual(result['prompt_version'], 'dab7465c7851')
         ex = ToolExecutor(self.provider, P, self.scope, RunContext(scope=self.scope), role='single')
         ex.execute('get_service_logs', {**self.window, 'category': 'dependency'})
         ex.execute('get_service_logs', {**self.window, 'category': 'dependency', 'level': 'ERROR'})

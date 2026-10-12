@@ -51,8 +51,8 @@ class BranchContext(RunContext):
         super().add_usage(usage)
         self.parent.add_usage(usage)
 
-    def claim_repair(self, state, *, reviewer=False, review_stage=None):
-        return self.parent.claim_repair(state, reviewer=reviewer, review_stage=review_stage)
+    def claim_repair(self, state, *, reviewer=False, review_stage=None, repair_role=None):
+        return self.parent.claim_repair(state, reviewer=reviewer, review_stage=review_stage, repair_role=repair_role)
 
     def error(self, exc, node=''):
         # Register once in both ledgers; super emits one warning through parent.

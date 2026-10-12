@@ -4,6 +4,7 @@ import json
 
 REPAIR_POLICY = 'collection_one_review_one_v1'
 REVIEW_STAGE_POLICY = 'collection_one_review_stages_one_v2'
+ROLE_REPAIR_POLICY = 'supervisor_diagnosis_reviewer_one_v3'
 
 
 def compact_schema(schema):
@@ -54,6 +55,8 @@ def supervisor_schema(schema, executors):
     """Show role/tool compatibility without duplicating the argument schemas."""
     schema = deepcopy(schema)
     for definition, check_field in (('TaskRequest', 'checks'), ('EvidenceNeedUpdate', 'next_check')):
+        if definition not in schema['$defs']:
+            continue
         constraints = []
         for role, executor in executors.items():
             names = [s['function']['name'] for s in executor.schemas()]
@@ -64,17 +67,23 @@ def supervisor_schema(schema, executors):
                 'if': {'properties': {'role': {'const': role}}, 'required': ['role']},
                 'then': {'properties': {check_field: field}}})
         schema['$defs'][definition].setdefault('allOf', []).extend(constraints)
-    schema['$defs']['EvidenceNeedUpdate'].setdefault('required', []).append('role')
+    if 'EvidenceNeedUpdate' in schema['$defs']:
+        schema['$defs']['EvidenceNeedUpdate'].setdefault('required', []).append('role')
     return schema
 
 
-def diagnosis_schema(schema):
+def diagnosis_schema(schema, *, canonical_checks=False):
     schema = deepcopy(schema)
     schema['$defs']['RecommendedAction']['allOf'] = [{
         'if': {'properties': {'kind': {'const': 'read_only_check'}}, 'required': ['kind']},
         'then': {'properties': {'checks': {'minItems': 1}, 'repair': {'type': 'null'}}}}, {
         'if': {'properties': {'kind': {'const': 'manual_check'}}, 'required': ['kind']},
         'then': {'properties': {'checks': {'maxItems': 0}, 'repair': {'type': 'null'}}}}]
+    if canonical_checks:
+        from agents.contracts import CHECK_EXPECTED_RESULTS
+        for constraint in schema['$defs']['RecommendedAction']['allOf']:
+            kind = constraint['if']['properties']['kind']['const']
+            constraint['then']['properties']['expected_result'] = {'const': CHECK_EXPECTED_RESULTS[kind]}
     return schema
 
 
@@ -85,6 +94,18 @@ def reviewer_schema(schema, needs, targets):
         'if': {'properties': {'need_id': {'enum': core}}, 'required': ['need_id']},
         'then': {'properties': {'verdict': {'enum': ['supported', 'uncertain']},
                                 'blocking': {'enum': [None]}}}}]
+    # Expose the existing blocker ownership guard before generation. This only
+    # restricts contradictory edges; it does not decide any semantic verdict.
+    for purpose in ('mechanism', 'alternative'):
+        need_ids = [n.need_id for n in needs.values() if n.purpose == purpose]
+        eligible = [key for key, target in targets.items()
+                    if not (key.startswith('H') and target.level == 'trigger')]
+        if need_ids:
+            schema['$defs']['NeedAssessment']['allOf'].append({
+                'if': {'properties': {'need_id': {'enum': need_ids}}, 'required': ['need_id']},
+                'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'}, {
+                    'type': 'object', 'properties': {'affected_targets': {
+                        'contains': {'type': 'string', 'enum': eligible}, 'minContains': 1}}}]}}}})
     request = schema['$defs']['EvidenceRequest']['properties']
     request['need_id'] = {'enum': [*needs, None]}
     request['hypothesis_id'] = {'enum': [k for k in targets if k.startswith('H')] + [None]}
@@ -171,6 +192,15 @@ def review_contract_view(schema):
 
 def corrections_within_policy(report):
     """Historical reports keep their cap; new counts must match repair events."""
+    if report.get('repair_policy') == ROLE_REPAIR_POLICY:
+        counts = report.get('repair_counts', {})
+        events = [e for e in report['events'] if e['type'] == 'validation_repair']
+        roles = {'supervisor', 'diagnosis', 'reviewer'}
+        actual = {role: sum(e.get('role', e.get('node')) == role for e in events) for role in roles}
+        return (set(counts) == roles and counts == actual
+                and all(type(v) is int and 0 <= v <= 1 for v in counts.values())
+                and all(e.get('repair_role') == e.get('role', e.get('node')) in roles for e in events)
+                and report['repairs'] == sum(counts.values()))
     if report.get('repair_policy') not in {REPAIR_POLICY, REVIEW_STAGE_POLICY}:
         return report['repairs'] <= 1
     counts = report.get('repair_counts', {})

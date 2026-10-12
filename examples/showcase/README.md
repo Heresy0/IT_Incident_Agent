@@ -1,5 +1,9 @@
 # Agent 编排与 Harness 项目展示
 
+最新局部修改见[复核关键缺口与核查结果说明](review-materiality.md)：默认核查预期结果由程序规范，保留原文审计；Reviewer 的关键缺口判断继续独立进行。[全部真实试验](review-materiality-runs.json)保留漏判、误拦和最终结果，尚未证明整体质量提升。
+
+默认三个模型角色与两个程序取证模块见[取证执行和调度职责](collection-boundaries.md)，包含 Knowledge 检索、提前校验补查计划及按角色隔离纠正额度；全部失败与复测保存在[验证摘要](collection-boundaries-runs.json)。
+
 当前默认流程见[计划取证与直接复核](planned-investigation.md)：Supervisor 规划查询，Investigation 程序执行，Diagnosis/Reviewer 判断原始证据，操作仍需人工确认。旧取证 Agent 与盲审保留为对照，免费脚本明确使用旧控制模式。本轮全部真实结果、版本及局限见[验证摘要](planned-investigation-runs.json)。
 
 最新局部收尾见[Reviewer 契约与非关键触发未知](review-handoff.md)：减少重复分类，保留必要缺口；完整结果见[验证摘要](review-handoff-runs.json)。

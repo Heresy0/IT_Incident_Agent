@@ -89,13 +89,24 @@ class RunContext:
                 self.emit_callback(event)
             record_event(event)
 
-    def claim_repair(self, state, *, reviewer=False, review_stage=None):
+    def claim_repair(self, state, *, reviewer=False, review_stage=None, repair_role=None):
         """One collection correction; optionally one per registered review stage.
 
         Eligibility never adds model calls. Standalone/parallel collection
         continue sharing one allowance; all calls use the original budget.
         """
         with self.lock:
+            if repair_role is not None:
+                if repair_role not in {'supervisor', 'diagnosis', 'reviewer'} or review_stage is not None:
+                    raise ValueError('unregistered role correction')
+                roles = state.setdefault('role_repairs', {})
+                if roles.get(repair_role, 0) >= 1:
+                    return False
+                roles[repair_role] = roles.get(repair_role, 0) + 1
+                state['repairs'] += 1
+                if repair_role == 'reviewer':
+                    state['reviewer_repairs'] = state.get('reviewer_repairs', 0) + 1
+                return True
             reviewed = state.get('reviewer_repairs', 0)
             used = reviewed if reviewer else state['repairs'] - reviewed
             if reviewer and review_stage is not None:

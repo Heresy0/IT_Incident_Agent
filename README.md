@@ -4,6 +4,10 @@
 
 默认采用[计划驱动取证与直接复核](examples/showcase/planned-investigation.md)：Supervisor 规划具体查询，Investigation 程序模块校验并执行，不调用独立取证模型。原始证据交给 Diagnosis/Reviewer 判断，查询完成不等于原因确认。旧 `agent` 模式与观测盲审仍可显式用于对照；免费脚本演示保留原控制流程。
 
+最新[取证执行和调度职责](examples/showcase/collection-boundaries.md)：Knowledge 也按计划执行检索；Supervisor 收窄为规划职责，证据支持程度交给诊断与复核。补查任务数量在派发前校验，三个核心模型角色各有全运行一次纠正额度，均计入原总预算。
+
+[复核关键缺口与核查结果说明](examples/showcase/review-materiality.md)：按问题实际影响区分未知项，默认核查建议采用程序生成的中性预期结果，原文保留审计。真实验证保留失败与误拦；有条件变更复核仍偏保守。
+
 [Reviewer 契约与收尾](examples/showcase/review-handoff.md)：程序按问题用途填充缺口类别；机制和有效下一步已复核、关键证据完整时，纯触发未知作为人工待核实限制保留。关键未知仍阻塞，原补查请求和未确认结论保留在运行记录。
 
 [Reviewer 分阶段纠正额度](examples/showcase/reviewer-stage-budget.md)亦可切换试验：split 模式盲审和最终复核各最多纠正一次，仍计入原总预算；默认保留共享一次。
@@ -51,11 +55,11 @@ flowchart TD
     E --> H[人工确认解决与保存经验]
 ```
 
-- Supervisor、Diagnosis、Reviewer 与可选 Knowledge 使用同一基础模型的不同提示词和局部消息历史；Investigation 保留为执行已校验查询的程序模块。LangGraph 编排阶段，Investigation / Knowledge 同轮独立任务可并行，诊断、复核及定向补查顺序执行。
+- 默认 Supervisor、Diagnosis、Reviewer 使用同一基础模型的不同提示词和局部消息历史；Investigation 与可选 Knowledge 为执行已校验查询的程序模块。LangGraph 编排阶段，两类取证同轮独立任务可并行，诊断、复核及定向补查顺序执行。
 - 六个只读工具：指标、日志、变更、负责人、手册检索、已确认历史工单检索。执行前检查身份、角色、服务、环境、版本与时间范围。
 - 取证按症状、机制与合理替代解释的问题覆盖决定收尾，聚焦查询不代替完整性；未解决问题在限次或预算耗尽时明确保留。Reviewer 提交证据缺口，Supervisor 可替换查询提示并规划具体补查，执行器只执行通过权限、去重和预算检查的调度计划。
 - RunContext 原子计数并约束模型、工具及时间预算；分支持有独立台账，汇总证据并保留失败缺口。严格输出契约、服务端来源引用、查询去重、任务检查与有界结构纠正构成 Harness。
-- 总上限由环境与已授权请求决定，当前配置示例为32次模型、48次工具、300秒。常规最多4次调度、6个任务、1轮补查；仅在明确区分价值、新查询及完整收尾预算通过门禁后，最多[追加一次补查](examples/showcase/additional-rework.md)，临时开放第5次调度/第7个任务位置。取证与诊断共享1次结构纠正，Reviewer另有1次，均消耗原模型总预算；单Agent仍最多1次。
+- 总上限由环境与已授权请求决定，当前配置示例为32次模型、48次工具、300秒。常规最多4次调度、6个任务、1轮补查；仅在明确区分价值、新查询及完整收尾预算通过门禁后，最多[追加一次补查](examples/showcase/additional-rework.md)，临时开放第5次调度/第7个任务位置。默认 Supervisor、Diagnosis、Reviewer 全运行各最多纠正1次，均消耗原模型总预算；旧 Agent 模式保留共享取证/诊断1次及 Reviewer 1次，单 Agent 仍最多1次。
 - 默认 Reviewer 直接核验原始证据、台账和草稿，输入不含已有问题状态、旧复核结论或取证模型的候选判断。观测盲审保留为可选对照，两种路径都保留引用校验和阻塞审计；症状、机制的阻塞属性由程序固定，模型只能评估证据是否支持。历史迭代见[改进记录](examples/showcase/agent-improvement.md)。
 - 阻塞复核须说明缺失观测、影响目标和判断变化；报告分开记录查询执行、机制支持与停止原因，合法补查交给调度者规划。实施及真实失败轨迹见[诊断审计记录](examples/showcase/diagnostic-audit.md)。
 - 当前在 v6 恢复点上[精简最终 Reviewer](examples/showcase/focused-review.md)，并校验[缺口归属、预留补查预算](examples/showcase/scope-rework-budget.md)：判断结论、下一步和证据缺口，补查参数由 Supervisor 规划。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查保留。恢复点见[版本回退记录](examples/showcase/rollback-v6.md)；逐项断言和决策分支实验已撤回，见[历史记录](examples/showcase/claim-decision-review.md)。

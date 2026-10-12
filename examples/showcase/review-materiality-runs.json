@@ -1,0 +1,2513 @@
+{
+  "final_source_version": "3bddfacd949ea956",
+  "model": "qwen3.7-flash",
+  "regression": {
+    "total": 483,
+    "passed": 476,
+    "skipped_database_integration": 7,
+    "seconds": 64.555,
+    "log": "output/review-materiality-regression-final.log"
+  },
+  "scope": [
+    "review gap materiality",
+    "neutral check outcome wording"
+  ],
+  "assessment": {
+    "overall_quality_improvement_proven": false,
+    "check_outcome_presupposition_prevented_by_program": true,
+    "original_expected_result_preserved_in_audit": true,
+    "final_real_reviewer_still_overblocks_conditional_change": true,
+    "experimental_extra_reviewer_field_reverted": true,
+    "raw_bad_check_result_not_detected_by_final_reviewer": "Program canonicalizes it before review; not a model detection claim.",
+    "human_review": "Codex assistant inspected outputs; no independent human scoring.",
+    "source_interrupted_batch": "a920ef5c failed source consistency after an edit during execution; excluded from quality comparisons."
+  },
+  "batches": [
+    {
+      "kind": "workflow",
+      "directory": "output/investigation-stage/29e453e6-66c3-4bdc-8329-8f39f0c9fef4",
+      "plan": {
+        "source_version": "fa9958988eb10015",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "fresh_001",
+          "fresh_002",
+          "fresh_003"
+        ],
+        "arms": [
+          "programmatic"
+        ],
+        "knowledge_mode": "same_as_investigation_arm",
+        "reviewer_repair_mode": "shared",
+        "review_mode": "direct",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_arm_case": 1,
+        "maximum_model_calls": 96,
+        "read_only": true,
+        "estimated_cost": null,
+        "dataset_freeze_sha256": "730eed6ca155de1068197e8673432e1edc9a0720e73c7e36ee284c7d5b43b134"
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "fresh_001-programmatic",
+          "report_file": "output/investigation-stage/29e453e6-66c3-4bdc-8329-8f39f0c9fef4/fresh_001-programmatic.json",
+          "report_sha256": "5af81b34b3a14347c8b0f18152cc9d6bbcdde343594015a5785469bd35bf0117",
+          "source_version": "fa9958988eb10015",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "MODEL_OUTPUT_INVALID",
+          "model_requests_accounted": 9,
+          "tool_calls": 4,
+          "duration_ms": 69031,
+          "rework_rounds": 1,
+          "repair_counts": {
+            "supervisor": 1,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [
+            {
+              "role": "supervisor",
+              "reason": "INVALID_TASK_CHECK",
+              "details": [
+                {
+                  "code": "TOOL_DENIED",
+                  "path": "tasks.1.checks.1.args",
+                  "tool": "search_runbooks",
+                  "role": "investigation",
+                  "allowed_tools": [
+                    "get_recent_changes",
+                    "get_service_logs",
+                    "get_service_metrics",
+                    "get_service_owner"
+                  ],
+                  "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+                }
+              ]
+            },
+            {
+              "role": "supervisor",
+              "reason": "INVALID_TASK_CHECK",
+              "details": [
+                {
+                  "code": "INVALID_ARGUMENTS",
+                  "path": "tasks.0.checks.0.args",
+                  "tool": "get_service_logs",
+                  "role": "investigation",
+                  "allowed_tools": [
+                    "get_recent_changes",
+                    "get_service_logs",
+                    "get_service_metrics",
+                    "get_service_owner"
+                  ],
+                  "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_06d19fb906a7804244332934和EV_618b8518eb0fe27a3b523fd5直接提供了指定时间点的错误率指标数据，与陈述一致。",
+              "evidence_ids": [
+                "EV_06d19fb906a7804244332934",
+                "EV_618b8518eb0fe27a3b523fd5"
+              ]
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_47ed3eb418ba79e2910ee1e4记录了变更摘要，明确说明仅更新日志格式，未改变归档路径和卷挂载，支持该陈述。",
+              "evidence_ids": [
+                "EV_47ed3eb418ba79e2910ee1e4"
+              ]
+            },
+            {
+              "target_id": "F3",
+              "verdict": "supported",
+              "reason": "EV_9a5c81285db0a17d73f68e8d包含INFO级别日志，显示远端探测返回200且连接成功，支持依赖正常的陈述。",
+              "evidence_ids": [
+                "EV_9a5c81285db0a17d73f68e8d"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "uncertain",
+              "reason": "虽然变更摘要(F2)暗示配置可能受影响，但查询本地应用ERROR/WARN日志结果为空(EV缺失)，无法确认是否存在本地初始化或配置加载异常。缺乏关键错误堆栈证据。",
+              "evidence_ids": [
+                "EV_47ed3eb418ba79e2910ee1e4"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前仅有探测成功的日志(F3)，缺乏故障时间窗内实际写入阶段的远端响应记录。无法排除瞬时拒绝或协议不匹配的可能性。",
+              "evidence_ids": [
+                "EV_9a5c81285db0a17d73f68e8d"
+              ]
+            },
+            {
+              "target_id": "H3",
+              "verdict": "supported",
+              "reason": "变更发生在故障前(F2)，且存在写入失败现象(F1)。由于H1和H2均因证据不足处于uncertain状态，H3作为区分两者的触发假设是合理的，且有变更事实支持。",
+              "evidence_ids": [
+                "EV_47ed3eb418ba79e2910ee1e4"
+              ]
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "鉴于当前工具无法获取远端内部状态(H2不确定)，人工核查是获取必要信息以区分H1/H2的有效且必要的下一步行动。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工核查远端对象存储服务的访问日志或监控面板，确认故障时间窗内是否存在针对receipt-archive服务的写入拒绝、超时或错误响应。",
+              "condition": "当前工具无法读取远端服务内部状态，需人工介入。",
+              "expected_result": "若发现远端有大量写入失败记录，则支持H2（远端问题）；若远端记录正常，则更支持H1（本地问题）。",
+              "risk": "无操作风险，仅为信息收集。",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本地应用侧因配置加载异常、初始化错误或资源限制导致写入请求处理失败（如抛出内部异常），尽管底层依赖连接正常。",
+              "level": "mechanism",
+              "status": "unresolved"
+            },
+            {
+              "cause": "远端对象存储虽然在探测时响应正常，但在实际写入阶段发生了瞬时拒绝、超时或协议不匹配。",
+              "level": "alternative",
+              "status": "unresolved"
+            },
+            {
+              "cause": "故障由部署变更触发，但具体原因需进一步区分是本地配置副作用还是远端交互问题。",
+              "level": "trigger",
+              "status": "supported"
+            }
+          ]
+        },
+        {
+          "case": "fresh_002-programmatic",
+          "report_file": "output/investigation-stage/29e453e6-66c3-4bdc-8329-8f39f0c9fef4/fresh_002-programmatic.json",
+          "report_sha256": "2d9d0312812f5f2afed13faf1d140fac2810d6472bb99215e6795aabbbea8019",
+          "source_version": "fa9958988eb10015",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 5,
+          "tool_calls": 2,
+          "duration_ms": 40344,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "REVIEW_BLOCKER_SCOPE",
+              "details": [
+                {
+                  "need_id": "N3",
+                  "path": "need_assessments.blocker.affected_targets",
+                  "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb日志明确记录CERT_EXPIRED及TLS握手拒绝，时间戳与陈述一致。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ]
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_36799151eb70055c9c7dfbd3、EV_2443f4053740ba3421b9df43显示故障期间错误率飙升；EV_4fdf025fb2f71cf8d53df160、EV_63904d490e6fb2335848bfe6显示此前正常，数据支持陈述。",
+              "evidence_ids": [
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43",
+                "EV_4fdf025fb2f71cf8d53df160",
+                "EV_63904d490e6fb2335848bfe6"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb直接证实因远端证书过期导致TLS连接受阻，机制成立。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "日志仅说明证书过期现象，未提供远端证书变更历史或管理策略证据以确认是触发源。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "H3",
+              "verdict": "not_supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb指出远端证书过期，且无本地配置持有旧证书的佐证，反证了本地配置未适配的说法。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ]
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "作为只读核查待办，旨在区分触发源（H2）与机制（H1），具有可操作性且风险低。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "核查近期变更以排除部署影响并确认触发源。",
+              "condition": "需要确认故障窗口内是否有相关部署或配置变更，以及远端证书变更情况。",
+              "expected_result": "若发现近期有针对shipment-fetcher的部署或配置变更，可能指向本地引入的问题；若无变更，则更倾向于远端证书自然过期或远端变更导致的触发。",
+              "risk": "只读查询，无风险。",
+              "requires_approval": false,
+              "kind": "read_only_check",
+              "checks": [
+                {
+                  "tool": "get_recent_changes",
+                  "args": {
+                    "start": "2026-10-12T09:50:00Z",
+                    "end": "2026-10-12T10:15:00Z",
+                    "category": null
+                  }
+                }
+              ],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "近端服务与物流状态拉取目标的TLS证书验证失败导致连接建立受阻。",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "远端服务证书更新或变更触发了本次故障。",
+              "level": "trigger",
+              "status": "unresolved"
+            },
+            {
+              "cause": "本地配置未正确更新以适配新的远端证书。",
+              "level": "alternative",
+              "status": "refuted"
+            }
+          ]
+        },
+        {
+          "case": "fresh_003-programmatic",
+          "report_file": "output/investigation-stage/29e453e6-66c3-4bdc-8329-8f39f0c9fef4/fresh_003-programmatic.json",
+          "report_sha256": "e14400f51ceb5c3ea48473fced5c28af704312d7084ba861ead098a5275a73d3",
+          "source_version": "fa9958988eb10015",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 10,
+          "tool_calls": 6,
+          "duration_ms": 73829,
+          "rework_rounds": 1,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 1,
+            "reviewer": 0
+          },
+          "validation_failures": [
+            {
+              "role": "diagnosis",
+              "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "details": [
+                {
+                  "path": "recommended_actions.0.checks.0",
+                  "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+                  "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_a123ce798d12badf2368edbf、EV_06801a622348252a5009d7e6、EV_96230199e6b45b9ba8de1cff、EV_ec3c1e55a0e3ab65dc038cdc 提供了故障前后指标数据，时间范围与工单一致。",
+              "evidence_ids": [
+                "EV_a123ce798d12badf2368edbf",
+                "EV_06801a622348252a5009d7e6",
+                "EV_96230199e6b45b9ba8de1cff",
+                "EV_ec3c1e55a0e3ab65dc038cdc"
+              ]
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_e9a9a9c6b815f321d473fd8d 记录了 10:04 的部署变更摘要，时间与 F1 中现象发生时间吻合。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "uncertain",
+              "reason": "虽然存在超时和错误率上升的现象（F1），但确认具体依赖交互失败原因的关键日志查询（get_service_logs, category=dependency）因 SOURCE_UNAVAILABLE 失败，缺乏直接证据支持近端处理异常的具体机制。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "虽有部署变更（F2），但无法通过日志确认是否存在配置加载错误或新异常堆栈（日志查询失败）。仅凭时间相关性不足以确立因果，需排除其他因素。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d"
+              ]
+            },
+            {
+              "target_id": "H3",
+              "verdict": "uncertain",
+              "reason": "远端依赖服务状态未知。由于获取 dependency 类别日志失败，无法区分是本地主动拒绝/超时还是收到远端错误响应，缺乏验证远端不可用的证据。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "在自动日志查询受阻的情况下，人工核实依赖服务名称及健康状态是获取关键信息以区分故障根源的必要且可行的待办事项。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工核实目录预览服务的依赖服务名称及其在故障期间的健康状态。",
+              "condition": "系统日志查询功能暂时不可用，无法自动提取依赖信息。",
+              "expected_result": "明确具体的依赖服务后，可针对性地检查该依赖服务的监控或日志，从而区分故障根源是在本地配置/代码还是远端依赖。",
+              "risk": "无操作风险，仅为信息收集。",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "近端服务在处理请求时因依赖交互异常导致超时和错误率上升。",
+              "level": "mechanism",
+              "status": "unresolved"
+            },
+            {
+              "cause": "10:04的展示文案部署变更引入了不兼容的配置或代码逻辑，导致后续请求处理异常。",
+              "level": "trigger",
+              "status": "unresolved"
+            },
+            {
+              "cause": "远端依赖服务自身发生不可用或响应变慢，导致本地服务被动超时。",
+              "level": "alternative",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "reviewer_probe",
+      "directory": "output/review-materiality/a0e1efda-63e9-4169-abd1-fbe78d15d488",
+      "plan": {
+        "source_version": "fa9958988eb10015",
+        "script_sha256": "02ac1dd02656160f5176daa05cf27c4f093b815b0b9c42351f34c09ad2351e74",
+        "fixture_sha256": "e457eaa6831115d7cd57b81a712b719a538f2de66c76412e72743de9c3ae2a33",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "neutral_check",
+          "presupposed_check_result",
+          "unconditional_change"
+        ],
+        "limits": {
+          "model_calls": 8,
+          "web_calls": 12,
+          "tool_calls": 4,
+          "seconds": 120,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_case": 1,
+        "real_roles": [
+          "reviewer"
+        ],
+        "read_only_provider": true,
+        "estimated_cost": null,
+        "maximum_real_model_calls": 9
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "neutral_check",
+          "report_file": "output/review-materiality/a0e1efda-63e9-4169-abd1-fbe78d15d488/neutral_check.json",
+          "report_sha256": "c62e72ee6eaefcd787b2a755e118eb623ff3ab1bf803c585b441d903b24e4200",
+          "source_version": "fa9958988eb10015",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8593,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED，且时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端流控拒绝导致写入失败，证据充分支持该机制。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅确认了流控现象，未包含远端配额变更记录或维护方操作日志，无法证实是人为下调配额触发。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "作为获取未知信息（远端状态）的待办事项，其条件已满足且无配置风险，逻辑成立。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "取得流控状态和配额记录，区分临时流控与持续配额限制",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "presupposed_check_result",
+          "report_file": "output/review-materiality/a0e1efda-63e9-4169-abd1-fbe78d15d488/presupposed_check_result.json",
+          "report_sha256": "47f137f23a616bf790a7a716ffc833f72568fcc28bde95c64e5e10484d82e302",
+          "source_version": "fa9958988eb10015",
+          "status": "partial",
+          "review_status": "not_performed",
+          "termination_reason": "MODEL_OUTPUT_INVALID",
+          "model_requests_accounted": 2,
+          "tool_calls": 2,
+          "duration_ms": 17625,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "REVIEW_BLOCKER_REQUIRED",
+              "details": [
+                {
+                  "need_id": "N3",
+                  "path": "need_assessments.blocker",
+                  "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+                }
+              ]
+            },
+            {
+              "role": "reviewer",
+              "reason": "REVIEW_BLOCKER_SCOPE",
+              "details": [
+                {
+                  "need_id": "N3",
+                  "path": "need_assessments.blocker.affected_targets",
+                  "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "tentative"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "tentative"
+            }
+          ]
+        },
+        {
+          "case": "unconditional_change",
+          "report_file": "output/review-materiality/a0e1efda-63e9-4169-abd1-fbe78d15d488/unconditional_change.json",
+          "report_sha256": "2a88ec92bfb8a5e8ce3a235a475a2f978574d6044b195858f1a50a025492c3a3",
+          "source_version": "fa9958988eb10015",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 11016,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503 RATE_LIMITED及未写入结果，时间戳与日志一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "远端返回RATE_LIMITED直接证明流控拒绝导致写入失败，证据充分且因果清晰。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "仅凭当前日志无法确认配额被下调，缺乏远端变更记录或历史对比证据，需补查。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议基于H2（配额下调）这一未证实假设，若根因非配额问题则建议无效；且修改配额风险高，需先验证原因。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "reviewer_probe",
+      "directory": "output/review-materiality/a2517256-4d4c-482b-934c-446c62887b5b",
+      "plan": {
+        "source_version": "774ed9b311e0feac",
+        "script_sha256": "6566dcf93ff47f85a89a150b4272d5a18345996138d44dce63d872d535b294e4",
+        "fixture_sha256": "e457eaa6831115d7cd57b81a712b719a538f2de66c76412e72743de9c3ae2a33",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "neutral_check",
+          "presupposed_check_result",
+          "unconditional_change"
+        ],
+        "limits": {
+          "model_calls": 8,
+          "web_calls": 12,
+          "tool_calls": 4,
+          "seconds": 120,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_case": 1,
+        "real_roles": [
+          "reviewer"
+        ],
+        "read_only_provider": true,
+        "estimated_cost": null,
+        "maximum_real_model_calls": 9
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "neutral_check",
+          "report_file": "output/review-materiality/a2517256-4d4c-482b-934c-446c62887b5b/neutral_check.json",
+          "report_sha256": "18f97ffee08c9238330e50aa975602b9accb70872803724cfeae39266547f253",
+          "source_version": "774ed9b311e0feac",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 10625,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8 明确记录了 DNS/TLS 成功、HTTP 503 RATE_LIMITED 及 Retry-After=60，与陈述完全一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志证据直接显示远端返回流控拒绝导致写入失败，因果链条清晰且由当前观测支持。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "缺乏远端配额变更记录或维护方操作日志，无法确认是人为下调配额还是其他自动策略触发，属于未知触发来源。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "在机制已确认但触发原因不明时，人工联系维护方核对状态和记录是获取缺失信息的有效待办，风险可控且符合逻辑。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "取得流控状态和配额记录，区分临时流控与持续配额限制",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "presupposed_check_result",
+          "report_file": "output/review-materiality/a2517256-4d4c-482b-934c-446c62887b5b/presupposed_check_result.json",
+          "report_sha256": "13c713d362e745241b14a4abc34132f20add71915d31e6d63be5fa9a7b7a0a0e",
+          "source_version": "774ed9b311e0feac",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8156,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED，且时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端流控拒绝导致写入失败，证据充分支持该机制解释现象。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "日志声明未取得远端配额变更记录，当前观测无法证实或排除维护方下调配额的假设。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "针对未知的触发原因（H2），人工联系维护方是获取必要信息的合理待办事项，符合manual_check定义。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "确认维护方降低了配额并取得预计恢复时间",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "unconditional_change",
+          "report_file": "output/review-materiality/a2517256-4d4c-482b-934c-446c62887b5b/unconditional_change.json",
+          "report_sha256": "0e0a996723788e364e2ff63f726646750093ab413e22220fbfa97ad810f0b875",
+          "source_version": "774ed9b311e0feac",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8328,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503及RATE_LIMITED，与陈述一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8直接证实远端流控拒绝导致写入失败，机制成立。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "缺乏远端配额变更记录证据，无法确认是否由维护方下调触发，仅凭现象无法推断原因。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议基于H2（配额下调）这一未证实假设，且预期结果断言了未知原因下的唯一恢复路径，需先核实触发源。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "reviewer_probe",
+      "directory": "output/review-materiality/a222dd79-ba55-47f8-a115-1727b6475804",
+      "plan": {
+        "source_version": "20872ad63d2fa632",
+        "script_sha256": "6566dcf93ff47f85a89a150b4272d5a18345996138d44dce63d872d535b294e4",
+        "fixture_sha256": "e457eaa6831115d7cd57b81a712b719a538f2de66c76412e72743de9c3ae2a33",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "neutral_check",
+          "presupposed_check_result",
+          "unconditional_change"
+        ],
+        "limits": {
+          "model_calls": 8,
+          "web_calls": 12,
+          "tool_calls": 4,
+          "seconds": 120,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_case": 1,
+        "real_roles": [
+          "reviewer"
+        ],
+        "read_only_provider": true,
+        "estimated_cost": null,
+        "maximum_real_model_calls": 9
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "neutral_check",
+          "report_file": "output/review-materiality/a222dd79-ba55-47f8-a115-1727b6475804/neutral_check.json",
+          "report_sha256": "433138823d29cc0fc709a2e721995c9d98eed5f9325c689d8402737a189fb296",
+          "source_version": "20872ad63d2fa632",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8750,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503及RATE_LIMITED，与陈述一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端返回流控拒绝导致写入失败，因果链条完整且有证据支持。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅知被流控，无远端配额变更记录或维护方下调配额的证据，无法确认触发原因。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：针对未知触发原因（H2），人工联系维护方是获取必要信息的合理待办，风险可控。",
+              "evidence_ids": [],
+              "expected_result_verdict": "uncertain"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "presupposed_check_result",
+          "report_file": "output/review-materiality/a222dd79-ba55-47f8-a115-1727b6475804/presupposed_check_result.json",
+          "report_sha256": "e25b0cab8b0012fe8e9f070429435d595b960c7923fa324aac92a60c5fad80d3",
+          "source_version": "20872ad63d2fa632",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8078,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503及RATE_LIMITED，与陈述一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端返回流控拒绝导致写入失败，因果链条完整且有证据支持。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅知被流控，未获取远端配额变更记录，无法确认是否由维护方下调触发。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：针对未知触发原因（H2），人工联系核对是合理的待办行动，且无配置修改风险。",
+              "evidence_ids": [],
+              "expected_result_verdict": "uncertain"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "unconditional_change",
+          "report_file": "output/review-materiality/a222dd79-ba55-47f8-a115-1727b6475804/unconditional_change.json",
+          "report_sha256": "8227241fb7c245c626ff0ac4ad2e0734d36519ce967f7f67b90f826d518cb092",
+          "source_version": "20872ad63d2fa632",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 9109,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503及RATE_LIMITED，且时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端返回流控拒绝导致写入失败，证据充分支持该机制。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅确认了流控发生，未获取远端配额变更记录，无法证实是维护方下调触发。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：针对已确认的流控现象，要求恢复配额是合理的应对动作；但预期结果基于未知原因假设。",
+              "evidence_ids": [],
+              "expected_result_verdict": "uncertain"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "workflow",
+      "directory": "output/investigation-stage/a920ef5c-8af4-476a-bbb1-20ec946921d5",
+      "plan": {
+        "source_version": "20872ad63d2fa632",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "fresh_002",
+          "fresh_003"
+        ],
+        "arms": [
+          "programmatic"
+        ],
+        "knowledge_mode": "same_as_investigation_arm",
+        "reviewer_repair_mode": "shared",
+        "review_mode": "direct",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_arm_case": 1,
+        "maximum_model_calls": 64,
+        "read_only": true,
+        "estimated_cost": null,
+        "dataset_freeze_sha256": "730eed6ca155de1068197e8673432e1edc9a0720e73c7e36ee284c7d5b43b134"
+      },
+      "source_consistency_verified": false,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "fresh_002-programmatic",
+          "report_file": "output/investigation-stage/a920ef5c-8af4-476a-bbb1-20ec946921d5/fresh_002-programmatic.json",
+          "report_sha256": "29f44c91bd405631c003168e19cccb66eeb2dcb28e6e7fb8195d752453cb2a0d",
+          "source_version": "20872ad63d2fa632",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "REWORK_LIMIT",
+          "model_requests_accounted": 7,
+          "tool_calls": 4,
+          "duration_ms": 54140,
+          "rework_rounds": 1,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb明确记录了CERT_EXPIRED错误及TLS握手拒绝详情，时间戳与陈述一致。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_36799151eb70055c9c7dfbd3、EV_2443f4053740ba3421b9df43、EV_4fdf025fb2f71cf8d53df160、EV_63904d490e6fb2335848bfe6提供了故障前后（10:10 vs 09:55）的错误率数据，数值与陈述完全吻合。",
+              "evidence_ids": [
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43",
+                "EV_4fdf025fb2f71cf8d53df160",
+                "EV_63904d490e6fb2335848bfe6"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志证据直接显示远端证书过期导致TLS握手被拒，且发生在HTTP请求之前，因果链条完整且有直接观测支持。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前机制已确立，但触发源（远端变更操作）缺乏本地配置变更记录或外部系统日志佐证，无法确认具体触发事件。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：作为获取未知触发源的待办事项，其行动合理且无本地风险；预期结果基于条件分支，符合manual_check性质。",
+              "evidence_ids": [],
+              "expected_result_verdict": "uncertain"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "远端物流服务的TLS证书于10:00过期，导致本地服务发起的HTTPS连接在握手阶段被直接拒绝。",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "远端物流服务的证书更新、轮换或配置变更操作发生在10:00左右。",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "fresh_003-programmatic",
+          "report_file": "output/investigation-stage/a920ef5c-8af4-476a-bbb1-20ec946921d5/fresh_003-programmatic.json",
+          "report_sha256": "4e6e445b86f424bc943fd08e7d0d85186211ef3949ca14c74a4ad77648b869ed",
+          "source_version": "20872ad63d2fa632",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 6,
+          "tool_calls": 5,
+          "duration_ms": 40515,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_a123ce798d12badf2368edbf、EV_06801a622348252a5009d7e6、EV_96230199e6b45b9ba8de1cff、EV_ec3c1e55a0e3ab65dc038cdc 提供了故障窗口内错误率和延迟的具体数值，支持陈述。",
+              "evidence_ids": [
+                "EV_a123ce798d12badf2368edbf",
+                "EV_06801a622348252a5009d7e6",
+                "EV_96230199e6b45b9ba8de1cff",
+                "EV_ec3c1e55a0e3ab65dc038cdc"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_e9a9a9c6b815f321d473fd8d 记录了部署摘要，确认了展示文案更新且无配置/依赖健康信息记录，支持陈述。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "uncertain",
+              "reason": "缺乏 resource/configuration 日志证据（查询失败），无法证实或排除应用内部逻辑变更导致的阻塞或资源争用。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "仅有部署摘要，缺乏 dependency 日志证据（查询失败），无法证实新代码是否触发了下游拒绝或协议错误。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H3",
+              "verdict": "uncertain",
+              "reason": "缺乏 dependency 日志证据（查询失败），无法区分是本地阻塞还是远程调用等待，无法评估远端依赖状态。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：在自动日志查询失败的背景下，人工核实日志是获取未知信息的合理待办，风险低且具备可操作性。",
+              "evidence_ids": [],
+              "expected_result_verdict": "uncertain"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "应用内部逻辑变更导致处理阻塞或资源争用",
+              "level": "mechanism",
+              "status": "unresolved"
+            },
+            {
+              "cause": "近期部署的展示文案更新引入了不兼容的依赖行为或配置变更",
+              "level": "trigger",
+              "status": "unresolved"
+            },
+            {
+              "cause": "远端依赖服务偶发不可用或响应变慢",
+              "level": "alternative",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "reviewer_probe",
+      "directory": "output/review-materiality/60f2f081-c63f-4970-b36e-b1e6a777835a",
+      "plan": {
+        "source_version": "6c55422e162a09b4",
+        "script_sha256": "fd9ef87d0d6fad0f1dd1df71b5d1df7f154b1c58a69edb18332ede6f019bd494",
+        "fixture_sha256": "86c0f59f2445ef9a3940a85a9f64d7ed38758574bf6538634a5636ce628e18de",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "neutral_check",
+          "presupposed_check_result",
+          "unconditional_change",
+          "conditional_change"
+        ],
+        "limits": {
+          "model_calls": 8,
+          "web_calls": 12,
+          "tool_calls": 4,
+          "seconds": 120,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_case": 1,
+        "real_roles": [
+          "reviewer"
+        ],
+        "read_only_provider": true,
+        "estimated_cost": null,
+        "maximum_real_model_calls": 12
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "neutral_check",
+          "report_file": "output/review-materiality/60f2f081-c63f-4970-b36e-b1e6a777835a/neutral_check.json",
+          "report_sha256": "1cbd70c9dbac70f4c61f909dcf19da73812b381486dd3622fe3a05a550410c1a",
+          "source_version": "6c55422e162a09b4",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 2,
+          "tool_calls": 2,
+          "duration_ms": 21656,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.3.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED、Retry-After=60，且未成功写入。观测时间与范围与任务查询一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "当前机制为远端流控拒绝导致写入失败。EV_49a4a1e95340d41bf2c171f8直接提供了HTTP 503和RATE_LIMITED证据，解释了现象。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "假设维护方下调配额触发流控。虽然存在流控，但日志明确指出“未取得远端配额或变更记录”，缺乏支持该特定触发原因的证据。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "人工联系维护方核对状态是获取未知触发原因（如配额变更）的合理待办事项。条件已满足（观测到流控），风险可控。",
+              "evidence_ids": [],
+              "expected_result_verdict": "appropriate"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "取得流控状态和配额记录，区分临时流控与持续配额限制",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "presupposed_check_result",
+          "report_file": "output/review-materiality/60f2f081-c63f-4970-b36e-b1e6a777835a/presupposed_check_result.json",
+          "report_sha256": "598bdc71cef4389b6d7995b7ed34ee0cf41a66674c1276cc73894b13b7c467a4",
+          "source_version": "6c55422e162a09b4",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 9625,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED，且时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端流控拒绝导致写入失败，证据充分支持该机制。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅确认了流控现象，未包含远端配额变更记录，无法确定触发原因是维护方下调配额还是其他原因。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：针对未知的触发原因（H2），人工联系维护方是获取必要信息的合理待办事项。",
+              "evidence_ids": [],
+              "expected_result_verdict": "unsupported_assumption"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "unconditional_change",
+          "report_file": "output/review-materiality/60f2f081-c63f-4970-b36e-b1e6a777835a/unconditional_change.json",
+          "report_sha256": "c6264cd17b969a599d47559cbfe6d1a013137bfe50aba41510d0b20b09843799",
+          "source_version": "6c55422e162a09b4",
+          "status": "partial",
+          "review_status": "not_performed",
+          "termination_reason": "MODEL_OUTPUT_INVALID",
+          "model_requests_accounted": 2,
+          "tool_calls": 2,
+          "duration_ms": 16375,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.3.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            },
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.3.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "tentative"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "tentative"
+            }
+          ]
+        },
+        {
+          "case": "conditional_change",
+          "report_file": "output/review-materiality/60f2f081-c63f-4970-b36e-b1e6a777835a/conditional_change.json",
+          "report_sha256": "285c3f76955cbdb557bbce929caff1b88cf1dccc986030fc4305422238acdf50",
+          "source_version": "6c55422e162a09b4",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "REVIEW_INCOMPLETE",
+          "model_requests_accounted": 2,
+          "tool_calls": 2,
+          "duration_ms": 20516,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.3.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED、Retry-After=60，且未成功写入。观测时间2026-09-14T10:05:00在工单范围[09:50, 10:20]内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "当前机制为远端流控拒绝导致写入失败。EV_49a4a1e95340d41bf2c171f8直接提供了RATE_LIMITED和HTTP 503的证据，解释了现象。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "假设维护方下调配额是触发原因，但证据中明确说明“未取得远端配额或变更记录”，缺乏支持该因果链的直接观测。",
+              "evidence_ids": [],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议预期结果未通过复核：建议措施逻辑合理：需先确认配额变化（条件），再恢复并观察错误率（预期结果）。风险与审批流程描述完整。",
+              "evidence_ids": [],
+              "expected_result_verdict": "unsupported_assumption"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "workflow",
+      "directory": "output/investigation-stage/072cf422-b802-4a61-8afb-9bab91838eb5",
+      "plan": {
+        "source_version": "6c55422e162a09b4",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "fresh_002",
+          "fresh_003"
+        ],
+        "arms": [
+          "programmatic"
+        ],
+        "knowledge_mode": "same_as_investigation_arm",
+        "reviewer_repair_mode": "shared",
+        "review_mode": "direct",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_arm_case": 1,
+        "maximum_model_calls": 64,
+        "read_only": true,
+        "estimated_cost": null,
+        "dataset_freeze_sha256": "730eed6ca155de1068197e8673432e1edc9a0720e73c7e36ee284c7d5b43b134"
+      },
+      "source_consistency_verified": true,
+      "current_implementation": false,
+      "records": [
+        {
+          "case": "fresh_002-programmatic",
+          "report_file": "output/investigation-stage/072cf422-b802-4a61-8afb-9bab91838eb5/fresh_002-programmatic.json",
+          "report_sha256": "593d9b71d54463fab7dc0235ff4551d440664b61e271d51a21e69cdd051cd184",
+          "source_version": "6c55422e162a09b4",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 6,
+          "tool_calls": 3,
+          "duration_ms": 56312,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 1,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "diagnosis",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "findings.2.refs.0.reference_id",
+                  "type": "string_pattern_mismatch"
+                }
+              ]
+            },
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.6.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49e6a71603991e995ae568bc明确记录变更摘要为仅调整响应字段，依赖地址、信任链及TLS参数保持不变。",
+              "evidence_ids": [
+                "EV_49e6a71603991e995ae568bc"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb日志显示CERT_EXPIRED错误，且消息指出远端证书notAfter为10:00，导致TLS握手拒绝。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "F3",
+              "verdict": "supported",
+              "reason": "EV_36799151eb70055c9c7dfbd3和EV_2443f4053740ba3421b9df43显示10:10时依赖和请求错误率显著升高（0.79/0.81），而EV_4fdf025fb2f71cf8d53df160和EV_63904d490e6fb2335848bfe6显示09:55时处于低位（0.0/0.02）。",
+              "evidence_ids": [
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43",
+                "EV_4fdf025fb2f71cf8d53df160",
+                "EV_63904d490e6fb2335848bfe6"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "F2提供确凿证据表明远端证书在10:00过期，直接导致10:01起TLS握手被拒；F3证实了随后的错误率飙升，因果链条完整。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb",
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H2",
+              "verdict": "supported",
+              "reason": "F1证明本地配置未变，排除了本地发布或配置错误作为触发原因；故障由外部证书过期这一触发条件引起。",
+              "evidence_ids": [
+                "EV_49e6a71603991e995ae568bc"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "H3",
+              "verdict": "not_supported",
+              "reason": "F1明确指出依赖地址、信任链及TLS参数保持不变，且无回滚记录，直接反驳了本地版本回滚或配置错误的假设。",
+              "evidence_ids": [
+                "EV_49e6a71603991e995ae568bc"
+              ],
+              "expected_result_verdict": null
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "鉴于当前机制已确定为远端证书过期且本地无法修复，联系远端团队确认状态是合理的待办事项。",
+              "evidence_ids": [],
+              "expected_result_verdict": "appropriate"
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "联系远端物流服务团队确认证书续期状态及预计恢复时间。",
+              "condition": "当前远端证书已过期且本地无法通过配置修复。",
+              "expected_result": "获取远端修复时间表，评估是否需临时切换备用通道或等待修复。",
+              "risk": "无本地操作风险，取决于外部响应速度。",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "远端物流服务的TLS证书于10:00过期，导致staging环境服务发起的HTTPS连接被拒绝。",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "远端证书过期是触发条件，而非本地配置或发布变更所致。",
+              "level": "trigger",
+              "status": "supported"
+            },
+            {
+              "cause": "本地版本回滚或配置错误导致故障。",
+              "level": "alternative",
+              "status": "refuted"
+            }
+          ]
+        },
+        {
+          "case": "fresh_003-programmatic",
+          "report_file": "output/investigation-stage/072cf422-b802-4a61-8afb-9bab91838eb5/fresh_003-programmatic.json",
+          "report_sha256": "b88f6fa3067500cb4862313c9819fafe1dac0838c30b5b7f1a2795bde7a45a6d",
+          "source_version": "6c55422e162a09b4",
+          "status": "partial",
+          "review_status": "not_performed",
+          "termination_reason": "MODEL_OUTPUT_INVALID",
+          "model_requests_accounted": 6,
+          "tool_calls": 3,
+          "duration_ms": 48250,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "assessments.5.<extra>",
+                  "type": "extra_forbidden"
+                }
+              ]
+            },
+            {
+              "role": "reviewer",
+              "reason": "REVIEW_BLOCKER_REQUIRED",
+              "details": [
+                {
+                  "need_id": "N3",
+                  "path": "need_assessments.blocker",
+                  "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "应用侧变更导致对下游依赖的调用行为改变（如超时设置收紧、重试逻辑变化），引发级联延迟与错误。",
+              "level": "mechanism",
+              "status": "tentative"
+            },
+            {
+              "cause": "下游依赖服务自身性能下降或不可用，导致上游请求堆积与超时。",
+              "level": "alternative",
+              "status": "tentative"
+            },
+            {
+              "cause": "故障发生的具体触发条件（如特定流量突增、依赖连接池耗尽）未知。",
+              "level": "trigger",
+              "status": "tentative"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "reviewer_probe",
+      "directory": "output/review-materiality/8fb797a2-a004-4214-98f0-291a848272a1",
+      "plan": {
+        "source_version": "3bddfacd949ea956",
+        "script_sha256": "fd9ef87d0d6fad0f1dd1df71b5d1df7f154b1c58a69edb18332ede6f019bd494",
+        "fixture_sha256": "86c0f59f2445ef9a3940a85a9f64d7ed38758574bf6538634a5636ce628e18de",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "neutral_check",
+          "presupposed_check_result",
+          "unconditional_change",
+          "conditional_change"
+        ],
+        "limits": {
+          "model_calls": 8,
+          "web_calls": 12,
+          "tool_calls": 4,
+          "seconds": 120,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_case": 1,
+        "real_roles": [
+          "reviewer"
+        ],
+        "read_only_provider": true,
+        "estimated_cost": null,
+        "maximum_real_model_calls": 12
+      },
+      "source_consistency_verified": true,
+      "current_implementation": true,
+      "records": [
+        {
+          "case": "neutral_check",
+          "report_file": "output/review-materiality/8fb797a2-a004-4214-98f0-291a848272a1/neutral_check.json",
+          "report_sha256": "2b003107c58369c2732b1cb50a75ea9fef04024564e7f42da36468446b4fd777",
+          "source_version": "3bddfacd949ea956",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8656,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED、Retry-After=60，且未成功写入。时间戳与日志一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "当前观测（EV_49a4a1e95340d41bf2c171f8）直接显示远端流控拒绝导致写入失败，机制成立。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "缺乏远端配额变更记录证据，无法确认是否由维护方下调配额触发。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "作为取得未知信息（H2原因）的待办事项，其条件已满足（观测到流控），行动合理。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            }
+          ],
+          "action_outcome_normalizations": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "action_kind": "manual_check",
+              "original_expected_result": "取得流控状态和配额记录，区分临时流控与持续配额限制",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "verdicts_changed": false,
+              "execution_authorized": false
+            }
+          ],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "presupposed_check_result",
+          "report_file": "output/review-materiality/8fb797a2-a004-4214-98f0-291a848272a1/presupposed_check_result.json",
+          "report_sha256": "f5e27535b37e1bae7eddbe6435dcaf38e81ddf2f79b4aec54efcc44550e87798",
+          "source_version": "3bddfacd949ea956",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8719,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED，与陈述一致。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8证实远端流控拒绝导致写入失败，因果链完整。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "当前观测仅显示流控结果，无远端配额变更记录或维护方操作日志支持‘下调配额’这一特定触发原因。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "在机制已确认但触发原因未知时，人工联系维护方是获取缺失信息（如配额变更）的标准待办动作，且风险可控。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "action_kind": "manual_check",
+              "original_expected_result": "确认维护方降低了配额并取得预计恢复时间",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "verdicts_changed": false,
+              "execution_authorized": false
+            }
+          ],
+          "published_actions": [
+            {
+              "action": "人工联系对象存储维护方核对流控状态和近期配额记录",
+              "condition": "已观测到对象写入调用被流控拒绝",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "risk": "只读核实，无配置修改",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "unconditional_change",
+          "report_file": "output/review-materiality/8fb797a2-a004-4214-98f0-291a848272a1/unconditional_change.json",
+          "report_sha256": "55840095bf25250c68b51d0632d1031c416291b21d0807bf5da0e9eff7a33231",
+          "source_version": "3bddfacd949ea956",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 7640,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、HTTP 503及RATE_LIMITED，时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端返回流控拒绝导致写入失败，证据充分支持该机制。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "缺乏远端配额变更记录或维护方操作日志，无法确认是否由下调配额触发。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议基于H2成立的前提（即确认为配额下调），但H2未证实；且需人工审批与验证，当前仅具备条件性建议依据。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "case": "conditional_change",
+          "report_file": "output/review-materiality/8fb797a2-a004-4214-98f0-291a848272a1/conditional_change.json",
+          "report_sha256": "d120dd95b8700cb12ff81f665ed9f81d7ce8955c71ddcdfefdc06002ce59b0fe",
+          "source_version": "3bddfacd949ea956",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 1,
+          "tool_calls": 2,
+          "duration_ms": 8813,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "validation_failures": [],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_49a4a1e95340d41bf2c171f8明确记录了DNS/TLS成功、blob-store返回HTTP 503及RATE_LIMITED，且时间戳在工单范围内。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "日志直接显示远端流控拒绝导致写入失败，证据充分支持该机制解释当前现象。",
+              "evidence_ids": [
+                "EV_49a4a1e95340d41bf2c171f8"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "缺乏远端配额变更记录或维护方确认证据，无法证实是维护方下调配额触发的流控。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "A1",
+              "verdict": "uncertain",
+              "reason": "建议依赖于H2（配额被下调）成立，但H2目前未获支持；且需人工审批和验证，条件尚未满足。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [],
+          "hypothesis_states": [
+            {
+              "cause": "本次对象写入调用收到远端流控拒绝，未成功写入",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "维护方下调配额触发本次流控",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "workflow",
+      "directory": "output/investigation-stage/15a415a3-bd77-4d24-8df5-b81284c7cf03",
+      "plan": {
+        "source_version": "3bddfacd949ea956",
+        "model": "qwen3.7-flash",
+        "cases": [
+          "fresh_002",
+          "fresh_003"
+        ],
+        "arms": [
+          "programmatic"
+        ],
+        "knowledge_mode": "same_as_investigation_arm",
+        "reviewer_repair_mode": "shared",
+        "review_mode": "direct",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "attempts_per_arm_case": 1,
+        "maximum_model_calls": 64,
+        "read_only": true,
+        "estimated_cost": null,
+        "dataset_freeze_sha256": "730eed6ca155de1068197e8673432e1edc9a0720e73c7e36ee284c7d5b43b134"
+      },
+      "source_consistency_verified": true,
+      "current_implementation": true,
+      "records": [
+        {
+          "case": "fresh_002-programmatic",
+          "report_file": "output/investigation-stage/15a415a3-bd77-4d24-8df5-b81284c7cf03/fresh_002-programmatic.json",
+          "report_sha256": "77b9480f844679dd60dd6ebc9e686d596824165b4233d4393e0d2d601115371e",
+          "source_version": "3bddfacd949ea956",
+          "status": "completed",
+          "review_status": "passed",
+          "termination_reason": "FINISHED",
+          "model_requests_accounted": 5,
+          "tool_calls": 2,
+          "duration_ms": 41953,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 1,
+            "reviewer": 0
+          },
+          "validation_failures": [
+            {
+              "role": "diagnosis",
+              "reason": "schema_mismatch",
+              "details": [
+                {
+                  "path": "findings.1.refs.3.reference_id",
+                  "type": "string_pattern_mismatch"
+                }
+              ]
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_1acdf2b57c771a8f87bf13eb日志明确记录CERT_EXPIRED及TLS握手拒绝，时间戳与陈述一致。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ]
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_36799151eb70055c9c7dfbd3、EV_2443f4053740ba3421b9df43、EV_4fdf025fb2f71cf8d53df160数据准确反映故障窗口内错误率飙升及此前正常状态。",
+              "evidence_ids": [
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43",
+                "EV_4fdf025fb2f71cf8d53df160"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "supported",
+              "reason": "证书过期导致握手失败（F1）且引发依赖错误率上升（F2），因果链条完整且有直接证据支持。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb",
+                "EV_36799151eb70055c9c7dfbd3",
+                "EV_2443f4053740ba3421b9df43"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "仅凭证书过期现象无法确定是远端主动轮换还是自然到期，缺乏变更操作记录证据。",
+              "evidence_ids": []
+            },
+            {
+              "target_id": "H3",
+              "verdict": "not_supported",
+              "reason": "日志明确指出是远端证书notAfter过期导致的握手拒绝，而非本地缓存或配置异常，有反证。",
+              "evidence_ids": [
+                "EV_1acdf2b57c771a8f87bf13eb"
+              ]
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "为区分H1与H2，需人工核查远端变更历史，该行动具备可操作性且无系统风险。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工核查远端物流服务在2026-10-12T10:00Z附近的证书更新或变更操作记录。",
+              "condition": "需要联系远端服务负责人或通过外部监控平台获取其变更历史。",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "risk": "无系统风险，仅为信息收集。",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "远端物流服务的TLS证书于10:00过期，导致staging环境下的shipment-fetcher在10:01发起连接时遭遇握手失败。",
+              "level": "mechanism",
+              "status": "supported"
+            },
+            {
+              "cause": "远端物流服务在10:00进行了证书轮换或变更操作。",
+              "level": "trigger",
+              "status": "unresolved"
+            },
+            {
+              "cause": "本地staging环境的客户端缓存了旧的证书信息或存在配置异常。",
+              "level": "alternative",
+              "status": "refuted"
+            }
+          ]
+        },
+        {
+          "case": "fresh_003-programmatic",
+          "report_file": "output/investigation-stage/15a415a3-bd77-4d24-8df5-b81284c7cf03/fresh_003-programmatic.json",
+          "report_sha256": "0154e5130c06f74b45bd629457e9a33625bc594cbb2c07cf583ee21868b791ea",
+          "source_version": "3bddfacd949ea956",
+          "status": "partial",
+          "review_status": "needs_information",
+          "termination_reason": "NEEDS_INFORMATION",
+          "model_requests_accounted": 7,
+          "tool_calls": 4,
+          "duration_ms": 49469,
+          "rework_rounds": 0,
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 1
+          },
+          "validation_failures": [
+            {
+              "role": "reviewer",
+              "reason": "UNKNOWN_OR_DUPLICATE_EVIDENCE",
+              "details": []
+            }
+          ],
+          "last_target_assessments": [
+            {
+              "target_id": "F1",
+              "verdict": "supported",
+              "reason": "EV_ec3c1e55a0e3ab65dc038cdc和EV_06801a622348252a5009d7e6明确记录了指定时间点的延迟数值，与陈述一致。",
+              "evidence_ids": [
+                "EV_ec3c1e55a0e3ab65dc038cdc",
+                "EV_06801a622348252a5009d7e6"
+              ]
+            },
+            {
+              "target_id": "F2",
+              "verdict": "supported",
+              "reason": "EV_e9a9a9c6b815f321d473fd8d记录了变更摘要，内容包含“展示文案更新”且未记录配置/依赖信息，与陈述一致。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d"
+              ]
+            },
+            {
+              "target_id": "H1",
+              "verdict": "uncertain",
+              "reason": "变更摘要仅提及文案更新，缺乏代码逻辑修改或资源竞争的直接证据；日志查询失败导致无法确认具体耗时点。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d",
+                "EV_ec3c1e55a0e3ab65dc038cdc"
+              ]
+            },
+            {
+              "target_id": "H2",
+              "verdict": "uncertain",
+              "reason": "高延迟现象存在，但确认外部依赖交互超时的关键日志（dependency类别）因SOURCE_UNAVAILABLE查询失败，缺乏直接证据。",
+              "evidence_ids": [
+                "EV_ec3c1e55a0e3ab65dc038cdc"
+              ]
+            },
+            {
+              "target_id": "H3",
+              "verdict": "uncertain",
+              "reason": "变更摘要未提供对系统资源或流量的预期影响，且资源类日志查询失败，无法确认是否存在负载激增或资源争用。",
+              "evidence_ids": [
+                "EV_e9a9a9c6b815f321d473fd8d"
+              ]
+            },
+            {
+              "target_id": "A1",
+              "verdict": "supported",
+              "reason": "当前自动查询因源不可用失败且变更摘要细节不足，人工核实是获取未知信息的合理待办，无系统风险。",
+              "evidence_ids": []
+            }
+          ],
+          "action_outcome_normalizations": [],
+          "published_actions": [
+            {
+              "action": "人工核实部署变更详情与依赖健康状况",
+              "condition": "当前日志查询因SOURCE_UNAVAILABLE失败，且变更摘要未提供足够技术细节。",
+              "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+              "risk": "无系统风险，仅涉及信息收集。",
+              "requires_approval": false,
+              "kind": "manual_check",
+              "checks": [],
+              "repair": null
+            }
+          ],
+          "hypothesis_states": [
+            {
+              "cause": "近端处理逻辑变更导致响应变慢：部署更新可能引入了新的串行处理、序列化开销或本地资源竞争，导致请求处理时间延长。",
+              "level": "mechanism",
+              "status": "unresolved"
+            },
+            {
+              "cause": "外部依赖交互超时：服务在处理请求时等待下游响应，但日志源不可用无法确认具体的拒绝或超时错误。",
+              "level": "alternative",
+              "status": "unresolved"
+            },
+            {
+              "cause": "变更触发了偶发性负载激增或资源争用：部署后流量模式改变或资源未正确释放导致间歇性阻塞。",
+              "level": "trigger",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "model_requests_accounted_all_trials": 82,
+  "estimated_cost": null,
+  "limits_note": "Different revisions are retained separately; no pooled accuracy. Probe planner and Diagnosis are scripted, only Reviewer uses the real model."
+}

@@ -1,7 +1,7 @@
 """Shared deterministic diagnosis expansion; no models or evaluation answers."""
 import json
 from evidence.contracts import Finding, InvestigationOutput
-from agents.contracts import Hypothesis, DiagnosisDraft
+from agents.contracts import Hypothesis, DiagnosisDraft, CHECK_EXPECTED_RESULTS
 from agents.investigation import resolve_output, validate_output
 from evidence.ownership import resolve_owner
 from evidence.model_view import evidence_view
@@ -105,6 +105,13 @@ def expand_diagnosis(selection, registry):
                     or intent.action == 'rollback_release' and intent.parameters['version'] not in capability['versions']):
                 raise ProtocolError('REPAIR_PARAMETERS_DENIED')
             action = action.model_copy(update={'kind': 'registered_repair'})
+        if getattr(registry, 'planning_only', False) and action.kind in CHECK_EXPECTED_RESULTS:
+            expected = CHECK_EXPECTED_RESULTS[action.kind]
+            if action.expected_result != expected:
+                registry.event('check_outcome_normalized', 'diagnosis', action=action.action,
+                    action_kind=action.kind, original_expected_result=action.expected_result,
+                    expected_result=expected, verdicts_changed=False, execution_authorized=False)
+                action = action.model_copy(update={'expected_result': expected})
         actions.append(action)
     facts, _ = resolve_output(json.dumps({"findings": [f.model_dump() for f in selection.findings]}), registry)
     hypotheses = [Hypothesis(hypothesis_id=f"H{n}", cause=h.cause,
