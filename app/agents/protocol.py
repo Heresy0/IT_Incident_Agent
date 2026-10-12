@@ -93,10 +93,61 @@ def reviewer_schema(schema, needs, targets):
     request['need_id'] = {'enum': [*needs, None]}
     request['hypothesis_id'] = {'enum': [k for k in targets if k.startswith('H')] + [None]}
     request['target_id'] = {'enum': [k for k in targets if k.startswith(('H', 'A'))] + [None]}
+    for level, excluded in (('trigger', {'symptom', 'mechanism', 'alternative'}),
+                            ('mechanism', {'trigger'}), ('alternative', {'trigger'})):
+        target_ids = [key for key, target in targets.items()
+                      if key.startswith('H') and target.level == level]
+        if target_ids:
+            schema['$defs']['EvidenceRequest'].setdefault('allOf', []).append({
+                'if': {'properties': {'target_id': {'enum': target_ids}}, 'required': ['target_id']},
+                'then': {'properties': {'need_id': {'enum': [
+                    key for key, need in needs.items() if need.purpose not in excluded] + [None]}}}})
     if 'ReviewBlocker' in schema['$defs']:
         schema['$defs']['ReviewBlocker']['properties']['affected_targets']['items'] = {
             'type': 'string', 'enum': list(targets)}
-    return schema
+    # The reviewer describes evidence gaps; only Supervisor plans executable
+    # checks. Keep the public runtime contract compatible with older reports.
+    request.pop('hypothesis_id', None)
+    request.pop('proposed_check', None)
+    request.pop('target_role', None)
+    request['checks'] = {'type': 'array', 'maxItems': 0, 'default': []}
+    blocker = schema['$defs']['ReviewBlocker']['properties']
+    blocker.pop('target_role', None)
+    blocker['checks'] = {'type': 'array', 'maxItems': 0, 'default': []}
+    blocker['resolution']['enum'] = ['external_source', 'not_planned']
+    return review_contract_view(schema)
+
+
+def review_contract_view(schema):
+    """Remove duplicate prose and unreachable definitions, not validation rules."""
+    if isinstance(schema, list):
+        return [review_contract_view(item) for item in schema]
+    if not isinstance(schema, dict):
+        return schema
+    result = {key: review_contract_view(value) for key, value in schema.items()
+              if key not in {'description', 'title', 'examples'}}
+    if '$defs' in result:
+        definitions = result['$defs']
+        used = set()
+        def collect(value):
+            if isinstance(value, dict):
+                reference = value.get('$ref', '')
+                if reference.startswith('#/$defs/'):
+                    used.add(reference.removeprefix('#/$defs/'))
+                for child in value.values():
+                    collect(child)
+            elif isinstance(value, list):
+                for child in value:
+                    collect(child)
+        collect({k: v for k, v in result.items() if k != '$defs'})
+        pending = list(used)
+        while pending:
+            key = pending.pop()
+            previous = set(used)
+            collect(definitions[key])
+            pending.extend(used - previous)
+        result['$defs'] = {key: value for key, value in definitions.items() if key in used}
+    return result
 
 
 def corrections_within_policy(report):

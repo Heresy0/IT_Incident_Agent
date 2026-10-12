@@ -110,9 +110,8 @@ class StatusCheckTests(unittest.TestCase):
         self.assertEqual(review.request_evidence.missing_observation, '缺少 CPU 指标')
         self.assertEqual(c.context.counts['tool_calls'], 0)
         data = json.loads(captured[0][1].content)
-        checks = data['output_schema']['$defs']['ReadOnlyCheck']['oneOf']
-        metric = next(check for check in checks if check['properties']['tool']['const'] == 'get_service_metrics')
-        self.assertEqual(metric['properties']['args']['properties']['metrics']['items']['enum'], ['queue_depth'])
+        self.assertNotIn('ReadOnlyCheck', data['output_schema']['$defs'])
+        self.assertEqual(data['output_schema']['$defs']['EvidenceRequest']['properties']['checks']['maxItems'], 0)
         self.assertEqual(data['input']['read_only_capabilities']['investigation']['registered_log_categories'], ['resource'])
         coverage = c.status_check_coverage()
         self.assertEqual(coverage['unchecked_log_categories'], ['resource'])

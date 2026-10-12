@@ -125,7 +125,8 @@ class ProtocolProgressTests(unittest.TestCase):
         with patch.object(provider, 'query', side_effect=read):
             result = collaborate(models, provider, P)
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
-        self.assertEqual((result['supervisor_decisions'], result['run_summary']['tool_calls']), (4, 3))
+        self.assertEqual((result['supervisor_decisions'], result['run_summary']['tool_calls']), (3, 3))
+        self.assertTrue(any(e['type'] == 'collection_reserve_reached' for e in result['events']))
         self.assertEqual(result['repairs'], 0)
         self.assertEqual(result['task_results'][1]['output']['findings'], [])
         self.assertFalse(any('任务目标未满足' in gap for gap in result['output']['missing_information']))

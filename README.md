@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+模型通过 LangChain `ChatOpenAI` 调用 OpenAI 兼容的 Chat Completions 接口。配置 `MODEL`、`MODEL_BASE_URL`、`MODEL_API_KEY`（未设置则沿用 `DASHSCOPE_API_KEY`）；同服务内切换支持工具调用和 JSON 输出的模型通常只改 `MODEL`。跨服务需调整地址和密钥，厂商参数由 `MODEL_EXTRA_BODY` 的 JSON 对象提供：当前通义为 `{"enable_thinking":false}`，不支持此参数的服务使用 `{}`。单次超时 30 秒，SDK 自动重试为 0，程序继续校验输出结构与证据。服务需重启以加载配置。详见[兼容接口迁移记录](examples/showcase/openai-compatible.md)。
+
 面向内部服务故障的诊断与处置辅助系统，主要展示 AI Agent 编排与 Harness 工程：自然语言生成工单、受限自主取证、证据诊断、独立复核、一次定向补查，以及人工审批后的受控修复。
 
 ## 快速体验
@@ -50,7 +52,7 @@ flowchart TD
 - 默认最多16次模型请求、24次工具尝试、180秒，预留3次模型/20秒收尾；最多4次调度、6个任务、1轮补查。取证与诊断共享1次结构纠正，Reviewer另有1次，均消耗原模型总预算；单Agent仍最多1次。实际额度由已授权请求决定。
 - 真实多Agent复核先独立读取观测范围，再核验草稿，两个阶段均计入原预算并保留审计记录。实施与完整真实迭代见[改进记录](examples/showcase/agent-improvement.md)。
 - 阻塞复核须说明缺失观测、影响目标和判断变化；报告分开记录查询执行、机制支持与停止原因，合法补查交给调度者规划。实施及真实失败轨迹见[诊断审计记录](examples/showcase/diagnostic-audit.md)。
-- 当前已回退至 `incident_graph_v6_blocker_audit`，撤回后续逐项断言、盲审边界映射与决策分支契约。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查继续保留。回退依据和验证见[版本回退记录](examples/showcase/rollback-v6.md)；被撤回的实验见[断言与决策影响历史记录](examples/showcase/claim-decision-review.md)。
+- 当前在 v6 恢复点上[精简最终 Reviewer](examples/showcase/focused-review.md)，并校验[缺口归属、预留补查预算](examples/showcase/scope-rework-budget.md)：判断结论、下一步和证据缺口，补查参数由 Supervisor 规划。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查保留。恢复点见[版本回退记录](examples/showcase/rollback-v6.md)；逐项断言和决策分支实验已撤回，见[历史记录](examples/showcase/claim-decision-review.md)。
 - 工单与运行按服务端身份隔离，PostgreSQL 保存结果、事件与修复阶段，SSE 支持续读。JSON 日志位于 `logs/incident.log`，指标位于 `/metrics`。
 - 登记服务可接入 Prometheus/Loki 与私有确认历史；未登记渠道明确返回缺口。提供知识库 Worker、API、PostgreSQL、Redis 的配置示例，数据库与缓存示例目前只有运维日志。
 - 修复独立于诊断：Agent 候选或人工提案 → 绑定证据、工单版本及配置 → operator 审批 → 单次执行 → 有界恢复验证。当前默认执行器只支持精确登记 Docker 容器的重启，拒绝任意脚本、Shell、扩缩容与回滚。

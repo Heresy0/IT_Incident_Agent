@@ -96,9 +96,8 @@ def main(argv=None):
     limits = Limits(model_calls=args.model_budget, tool_calls=args.tool_budget, reserve_model_calls=3, reserve_seconds=20)
     configuration = {'cases': args.cases, 'limits': asdict(limits), 'model': 'scripted' if args.fake else args.model,
         'execution_mode': 'live' if args.live else 'scripted_control_only' if args.fake else 'plan_only',
-        'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30,
-            **({'enable_thinking': False, 'response_format': {'type': 'json_object'}}
-               if args.model == DEFAULT_MODEL or args.model.startswith(DEFAULT_MODEL + '-') else {})}}
+        'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 0, 'request_timeout': 30, 'transport': 'openai_chat_completions',
+            'response_format': {'type': 'json_object'}}}
     if not args.live and not args.fake:
         print(json.dumps({'plan_only': True, 'configuration': configuration, 'paired_runs': 2 * len(args.cases),
             'maximum_model_calls': 2 * len(args.cases) * limits.model_calls,

@@ -218,7 +218,7 @@ class ScriptedRole:
         result = {"assessments": assessments, 'need_assessments': control_need_assessments(payload)}
         if weak:
             db = metrics["db_cpu"]
-            scope = payload['check_scope']
+            scope = payload['ticket']['scope']
             window = {k: scope[k] for k in ('start', 'end')}
             result["request_evidence"] = {"hypothesis_id": "H1", "evidence_ids": [db["evidence_id"]],
                 "missing_observation": "缺少当前应用连接池使用率、等待和获取连接日志",

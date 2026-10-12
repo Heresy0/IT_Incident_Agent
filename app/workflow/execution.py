@@ -66,7 +66,8 @@ class IncidentAdapter:
             config = self.service._base_config
             if not config.api_key or config.api_key == "test-only":
                 return self.failure(request, context, "AUTH_ERROR")
-            models = (self.model_factory or build_roles)(config.api_key, config.model)
+            models = (self.model_factory(config.api_key, config.model) if self.model_factory else
+                      build_roles(config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body))
         result = collaborate(models, provider, self.principal(request), context=context, event_log=events)
         result.update(execution_mode=mode, model="scripted" if mode == "scripted_control_only" else self.service._base_config.model)
         result["final"] = render(result)

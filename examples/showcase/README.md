@@ -1,6 +1,6 @@
 # Agent 编排与 Harness 项目展示
 
-2026-10-11 已[回退至 v6 诊断审计版本](rollback-v6.md)。后续[断言逐项复核与补查决策影响](claim-decision-review.md)实验已撤回，文档和[运行记录](claim-decision-runs.json)继续保留作为历史，不能代表当前启用的功能。
+2026-10-12 在[精简最终 Reviewer](focused-review.md)上，仅修正[缺口归属与补查预算](scope-rework-budget.md)，随后冻结实现并完成[三个新案例验证](fresh-validation.md)与[增加整体预算对照](expanded-budget.md)。已提交的 [v6 恢复点](rollback-v6.md)仍可恢复。此前[断言逐项复核与补查决策影响](claim-decision-review.md)实验已撤回，文档和[运行记录](claim-decision-runs.json)继续保留作为历史，不能代表当前启用的功能。
 
 2026-10-11 新增[多 Agent 改进与真实验证](agent-improvement.md)：角色工具契约、分阶段纠正、建议隔离、上下文去重及先看原始观测的两阶段复核。所有真实迭代保留失败与版本，谨慎 partial 和内部 passed 均按实际证据审阅。
 

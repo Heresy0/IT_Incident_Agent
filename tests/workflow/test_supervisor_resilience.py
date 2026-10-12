@@ -142,7 +142,7 @@ class SupervisorResilienceTests(unittest.TestCase):
                 'evidence_ids': [payload['evidence'][0]['evidence_id']],
                 'missing_observation': '需要确认近期变更', 'proposed_check': '查询登记的近期变更',
                 'expected_value': '变更可帮助区分原因', 'checks': [{'tool': 'get_recent_changes',
-                    'args': {k: payload['check_scope'][k] for k in ('start', 'end')}}]}
+                    'args': {k: payload['ticket']['scope'][k] for k in ('start', 'end')}}]}
             return json_response(value)
         result, models = self.run_case(break_core, review=request)
         self.assertEqual((result['status'], result['run_summary']['termination_reason']), ('partial', 'REVIEW_INCOMPLETE'))

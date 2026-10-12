@@ -1,0 +1,17 @@
+[
+  {
+    "case_id": "fresh_001",
+    "file": "fresh_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "fresh_002",
+    "file": "fresh_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "fresh_003",
+    "file": "fresh_003.json",
+    "visibility": "public_synthetic"
+  }
+]

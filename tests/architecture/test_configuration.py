@@ -43,6 +43,17 @@ class ConfigurationTests(unittest.TestCase):
         (self.root / 'config.json').unlink()
         self.assertEqual(IncidentConfig.from_file().model, DEFAULT_MODEL)
 
+    def test_compatible_endpoint_key_and_provider_options(self):
+        (self.root / '.env').write_text('MODEL_API_KEY=generic-canary\nDASHSCOPE_API_KEY=old-canary\nMODEL_BASE_URL=https://example.invalid/v1\nMODEL_EXTRA_BODY={"enable_thinking":false}\n', encoding='utf-8')
+        config = IncidentConfig.from_file()
+        self.assertEqual(config.api_key, 'generic-canary')
+        self.assertEqual(config.base_url, 'https://example.invalid/v1')
+        self.assertEqual(config.extra_body, {'enable_thinking': False})
+        self.assertNotIn('canary', repr(config))
+        os.environ['MODEL_EXTRA_BODY'] = '[]'
+        with self.assertRaises(ValueError):
+            IncidentConfig.from_file()
+
     def test_both_comparison_plans_follow_env_and_explicit_model_override(self):
         from scripts.compare_incident import main as incident_main
         from scripts.compare_independent import main as independent_main

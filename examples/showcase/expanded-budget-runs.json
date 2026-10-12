@@ -1,0 +1,189 @@
+{
+  "source_version": "53e1f1e5008e9018",
+  "model": "qwen3.7-plus",
+  "baseline": "examples/showcase/fresh-validation-runs.json",
+  "execution_plan": {
+    "budget_profile": "expanded",
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "source_version": "53e1f1e5008e9018",
+    "model": "qwen3.7-plus",
+    "attempts_per_case": 1,
+    "baseline_reports": "examples/showcase/fresh-validation-runs.json"
+  },
+  "method": "One additional run per same frozen synthetic case; author qualitative assessment, not independent human review; stochastic variation not separated from budget effects.",
+  "model_calls": 36,
+  "tool_calls": 12,
+  "estimated_cost": null,
+  "runs": [
+    {
+      "case_id": "fresh_001",
+      "status": "completed",
+      "review_status": "passed",
+      "report_file": "output/fresh-validation/608f9464-3ca7-4197-9c0b-ec5f880e1936/fresh_001.json",
+      "report_sha256": "a75f4e9e5d7fa21f0e2ed5574dcad04ccdde14e1a851a9b04ed2ef51b6940a38",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 15,
+        "web_calls": 0,
+        "tool_calls": 5,
+        "token_usage": {
+          "input_tokens": 78620,
+          "output_tokens": 6871,
+          "known_calls": 15,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 150422,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_002",
+      "status": "completed",
+      "review_status": "passed",
+      "report_file": "output/fresh-validation/608f9464-3ca7-4197-9c0b-ec5f880e1936/fresh_002.json",
+      "report_sha256": "a012e971b0096fe7e4ac1625d431f51e7b900d230e6f2c96d70079c05104a142",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 11,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 54943,
+          "output_tokens": 5370,
+          "known_calls": 11,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 113031,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_003",
+      "status": "partial",
+      "review_status": "not_performed",
+      "report_file": "output/fresh-validation/608f9464-3ca7-4197-9c0b-ec5f880e1936/fresh_003.json",
+      "report_sha256": "5936ad8baa16ad02fa89dcbb5523573d6158e692ff66d84bbc6e3f2bd4be0d08",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 10,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 52212,
+          "output_tokens": 3951,
+          "known_calls": 10,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 87235,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "investigation",
+          "reason": "invalid_json",
+          "details": []
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_NEED_CHECK",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "next_check",
+              "code": "TOOL_DENIED"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

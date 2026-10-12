@@ -45,7 +45,8 @@ class GeneralProgressTests(unittest.TestCase):
                 result = collaborate(models, provider, P)
                 self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
                 self.assertEqual((result['supervisor_decisions'], result['run_summary']['model_calls'],
-                    result['run_summary']['tool_calls']), (4, 10, 3))
+                    result['run_summary']['tool_calls']), (3, 9, 3))
+                self.assertTrue(any(e['type'] == 'collection_reserve_reached' for e in result['events']))
                 events = [e for e in result['events'] if e['type'] == 'collection_follow_up']
                 self.assertEqual([e['reason'] for e in events], ['no_new_read'])
                 self.assertEqual(sum(e['type'] == 'task_reused' for e in result['events']), 1)
@@ -107,7 +108,7 @@ class GeneralProgressTests(unittest.TestCase):
         self.assertEqual(result['repairs'], 0)
 
     def test_planning_hint_never_promotes_unresolved_need_and_small_budget_skips_it(self):
-        for cap, expected in ((16, 7), (6, 6)):
+        for cap, expected in ((16, 6), (6, 6)):
             models = scripted_models()
             def schedule(response, *_):
                 value = json.loads(response.content)
@@ -129,7 +130,7 @@ class GeneralProgressTests(unittest.TestCase):
                 self.assertTrue(all(n['status'] == 'deferred' for n in result['evidence_needs']))
                 self.assertTrue(result['collection_exits'][0]['limited'])
                 self.assertEqual(result['run_summary']['model_calls'], expected)
-                self.assertEqual(sum(e['type'] == 'collection_follow_up' for e in result['events']), int(cap == 16))
+                self.assertEqual(sum(e['type'] == 'collection_follow_up' for e in result['events']), 0)
 
     def test_six_remaining_calls_allow_one_review_hint_and_approved_rework(self):
         provider = FixtureProvider('case_003', P)

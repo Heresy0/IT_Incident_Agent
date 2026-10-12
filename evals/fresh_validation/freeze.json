@@ -1,0 +1,15 @@
+{
+  "source_version": "53e1f1e5008e9018",
+  "model": "qwen3.7-plus",
+  "model_calls": 16,
+  "tool_calls": 8,
+  "seconds": 180,
+  "attempts_per_case": 1,
+  "files": {
+    "evals/fresh_validation/criteria.json": "af0c24910c9822c9b258156f9e96ea94b9633851b6beca6a142ac8af9bc366bb",
+    "fixtures/incident_fresh_validation/catalog.json": "e6fbb2ebe64dbca334116a5aafae7c809d6544ed902326980d02edd3277b83d8",
+    "fixtures/incident_fresh_validation/fresh_001.json": "64532417db10a908af9344c0fcd099ab36eed3e6780a9fb012b72c8e004d088e",
+    "fixtures/incident_fresh_validation/fresh_002.json": "1d89e97fdf784930bf0a80c9d2903df37d0caed834cb7dace4183129c3c896fb",
+    "fixtures/incident_fresh_validation/fresh_003.json": "9f44c523f3cba5d638fab60409a28589db5c4752b466aa2b9a14b487b65143e4"
+  }
+}

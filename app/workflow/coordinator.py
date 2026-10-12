@@ -241,12 +241,20 @@ class Collaboration:
                 {'name': item['function']['name'], 'description': item['function']['description'],
                  'args_schema': 'output_schema.$defs.ReadOnlyCheck.oneOf (match tool)'}
                 for item in executor.schemas()] for r, executor in self.executors.items()}}
+        model_input = payload if role == 'reviewer' and schema is ReviewDecision else {
+            **payload, 'owner_options': owner_options(self)}
         messages = [SystemMessage(content=system_prompt or ROLE_PROMPTS[role]), HumanMessage(content=json.dumps({
-            "input": {**payload, 'owner_options': owner_options(self)}, "output_schema": output_schema}, ensure_ascii=False, separators=(',', ':')))]
+            "input": model_input, "output_schema": output_schema}, ensure_ascii=False, separators=(',', ':')))]
         attempt = 0
         schema_version = hashlib.sha256(json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()[:12]
         while True:
             attempt += 1
+            if role == 'reviewer':
+                self.event('model_input', role, schema_name=schema.__name__, attempt=attempt,
+                    input_chars=sum(len(str(m.content)) for m in messages),
+                    system_chars=len(messages[0].content),
+                    schema_chars=len(json.dumps(output_schema, ensure_ascii=False, separators=(',', ':'))),
+                    source_rows=len(payload.get('evidence', [])))
             response = invoke_chat_model(self.models[role], messages, role, terminal=terminal)
             deadline = self.context.limits.seconds - (0 if terminal else self.context.limits.reserve_seconds)
             if time.monotonic() - self.context.started >= deadline:
@@ -386,6 +394,10 @@ class Collaboration:
         targets = {}
         for key, item in self.targets().items():
             value = item.model_dump(mode="json")
+            # A previous model's verdict/explanation is not evidence. The claim,
+            # selected fields and its stated unknowns remain available.
+            value.pop('status', None)
+            value.pop('evidence_explanation', None)
             for field in ("refs", "support_refs", "counter_refs"):
                 if field in value:
                     value[field] = [{"evidence_id": r["evidence_id"], "field_path": r["field_path"]} for r in value[field]]
@@ -394,10 +406,11 @@ class Collaboration:
         # verdicts and candidate summaries are not answers for this reviewer.
         needs = [{k: row[k] for k in ('need_id', 'question', 'purpose')}
                  for row in self.need_input()]
-        tasks = [{k: v for k, v in row.items() if k not in
-                  {'candidate_mechanisms', 'missing_information'}} for row in self.task_input()]
+        tasks = [{k: row[k] for k in ('task_id', 'role', 'goal', 'need_ids', 'completion',
+                                    'query_state_source', 'model_summary_verified')}
+                 for row in self.task_input()]
+        rework_budget = self.rework_budget(pending_model_calls=1)
         return {"targets": targets, "required_target_ids": list(targets),
-                'diagnosis_policy': review_policy(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
                 'core_need_ids': [n.need_id for n in self.evidence_needs.values()
                                   if n.purpose in {'symptom', 'mechanism'}],
@@ -410,16 +423,9 @@ class Collaboration:
                 "read_only_capabilities": {r: ex.capabilities() for r, ex in self.executors.items()},
                 "repair_capabilities": getattr(self.provider, 'repair_capabilities', []),
                 "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
-                "log_query_feedback": log_query_feedback(self.executors['investigation']),
                 "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
-                "check_scope": self.ticket.scope.model_dump(mode='json', exclude={'tenant_id', 'user_id'}),
-                "read_only_tools": {r: ex.schemas() for r, ex in self.executors.items()},
-                "budget": {"can_collect": self.rework_budget(pending_model_calls=1)['can_collect'],
-                           "remaining_model_calls": self.context.limits.model_calls - self.context.counts['model_calls'],
-                           "remaining_research_calls": max(0, self.context.limits.model_calls
-                               - self.context.limits.reserve_model_calls - self.context.counts['model_calls']),
-                           "remaining_tools": self.context.limits.tool_calls - self.context.counts['tool_calls'],
-                           "rework_plan": self.rework_budget(pending_model_calls=1)}}
+                "budget": {key: rework_budget[key] for key in
+                           ('can_collect', 'remaining_model_calls', 'remaining_tools')}}
 
     def rework_budget(self, *, pending_model_calls=0, tool_calls=1, supervisor_completed=False):
         # Approved checks run before one interpretation call. Count future steps
@@ -550,6 +556,17 @@ class Collaboration:
                         or any(a.target_id == disputed and a.verdict == 'supported' for a in checked))
                     or disputed is None and request.need_id is None):
                 raise ProtocolError('INVALID_REWORK_TARGET')
+            if request.need_id and disputed and disputed.startswith('H'):
+                purpose = self.evidence_needs[request.need_id].purpose
+                level = targets[disputed].level
+                if (level == 'trigger' and purpose in {'symptom', 'mechanism', 'alternative'}
+                        or purpose == 'trigger' and level in {'mechanism', 'alternative'}):
+                    # The target and gap remain valid. Detach only the conflicting
+                    # edge; never promote a verdict or discard a missing observation.
+                    self.event('review_request_scope_detached', 'reviewer', code='REVIEW_REQUEST_SCOPE',
+                        need_id=request.need_id, target_id=disputed,
+                        need_purpose=purpose, target_level=level, verdicts_changed=False)
+                    request = request.model_copy(update={'need_id': None})
             # Hints never authorize a call. Discard unsafe/redundant suggestions,
             # but preserve the legitimate evidence gap for Supervisor to plan.
             normalized, signatures = [], set()
@@ -589,6 +606,8 @@ class Collaboration:
             self.event('review_blocker_handoff', 'reviewer', need_id=handoff.need_id,
                        target_id=handoff.target_id, planning_required=True)
             normalized = normalized.model_copy(update={'request_evidence': handoff})
+            # A legacy blocker-derived request must pass the same ownership gate.
+            return self.validate_review(normalized)
         return normalized
 
     def diagnose(self):
@@ -720,6 +739,10 @@ class Collaboration:
                 return
             raise ExecutionError("BUDGET_EXCEEDED")
         selected = list(zip(proposed, keys))
+        if self.ticket.purpose == 'diagnosis' and self.phase != 'rework':
+            selected.sort(key=lambda pair: (pair[0].role != 'investigation',
+                not any(self.evidence_needs[n].purpose in {'symptom', 'mechanism'}
+                        for n in pair[0].need_ids)))
         if capacity < len(selected):
             # Current observations are a prerequisite for diagnosis; knowledge is optional.
             if not any(e.kind == "observation" for e in self.evidence.values()):
@@ -847,7 +870,8 @@ class Collaboration:
                 return
             raise ExecutionError('BUDGET_EXCEEDED')
         objective = self.task_objective(task, follow_up)
-        available_steps = self.context.limits.model_calls - self.context.limits.reserve_model_calls - self.context.counts['model_calls']
+        reserve = self.context.limits.reserve_model_calls if follow_up else self.collection_reserve()
+        available_steps = self.context.limits.model_calls - reserve - self.context.counts['model_calls']
         steps = min(4, available_steps - 2 * len(self.dispatch_queue))
         result = self.collect_task(task, objective, self.executors[role], self.context, self.events, steps)
         self.record_task(task, objective, result)
@@ -880,7 +904,7 @@ class Collaboration:
                 {t.role for t in self.dispatch_queue} != {'investigation', 'knowledge'}):
             raise ProtocolError('INVALID_TASK_ROUTE')
         with self.context.lock:
-            available_models = self.context.limits.model_calls - self.context.limits.reserve_model_calls - self.context.counts['model_calls']
+            available_models = self.context.limits.model_calls - self.collection_reserve() - self.context.counts['model_calls']
             available_tools = self.context.limits.tool_calls - self.context.counts['tool_calls']
         if available_models < 4 or available_tools < 2 or not self.context.can_research():
             raise ExecutionError('BUDGET_EXCEEDED')
@@ -952,15 +976,43 @@ class Collaboration:
         else:
             self.next_node = 'supervisor'
 
+    def collection_reserve(self):
+        # First diagnosis/review, then one Supervisor-planned read/interpretation
+        # and a revised diagnosis/review. No extra calls or budget enlargement.
+        base = self.context.limits.reserve_model_calls
+        if self.ticket.purpose != 'diagnosis':
+            return base
+        required = 2 * (2 + int(self.blind_review)) + 2
+        # Tiny budgets still permit the initial collection and finalization;
+        # they cannot promise a full rework path.
+        return max(base, required) if self.context.limits.model_calls >= required + 3 else base
+
     def dispatch_capacity(self, pending_model_call=False):
         available = self.context.limits.model_calls - self.context.counts["model_calls"] - int(pending_model_call)
         tools = self.context.limits.tool_calls - self.context.counts["tool_calls"]
         if self.phase == 'rework':
             checks = 1 if self.pending.get('planning_required') else len(self.pending['checks'])
             return int(tools >= checks and available >= max(2, self.context.limits.reserve_model_calls) + 1)
-        return max(0, min(2, tools, (available - self.context.limits.reserve_model_calls) // 2))
+        diagnosis = self.ticket.purpose == 'diagnosis'
+        keep_tool = (diagnosis and self.collection_reserve() > self.context.limits.reserve_model_calls
+                     and any(e.kind == 'observation' for e in self.evidence.values()))
+        return max(0, min(2, tools - int(keep_tool),
+            (available - self.collection_reserve()) // 2,
+            (5 if diagnosis else 6) - len(self.tasks)))
 
     def supervise(self):
+        if (self.phase == 'collect' and self.ticket.purpose == 'diagnosis'
+                and any(e.kind == 'observation' for e in self.evidence.values())
+                and self.collection_reserve() > self.context.limits.reserve_model_calls
+                and (self.supervisor_calls >= 3
+                    or self.context.limits.model_calls - self.context.counts['model_calls']
+                        <= self.collection_reserve())):
+            self.event('collection_reserve_reached', remaining_model_calls=
+                self.context.limits.model_calls - self.context.counts['model_calls'],
+                protected_model_calls=self.collection_reserve(),
+                supervisor_slot_reserved=True, tool_slot_reserved=True)
+            self.next_node = 'diagnosis'
+            return
         if self.supervisor_calls >= 4:
             self.stop = "SUPERVISOR_LIMIT"
             return

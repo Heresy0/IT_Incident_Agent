@@ -1,0 +1,165 @@
+{
+  "source_version": "53e1f1e5008e9018",
+  "model": "qwen3.7-plus",
+  "method": "Newly authored synthetic cases, one run each, author qualitative review; not independent human scoring or formal holdout.",
+  "external_request_timeouts": 0,
+  "model_calls": 34,
+  "tool_calls": 11,
+  "estimated_cost": null,
+  "core_application_changed": false,
+  "runs": [
+    {
+      "case_id": "fresh_001",
+      "status": "partial",
+      "review_status": "needs_information",
+      "report_file": "output/fresh-validation/e29bd88f-78d0-4450-b8ea-a9f815cadc8c/fresh_001.json",
+      "report_sha256": "5b6d38c9beeb5bdf0bb7d2afb262511f91848cfd1784df71c47bf6552db6209f",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 57358,
+          "output_tokens": 6137,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 127203,
+        "termination_reason": "DIAGNOSIS_INCOMPLETE",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_002",
+      "status": "completed",
+      "review_status": "passed",
+      "report_file": "output/fresh-validation/e29bd88f-78d0-4450-b8ea-a9f815cadc8c/fresh_002.json",
+      "report_sha256": "835ecf1a939d7bce358c683edc97852fc57820ecc3478915ac89ee987c33eff9",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 9,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 42433,
+          "output_tokens": 4318,
+          "known_calls": 9,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 87984,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": []
+    },
+    {
+      "case_id": "fresh_003",
+      "status": "partial",
+      "review_status": "needs_information",
+      "report_file": "output/fresh-validation/e29bd88f-78d0-4450-b8ea-a9f815cadc8c/fresh_003.json",
+      "report_sha256": "19b4098333ddbcd5942819ab6f18633a551074a05161bc50a4b7f39fedd18eb7",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 13,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 66788,
+          "output_tokens": 7085,
+          "known_calls": 13,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 146000,
+        "termination_reason": "DIAGNOSIS_INCOMPLETE",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_REQUIRED",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker",
+              "instruction": "阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

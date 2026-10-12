@@ -326,7 +326,7 @@ class IncidentCollaborationTests(unittest.TestCase):
             reserve_model_calls=3, reserve_seconds=20))
         self.assertEqual(result["status"], "completed")
         self.assertEqual(models["knowledge"].histories, [])
-        self.assertEqual(result["run_summary"]["model_calls"], 5)
+        self.assertEqual(result["run_summary"]["model_calls"], 6)
         self.assertEqual(result["run_summary"]["tool_calls"], 2)
         self.assertEqual(len(result["reviews"]), 1)
 

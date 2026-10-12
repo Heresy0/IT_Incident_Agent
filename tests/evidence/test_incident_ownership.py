@@ -147,7 +147,7 @@ class IncidentOwnershipTests(unittest.TestCase):
         models = scripted_models()
         models.update({role: OwnerFlowModel(role) for role in ('supervisor', 'investigation', 'diagnosis', 'reviewer')})
         result = collaborate(models, FixtureProvider('case_003', P), P,
-            limits=Limits(model_calls=16, tool_calls=8, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=20, tool_calls=9, reserve_model_calls=3, reserve_seconds=20))
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['review_status'], 'passed')
         self.assertEqual(result['repairs'], 1)

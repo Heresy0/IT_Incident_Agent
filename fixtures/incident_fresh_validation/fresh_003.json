@@ -1,0 +1,105 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "fresh_003",
+    "title": "fresh_003",
+    "symptoms": "目录预览偶发超时，希望确认是应用还是依赖问题。",
+    "scope": {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "service_version": "1.4.0",
+      "start": "2026-10-12T09:50:00+00:00",
+      "end": "2026-10-12T10:15:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-12T09:55:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.02,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.24,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "request_latency_ms-before",
+      "timestamp": "2026-10-12T09:55:00+00:00",
+      "metric": "request_latency_ms",
+      "value": 90,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "request_latency_ms-after",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "metric": "request_latency_ms",
+      "value": 1800,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [],
+  "changes": [
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "change",
+      "timestamp": "2026-10-12T10:04:00+00:00",
+      "category": "deployment",
+      "version": "1.4.0",
+      "summary": "展示文案更新；未记录运行配置或依赖健康信息。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "service": "catalog-preview",
+      "environment": "staging",
+      "data_version": "fresh-validation-v1",
+      "visibility": "public_synthetic",
+      "id": "owner",
+      "timestamp": "2026-10-12T10:10:00+00:00",
+      "aliases": [
+        "catalog-preview"
+      ],
+      "team": "Synthetic Fresh Ops",
+      "escalation": "合成测试值班队列"
+    }
+  ],
+  "runbooks": [],
+  "incidents": [],
+  "source_errors": {
+    "get_service_logs": "SOURCE_UNAVAILABLE"
+  }
+}

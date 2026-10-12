@@ -31,7 +31,7 @@ def probe():
     assert context.counts == {"model_calls": 2, "tool_calls": 1, "web_calls": 0}
     return {"mode": "fake_protocol_control_only", "counts": context.counts,
             "model_spans": sum(e["type"] == "call_start" for e in events),
-            "chat_tongyi_binding": "ok", "live_verified": False}
+            "openai_compatible_binding": "ok", "live_verified": False}
 
 
 if __name__ == "__main__":

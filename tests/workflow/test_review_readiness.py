@@ -83,7 +83,10 @@ class ReviewReadinessTests(unittest.TestCase):
         for role in ('supervisor', 'diagnosis', 'reviewer'):
             model = models[role].model if isinstance(models[role], AlterOutput) else models[role]
             data = json.loads(model.histories[0][1].content)['input']
-            self.assertEqual(data['diagnosis_policy']['version'], 'diagnosis_readiness_v2')
+            if role == 'reviewer':
+                self.assertEqual(data['diagnosis_completion_gaps'], [])
+            else:
+                self.assertEqual(data['diagnosis_policy']['version'], 'diagnosis_readiness_v2')
 
     def test_nonblocking_uncertainty_requires_explicit_materiality_assessment(self):
         for blocking, status in ((False, 'completed'), (True, 'partial'), (None, 'partial')):

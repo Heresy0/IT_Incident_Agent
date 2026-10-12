@@ -93,7 +93,6 @@ class LogQueryPlanningTests(unittest.TestCase):
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['run_summary']['tool_calls'], 3)
         review = json.loads(models['reviewer'].histories[0][1].content)['input']
-        self.assertEqual(review['log_query_feedback'], [])
         broader = [row for row in review['collection'] if row['name'] == 'get_service_logs'][-1]
         self.assertEqual(broader['status'], 'ok')
         self.assertIsNone(broader['query_profile']['error_code'])

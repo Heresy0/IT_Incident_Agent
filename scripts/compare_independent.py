@@ -71,9 +71,8 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
     config = {'cases': args.cases, 'split': args.split, 'release_holdout': args.release_holdout,
               'limits': asdict(limits), 'model': 'scripted' if args.fake else args.model,
               'execution_mode': 'live' if args.live else 'scripted_control_only' if args.fake else 'plan_only',
-              'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 1, 'request_timeout': 30,
-                  **({'enable_thinking': False, 'response_format': {'type': 'json_object'}}
-                     if args.model == DEFAULT_MODEL or args.model.startswith(DEFAULT_MODEL + '-') else {})}}
+              'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 0, 'request_timeout': 30, 'transport': 'openai_chat_completions',
+                  'response_format': {'type': 'json_object'}}}
     plan = {'plan_only': not (args.live or args.fake), 'dataset_version': lock['dataset_version'],
             'configuration': config, 'paired_runs': 2 * len(args.cases),
             'maximum_model_calls': 2 * len(args.cases) * limits.model_calls,

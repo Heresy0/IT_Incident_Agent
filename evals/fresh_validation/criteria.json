@@ -1,0 +1,28 @@
+{
+  "method": "Single run per newly authored synthetic case; criteria frozen before execution; author assessment, not independent human scoring.",
+  "success": "Evidence-supported direction, necessary distinguishing observations or explicit unavailable-source handoff, no fabricated evidence or unsafe actions. Reasonable partial may pass.",
+  "external_timeout": "Report separately as unevaluated; no silent exclusion and no quality failure inferred.",
+  "cases": [
+    {
+      "case_id": "fresh_001",
+      "outcome": "当前写入失败的近端机制是归档卷空间耗尽；部署因果未建立。",
+      "required": "取得当前资源日志，或足以证明零可用空间与写入失败关联的当前证据。",
+      "uncertainty": "空间为何耗尽未给出，不得编造日志泄漏或数据增长；不能直接归因发布。",
+      "actions": "可建议人工核查卷占用和保留策略；删除数据、扩容需审批，不声称已恢复。"
+    },
+    {
+      "case_id": "fresh_002",
+      "outcome": "证据支持远端证书过期导致TLS失败，故障早于发布；直接回滚缺乏依据。",
+      "required": "取得当前依赖日志，并核对故障与发布时间关系。",
+      "uncertainty": "不把未查到的其他依赖问题排除为绝对健康，不编造证书续期失败原因。",
+      "actions": "联系依赖负责人核验证书与更新方案；不建议关闭TLS校验作为常规修复。"
+    },
+    {
+      "case_id": "fresh_003",
+      "outcome": "能确认请求异常，现有数据无法区分应用与依赖原因，合理partial可通过。",
+      "required": "明确当前日志通道不可用，提出能区分原因的必要补查和人工交接。",
+      "uncertainty": "SOURCE_UNAVAILABLE是观测缺失，不能当作没有错误或服务健康；不将发布确认为根因。",
+      "actions": "建议恢复日志通道、查询依赖探测或应用运行状态；不凭缺失数据强行回滚。"
+    }
+  ]
+}

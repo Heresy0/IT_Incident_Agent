@@ -1,0 +1,549 @@
+{
+  "source_version": "a466927bf185b8c3",
+  "previous_source_version": "50e417f53bbe99d6",
+  "workflow_version": "incident_graph_v9_scope_rework_budget",
+  "baseline_commit": "62bbce7",
+  "model": "qwen3.7-plus",
+  "method": "Frozen final batch: eval_002 and eval_009 repeated after analyzing first-candidate ownership failures. These are development regressions, not held-out or randomized accuracy evidence; no reference answers supplied to models or scoring.",
+  "regression": {
+    "total": 436,
+    "passed": 429,
+    "skipped": 7,
+    "seconds": 63.513,
+    "last_change": "Conservative detachment retains original request, target and need verdicts; covered by final full regression."
+  },
+  "first_candidate_record": "examples/showcase/scope-rework-budget-strict-runs.json",
+  "runs": [
+    {
+      "case_id": "eval_002",
+      "source_version": "a466927bf185b8c3",
+      "status": "partial",
+      "review_status": "needs_information",
+      "model": "qwen3.7-plus",
+      "report_file": "output/two-fixes/detached-live/92175200-1b1f-4462-b546-06436c922645/eval_002.json",
+      "report_sha256": "3c8e118f47aa22a28c709da6b34359cf9abec42948eeed79718476a57cccca29",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 49979,
+          "output_tokens": 6432,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 135719,
+        "termination_reason": "REWORK_LIMIT",
+        "errors": [],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "diagnostic_audit": {
+        "version": "diagnostic_audit_v1",
+        "partial_origin": "budget_or_workflow_limit",
+        "mechanism_status": "supported",
+        "next_step_status": "supported",
+        "investigation_status": "declared_queries_completed",
+        "query_ledger": [
+          {
+            "tool": "get_recent_changes",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_33c0988017f4037d16ce7acd"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N2"
+            ],
+            "goal": "获取 identity-gateway 在故障窗口内的部署或配置变更，以及依赖交互日志，以验证401错误的近端机制。",
+            "expected_value": "变更记录可确认是否有新版本发布或配置调整；依赖日志中的认证失败记录（如401/403）可支持认证依赖不可用或配置错误的假设。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": "dependency",
+              "level": null,
+              "error_code": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_967d205af464c4ae4ae68e97"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N2"
+            ],
+            "goal": "获取 identity-gateway 在故障窗口内的部署或配置变更，以及依赖交互日志，以验证401错误的近端机制。",
+            "expected_value": "变更记录可确认是否有新版本发布或配置调整；依赖日志中的认证失败记录（如401/403）可支持认证依赖不可用或配置错误的假设。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": "configuration",
+              "level": null,
+              "error_code": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_72d4daf8f50f04119f80225e"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1"
+            ],
+            "goal": "查询 identity-gateway 的配置类别日志，确认 auth_audience 配置加载或校验的具体记录，以区分是配置错误还是依赖交互问题。",
+            "expected_value": "若存在配置加载失败或校验警告日志，可支持配置错误机制；若查空，则结合已有部署变更证据，倾向于确认配置变更本身即为根因，无需进一步日志佐证。"
+          }
+        ],
+        "gaps": [
+          {
+            "need_id": "N1",
+            "purpose": "symptom",
+            "blocking": true,
+            "category": "unexplained_blocker",
+            "query_checks": [
+              {
+                "tool": "get_service_logs",
+                "args": {
+                  "start": "2026-10-01T09:50:00Z",
+                  "end": "2026-10-01T10:15:00Z",
+                  "category": "configuration",
+                  "level": null,
+                  "error_code": null
+                },
+                "status": "satisfied",
+                "query_complete": true,
+                "evidence_ids": [
+                  "EV_72d4daf8f50f04119f80225e"
+                ],
+                "error": null
+              }
+            ],
+            "blocker": null,
+            "reason": "复核提出证据缺口，此问题暂缓关闭：外部发布流水线配置、变更审批记录或操作审计日志",
+            "semantic_necessity_verified_by_program": false,
+            "category_basis": "review_state"
+          }
+        ],
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": [],
+        "termination_reason": "REWORK_LIMIT",
+        "meaning": "分类依据查询台账和复核契约；查空、预算停止不证明渠道缺失。因果正确性与缺口必要性仍需语义评估；不自动更改完成状态。"
+      },
+      "validation_failures": [],
+      "reviewer_inputs": [
+        {
+          "schema_name": "ObservationReview",
+          "attempt": 1,
+          "input_chars": 3996,
+          "system_chars": 856,
+          "schema_chars": 1190,
+          "source_rows": 2
+        },
+        {
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 9690,
+          "system_chars": 1145,
+          "schema_chars": 3595,
+          "source_rows": 2
+        },
+        {
+          "schema_name": "ObservationReview",
+          "attempt": 1,
+          "input_chars": 4906,
+          "system_chars": 856,
+          "schema_chars": 1282,
+          "source_rows": 3
+        },
+        {
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 11959,
+          "system_chars": 1145,
+          "schema_chars": 3625,
+          "source_rows": 3
+        }
+      ],
+      "semantic_quality": "not_independently_scored",
+      "scope_detachments": [],
+      "rework_rounds": 1,
+      "reserve_events": [],
+      "review_requests": [
+        {
+          "revision": 1,
+          "request": {
+            "hypothesis_id": null,
+            "need_id": "N1",
+            "target_id": "H2",
+            "evidence_ids": [],
+            "missing_observation": "发布流水线配置、变更审批记录或操作审计日志",
+            "proposed_check": "",
+            "expected_value": "确认导致auth_audience被修改为portal-preview的具体操作者或自动化脚本步骤",
+            "target_role": "investigation",
+            "checks": []
+          }
+        },
+        {
+          "revision": 2,
+          "request": {
+            "hypothesis_id": null,
+            "need_id": "N1",
+            "target_id": "H2",
+            "evidence_ids": [],
+            "missing_observation": "外部发布流水线配置、变更审批记录或操作审计日志",
+            "proposed_check": "",
+            "expected_value": "确认audience配置变更是否经过预期审批，或是否为脚本/人为失误。",
+            "target_role": "investigation",
+            "checks": []
+          }
+        }
+      ],
+      "approved_rework": [
+        {
+          "need_id": "N1",
+          "checks": [
+            {
+              "tool": "get_service_logs",
+              "args": {
+                "start": "2026-10-01T09:50:00Z",
+                "end": "2026-10-01T10:15:00Z",
+                "category": "configuration",
+                "level": null,
+                "error_code": null
+              }
+            }
+          ],
+          "target_role": "investigation",
+          "expected_value": "若存在配置加载失败或校验警告日志，可支持配置错误机制；若查空，则结合已有部署变更证据，倾向于确认配置变更本身即为根因，无需进一步日志佐证。"
+        }
+      ]
+    },
+    {
+      "case_id": "eval_009",
+      "source_version": "a466927bf185b8c3",
+      "status": "partial",
+      "review_status": "not_performed",
+      "model": "qwen3.7-plus",
+      "report_file": "output/two-fixes/detached-live/92175200-1b1f-4462-b546-06436c922645/eval_009.json",
+      "report_sha256": "4826493e3072737103a7130d14af418c147cfeccace8efe5063e63fbc17dc618",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 11,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 54420,
+          "output_tokens": 4770,
+          "known_calls": 10,
+          "status": "partial_or_unknown"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 121313,
+        "termination_reason": "TIMEOUT",
+        "errors": [
+          {
+            "code": "TIMEOUT",
+            "provider": "model",
+            "message": "外部服务请求超时。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 3,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "diagnostic_audit": {
+        "version": "diagnostic_audit_v1",
+        "partial_origin": "protocol_or_execution_failure",
+        "mechanism_status": "unconfirmed",
+        "next_step_status": "unconfirmed",
+        "investigation_status": "declared_queries_completed",
+        "query_ledger": [
+          {
+            "tool": "get_service_metrics",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "metrics": [
+                "db_cpu",
+                "lock_wait_ms",
+                "request_latency"
+              ],
+              "granularity": "1m"
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_0865d9d7c422a4618d7daf82",
+              "EV_a7b2ef8977bdb64c6abad99d",
+              "EV_54d26050d86c32e6ae4667b6",
+              "EV_8d3655e3aed0821d38deef36",
+              "EV_d15492c20b9cc078e60deb1d",
+              "EV_eeafae6fa998513794806a97"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N2"
+            ],
+            "goal": "获取服务在故障窗口内的关键性能指标，验证写入延迟和资源压力情况。",
+            "expected_value": "若request_latency显著升高且伴随db_cpu或lock_wait_ms异常，则支持资源竞争或数据库瓶颈机制；若指标正常，则需排查其他依赖或配置问题。"
+          },
+          {
+            "tool": "get_recent_changes",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": null
+            },
+            "status": "satisfied",
+            "query_complete": true,
+            "evidence_ids": [
+              "EV_6cdbea6fb1f2ef3f38b485bd"
+            ],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N1",
+              "N3"
+            ],
+            "goal": "检查故障窗口内的部署和配置变更，评估发布活动与故障的时间相关性。",
+            "expected_value": "若存在近期部署或配置变更，可作为触发线索；若无变更，则排除发布直接导致的可能性，需聚焦于运行时状态或外部依赖。"
+          },
+          {
+            "tool": "get_service_logs",
+            "args": {
+              "start": "2026-10-01T09:50:00Z",
+              "end": "2026-10-01T10:15:00Z",
+              "category": "dependency",
+              "level": null,
+              "error_code": null
+            },
+            "status": "empty",
+            "query_complete": true,
+            "evidence_ids": [],
+            "error": null,
+            "role": "investigation",
+            "need_ids": [
+              "N2",
+              "N3"
+            ],
+            "goal": "获取应用层日志以确认锁等待的具体原因（如死锁、慢查询或事务持有者），区分是代码逻辑变更还是数据竞争导致。",
+            "expected_value": "若日志中出现数据库超时、死锁检测记录或特定SQL执行缓慢，则支持数据库交互层面的机制；若日志显示应用内部处理延迟但无DB错误，则需转向资源或配置检查。"
+          }
+        ],
+        "gaps": [
+          {
+            "need_id": "N1",
+            "purpose": "symptom",
+            "blocking": true,
+            "category": "review_not_completed",
+            "query_checks": [
+              {
+                "tool": "get_service_metrics",
+                "args": {
+                  "start": "2026-10-01T09:50:00Z",
+                  "end": "2026-10-01T10:15:00Z",
+                  "metrics": [
+                    "db_cpu",
+                    "lock_wait_ms",
+                    "request_latency"
+                  ],
+                  "granularity": "1m"
+                },
+                "status": "satisfied",
+                "query_complete": true,
+                "evidence_ids": [
+                  "EV_0865d9d7c422a4618d7daf82",
+                  "EV_a7b2ef8977bdb64c6abad99d",
+                  "EV_54d26050d86c32e6ae4667b6",
+                  "EV_8d3655e3aed0821d38deef36",
+                  "EV_d15492c20b9cc078e60deb1d",
+                  "EV_eeafae6fa998513794806a97"
+                ],
+                "error": null,
+                "role": "investigation",
+                "need_ids": [
+                  "N1",
+                  "N2"
+                ],
+                "goal": "获取服务在故障窗口内的关键性能指标，验证写入延迟和资源压力情况。",
+                "expected_value": "若request_latency显著升高且伴随db_cpu或lock_wait_ms异常，则支持资源竞争或数据库瓶颈机制；若指标正常，则需排查其他依赖或配置问题。"
+              },
+              {
+                "tool": "get_recent_changes",
+                "args": {
+                  "start": "2026-10-01T09:50:00Z",
+                  "end": "2026-10-01T10:15:00Z",
+                  "category": null
+                },
+                "status": "satisfied",
+                "query_complete": true,
+                "evidence_ids": [
+                  "EV_6cdbea6fb1f2ef3f38b485bd"
+                ],
+                "error": null,
+                "role": "investigation",
+                "need_ids": [
+                  "N1",
+                  "N3"
+                ],
+                "goal": "检查故障窗口内的部署和配置变更，评估发布活动与故障的时间相关性。",
+                "expected_value": "若存在近期部署或配置变更，可作为触发线索；若无变更，则排除发布直接导致的可能性，需聚焦于运行时状态或外部依赖。"
+              }
+            ],
+            "blocker": null,
+            "reason": "指标数据显示请求延迟从90ms升至2100ms，锁等待从1ms升至1900ms，且期间有部署动作，现象与时间窗口一致。",
+            "semantic_necessity_verified_by_program": false,
+            "category_basis": "review_state"
+          },
+          {
+            "need_id": "N2",
+            "purpose": "mechanism",
+            "blocking": true,
+            "category": "review_not_completed",
+            "query_checks": [
+              {
+                "tool": "get_service_logs",
+                "args": {
+                  "start": "2026-10-01T09:50:00Z",
+                  "end": "2026-10-01T10:15:00Z",
+                  "category": "dependency",
+                  "level": null,
+                  "error_code": null
+                },
+                "status": "empty",
+                "query_complete": true,
+                "evidence_ids": [],
+                "error": null
+              }
+            ],
+            "blocker": null,
+            "reason": "关键问题仍未完成评估；预算/限次范围内未形成有效的新补查计划，带限制进入诊断，不视为已取证充分。虽已确认锁等待是近端机制，但尚缺日志证据说明锁竞争的具体触发源（如特定SQL或事务逻辑），需进一步查证。",
+            "semantic_necessity_verified_by_program": false,
+            "category_basis": "review_state"
+          },
+          {
+            "need_id": "N3",
+            "purpose": "alternative",
+            "blocking": true,
+            "category": "review_not_completed",
+            "query_checks": [
+              {
+                "tool": "get_service_logs",
+                "args": {
+                  "start": "2026-10-01T09:50:00Z",
+                  "end": "2026-10-01T10:15:00Z",
+                  "category": "dependency",
+                  "level": null,
+                  "error_code": null
+                },
+                "status": "empty",
+                "query_complete": true,
+                "evidence_ids": [],
+                "error": null
+              }
+            ],
+            "blocker": null,
+            "reason": "关键问题仍未完成评估；预算/限次范围内未形成有效的新补查计划，带限制进入诊断，不视为已取证充分。需通过日志排除其他依赖故障或配置错误，确认是否为发布引入的代码逻辑变化导致的锁竞争。",
+            "semantic_necessity_verified_by_program": false,
+            "category_basis": "review_state"
+          }
+        ],
+        "review_consistency_issues": [],
+        "overblocking_suspected_need_ids": [],
+        "termination_reason": "TIMEOUT",
+        "meaning": "分类依据查询台账和复核契约；查空、预算停止不证明渠道缺失。因果正确性与缺口必要性仍需语义评估；不自动更改完成状态。"
+      },
+      "validation_failures": [
+        {
+          "role": "investigation",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "reviewer_inputs": [
+        {
+          "schema_name": "ObservationReview",
+          "attempt": 1,
+          "input_chars": 6513,
+          "system_chars": 856,
+          "schema_chars": 1433,
+          "source_rows": 7
+        }
+      ],
+      "semantic_quality": "not_independently_scored",
+      "scope_detachments": [],
+      "rework_rounds": 0,
+      "reserve_events": [
+        {
+          "type": "collection_reserve_reached",
+          "remaining_model_calls": 8,
+          "protected_model_calls": 8,
+          "supervisor_slot_reserved": true,
+          "tool_slot_reserved": true
+        }
+      ],
+      "review_requests": [],
+      "approved_rework": []
+    }
+  ],
+  "independent_semantic_review": "not_performed"
+}
