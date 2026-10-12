@@ -4,6 +4,8 @@
 
 默认采用[计划驱动取证与直接复核](examples/showcase/planned-investigation.md)：Supervisor 规划具体查询，Investigation 程序模块校验并执行，不调用独立取证模型。原始证据交给 Diagnosis/Reviewer 判断，查询完成不等于原因确认。旧 `agent` 模式与观测盲审仍可显式用于对照；免费脚本演示保留原控制流程。
 
+[Reviewer 契约与收尾](examples/showcase/review-handoff.md)：程序按问题用途填充缺口类别；机制和有效下一步已复核、关键证据完整时，纯触发未知作为人工待核实限制保留。关键未知仍阻塞，原补查请求和未确认结论保留在运行记录。
+
 [Reviewer 分阶段纠正额度](examples/showcase/reviewer-stage-budget.md)亦可切换试验：split 模式盲审和最终复核各最多纠正一次，仍计入原总预算；默认保留共享一次。
 
 面向内部服务故障的诊断与处置辅助系统，主要展示 AI Agent 编排与 Harness 工程：自然语言生成工单、受限计划取证、证据诊断、独立复核、一次定向补查，以及人工审批后的受控修复。

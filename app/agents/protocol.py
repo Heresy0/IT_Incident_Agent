@@ -1,5 +1,6 @@
 """Model-facing schemas and auditable correction accounting."""
 from copy import deepcopy
+import json
 
 REPAIR_POLICY = 'collection_one_review_one_v1'
 REVIEW_STAGE_POLICY = 'collection_one_review_stages_one_v2'
@@ -84,12 +85,6 @@ def reviewer_schema(schema, needs, targets):
         'if': {'properties': {'need_id': {'enum': core}}, 'required': ['need_id']},
         'then': {'properties': {'verdict': {'enum': ['supported', 'uncertain']},
                                 'blocking': {'enum': [None]}}}}]
-    mechanism_needs = [n.need_id for n in needs.values() if n.purpose in {'mechanism', 'alternative'}]
-    schema['$defs']['NeedAssessment']['allOf'].append({
-        'if': {'properties': {'need_id': {'enum': mechanism_needs}}, 'required': ['need_id']},
-        'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'},
-            {'type': 'object', 'properties': {'cause_level': {
-                'enum': ['observation', 'mechanism', 'alternative', 'action_condition']}}}]}}}})
     request = schema['$defs']['EvidenceRequest']['properties']
     request['need_id'] = {'enum': [*needs, None]}
     request['hypothesis_id'] = {'enum': [k for k in targets if k.startswith('H')] + [None]}
@@ -113,10 +108,33 @@ def reviewer_schema(schema, needs, targets):
     request.pop('target_role', None)
     request['checks'] = {'type': 'array', 'maxItems': 0, 'default': []}
     blocker = schema['$defs']['ReviewBlocker']['properties']
+    # A blocker belongs to an existing question. Its category is derived from
+    # that question, rather than asking the model to classify it a second time.
+    blocker.pop('cause_level', None)
+    schema['$defs']['ReviewBlocker']['required'].remove('cause_level')
     blocker.pop('target_role', None)
     blocker['checks'] = {'type': 'array', 'maxItems': 0, 'default': []}
     blocker['resolution']['enum'] = ['external_source', 'not_planned']
     return review_contract_view(schema)
+
+
+def parse_review_selection(content, needs):
+    """Expand only omitted question metadata; never manufacture a verdict/ref."""
+    from agents.contracts import ReviewDecision
+    data = json.loads(content)
+    if isinstance(data, dict) and isinstance(data.get('need_assessments'), list):
+        categories = {'symptom': 'observation', 'mechanism': 'mechanism',
+                      'alternative': 'alternative', 'trigger': 'trigger',
+                      'action_condition': 'action_condition'}
+        for assessment in data['need_assessments']:
+            if not isinstance(assessment, dict):
+                continue
+            blocker = assessment.get('blocker')
+            need = needs.get(assessment.get('need_id'))
+            if isinstance(blocker, dict) and 'cause_level' not in blocker and need is not None:
+                blocker['cause_level'] = categories[need.purpose]
+    # Explicit legacy categories still pass the original strict validators.
+    return ReviewDecision.model_validate(data)
 
 
 def review_contract_view(schema):

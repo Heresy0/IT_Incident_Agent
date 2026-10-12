@@ -12,7 +12,7 @@ from agents.contracts import EvidenceRequest
 VERSION = 'diagnostic_audit_v1'
 
 
-def validate_blockers(needs, review, executors, *, required=False):
+def validate_blockers(needs, review, executors, *, required=False, targets=None):
     verdicts = {a.target_id: a.verdict for a in review.assessments}
     for assessment in review.need_assessments:
         need = needs[assessment.need_id]
@@ -30,9 +30,14 @@ def validate_blockers(needs, review, executors, *, required=False):
             continue
         if len(set(blocker.affected_targets)) != len(blocker.affected_targets) or not set(blocker.affected_targets) <= set(verdicts):
             raise ProtocolError('REVIEW_BLOCKER_TARGET', [{'need_id': need.need_id, 'allowed': list(verdicts)}])
-        if need.purpose in {'mechanism', 'alternative'} and blocker.cause_level == 'trigger':
+        trigger_only = targets is not None and all(
+            key.startswith('H') and targets[key].level == 'trigger'
+            or key.startswith('A') and verdicts[key] == 'supported'
+            for key in blocker.affected_targets)
+        if need.purpose in {'mechanism', 'alternative'} and (blocker.cause_level == 'trigger' or trigger_only):
             raise ProtocolError('REVIEW_BLOCKER_SCOPE', [{'need_id': need.need_id,
-                'instruction': '机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。'}])
+                'path': 'need_assessments.blocker.affected_targets',
+                'instruction': '此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。'}])
         if all(verdicts[target] == 'supported' for target in blocker.affected_targets):
             raise ProtocolError('REVIEW_BLOCKER_CONFLICT', [{'need_id': need.need_id,
                 'instruction': '声称缺口影响的目标全部supported，与阻塞矛盾。独立复核目标或问题，不得自动提升任一结论。'}])

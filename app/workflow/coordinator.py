@@ -21,8 +21,8 @@ from evidence.ownership import parse_owner_selection, resolve_owner, owner_optio
 from workflow.task_checks import completion, adds_information, log_query_feedback
 from workflow.evidence_needs import CORE, initial_needs, update_needs, apply_need_updates, validate_assessments, reviewed_needs, limitations, is_blocking
 from workflow.diagnostic_audit import validate_blockers, diagnostic_audit, blocker_follow_up
-from workflow.review_outcome import review_policy, readiness_gaps, action_projection
-from agents.protocol import compact_schema, reviewer_schema, diagnosis_schema, supervisor_schema, bind_evidence_ids, bind_reference_ids, REPAIR_POLICY, REVIEW_STAGE_POLICY
+from workflow.review_outcome import review_policy, readiness_gaps, action_projection, nonblocking_trigger_request
+from agents.protocol import compact_schema, reviewer_schema, diagnosis_schema, supervisor_schema, bind_evidence_ids, bind_reference_ids, REPAIR_POLICY, REVIEW_STAGE_POLICY, parse_review_selection
 from evidence.observations import source_statement
 
 
@@ -80,6 +80,7 @@ class Collaboration:
         self.collection_exits = []
         self.blind_review = getattr(models['reviewer'], 'blind_review', False) if blind_review is None else blind_review
         self.observation_reviews = []
+        self.deferred_review_requests = []
 
     def event(self, kind, role="supervisor", **fields):
         self.context.emit({"type": kind, "role": role, "span_id": self.workflow_span,
@@ -313,6 +314,7 @@ class Collaboration:
                             ignored_count=len(data['tasks']) if isinstance(data['tasks'], list) else 1)
                         content = json.dumps({**data, 'tasks': []})
                 value = (parse_owner_selection(schema, content, self) if issubclass(schema, EscalationSelection)
+                         else parse_review_selection(content, self.evidence_needs) if schema is ReviewDecision
                          else schema.model_validate_json(content))
                 result = validate(value) if validate else value
                 if role == 'supervisor' and self.needs_collection_follow_up(result):
@@ -677,7 +679,8 @@ class Collaboration:
             need_assessments = reopened
         normalized = review.model_copy(update={'assessments': checked, 'need_assessments': need_assessments,
                                                'request_evidence': request})
-        normalized = validate_blockers(self.evidence_needs, normalized, self.executors, required=self.blind_review or getattr(self.models['reviewer'], 'json_output', False))
+        normalized = validate_blockers(self.evidence_needs, normalized, self.executors,
+            required=self.blind_review or getattr(self.models['reviewer'], 'json_output', False), targets=targets)
         handoff = blocker_follow_up(self.evidence_needs, normalized, self.executors)
         if handoff:
             self.event('review_blocker_handoff', 'reviewer', need_id=handoff.need_id,
@@ -740,14 +743,24 @@ class Collaboration:
                 self.event('observation_review_skipped', 'reviewer', code='BUDGET_EXCEEDED', revision=revision)
         self.review = self.ask("reviewer", ReviewDecision, self.reviewer_input(), terminal=True, validate=self.validate_review)
         self.evidence_needs = reviewed_needs(self.evidence_needs, self.review.need_assessments)
+        request = self.review.request_evidence
+        if (request and self.ticket.purpose == 'diagnosis' and not self.reviewed_gaps()
+                and nonblocking_trigger_request(self.draft, self.review, self.evidence_needs)):
+            # Keep the actual request and unresolved verdict in the audit record.
+            # Only the automatic routing is deferred to human follow-up.
+            deferred = {'revision': revision, 'request': request.model_dump(mode='json'),
+                        'reason': '机制和有效下一步已复核；纯触发未知作为人工待核实限制保留。'}
+            self.deferred_review_requests.append(deferred)
+            self.extra_gaps.append('非关键触发原因待人工核实：' + request.missing_observation)
+            self.event('review_request_deferred', 'reviewer', **deferred, verdicts_changed=False)
+            request = None
         self.event('evidence_needs_reviewed', 'reviewer', revision=revision,
                    evidence_needs=self.need_input(), blocking_gaps=limitations(self.evidence_needs, blocking_only=True))
         self.reviews.append({"revision": revision, "review": self.review.model_dump(mode="json")})
         self.event("review_completed", "reviewer", revision=revision,
                    follow_up_reason=self.review.follow_up_reason,
-                   status="needs_rework" if self.review.request_evidence else
+                   status="needs_rework" if request else
                    "passed" if not self.reviewed_gaps() else "needs_information")
-        request = self.review.request_evidence
         if request:
             self.note("challenge", "reviewer", "diagnosis", hypothesis_id=request.hypothesis_id,
                       evidence_ids=request.evidence_ids, reason=request.missing_observation)
@@ -1384,6 +1397,8 @@ class Collaboration:
             "used_evidence_ids": sorted(used), "evidence": [e.model_dump(mode="json") for e in self.evidence.values()],
             "task_results": self.task_results(), "drafts": self.drafts, "reviews": self.reviews, "negotiation": self.negotiation,
             'blind_review_enabled': self.blind_review, 'observation_reviews': self.observation_reviews,
+            'review_contract_version': 'question_owned_blocker_v2',
+            'deferred_review_requests': self.deferred_review_requests,
             'evidence_needs': self.need_input(), 'evidence_needs_version': 'question_ledger_v1',
             'collection_exits': self.collection_exits,
             'evidence_needs_validation': 'model_semantics_with_program_guards',

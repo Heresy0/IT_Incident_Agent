@@ -35,6 +35,32 @@ def readiness_gaps(draft, review, purpose):
     return gaps
 
 
+def nonblocking_trigger_request(draft, review, needs):
+    """A target-only trigger gap is optional only after independent readiness."""
+    request = review.request_evidence
+    if request is None:
+        return False
+    target_id = request.target_id or request.hypothesis_id
+    target = next((h for h in draft.hypotheses if h.hypothesis_id == target_id), None)
+    if target is None or target.level != 'trigger':
+        return False
+    if request.need_id is not None and needs[request.need_id].purpose != 'trigger':
+        return False
+    verdicts = {a.target_id: a.verdict for a in review.assessments}
+    if verdicts.get(target_id) != 'uncertain' or any(
+            key.startswith('A') and value == 'uncertain' for key, value in verdicts.items()):
+        return False
+    # A gap linked to a mechanism or an action condition is not a pure trigger
+    # limitation, even if the request itself names a trigger hypothesis.
+    for assessment in review.need_assessments:
+        if assessment.blocker and any(
+                not key.startswith('H') or next((h.level for h in draft.hypotheses
+                    if h.hypothesis_id == key), None) != 'trigger'
+                for key in assessment.blocker.affected_targets):
+            return False
+    return True
+
+
 def action_projection(draft, review):
     verdicts = {a.target_id: a for a in review.assessments} if review else {}
     approved, pending = [], []

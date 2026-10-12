@@ -1,0 +1,570 @@
+{
+  "baseline_commit": "8e4f4e8",
+  "final_source_version": "08bcd93137c99e9f",
+  "model": "qwen3.7-flash",
+  "verification_scope": "Real model, frozen synthetic observations, author assessment. Reference criteria not sent to models.",
+  "selection_policy": "Three initial cases once; final target-scope clarification repeats only affected fresh_002 once. All attempts retained. Do not pool versions into an accuracy rate.",
+  "regression": {
+    "total": 470,
+    "passed": 463,
+    "skipped_db_integration": 7,
+    "duration_seconds": 63.272,
+    "log": "output/review-handoff-final-regression.log"
+  },
+  "total_model_calls": 22,
+  "total_tool_calls": 14,
+  "estimated_cost": null,
+  "records": [
+    {
+      "case_id": "fresh_001",
+      "arm": "programmatic",
+      "status": "completed",
+      "review_status": "passed",
+      "source_version": "98a3a340dad6ba78",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 5,
+        "web_calls": 0,
+        "tool_calls": 5,
+        "token_usage": {
+          "input_tokens": 30411,
+          "output_tokens": 4414,
+          "known_calls": 5,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 48640,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/87f4bcee-250a-4b99-8b8c-ce5dfcbd368c/fresh_001-programmatic.json",
+      "report_sha256": "e05d480486785fe9d057aadec7c8b34ba324786097be7b9b562b80cdc92df1d8",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "validation_failures": [],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "supported",
+      "next_step_status": "supported",
+      "review_contract_version": "question_owned_blocker_v2",
+      "deferred_review_requests": [],
+      "published_hypotheses": [
+        {
+          "cause": "本地归档卷存储空间耗尽（Disk Full），导致应用进程无法将收据数据写入持久化存储，引发写入失败和错误率飙升。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "近期上线操作（版本1.4.0）可能改变了归档数据的生成频率、大小或清理策略，导致存储空间迅速耗尽。",
+          "level": "trigger",
+          "status": "unresolved"
+        },
+        {
+          "cause": "远端对象存储不可用或响应缓慢，导致本地写入堆积并最终耗尽资源。",
+          "level": "alternative",
+          "status": "refuted"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "人工检查staging环境receipt-archive服务的归档卷使用情况，确认可用空间状态及是否存在可清理的旧文件。",
+          "condition": "需要访问staging环境的服务器或存储后端权限。",
+          "expected_result": "确认磁盘确实已满，并识别出可安全删除的归档文件或调整清理策略的空间。",
+          "risk": "若误删重要归档数据可能导致业务数据丢失；若清理不当可能短暂影响服务可用性。",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "errors": [],
+      "queries": [
+        {
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          },
+          "status": "empty",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "resource",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_002",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "98a3a340dad6ba78",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 5,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 30695,
+          "output_tokens": 4194,
+          "known_calls": 5,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 45109,
+        "termination_reason": "REWORK_NOT_EXECUTED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/87f4bcee-250a-4b99-8b8c-ce5dfcbd368c/fresh_002-programmatic.json",
+      "report_sha256": "7e2f9d2d990f104da4c6c16c1324e14a2c94f89748fad76ad320e82a942dd040",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "validation_failures": [],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "supported",
+      "next_step_status": "supported",
+      "review_contract_version": "question_owned_blocker_v2",
+      "deferred_review_requests": [],
+      "published_hypotheses": [
+        {
+          "cause": "近端依赖交互失败：远端服务证书过期导致TLS握手被拒，引发拉取物流状态失败。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "触发原因：远端服务在10:00发生了证书轮换或更新，导致旧证书失效。",
+          "level": "trigger",
+          "status": "unresolved"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "联系远端物流服务负责人或查阅其运维公告，确认10:00左右的证书更新情况及后续计划。",
+          "condition": "需要人工核实未登记的外部系统状态。",
+          "expected_result": "确认是否为已知维护事件，评估是否需等待远端修复或采取临时规避措施。",
+          "risk": "无操作风险，仅为信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "errors": [],
+      "queries": [
+        {
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "98a3a340dad6ba78",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 8,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 37464,
+          "output_tokens": 4304,
+          "known_calls": 8,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 47375,
+        "termination_reason": "INVALID_REWORK_DISPATCH",
+        "errors": [
+          {
+            "code": "INVALID_REWORK_DISPATCH",
+            "provider": "workflow",
+            "message": "诊断执行失败，请根据运行 ID 查看日志。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/87f4bcee-250a-4b99-8b8c-ce5dfcbd368c/fresh_003-programmatic.json",
+      "report_sha256": "0a21211bbb7ca330308662d17ed544931cbb092a4085cf6c1904e903f4a1c58e",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "validation_failures": [
+        {
+          "role": "knowledge",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs",
+              "type": "too_short"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "phase": "initial",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "unconfirmed",
+      "review_contract_version": "question_owned_blocker_v2",
+      "deferred_review_requests": [],
+      "published_hypotheses": [
+        {
+          "cause": "本次展示文案更新（部署）引入了新的依赖调用或配置参数，导致下游服务响应变慢或拒绝连接，从而引发上游超时和错误率上升。",
+          "level": "mechanism",
+          "status": "unresolved"
+        },
+        {
+          "cause": "变更触发了非预期的资源竞争或容量瓶颈（如连接池耗尽），而非单纯的逻辑错误。",
+          "level": "alternative",
+          "status": "unresolved"
+        },
+        {
+          "cause": "变更本身未直接导致故障，而是巧合地发生在外部依赖不稳定的时段。",
+          "level": "trigger",
+          "status": "unresolved"
+        }
+      ],
+      "published_actions": [],
+      "errors": [
+        {
+          "code": "INVALID_REWORK_DISPATCH",
+          "provider": "workflow",
+          "message": "诊断执行失败，请根据运行 ID 查看日志。",
+          "retryable": false,
+          "node": "supervisor"
+        }
+      ],
+      "queries": [
+        {
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "request_latency_ms"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "error",
+          "error": {
+            "code": "SOURCE_UNAVAILABLE",
+            "retryable": false
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ]
+    },
+    {
+      "case_id": "fresh_002",
+      "arm": "programmatic",
+      "status": "completed",
+      "review_status": "passed",
+      "source_version": "08bcd93137c99e9f",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 4,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 23027,
+          "output_tokens": 3799,
+          "known_calls": 4,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 37375,
+        "termination_reason": "FINISHED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/40bc67e4-048a-45f4-bcf7-e3a8ce52ddf6/fresh_002-programmatic.json",
+      "report_sha256": "ee0148cabff8fe8148a32229d0ece9cb7b939c47d565a9430795693a15af4807",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "validation_failures": [],
+      "phase": "final_targeted",
+      "model": "qwen3.7-flash",
+      "mechanism_status": "supported",
+      "next_step_status": "supported",
+      "review_contract_version": "question_owned_blocker_v2",
+      "deferred_review_requests": [
+        {
+          "revision": 1,
+          "request": {
+            "hypothesis_id": null,
+            "need_id": null,
+            "target_id": "H2",
+            "evidence_ids": [],
+            "missing_observation": "远端物流服务在 10:00 前后的内部状态及变更历史",
+            "proposed_check": "",
+            "expected_value": "确认远端是否有证书轮换记录或配置变更",
+            "target_role": "investigation",
+            "checks": []
+          },
+          "reason": "机制和有效下一步已复核；纯触发未知作为人工待核实限制保留。"
+        }
+      ],
+      "published_hypotheses": [
+        {
+          "cause": "远端物流服务的 TLS 证书于 10:00 过期，导致 shipment-fetcher 发起的依赖连接在握手阶段被拒绝。",
+          "level": "mechanism",
+          "status": "supported"
+        },
+        {
+          "cause": "远端服务在 10:00 进行了证书轮换但未通知下游，或远端服务自身发生了未记录的变更。",
+          "level": "trigger",
+          "status": "unresolved"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "联系远端物流服务团队，确认证书过期情况及后续轮换计划，并协商临时修复方案（如更新本地信任库或获取新证书）。",
+          "condition": "确认为远端单方面证书过期且无自动续期机制。",
+          "expected_result": "获得远端侧的明确解释及修复时间表，以便决定是否需要回滚或采取其他缓解措施。",
+          "risk": "无操作风险，属于信息核实。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "errors": [],
+      "queries": [
+        {
+          "tool": "get_service_metrics",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_recent_changes",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          },
+          "status": "ok",
+          "error": null
+        },
+        {
+          "tool": "get_service_logs",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          },
+          "status": "ok",
+          "error": null
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "reviewer_validation_failures": 0,
+    "overall_quality_stability_proven": false,
+    "initial_fresh_001": "ENOSPC mechanism supported, manual information collection step, trigger unresolved, completed with limitations. Remote-success probe used as an overly strong refutation of a broad competing cause.",
+    "initial_fresh_002": "Certificate expiry mechanism supported; reviewer still marked N3 blocking from trigger/approved next-step targets. Partial without invalid JSON.",
+    "initial_fresh_003": "Logs unavailable, unknown mechanisms preserved. Knowledge empty refs and redundant Diagnosis advice exhausted collection correction; Supervisor rework invalid. No published actions. Do not count as a good human handoff.",
+    "final_fresh_002": "Certificate expiry mechanism and human next step supported; trigger evidence request actually deferred, stored verbatim, hypothesis remains unresolved; completed with limitations.",
+    "remaining_limitations": [
+      "Question-owned category metadata does not verify semantic accuracy.",
+      "Final suggested information collection includes speculative remediation examples and needs human review.",
+      "Remote health probes cannot generally rule out request-specific or intermittent dependency failures.",
+      "Collection and Supervisor failure modes are outside this two-problem change.",
+      "Small samples and differing plans cannot establish accuracy improvement."
+    ],
+    "runtime_branch_coverage": {
+      "trigger_handoff_observed_live": true,
+      "new_blocker_target_scope_correction_observed_live": false
+    },
+    "interpretation": "The final run did not need the new target-scope correction; that branch is verified by deterministic boundary tests. Real live handoff preserved the original request and unknown verdict, without additional rework calls."
+  }
+}

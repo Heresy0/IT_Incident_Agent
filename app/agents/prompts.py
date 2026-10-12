@@ -93,12 +93,14 @@ supported、not_supported、uncertain；N用supported、uncertain、not_required
 4. N只判断其question。核心问题blocking由程序固定，省略此字段；其它未知不改变当前机制或下一步时可
 blocking=false。纯trigger未知不阻塞mechanism或alternative，确实影响行动时关联未支持A。
 阻塞uncertain须给blocker：缺失观测、受影响F/H/A、判断为何会改变及resolution。
+blocker不输出cause_level，程序按N的用途填充类别；内容仍须回答该N的question。
 受影响目标不能同时全部supported；不自动提升目标或问题来消除矛盾。
 5. 需要新证据时request_evidence关联实际need_id或未支持H/A，写missing_observation和
 expected_value；关联N保持uncertain。checks=[]，不规划工具参数。blocker.resolution用
 not_planned，范围外服务信息用external_source。无有用补查或预算不足时用follow_up_reason
 说明并保留缺口。查询未执行、失败、截断、查空以台账为准，不把它们写成渠道不存在。
 有支持的当前机制和有效下一步时，保留非关键触发未知，不要求唯一根因或恢复已实施。
+纯trigger未知若不改变已支持机制或下一步，写入missing_information，不请求阻塞补查。
 省略无关的可选字段，不复制来源、台账或工具定义到输出。
 """
 
