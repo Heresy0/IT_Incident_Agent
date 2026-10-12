@@ -87,8 +87,18 @@ def diagnosis_schema(schema, *, canonical_checks=False):
     return schema
 
 
-def reviewer_schema(schema, needs, targets, *, conservative=False):
+def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refutation=False):
     schema = deepcopy(schema)
+    assessment = schema['$defs']['Assessment']
+    if bounded_refutation:
+        assessment.setdefault('allOf', []).append({
+            'if': {'properties': {'target_id': {'enum': [k for k in targets if k.startswith('H')]},
+                                  'verdict': {'const': 'not_supported'}},
+                   'required': ['target_id', 'verdict']},
+            'then': {'properties': {'refutation_basis': {'$ref': '#/$defs/RefutationBasis'}},
+                     'required': ['refutation_basis']}})
+    else:
+        assessment['properties'].pop('refutation_basis', None)
     core = [n.need_id for n in needs.values() if n.purpose in {'symptom', 'mechanism'}]
     schema['$defs']['NeedAssessment']['allOf'] = [{
         'if': {'properties': {'need_id': {'enum': core}}, 'required': ['need_id']},

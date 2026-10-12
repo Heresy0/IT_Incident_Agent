@@ -1,0 +1,83 @@
+{
+  "baseline_id": "default-flow-2026-10-13",
+  "git_tag": "codex/default-flow-2026-10-13",
+  "created_date": "2026-10-13",
+  "timezone": "Asia/Shanghai",
+  "scope": "source_defaults_only_no_private_configuration_or_runtime_data",
+  "workflow_version": "incident_graph_v17_programmatic_source_handoff",
+  "application_source_version": "54b4675c146b4fa0",
+  "application_source_version_lf_normalized": "ec83fe573a0c636e",
+  "defaults": {
+    "live_investigation_mode": "programmatic",
+    "live_knowledge_mode": "programmatic",
+    "parallel_collection": true,
+    "live_blind_review": false,
+    "reviewer_repair_mode": "shared",
+    "role_corrections": "one_per_supervisor_diagnosis_reviewer_in_programmatic_mode",
+    "review_protection": "bounded_refutation_v1",
+    "diagnostic_pack": "explicit_python_argument_only",
+    "runbook_rag": "opt_in_per_existing_service_configuration",
+    "rag_index_backend": "local_json",
+    "ordinary_dispatch_round_limit": 4,
+    "ordinary_task_limit": 6,
+    "ordinary_rework_limit": 1,
+    "additional_rework": "one_extra_round_only_when_existing_eligibility_and_budget_guards_pass",
+    "python_incident_limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 24,
+      "seconds": 180,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "api_limits": {
+      "model_calls_default_if_omitted": 16,
+      "tool_calls_default_if_omitted": 24,
+      "seconds": 180,
+      "input_chars": 28000,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20
+    },
+    "rag": {
+      "index_dir": "app/data/runbooks",
+      "embedding_model": "text-embedding-v1",
+      "embedding_dimension": 1536,
+      "embedding_url": "https://dashscope.aliyuncs.com",
+      "embedding_api_key_env": "DASHSCOPE_API_KEY",
+      "top_k": 3,
+      "min_score": 0.35,
+      "chunk_size": 500,
+      "chunk_overlap": 50
+    },
+    "model_timeout_seconds": 30,
+    "model_sdk_retries": 0,
+    "scripted_api_mode": "historical_agent_execution_for_controls_only"
+  },
+  "verification": {
+    "regression": {
+      "command": "PYTHONPATH=app python -m unittest discover -s tests -t . -q",
+      "total": 599,
+      "passed": 592,
+      "skipped": 7,
+      "failed": 0,
+      "local_log": "output/rag-lightweight-tests.log",
+      "log_sha256": "eabd4c178f4c045df8fab8ace68104ac377c7d80616a7eccd220b40794dab982"
+    },
+    "rag_smoke": {
+      "method": "local_json_with_mock_embeddings_v1",
+      "quality_measured": false,
+      "paid_model_calls": 0,
+      "local_report": "output/runbook-rag-local-smoke/summary.json",
+      "report_sha256": "3ea1efc7c3ec7fa4374d4e5122820c0215b5fc3e8ac49b45671324156f1c3571"
+    }
+  },
+  "limits": [
+    "No new live model validation for this freeze.",
+    "Semantic contradiction and industry generalization are not established.",
+    "Real manual retrieval quality has not been measured.",
+    "Local credentials, service registrations, document indexes and run data are not committed."
+  ]
+}

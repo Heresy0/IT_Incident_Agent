@@ -29,7 +29,7 @@ def validate_endpoint(base):
         raise ProviderError('ENDPOINT_TLS_REQUIRED')
 
 
-def request_json(base, method, path, *, params=None, authorization_env=None, transport=None):
+def request_json(base, method, path, *, params=None, authorization_env=None, transport=None, json_body=None, bearer_env=None):
     validate_endpoint(base)
     headers = {}
     if authorization_env:
@@ -37,10 +37,15 @@ def request_json(base, method, path, *, params=None, authorization_env=None, tra
         if not token:
             raise ProviderError('PROVIDER_AUTH_MISSING')
         headers['Authorization'] = token
+    if bearer_env:
+        token = os.getenv(bearer_env)
+        if not token:
+            raise ProviderError('PROVIDER_AUTH_MISSING')
+        headers['Authorization'] = 'Bearer ' + token
     try:
         started = time.monotonic()
         with httpx.Client(timeout=5, follow_redirects=False, trust_env=False, transport=transport) as client:
-            with client.stream(method, base.rstrip('/') + path, params=params, headers=headers) as response:
+            with client.stream(method, base.rstrip('/') + path, params=params, headers=headers, json=json_body) as response:
                 if response.status_code == 429:
                     raise ProviderError('RATE_LIMIT', True)
                 if not 200 <= response.status_code < 300:
@@ -63,14 +68,14 @@ def request_json(base, method, path, *, params=None, authorization_env=None, tra
         raise ProviderError('PROVIDER_FORMAT_INVALID') from None
 
 
-def safe_text(text):
+def safe_text(text, *, max_chars=1800):
     # Only sanitized log messages enter model prompts/evidence, never raw log documents.
     text = re.sub(r'(?i)bearer\s+\S+', 'Bearer [REDACTED]', str(text))
     text = re.sub(r'''(?i)(["']?(?:password|token|api[_-]?key|secret|authorization|access_token|refresh_token)["']?\s*[=:]\s*)(?:"[^"]*"|'[^']*'|[^\s,;}]+)''',
                   r'\1[REDACTED]', text)
     text = re.sub(r'(?i)([a-z][a-z0-9+.-]*://)[^/@\s]+:[^/@\s]+@', r'\1[REDACTED]@', text)
     text = re.sub(r'\bsk-[A-Za-z0-9_-]+', '[REDACTED]', text)
-    return text[:1800]
+    return text[:max_chars]
 
 
 class HTTPObservationProvider:
@@ -184,6 +189,9 @@ class HTTPObservationProvider:
                                    'filtered_rows': filtered, 'retained_rows': min(len(rows), 50)}
             return rows[:50], count >= 51 or len(rows) > 50
         # Small operator-maintained metadata; no model-supplied paths or knowledge-base credentials.
+        if name == 'search_runbooks' and self.binding.observations.get('runbook_rag'):
+            from knowledge.retrieval import search_runbooks
+            return search_runbooks(self.binding, scope, args, transport=self.transport)
         key = {'get_recent_changes': 'changes', 'get_service_owner': 'owners',
                'search_runbooks': 'runbooks', 'search_incidents': 'incidents'}.get(name)
         if key is None:

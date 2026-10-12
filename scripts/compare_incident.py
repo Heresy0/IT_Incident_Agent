@@ -16,6 +16,7 @@ from api.auth import Principal
 from config.incident import DEFAULT_MODEL, IncidentConfig
 from runtime.context import Limits, RunContext, ExecutionError
 from workflow.coordinator import Collaboration
+from workflow.review_protection import DEFAULT_REVIEW_PROTECTION
 from agents.contracts import DiagnosisDraft
 from providers.fixtures import FixtureProvider, ProviderError
 from agents.single import single_agent
@@ -28,7 +29,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider, investigation_mode='programmatic', reviewer_repair_mode='shared', blind_review=None, knowledge_mode=None, diagnostic_pack=None, review_protection='conservative_v1'):
+def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider, investigation_mode='programmatic', reviewer_repair_mode='shared', blind_review=None, knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
     """Use one existing harness for both paths; retain accounting/evidence on unexpected failure."""
     provider = provider_factory(case_id, principal)
     events = []

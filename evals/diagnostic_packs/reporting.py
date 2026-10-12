@@ -1,6 +1,7 @@
 """Simplified Chinese display labels; JSON keeps stable machine-readable codes."""
 
 LABELS = {
+    'queue_polling': '队列长轮询超时', 'read_only_volume': '只读卷写入失败', 'certificate_window': '证书尚未生效',
     'connection_wait': '连接等待', 'authentication': '认证异常', 'source_unavailable': '取证数据源不可用',
     'different_mechanism': '故障机制变化', 'renamed_registration': '服务及指标改名',
     'status_only': '仅检查状态', 'small_budget': '小预算', 'empty_business_logs': '业务日志无匹配记录',

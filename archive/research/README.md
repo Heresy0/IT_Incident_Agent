@@ -8,4 +8,4 @@
 
 现有运行记录、数据库及历史验收报告未删除。当前系统说明以根目录 README 和 docs/项目结构与模块说明.md 为准。
 
-旧研究使用说明集中在 [legacy-guide.md](legacy-guide.md)，原技术选型笔记集中在 `examples/tech_selection/`。它们保留历史内容，不是当前 IT 系统的启动或安装入口；52项受清单保护的源码快照未修改。
+旧研究使用说明集中在 [legacy-guide.md](legacy-guide.md)，不是当前 IT 系统的启动或安装入口；52项受清单保护的源码快照未修改。2026-10-13 按用户要求删除了 `examples/tech_selection/` 中的四份旧知识笔记及本机 `tech_selection_v1` 向量集合。历史使用说明中的入库路径与旧集合名仅用于追溯。当前知识检索在 `app/knowledge/` 使用新的服务隔离索引，不导入此归档模块。

@@ -21,13 +21,16 @@ from scripts.compare_incident import capture
 from workflow.task_checks import completion
 from tools.executor import ToolExecutor
 from runtime.context import RunContext
+from evals.refutations.validation import validation_cases, quality_criteria, VALIDATION_IDS
+from workflow.review_protection import DEFAULT_REVIEW_PROTECTION
 
 KNOWN = ('connection_wait', 'source_unavailable', 'authentication')
 
 
 def arm_label(arm):
     return {'baseline': '原流程', 'pack': '诊断包流程',
-            'strict': '调整前复核规则', 'conservative': '调整后复核规则'}[arm]
+            'strict': '调整前复核规则', 'conservative': '调整后复核规则',
+            'bounded': '有限反证优化'}[arm]
 
 
 def summarize_report(report, required, provider, limits):
@@ -60,8 +63,9 @@ def summarize_report(report, required, provider, limits):
 
 def markdown(summary):
     config = summary['configuration']
-    protection_comparison = config.get('comparison') == 'review-protection'
-    lines = ['# 复核保护调整对照验证' if protection_comparison else '# 增加预算后的诊断包验证', '',
+    bounded_comparison = config.get('comparison') == 'bounded-refutation'
+    protection_comparison = config.get('comparison') in {'review-protection', 'bounded-refutation'}
+    lines = ['# 有限反证优化对照验证' if bounded_comparison else '# 复核保护调整对照验证' if protection_comparison else '# 增加预算后的诊断包验证', '',
              f"模型：{config['model']}；已运行 {len(summary['runs'])} 次；每个流程输入上限 {config['limits']['input_chars']} 字符，"
              f"模型调用上限 {config['limits']['model_calls']} 次，工具调用上限 {config['limits']['tool_calls']} 次，"
              f"单次输出上限 {config['max_output_tokens']} 个词元。", '',
@@ -81,9 +85,11 @@ def markdown(summary):
                      f"{label(row['termination_reason'])} | {row['protocol_failures']} | {row['accepted_drafts']} | "
                      f"{row['accepted_reviews']} | {row['published_actions']} | {row['pending_actions']} |")
     lines += ['', '## 解释边界', '',
-              ('- 两边都启用相同诊断包，使用相同模型、预算和数据，每个场景每种规则只运行一次。仅复核保护及其模型输入契约不同，不重跑筛选。'
+              ('- 两边都启用相同诊断包，使用相同模型、预算和数据，每个场景每种规则只运行一次。差异是反证保护、复核契约以及诊断和复核的补充提示，不重跑筛选。'
+               if bounded_comparison else '- 两边都启用相同诊断包，使用相同模型、预算和数据，每个场景每种规则只运行一次。仅复核保护及其模型输入契约不同，不重跑筛选。'
                if protection_comparison else '- 每个场景每个流程只运行一次；两流程使用相同模型、提高后的预算和数据。此对照评估诊断包在高预算下的增量效果，不单独证明提高预算的效果。'),
-              '- 使用已知合成开发案例，不是外部盲测或独立保留集。程序不向模型提供评价标准或参考答案。',
+              ('- 使用本轮规则完成后补充的合成服务场景，不在验证后针对结果调参；由同一开发方编写，不是外部盲测或独立质量基准。评价标准不进入模型输入。'
+               if bounded_comparison else '- 使用已知合成开发案例，不是外部盲测或独立保留集。程序不向模型提供评价标准或参考答案。'),
               '- 完成状态、建议数量和程序覆盖不能代替业务质量审阅；合理的有限诊断及人工交接可以有价值。',
               '- 费用未配置计价单价，不能将未知费用视为零；词元及调用统计用于核对实际开销。',
               '- 原始报告、数据快照和执行计划保留；错误运行也计入，不通过重跑筛选结果。']
@@ -95,8 +101,8 @@ def markdown(summary):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
-    parser.add_argument('--comparison', choices=('diagnostic-pack', 'review-protection'), default='diagnostic-pack')
-    parser.add_argument('--cases', nargs='+', choices=KNOWN)
+    parser.add_argument('--comparison', choices=('diagnostic-pack', 'review-protection', 'bounded-refutation'), default='diagnostic-pack')
+    parser.add_argument('--cases', nargs='+', choices=(*KNOWN, *VALIDATION_IDS))
     parser.add_argument('--model-budget', type=int)
     parser.add_argument('--tool-budget', type=int)
     parser.add_argument('--input-chars', type=int)
@@ -107,7 +113,10 @@ def main(argv=None):
     if args.execute_live and (not args.cases or any(value is None for value in
             (args.model_budget, args.tool_budget, args.input_chars))):
         parser.error('真实调用需要明确场景、模型预算、工具预算和输入上限')
-    chosen = args.cases or list(KNOWN)
+    available = VALIDATION_IDS if args.comparison == 'bounded-refutation' else KNOWN
+    chosen = args.cases or list(available)
+    if not set(chosen) <= set(available):
+        parser.error('所选场景不属于当前对照数据集')
     if len(chosen) != len(set(chosen)):
         parser.error('场景不能重复')
     limits = Limits(model_calls=args.model_budget or 48, tool_calls=args.tool_budget or 64,
@@ -118,7 +127,8 @@ def main(argv=None):
             and 180 <= limits.seconds <= 900):
         parser.error('预算超出本验证允许范围')
     config = IncidentConfig.from_file()
-    selected = [next(case for case in cases() if case['case_id'] == cid) for cid in chosen]
+    pool = validation_cases() if args.comparison == 'bounded-refutation' else cases()
+    selected = [next(case for case in pool if case['case_id'] == cid) for cid in chosen]
     # Preflight every scope/pack and declared read before the first model call.
     required = {}
     for case in selected:
@@ -135,7 +145,7 @@ def main(argv=None):
                      'comparison': args.comparison,
                      'temperature': 0, 'request_timeout': 30, 'max_retries': 0,
                      'transport_extra_body_sha256': digest(config.extra_body)}
-    plan = {'method': 'paired_live_review_protection_v1' if args.comparison == 'review-protection' else 'paired_live_diagnostic_pack_replay_v1', 'source_version': source,
+    plan = {'method': 'paired_live_bounded_refutation_v1' if args.comparison == 'bounded-refutation' else 'paired_live_review_protection_v1' if args.comparison == 'review-protection' else 'paired_live_diagnostic_pack_replay_v1', 'source_version': source,
             'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'configuration': configuration, 'plan_only': not args.execute_live,
             'attempts_per_case_and_arm': 1, 'paired_runs': 2 * len(selected),
@@ -151,6 +161,8 @@ def main(argv=None):
         parser.error('未配置真实模型密钥，未发起模型请求')
     directory = args.output / str(uuid4())
     write_json(directory / 'plan.json', plan)
+    if args.comparison == 'bounded-refutation':
+        write_json(directory / 'quality-criteria.json', quality_criteria())
     for case in selected:
         write_json(directory / (case['case_id'] + '.fixture.json'), case['snapshot'])
     summary = {**plan, 'runs': [], 'stopped_early': False}
@@ -158,7 +170,7 @@ def main(argv=None):
     print(json.dumps({'directory': str(directory), 'model': config.model, 'planned_runs': plan['paired_runs']}, ensure_ascii=False), flush=True)
     for index, case in enumerate(selected):
         # Alternate order to reduce a uniform first/second-arm timing effect.
-        arms = ('strict', 'conservative') if args.comparison == 'review-protection' else ('baseline', 'pack')
+        arms = ('conservative', 'bounded') if args.comparison == 'bounded-refutation' else ('strict', 'conservative') if args.comparison == 'review-protection' else ('baseline', 'pack')
         for arm in (arms if index % 2 == 0 else tuple(reversed(arms))):
             if implementation_version() != source:
                 raise RuntimeError('验证期间应用源码发生变化，停止后续调用')
@@ -170,7 +182,8 @@ def main(argv=None):
             report = capture(case['case_id'], 'multi', factory, P, limits,
                 provider_factory=lambda cid, principal: provider,
                 diagnostic_pack=case['pack'] if arm != 'baseline' else None,
-                review_protection='strict_v1' if arm == 'strict' else 'conservative_v1')
+                review_protection=('bounded_refutation_v1' if arm == 'bounded' else 'conservative_v1'
+                    if arm == 'conservative' else 'strict_v1' if arm == 'strict' else DEFAULT_REVIEW_PROTECTION))
             if report['task_type'] == 'incident_multi':
                 # capture's generic exception report uses a workflow alias;
                 # this runner is exclusively the collaboration workflow.
@@ -180,7 +193,7 @@ def main(argv=None):
             report.update(source_version=source, execution_mode='live', model=config.model,
                           experiment_arm=arm, experiment_case=case['case_id'],
                           fixture_snapshot_sha256=digest(case['snapshot']), model_settings=configuration,
-                          provenance={'dataset_version': 'diagnostic_pack_known_development_replay_v1',
+                          provenance={'dataset_version': 'bounded_refutation_supplementary_synthetic_v1' if args.comparison == 'bounded-refutation' else 'diagnostic_pack_known_development_replay_v1',
                                       'configuration_sha256': digest(configuration),
                                       'runner_sha256': plan['runner_sha256']})
             path = directory / (case['case_id'] + '-' + arm + '.json')

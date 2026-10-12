@@ -244,7 +244,9 @@ class IncidentCollaborationTests(unittest.TestCase):
         self.assertEqual(len(result["reviews"]), 1)
         self.assertEqual(result["rework_rounds"], 0)
         self.assertEqual(result["run_summary"]["model_calls"], 8)
-        self.assertEqual(result["output"]["hypotheses"][0]["status"], "refuted")
+        self.assertEqual(result["output"]["hypotheses"][0]["status"], "unresolved")
+        self.assertTrue(any(e.get('code') == 'MISSING_REFUTATION_BASIS'
+                            for e in result['review_protection_adjustments']))
 
     def test_reviewer_has_own_bounded_correction_after_leaf_failure(self):
         def broken_final(response, _, calls):

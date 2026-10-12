@@ -4,7 +4,7 @@ import time
 from copy import deepcopy
 from datetime import datetime, timezone
 from api.auth import Principal
-from runtime.context import ExecutionError, RunContext
+from runtime.context import ExecutionError, RunContext, activate
 from evidence.contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS, Evidence,
                         ToolResult, ToolError, ReferenceOption, EvidenceRef)
 from providers.fixtures import ProviderError
@@ -210,7 +210,7 @@ class ToolExecutor:
         for attempt in range(2):
             try:
                 self.context.reserve("tool")
-                with self.context.span("tool", name):
+                with activate(self.context), self.context.span("tool", name):
                     if name == 'get_service_metrics' and hasattr(self.provider, 'binding'):
                         rows, truncated = self.provider.query(name, args, self.scope,
                             max_metric_points=self.metric_point_limit(args))

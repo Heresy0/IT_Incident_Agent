@@ -97,6 +97,38 @@ class PackLiveTests(unittest.TestCase):
             self.assertIn('调整前复核规则', text)
             self.assertIn('调整后复核规则', text)
 
+    def test_bounded_comparison_has_separate_data_and_matching_budgets(self):
+        from scripts.compare_incident import capture
+        config = IncidentConfig(api_key='fake-for-patched-test', model='fake')
+        with tempfile.TemporaryDirectory() as temp, redirect_stdout(io.StringIO()) as output, \
+                patch('scripts.validate_diagnostic_packs.IncidentConfig.from_file', return_value=config), \
+                patch('scripts.validate_diagnostic_packs.build_roles', side_effect=ExecutionError('AUTH_ERROR')) as factory, \
+                patch('scripts.validate_diagnostic_packs.capture', wraps=capture) as runner:
+            self.assertEqual(main(['--execute-live', '--comparison', 'bounded-refutation', '--cases', 'queue_polling',
+                '--model-budget', '24', '--tool-budget', '16', '--input-chars', '56000', '--output', temp]), 2)
+            self.assertEqual(factory.call_count, 1)
+            self.assertEqual(runner.call_args.kwargs['review_protection'], 'conservative_v1')
+            directory = Path(output.getvalue().splitlines()[-1]).parent
+            self.assertTrue((directory/'quality-criteria.json').exists())
+            snapshot = json.loads((directory/'queue_polling.fixture.json').read_text(encoding='utf-8'))
+            self.assertNotIn('quality_criteria', snapshot)
+            summary = json.loads((directory/'summary.json').read_text(encoding='utf-8'))
+            self.assertEqual(summary['configuration']['limits']['model_calls'], 24)
+            self.assertIn('队列长轮询超时', (directory/'summary.md').read_text(encoding='utf-8'))
+
+    def test_bounded_cases_cannot_leak_into_other_comparisons(self):
+        with patch('scripts.validate_diagnostic_packs.IncidentConfig.from_file', side_effect=AssertionError('No config')):
+            with self.assertRaises(SystemExit):
+                main(['--cases', 'queue_polling'])
+
+    def test_declared_refutation_controls_preserve_true_negatives(self):
+        from evals.refutations.controls import run_controls
+        result = run_controls()
+        self.assertEqual(len(result['rows']), 6)
+        self.assertEqual(sum(r['bounded']['verdict'] == 'not_supported' for r in result['rows']), 3)
+        self.assertFalse(result['semantic_accuracy_measured'])
+        self.assertEqual((result['paid_model_calls'], result['tool_calls']), (0, 0))
+
 
 if __name__ == '__main__':
     unittest.main()

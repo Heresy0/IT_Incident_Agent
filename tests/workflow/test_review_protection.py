@@ -14,7 +14,7 @@ from workflow.review_outcome import nonblocking_trigger_request
 
 class ReviewProtectionTests(unittest.TestCase):
     def prepared(self):
-        c = Collaboration(planned_models(), FixtureProvider('case_001', P), P)
+        c = Collaboration(planned_models(), FixtureProvider('case_001', P), P, review_protection='conservative_v1')
         c.run()
         c.stop = ''
         c.draft = c.draft.model_copy(update={'hypotheses': [

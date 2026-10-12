@@ -169,11 +169,18 @@ class DiagnosisDraft(Contract):
     rejected_actions: list[dict[str, str]] = Field(default_factory=list)
 
 
+class RefutationBasis(Contract):
+    kind: Literal['direct_contradiction', 'weakens_explanation', 'absence_of_support']
+    claim: str = Field(min_length=1, max_length=300,
+        description='The specific assertion in the target hypothesis being challenged. Classification is a model judgment, not a program-certified contradiction.')
+
+
 class Assessment(Contract):
     target_id: str = Field(pattern=r"^[FHA][1-9][0-9]?$", max_length=3)
     verdict: Literal["supported", "not_supported", "uncertain"]
     reason: str = Field(min_length=1, max_length=500)
     evidence_ids: list[str] = Field(default_factory=list, max_length=8)
+    refutation_basis: RefutationBasis | None = None
 
 
 class EvidenceRequest(Contract):

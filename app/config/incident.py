@@ -1,4 +1,4 @@
-"""Minimal IT runtime configuration; no research, vector store or search dependency."""
+"""IT model/runtime settings; optional runbook vector settings belong to service registrations."""
 import json
 import os
 from dataclasses import dataclass, field

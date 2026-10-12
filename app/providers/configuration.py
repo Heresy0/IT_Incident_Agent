@@ -10,6 +10,7 @@ from providers.fixtures import ProviderError
 from providers.http import validate_endpoint
 from providers.logs import LogMapping
 from repairs.verification import validate_checks
+from knowledge.configuration import RunbookRAGConfig
 
 
 def nonblank(value):
@@ -58,6 +59,7 @@ class Observations(ConfigModel):
     changes: list[dict[str, Any]] = Field(default_factory=list)
     owners: list[dict[str, Any]] = Field(default_factory=list)
     runbooks: list[dict[str, Any]] = Field(default_factory=list)
+    runbook_rag: RunbookRAGConfig | None = None
     incidents: list[dict[str, Any]] = Field(default_factory=list)
 
 
@@ -118,7 +120,8 @@ MESSAGES = {
     'string_pattern_mismatch': '字段格式不符合登记或工具范围规则。',
 }
 SCHEMA_FIELDS = set().union(*(set(model.model_fields) for model in (
-    Endpoint, MetricDefinition, Observations, SymptomCheck, RepairTarget, ServiceConfig, ServicesDocument, LogMapping)))
+    Endpoint, MetricDefinition, Observations, SymptomCheck, RepairTarget, ServiceConfig, ServicesDocument, LogMapping,
+    RunbookRAGConfig)))
 
 
 def issue(path, code, message, level='error'):
@@ -214,6 +217,8 @@ def validate_configuration(data):
             if definitions and getattr(observations, source) is None:
                 results.append(issue(base + '.observations.' + source, 'SOURCE_REQUIRED', '登记了查询但没有对应观测地址。'))
         for name in ('metrics', 'log_queries', 'owners', 'runbooks'):
+            if name == 'runbooks' and observations.runbook_rag is not None:
+                continue
             if not getattr(observations, name):
                 results.append(issue(base + '.observations.' + name, 'CHANNEL_EMPTY',
                     '该渠道未登记内容；取证或检索可能返回信息缺口。', 'warning'))

@@ -155,7 +155,10 @@ def engineering(report, pricing=None):
     usage = summary.get('token_usage', {})
     rates = (pricing or {}).get('models', {}).get(report.get('model'))
     cost = None
-    if report.get('execution_mode') == 'live' and rates and usage.get('status') == 'known' \
+    mixed_embedding = any(e.get('type') == 'call_start' and e.get('name') == 'knowledge_embedding' for e in events)
+    # Total token usage includes embeddings. A chat-only tariff cannot price
+    # this mixed run; retain unknown until per-model accounting is available.
+    if not mixed_embedding and report.get('execution_mode') == 'live' and rates and usage.get('status') == 'known' \
             and usage.get('known_calls') == summary.get('model_calls') \
             and all(number(usage.get(k)) for k in ('input_tokens', 'output_tokens')):
         cost = (usage['input_tokens'] * rates['input_per_million']

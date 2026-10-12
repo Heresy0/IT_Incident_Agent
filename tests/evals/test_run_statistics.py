@@ -159,6 +159,12 @@ class StatisticsTests(unittest.TestCase):
         row['report']['model'] = 'other'
         self.assertIsNone(summarize([row], pricing=prices)['runs'][0]['engineering']['estimated_token_cost'])
 
+    def test_embedding_run_is_not_priced_with_chat_only_rates(self):
+        row = saved()
+        row['report']['events'].append({'type':'call_start','kind':'model','name':'knowledge_embedding'})
+        prices = {'currency':'CNY','models':{'unit-model':{'input_per_million':2,'output_per_million':4}}}
+        self.assertIsNone(summarize([row],pricing=prices)['runs'][0]['engineering']['estimated_token_cost'])
+
     def test_invalid_prices_rejected(self):
         for price in (-1, float('nan'), True):
             with self.assertRaises(ValueError):

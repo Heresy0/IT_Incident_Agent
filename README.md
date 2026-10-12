@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+当前默认流程已冻结为 `codex/default-flow-2026-10-13`，默认规则、轻量 RAG、验证成绩和已知限制见[冻结基线](examples/showcase/default-flow-baseline.md)。后续比较以该标签为对照；历史实验记录保留当时的配置，不代替当前默认行为。
+
 模型通过 LangChain `ChatOpenAI` 调用 OpenAI 兼容的 Chat Completions 接口。配置 `MODEL`、`MODEL_BASE_URL`、`MODEL_API_KEY`（未设置则沿用 `DASHSCOPE_API_KEY`）；同服务内切换支持工具调用和 JSON 输出的模型通常只改 `MODEL`。跨服务需调整地址和密钥，厂商参数由 `MODEL_EXTRA_BODY` 的 JSON 对象提供：当前通义为 `{"enable_thinking":false}`，不支持此参数的服务使用 `{}`。单次超时 30 秒，SDK 自动重试为 0，程序继续校验输出结构与证据。服务需重启以加载配置。详见[兼容接口迁移记录](examples/showcase/openai-compatible.md)。
 
 默认采用[计划驱动取证与直接复核](examples/showcase/planned-investigation.md)：Supervisor 规划具体查询，Investigation 程序模块校验并执行，不调用独立取证模型。原始证据交给 Diagnosis/Reviewer 判断，查询完成不等于原因确认。旧 `agent` 模式与观测盲审仍可显式用于对照；免费脚本演示保留原控制流程。
@@ -82,6 +84,7 @@ flowchart TD
 | `app/workflow/` | LangGraph、调度、问题台账、补查、复核与收尾 |
 | `app/runtime/` | 全局和分支预算、调用计数与追踪 |
 | `app/tools/`、`app/providers/` | 受限工具执行、登记来源、查询及历史适配 |
+| `app/knowledge/` | 轻量手册切分、向量化、本地文件索引与相似度检索 |
 | `app/evidence/` | 来源、引用、诊断完整性与报告渲染 |
 | `app/repairs/` | 提案、审批、固定执行器及恢复验证 |
 | `app/storage/`、`app/observability/` | PostgreSQL 与迁移、JSON 日志和指标 |
@@ -91,9 +94,11 @@ flowchart TD
 | `examples/` | 服务登记示例、面试材料和公开验证摘要 |
 | `archive/research/` | 只供追溯的原研究成果，不参与当前运行和安装 |
 
-后端入口为 `main.py` 与 `local_run.py`。结果读取使用 `/api/v1/runs/{run_id}`；旧研究运行 URL 仅保留只读兼容。Python 包构建与 `requirements.txt` 使用相同的锁定依赖，不再安装研究、Milvus 或 Redis 检查点依赖。
+后端入口为 `main.py` 与 `local_run.py`。结果读取使用 `/api/v1/runs/{run_id}`；旧研究运行 URL 仅保留只读兼容。Python 包构建与 `requirements.txt` 使用相同的锁定基础依赖；轻量手册 RAG 使用本地文件索引，无需新增数据库或独立服务，不安装旧研究或 Redis 检查点依赖。
 
 ## 验证与面试材料
+
+- [轻量排障手册 RAG](examples/runbook-rag.md)：文档切分、Embedding、本地索引、Top-K 与现有证据引用；包含导入命令和免费链路验证。
 
 - [服务基础取证包独立实验](evals/diagnostic_packs/README.md)：显式可选的基础查询入口及同配置免费机械对照；保留额外调用、上下文压力与小预算观测损失，尚未验证端到端诊断质量，默认流程不启用。
 - [离线分类统计](evals/run-statistics.md)：分别统计协议错误、查询与计划执行缺口、耗时、调用和成本；通过原报告哈希绑定的人类评价统计关键漏查、错误结论、无依据建议、复核误拦与有效交接。入口 `scripts/summarize_runs.py` 不调用模型，输出 JSON 汇总、Markdown 报表与评价模板。

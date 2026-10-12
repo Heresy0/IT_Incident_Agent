@@ -25,11 +25,12 @@ from workflow.review_outcome import review_policy, readiness_gaps, action_projec
 from workflow.model_input import input_sizes, rebuild_correction
 from agents.protocol import compact_schema, reviewer_schema, diagnosis_schema, supervisor_schema, bind_evidence_ids, bind_reference_ids, REPAIR_POLICY, REVIEW_STAGE_POLICY, ROLE_REPAIR_POLICY, parse_review_selection
 from evidence.observations import source_statement
+from workflow.review_protection import conservative, BOUNDED_POLICY, DEFAULT_REVIEW_PROTECTION
 
 
 class Collaboration:
     def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None,
-                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection='conservative_v1'):
+                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
         from workflow.review_protection import MODES
         if review_protection not in MODES:
             raise ValueError('Unregistered review protection mode')
@@ -305,7 +306,8 @@ class Collaboration:
             output_schema['properties']['need_assessments'].update(
                 minItems=len(self.evidence_needs), maxItems=len(self.evidence_needs))
             output_schema = reviewer_schema(output_schema, self.evidence_needs, self.targets(),
-                conservative=self.review_protection == 'conservative_v1')
+                conservative=conservative(self.review_protection),
+                bounded_refutation=self.review_protection == BOUNDED_POLICY)
         if schema is ObservationReview:
             output_schema = bind_reference_ids(output_schema, self)
         output_schema = compact_schema(bind_evidence_ids(output_schema, self.evidence))
@@ -324,7 +326,14 @@ class Collaboration:
                 for item in executor.schemas()] for r, executor in self.executors.items()}}
         model_input = payload if role == 'reviewer' and schema is ReviewDecision else {
             **payload, 'owner_options': owner_options(self)}
-        messages = [SystemMessage(content=system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])), HumanMessage(content=json.dumps({
+        prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
+        if self.review_protection == BOUNDED_POLICY:
+            from agents.prompts import BOUNDED_DIAGNOSIS, BOUNDED_REVIEW
+            if role == 'diagnosis':
+                prompt += BOUNDED_DIAGNOSIS
+            elif role == 'reviewer' and schema is ReviewDecision:
+                prompt += BOUNDED_REVIEW
+        messages = [SystemMessage(content=prompt), HumanMessage(content=json.dumps({
             "input": model_input, "output_schema": output_schema}, ensure_ascii=False, separators=(',', ':')))]
         attempt = 0
         schema_version = hashlib.sha256(json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()[:12]
@@ -703,10 +712,11 @@ class Collaboration:
                     assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(self.observation_gaps())})
                     self.event('review_gate', 'reviewer', target_id=assessment.target_id, code='MISSING_HEALTH_CONTROL')
             checked.append(assessment)
-        if self.review_protection == 'conservative_v1':
+        if conservative(self.review_protection):
             from workflow.review_protection import protect_refutations
             checked = protect_refutations(review.model_copy(update={'assessments': checked}),
-                                          self.evidence, self.event).assessments
+                self.evidence, self.event, bounded=self.review_protection == BOUNDED_POLICY,
+                scope=self.ticket.scope).assessments
         request = review.request_evidence
         self.review_hint_status = []
         if request:
@@ -714,7 +724,7 @@ class Collaboration:
             if request.need_id is not None and request.need_id not in self.evidence_needs:
                 raise ProtocolError('UNKNOWN_OR_DUPLICATE_NEED')
             disputed = request.target_id or request.hypothesis_id
-            supported_check_request = (self.review_protection == 'conservative_v1'
+            supported_check_request = (conservative(self.review_protection)
                 and disputed in targets and disputed.startswith('A')
                 and targets[disputed].kind in {'manual_check', 'read_only_check'})
             if (request.hypothesis_id is not None and request.hypothesis_id not in targets
@@ -770,8 +780,8 @@ class Collaboration:
                                                'request_evidence': request})
         normalized = validate_blockers(self.evidence_needs, normalized, self.executors,
             required=self.blind_review or getattr(self.models['reviewer'], 'json_output', False), targets=targets,
-            conservative=self.review_protection == 'conservative_v1', event=self.event)
-        if self.review_protection == 'conservative_v1':
+            conservative=conservative(self.review_protection), event=self.event)
+        if conservative(self.review_protection):
             for assessment in normalized.need_assessments:
                 if assessment.blocker and not is_blocking(self.evidence_needs[assessment.need_id].model_copy(
                         update={} if assessment.blocking is None else {'blocking': assessment.blocking})):
@@ -844,7 +854,7 @@ class Collaboration:
         request = self.review.request_evidence
         if (request and self.ticket.purpose == 'diagnosis' and not self.reviewed_gaps()
                 and nonblocking_trigger_request(self.draft, self.review, self.evidence_needs,
-                    conservative=self.review_protection == 'conservative_v1')):
+                    conservative=conservative(self.review_protection))):
             # Keep the actual request and unresolved verdict in the audit record.
             # Only the automatic routing is deferred to human follow-up.
             deferred = {'revision': revision, 'request': request.model_dump(mode='json'),
@@ -1528,10 +1538,12 @@ class Collaboration:
             "used_evidence_ids": sorted(used), "evidence": [e.model_dump(mode="json") for e in self.evidence.values()],
             "task_results": self.task_results(), "drafts": self.drafts, "reviews": self.reviews, "negotiation": self.negotiation,
             'blind_review_enabled': self.blind_review, 'observation_reviews': self.observation_reviews,
-            'review_contract_version': 'question_owned_blocker_v3_conservative' if self.review_protection == 'conservative_v1' else 'question_owned_blocker_v2',
+            'review_contract_version': 'bounded_refutation_v1' if self.review_protection == BOUNDED_POLICY else
+                'question_owned_blocker_v3_conservative' if conservative(self.review_protection) else 'question_owned_blocker_v2',
             'review_protection': self.review_protection,
             'review_protection_adjustments': [e for e in self.events if e['type'] in
                 {'review_protection_applied', 'review_scope_limitation', 'review_scope_reclassified'}],
+            'refutation_audit': [e for e in self.events if e['type'] == 'refutation_basis_retained'],
             'deferred_review_requests': self.deferred_review_requests,
             'evidence_needs': self.need_input(), 'evidence_needs_version': 'question_ledger_v1',
             'collection_exits': self.collection_exits,
@@ -1573,7 +1585,7 @@ class Collaboration:
 
 
 def collaborate(models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None, event_log=None,
-                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection='conservative_v1'):
+                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
     return Collaboration(models, provider, principal, limits=limits, emit=emit, context=context,
                          event_log=event_log, parallel_collection=parallel_collection, blind_review=blind_review,
                          investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode,

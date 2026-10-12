@@ -48,7 +48,8 @@ class ReviewReadinessTests(unittest.TestCase):
                 'level': 'alternative', 'cause': '已排除的竞争解释'})
         def review(data):
             next(a for a in data['assessments'] if a['target_id'] == 'H2').update(
-                verdict='not_supported', reason='已有对照不支持此竞争解释。')
+                verdict='not_supported', reason='控制样本明确提供直接矛盾，不代表真实模型语义准确率。',
+                refutation_basis={'kind': 'direct_contradiction', 'claim': '已排除的竞争解释'})
         result, models = self.run_report(draft, review)
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['output']['hypotheses'][1]['status'], 'refuted')
