@@ -1,0 +1,36 @@
+{
+  "purpose": "Synthetic service registration for the opt-in experiment; not loaded by the HTTP backend",
+  "packs": [
+    {
+      "pack_id": "connection-acquisition",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "handoff_role": "服务值班人员",
+      "checks": [
+        {"check_id": "business-failure", "tool": "get_service_logs", "args": {"category": "resource"}, "human_check": "核查连接获取失败记录及连接持有、归还轨迹"},
+        {"check_id": "pressure-controls", "tool": "get_service_metrics", "args": {"metrics": ["pool_wait", "pool_usage", "db_cpu"]}, "human_check": "取得连接压力与数据库负载对照；CPU样本不能代表全部数据库状态"}
+      ]
+    },
+    {
+      "pack_id": "dependency-request",
+      "service": "report-publisher",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "checks": [
+        {"check_id": "business-failure", "tool": "get_service_logs", "args": {"category": "dependency"}, "human_check": "取得业务依赖交互的实际失败记录"},
+        {"check_id": "change-timeline", "tool": "get_recent_changes", "args": {}, "human_check": "取得故障前后变更时间线，不预设发布因果"}
+      ]
+    },
+    {
+      "pack_id": "export-impact",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "checks": [
+        {"check_id": "business-failure", "tool": "get_service_logs", "args": {"category": "dependency"}, "human_check": "恢复采集或通过有权限的人工渠道取得同窗口依赖交互记录"},
+        {"check_id": "symptom-controls", "tool": "get_service_metrics", "args": {"metrics": ["request_error_rate", "request_latency_ms"]}, "human_check": "核查业务错误率与延迟样本及其覆盖范围"}
+      ]
+    }
+  ]
+}

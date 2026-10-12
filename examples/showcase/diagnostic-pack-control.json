@@ -1,0 +1,373 @@
+{
+  "validation_date": "2026-10-13",
+  "baseline_commit": "0d8eb37",
+  "source_version": "3d61a0134a0029e2",
+  "method": "mechanical_collection_control_v1",
+  "registration_sha256": "54574085d873a5c1d02960b0c10f9803ef441bd68fcd5e4e34c6ed023a7955ac",
+  "cases": 11,
+  "runs": 22,
+  "paid_model_calls": 0,
+  "semantic_quality": "excluded_scripted",
+  "pairs": [
+    {
+      "case_id": "connection_wait",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19500,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "satisfied",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 12,
+        "input_chars_max": 23601,
+        "input_budget_rejections": 0,
+        "pack_status": "collected",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "authentication",
+      "extra_tool_calls": 0,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "satisfied",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 2,
+        "input_chars_max": 17295,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 2,
+        "scripted_model_steps": 1,
+        "query_statuses": [
+          "satisfied",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 2,
+        "input_chars_max": 17313,
+        "input_budget_rejections": 0,
+        "pack_status": "collected",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "source_unavailable",
+      "extra_tool_calls": 1,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 5,
+        "input_chars_max": 18489,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 3,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "failed",
+          "satisfied"
+        ],
+        "failed_queries": 1,
+        "observations_count": 5,
+        "input_chars_max": 20544,
+        "input_budget_rejections": 0,
+        "pack_status": "collected_with_gaps",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "different_mechanism",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19500,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "satisfied",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 12,
+        "input_chars_max": 23521,
+        "input_budget_rejections": 0,
+        "pack_status": "collected",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "renamed_registration",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19526,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "satisfied",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 12,
+        "input_chars_max": 23681,
+        "input_budget_rejections": 0,
+        "pack_status": "collected",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "status_only",
+      "extra_tool_calls": 0,
+      "baseline": {
+        "tool_calls": 1,
+        "scripted_model_steps": 2,
+        "query_statuses": [],
+        "failed_queries": 0,
+        "observations_count": 4,
+        "input_chars_max": 16376,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 1,
+        "scripted_model_steps": 2,
+        "query_statuses": [],
+        "failed_queries": 0,
+        "observations_count": 4,
+        "input_chars_max": 16376,
+        "input_budget_rejections": 0,
+        "pack_status": "skipped_status_check",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "small_budget",
+      "extra_tool_calls": -1,
+      "baseline": {
+        "tool_calls": 1,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 6,
+        "input_chars_max": 19058,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 0,
+        "scripted_model_steps": 0,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 0,
+        "input_chars_max": 0,
+        "input_budget_rejections": 0,
+        "pack_status": "budget_deferred",
+        "termination_reason": "BUDGET_EXCEEDED"
+      }
+    },
+    {
+      "case_id": "empty_business_logs",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19500,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "empty",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 11,
+        "input_chars_max": 23468,
+        "input_budget_rejections": 0,
+        "pack_status": "collected_with_gaps",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "truncated_business_logs",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19500,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "truncated",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 12,
+        "input_chars_max": 25843,
+        "input_budget_rejections": 0,
+        "pack_status": "collected_with_gaps",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "dense_business_logs",
+      "extra_tool_calls": 2,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "not_executed",
+          "not_executed"
+        ],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19500,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 4,
+        "scripted_model_steps": 2,
+        "query_statuses": [
+          "truncated",
+          "satisfied"
+        ],
+        "failed_queries": 0,
+        "observations_count": 15,
+        "input_chars_max": 27430,
+        "input_budget_rejections": 0,
+        "pack_status": "collected_with_gaps",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    },
+    {
+      "case_id": "unregistered_service",
+      "extra_tool_calls": 0,
+      "baseline": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19588,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      },
+      "pack": {
+        "tool_calls": 2,
+        "scripted_model_steps": 2,
+        "query_statuses": [],
+        "failed_queries": 0,
+        "observations_count": 7,
+        "input_chars_max": 19588,
+        "input_budget_rejections": 0,
+        "pack_status": "disabled_or_unregistered",
+        "termination_reason": "NEEDS_INFORMATION"
+      }
+    }
+  ],
+  "limitations": [
+    "使用相同脚本规划策略并复用已覆盖查询，仅比较程序取证和开销；没有运行自主诊断或复核。",
+    "基于已知合成开发案例及衍生扰动，不是外部盲测或独立保留集成绩。",
+    "诊断包由已知服务配置设计，跨服务转移需要重新登记名称；不证明自动发现新故障的能力。",
+    "固定空诊断仅用于复用/恢复路径的图收尾，不比较completed比例；空结果、失败和输入门禁均保留。",
+    "整体推迟基础包会在小预算下失去原流程可取得的部分观测；这是待评估的策略代价。",
+    "补齐证据增加上下文；密集日志接近原输入上限，尚未验证真实Diagnosis/Reviewer能稳定接收。"
+  ],
+  "verification": {
+    "new_control_tests": 25,
+    "regression_total": 535,
+    "regression_passed": 528,
+    "regression_skipped": 7,
+    "regression_failed": 0,
+    "regression_duration_seconds": 71.668,
+    "skip_reason": "Isolated PostgreSQL test database not configured",
+    "compile_check": "passed",
+    "default_feature_enabled": false,
+    "real_model_quality_verified": false
+  }
+}

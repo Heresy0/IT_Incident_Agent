@@ -72,7 +72,15 @@ def build_graph(coordinator):
     graph.add_node('diagnosis', guarded('diagnosis', c.diagnose))
     graph.add_node('reviewer', guarded('reviewer', c.review_draft))
     graph.add_node('finish', finish)
-    graph.add_edge(START, 'supervisor')
+    if c.diagnostic_pack is None:
+        graph.add_edge(START, 'supervisor')
+    else:
+        from workflow.diagnostic_pack import collect
+        graph.add_node('diagnostic_pack', guarded('diagnostic_pack', lambda: collect(c)))
+        graph.add_edge(START, 'diagnostic_pack')
+        graph.add_conditional_edges('diagnostic_pack',
+            lambda state: 'finish' if c.stop else 'supervisor',
+            {'finish': 'finish', 'supervisor': 'supervisor'})
     routes = {n: n for n in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer',
                              'collect_parallel', 'collect_results', 'finish')}
     for role in ('supervisor', 'diagnosis', 'reviewer', 'collect_results'):

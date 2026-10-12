@@ -29,7 +29,7 @@ from evidence.observations import source_statement
 
 class Collaboration:
     def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None,
-                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None):
+                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None):
         if investigation_mode not in {'agent', 'programmatic'}:
             raise ValueError('unregistered investigation mode')
         self.investigation_mode = investigation_mode
@@ -46,6 +46,14 @@ class Collaboration:
         self.models, self.provider, self.principal = models, provider, principal
         self.ticket = provider.ticket()
         provider.authorize(principal, self.ticket.scope)
+        self.diagnostic_pack, self.diagnostic_pack_result = None, None
+        if diagnostic_pack is not None:
+            from workflow.diagnostic_pack import DiagnosticPack
+            if not self.planning_only:
+                raise ValueError('Diagnostic pack experiment requires programmatic collection')
+            raw = diagnostic_pack.model_dump() if isinstance(diagnostic_pack, DiagnosticPack) else diagnostic_pack
+            self.diagnostic_pack = DiagnosticPack.model_validate_json(json.dumps(raw))
+            self.diagnostic_pack.assert_scope(self.ticket)
         self.evidence_needs = initial_needs(self.ticket)
         self.events, self.tasks, self.negotiation, self.drafts, self.reviews = [], [], [], [], []
         self.decisions = []
@@ -997,13 +1005,13 @@ class Collaboration:
                 if not context.can_research():
                     stop = 'BUDGET_EXCEEDED'
                     break
-                event('tool_selected', name=check['tool'], execution_source='validated_supervisor_plan')
+                event('tool_selected', name=check['tool'], execution_source=objective.get('execution_source', 'validated_supervisor_plan'))
                 result = executor.execute(check['tool'], check['args'])
                 event('tool_result', name=check['tool'], status=result.status,
                       evidence_ids=[e.evidence_id for e in result.evidence],
                       query_profile=dict(executor.last_query_profile), sample_order=result.sample_order,
                       truncated=result.truncated, error=result.error.model_dump() if result.error else None,
-                      execution_source='validated_supervisor_plan')
+                      execution_source=objective.get('execution_source', 'validated_supervisor_plan'))
                 if result.error and result.error.code == 'BUDGET_EXCEEDED':
                     stop = 'BUDGET_EXCEEDED'
                     break
@@ -1482,7 +1490,11 @@ class Collaboration:
                 'investigation_mode': self.investigation_mode,
                 'knowledge_mode': self.knowledge_mode, 'supervisor_planning_only': self.planning_only,
                 'parallel_batches': self.parallel_batches,
-                'max_parallel_roles': 2, 'rework_parallel': False},
+                'max_parallel_roles': 2, 'rework_parallel': False,
+                **({'diagnostic_pack_policy': self.diagnostic_pack_result['policy'],
+                    'diagnostic_pack_fingerprint': self.diagnostic_pack_result['fingerprint']}
+                   if self.diagnostic_pack_result is not None else {})},
+            **({'diagnostic_pack': self.diagnostic_pack_result} if self.diagnostic_pack_result is not None else {}),
             "prompt_version": self.prompt_version()}
 
     def prompt_version(self):
@@ -1497,7 +1509,8 @@ class Collaboration:
 
 
 def collaborate(models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None, event_log=None,
-                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None):
+                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None):
     return Collaboration(models, provider, principal, limits=limits, emit=emit, context=context,
                          event_log=event_log, parallel_collection=parallel_collection, blind_review=blind_review,
-                         investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode, knowledge_mode=knowledge_mode).run()
+                         investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode,
+                         knowledge_mode=knowledge_mode, diagnostic_pack=diagnostic_pack).run()

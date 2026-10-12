@@ -95,6 +95,7 @@ flowchart TD
 
 ## 验证与面试材料
 
+- [服务基础取证包独立实验](evals/diagnostic_packs/README.md)：显式可选的基础查询入口及同配置免费机械对照；保留额外调用、上下文压力与小预算观测损失，尚未验证端到端诊断质量，默认流程不启用。
 - [离线分类统计](evals/run-statistics.md)：分别统计协议错误、查询与计划执行缺口、耗时、调用和成本；通过原报告哈希绑定的人类评价统计关键漏查、错误结论、无依据建议、复核误拦与有效交接。入口 `scripts/summarize_runs.py` 不调用模型，输出 JSON 汇总、Markdown 报表与评价模板。
 - [五分钟讲解与追问](examples/showcase/interview-guide.md)、[编排与 Harness 设计](examples/showcase/design.md)、[Harness 证据](examples/showcase/harness.md)。
 - [并行取证与免费验证](examples/showcase/parallel-collection.md)、[完整公开展示入口](examples/showcase/README.md)。
