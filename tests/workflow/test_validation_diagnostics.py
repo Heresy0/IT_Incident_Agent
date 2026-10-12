@@ -56,7 +56,7 @@ class ValidationDiagnosticsTests(unittest.TestCase):
             return json_response(value)
 
         models['reviewer'] = AlterOutput(models['reviewer'], invalid_verdict)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         failures = [e for e in result['events'] if e['type'] == 'validation_failure']
         self.assertEqual(len(failures), 2)
         self.assertEqual([e['attempt'] for e in failures], [1, 2])

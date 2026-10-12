@@ -17,7 +17,7 @@ from tests.workflow.test_information_gain import action_models
 
 class EvidenceNeedGraphTests(unittest.TestCase):
     def run_case(self, models, **kwargs):
-        return collaborate(models, FixtureProvider('case_001', P), P, **kwargs)
+        return collaborate(models, FixtureProvider('case_001', P), P, **kwargs, investigation_mode='agent')
 
     def test_local_tasks_and_all_claims_can_pass_while_omitted_causal_question_blocks_completion(self):
         models = scripted_models()
@@ -112,7 +112,7 @@ class EvidenceNeedGraphTests(unittest.TestCase):
                     verdict='uncertain', reason='该候选机制还需要本次只读补查。')
             return json_response(value)
         models['reviewer'] = AlterOutput(models['reviewer'], review)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['rework_rounds']), ('completed', 1))
         self.assertEqual(result['task_results'][-1]['need_ids'], ['N2'])
         self.assertEqual(result['run_summary']['model_calls'], 11)
@@ -122,7 +122,7 @@ class EvidenceNeedGraphTests(unittest.TestCase):
     def test_status_check_has_no_invented_causal_requirements(self):
         provider = FixtureProvider('case_001', P)
         provider._data['ticket']['purpose'] = 'status_check'
-        result = collaborate(scripted_models(), provider, P)
+        result = collaborate(scripted_models(), provider, P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual([n['purpose'] for n in result['evidence_needs']], ['symptom'])
         self.assertFalse(result['output']['hypotheses'])
@@ -130,7 +130,7 @@ class EvidenceNeedGraphTests(unittest.TestCase):
 
 class EvidenceNeedBoundaryTests(unittest.TestCase):
     def setUp(self):
-        self.c = Collaboration(scripted_models(), FixtureProvider('case_003', P), P)
+        self.c = Collaboration(scripted_models(), FixtureProvider('case_003', P), P, investigation_mode='agent')
         ex = self.c.executors['investigation']
         ex.execute('get_service_metrics', {**self.c.ticket.scope.model_dump(mode='json', include={'start', 'end'}),
             'metrics': ['db_cpu']})

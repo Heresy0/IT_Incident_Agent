@@ -25,7 +25,7 @@ from providers.fixtures import FixtureProvider
 class IncidentConvergenceTests(unittest.TestCase):
     def test_actual_graph_visits_individual_roles_and_one_rework(self):
         principal = Principal('synthetic_demo', 'cli_reader')
-        coordinator = Collaboration(scripted_models(), FixtureProvider('case_003', principal), principal)
+        coordinator = Collaboration(scripted_models(), FixtureProvider('case_003', principal), principal, investigation_mode='agent')
         self.assertEqual(set(build_graph(coordinator).get_graph().nodes),
             {'__start__', '__end__', 'supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer',
              'collect_parallel', 'collect_results', 'finish'})

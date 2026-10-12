@@ -216,12 +216,12 @@ class IncidentAPITests(unittest.TestCase):
         self.result(self.start(incident, 'retry'))
 
     def test_live_adapter_injected_free_model_uses_requested_global_budget(self):
-        from agents.scripted import scripted_models
+        from tests.workflow.test_planned_default import planned_models
         self.service._base_config = TestConfig(api_key='injected-free')
         calls = []
         def factory(*args):
             calls.append(True)
-            return scripted_models()
+            return planned_models()
         self.service._incident.model_factory = factory
         incident = self.create()
         run_id = self.start(incident, 'live_injected', execution_mode='live', model_budget=6, tool_budget=4)
@@ -229,6 +229,11 @@ class IncidentAPITests(unittest.TestCase):
         self.assertLessEqual(result['run_summary']['model_calls'], 6)
         self.assertLessEqual(result['run_summary']['tool_calls'], 4)
         self.assertEqual(result['execution_mode'], 'live')
+        self.assertEqual(result['collection_execution']['investigation_mode'], 'programmatic')
+        self.assertGreater(result['run_summary']['tool_calls'], 0)
+        self.assertTrue(result['reviews'])
+        self.assertTrue(all(t['model_calls'] == 0 for t in result['task_results'] if t['role'] == 'investigation'))
+        self.assertFalse(result['blind_review_enabled'])
         self.assertEqual(self.store.get(run_id)['config']['limits']['model_calls'], 6)
         self.assertEqual(self.start(incident, 'live_injected', execution_mode='live', model_budget=6, tool_budget=4), run_id)
         self.assertEqual(calls, [True])

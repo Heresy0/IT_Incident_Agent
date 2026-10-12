@@ -25,7 +25,7 @@ class SupervisorResilienceTests(unittest.TestCase):
         models['supervisor'] = AlterOutput(models['supervisor'], schedule)
         if review:
             models['reviewer'] = AlterOutput(models['reviewer'], review)
-        return collaborate(models, FixtureProvider('case_001', P), P, **({'limits': limits} if limits else {})), models
+        return collaborate(models, FixtureProvider('case_001', P), P, **({'limits': limits} if limits else {}), investigation_mode='agent'), models
 
     def test_small_updates_preserve_server_questions_and_other_needs(self):
         def schedule(response, messages, calls):

@@ -24,9 +24,10 @@ from scripts.run_fresh_validation import FreshProvider
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
-    parser.add_argument('--cases', nargs='+', choices=('fresh_001', 'fresh_003'), default=['fresh_001', 'fresh_003'])
+    parser.add_argument('--cases', nargs='+', choices=('fresh_001', 'fresh_002', 'fresh_003'), default=['fresh_001', 'fresh_003'])
     parser.add_argument('--arms', nargs='+', choices=('agent', 'programmatic'), default=['agent', 'programmatic'])
     parser.add_argument('--reviewer-repair-mode', choices=('shared', 'split'), default='shared')
+    parser.add_argument('--review-mode', choices=('direct', 'blind'), default='direct')
     args = parser.parse_args()
     if len(args.cases) != len(set(args.cases)) or len(args.arms) != len(set(args.arms)):
         parser.error('Duplicate cases or arms')
@@ -39,7 +40,7 @@ def main():
     limits = Limits.from_env()
     source = implementation_version()
     plan = {'source_version': source, 'model': config.model, 'cases': args.cases,
-            'arms': args.arms, 'reviewer_repair_mode': args.reviewer_repair_mode,
+            'arms': args.arms, 'reviewer_repair_mode': args.reviewer_repair_mode, 'review_mode': args.review_mode,
             'limits': asdict(limits), 'attempts_per_arm_case': 1,
             'maximum_model_calls': len(args.cases) * len(args.arms) * limits.model_calls,
             'read_only': True, 'estimated_cost': None,
@@ -56,7 +57,7 @@ def main():
             print(json.dumps({'starting': case, 'arm': arm, 'directory': str(directory)}, ensure_ascii=False), flush=True)
             models = build_roles(config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body)
             report = capture(case, 'multi', lambda flow: models, Principal('synthetic_demo', 'cli_reader'), limits,
-                             provider_factory=FreshProvider, investigation_mode=arm, reviewer_repair_mode=args.reviewer_repair_mode)
+                             provider_factory=FreshProvider, investigation_mode=arm, reviewer_repair_mode=args.reviewer_repair_mode, blind_review=args.review_mode == 'blind')
             report.update(source_version=source, model=config.model, execution_mode='live', experiment_arm=arm)
             path = directory / f'{case}-{arm}.json'
             write_json(path, report)

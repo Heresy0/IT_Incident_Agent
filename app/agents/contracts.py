@@ -56,7 +56,7 @@ class TaskRequest(Contract):
     need_ids: list[str] = Field(default_factory=list, max_length=6,
         description='Existing N identifiers whose questions this task investigates. Task completion does not resolve them.')
     checks: list[ReadOnlyCheck] = Field(default_factory=list, max_length=2,
-        description='Concrete checks required by this goal, from read_only_tools[role]. They define coverage, not automatic execution or causal proof. Reuse completed results.')
+        description='Concrete checks required by this goal, from read_only_tools[role]. Programmatic Investigation executes validated checks; execution does not prove a cause. Reuse completed results.')
     expected_value: str | None = Field(default=None, min_length=1, max_length=400,
         description='What observed outcome would support or distinguish the candidate mechanism? Not a claimed observation.')
 

@@ -135,7 +135,7 @@ class IncidentRepairTests(unittest.TestCase):
                 request['proposed_check']='Increase the pool size, then measure wait time.'
             return json_response(data)
         models['reviewer']=AlterOutput(models['reviewer'],human_only)
-        result=collaborate(models,FixtureProvider('case_003',P),P)
+        result=collaborate(models,FixtureProvider('case_003',P),P, investigation_mode='agent')
         self.assertEqual(result['status'],'partial')
         self.assertEqual(result['rework_rounds'],0)
         self.assertEqual(result['repairs'],0)
@@ -159,7 +159,7 @@ class IncidentRepairTests(unittest.TestCase):
                         data['request_evidence'].update(target_role=role,checks=[check])
                     return json_response(data)
                 models['reviewer']=AlterOutput(models['reviewer'],invalid)
-                result=collaborate(models,FixtureProvider('case_003',P),P)
+                result=collaborate(models,FixtureProvider('case_003',P),P, investigation_mode='agent')
                 self.assertEqual(result['rework_rounds'],0)
                 self.assertEqual(result['run_summary']['tool_calls'],3)
                 self.assertTrue(any(e['type']=='review_hint_ignored' and e['code']==code for e in result['events']))
@@ -173,7 +173,7 @@ class IncidentRepairTests(unittest.TestCase):
                 return selected('get_service_owner',{'alias':'checkout-api'}, f'drift-{_}')
             return response
         models['investigation']=AlterOutput(models['investigation'],drift)
-        result=collaborate(models,FixtureProvider('case_003',P),P)
+        result=collaborate(models,FixtureProvider('case_003',P),P, investigation_mode='agent')
         self.assertTrue(any(e['type']=='tool_result' and e['error'] and e['error']['code']=='CHECK_NOT_APPROVED' for e in result['events']))
         self.assertEqual(result['run_summary']['tool_calls'],5)
         self.assertEqual(result['task_results'][-1]['status'],'partial')
@@ -188,7 +188,7 @@ class IncidentRepairTests(unittest.TestCase):
                 return json_response({'findings':[], 'missing_information':['Needs human interpretation']})
             return response
         models['investigation']=AlterOutput(models['investigation'],final_only)
-        result=collaborate(models,FixtureProvider('case_003',P),P)
+        result=collaborate(models,FixtureProvider('case_003',P),P, investigation_mode='agent')
         task=result['task_results'][-1]
         self.assertEqual(task['tool_calls'],2)
         self.assertEqual(task['model_calls'],1)
@@ -232,7 +232,7 @@ class IncidentRepairTests(unittest.TestCase):
         self.assertEqual(sum(e['type']=='observation_gap' for e in result['events']),1)
 
     def test_reviewer_cannot_accept_cause_with_error_only_log_gap(self):
-        c=Collaboration(scripted_models(),FixtureProvider('case_003',P),P)
+        c=Collaboration(scripted_models(),FixtureProvider('case_003',P),P, investigation_mode='agent')
         ex=c.executors['investigation']
         ex.execute('get_service_metrics',{**window(ex),'metrics':['db_cpu','pool_usage']})
         ex.execute('get_service_logs',{**window(ex),'category':'resource','level':'ERROR'})
@@ -246,7 +246,7 @@ class IncidentRepairTests(unittest.TestCase):
         self.assertIn('WARN/INFO',review.assessments[0].reason)
 
     def test_fact_only_review_does_not_hide_unchecked_log_levels(self):
-        c=Collaboration(scripted_models(),FixtureProvider('case_003',P),P)
+        c=Collaboration(scripted_models(),FixtureProvider('case_003',P),P, investigation_mode='agent')
         ex=c.executors['investigation']
         ex.execute('get_service_metrics',{**window(ex),'metrics':['db_cpu']})
         ex.execute('get_service_logs',{**window(ex),'category':'resource','level':'ERROR'})
@@ -326,7 +326,7 @@ class IncidentRepairTests(unittest.TestCase):
         self.assertEqual(result['coverage_gaps'], ['db_cpu'])
 
     def test_reviewer_cannot_approve_pool_cause_without_current_cpu_control(self):
-        coordinator = Collaboration(scripted_models(), FixtureProvider('case_003', P), P)
+        coordinator = Collaboration(scripted_models(), FixtureProvider('case_003', P), P, investigation_mode='agent')
         ex = coordinator.executors['investigation']
         ex.execute('get_service_metrics', {**window(ex), 'metrics': ['pool_usage']})
         coordinator.evidence.update(ex.evidence)
@@ -351,7 +351,7 @@ class IncidentRepairTests(unittest.TestCase):
             return response
         models['supervisor'] = AlterOutput(models['supervisor'], dispatch)
         result = collaborate(models, FixtureProvider('case_003', P), P,
-            limits=Limits(model_calls=16, tool_calls=8, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=16, tool_calls=8, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual([t['role'] for t in result['task_results'][:3]], ['investigation', 'investigation', 'knowledge'])
         self.assertTrue(any(e['kind'] == 'past_incident' for e in result['evidence']))
         second = json.loads(models['investigation'].histories[2][1].content)['objective']

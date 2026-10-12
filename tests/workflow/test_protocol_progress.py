@@ -123,7 +123,7 @@ class ProtocolProgressTests(unittest.TestCase):
         def read(tool, *args, **kwargs):
             return ([], False) if tool == 'get_recent_changes' else original(tool, *args, **kwargs)
         with patch.object(provider, 'query', side_effect=read):
-            result = collaborate(models, provider, P)
+            result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['supervisor_decisions'], result['run_summary']['tool_calls']), (3, 3))
         self.assertTrue(any(e['type'] == 'collection_reserve_reached' for e in result['events']))
@@ -144,7 +144,7 @@ class ProtocolProgressTests(unittest.TestCase):
                     if assessment['target_id'] == 'H1': assessment['verdict'] = 'uncertain'
             return json_response(data)
         models['reviewer'] = AlterOutput(models['reviewer'], conflicting)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['rework_rounds'], result['repairs']), (1, 0))
         first = result['reviews'][0]['review']
@@ -176,7 +176,7 @@ class ProtocolProgressTests(unittest.TestCase):
                         'metrics': ['pool_usage', 'pool_wait']}}], 'expected_value': '核查建议适用条件'}])
             return json_response(value)
         models['supervisor'] = AlterOutput(models['supervisor'], replan)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['rework_rounds'], result['repairs']), (1, 0))
         self.assertEqual(sum(e['type'] == 'review_follow_up_correction' for e in result['events']), 0)
@@ -194,7 +194,7 @@ class ProtocolProgressTests(unittest.TestCase):
             return json_response(data)
         models['reviewer'] = AlterOutput(models['reviewer'], invalid)
         result = collaborate(models, provider, P, limits=Limits(model_calls=8, tool_calls=5,
-            reserve_model_calls=3, reserve_seconds=20))
+            reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual((result['status'], result['rework_rounds']), ('partial', 0))
         self.assertEqual(result['run_summary']['tool_calls'], 2)
         self.assertTrue(any(e['type'] == 'review_hint_ignored' for e in result['events']))

@@ -119,7 +119,7 @@ class LiveProtocolRegressions(unittest.TestCase):
                 value.update(action='diagnose', tasks=[{'role': 'investigation', 'goal': '旧查询'}])
             return json_response(value)
         models['supervisor'] = AlterOutput(models['supervisor'], conflict)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['repairs'], 0)
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (6, 2))
@@ -139,7 +139,7 @@ class LiveProtocolRegressions(unittest.TestCase):
                 'action': action, 'reason': '重建动作与任务冲突',
                 'tasks': [{'role': 'investigation', 'goal': '不应执行的任务'}]}))
             with self.subTest(action=action):
-                result = collaborate(models, FixtureProvider('case_001', P), P)
+                result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
                 self.assertEqual(result['run_summary']['termination_reason'], stop)
                 self.assertEqual((result['repairs'], result['run_summary']['model_calls'],
                     result['run_summary']['tool_calls']), (0, 2 if action == 'diagnose' else 1, 0))
@@ -149,7 +149,7 @@ class LiveProtocolRegressions(unittest.TestCase):
         models = scripted_models()
         models['supervisor'] = AlterOutput(models['supervisor'], lambda response, _, calls:
             json_response({'action': 'dispatch', 'reason': '缺少任务'}) if calls == 1 else response)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['repairs'], 1)
         self.assertEqual(result['run_summary']['tool_calls'], 2)

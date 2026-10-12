@@ -87,7 +87,7 @@ class ConditionalRepairTests(unittest.TestCase):
 
         models['reviewer'] = AlterOutput(reviewer, assess_action)
         with patch('repairs.executors.DockerCLIExecutor.execute', side_effect=AssertionError('no writes')):
-            result = collaborate(models, provider, P)
+            result = collaborate(models, provider, P, investigation_mode='agent')
         return result, diagnosis, reviewer, deepcopy(provider.repair_capabilities)
 
     def test_both_roles_receive_same_capabilities_and_conditional_candidate_survives_review(self):

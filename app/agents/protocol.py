@@ -83,7 +83,7 @@ def reviewer_schema(schema, needs, targets):
     schema['$defs']['NeedAssessment']['allOf'] = [{
         'if': {'properties': {'need_id': {'enum': core}}, 'required': ['need_id']},
         'then': {'properties': {'verdict': {'enum': ['supported', 'uncertain']},
-                                'blocking': {'enum': [True, None]}}}}]
+                                'blocking': {'enum': [None]}}}}]
     mechanism_needs = [n.need_id for n in needs.values() if n.purpose in {'mechanism', 'alternative'}]
     schema['$defs']['NeedAssessment']['allOf'].append({
         'if': {'properties': {'need_id': {'enum': mechanism_needs}}, 'required': ['need_id']},

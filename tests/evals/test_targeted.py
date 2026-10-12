@@ -30,7 +30,7 @@ class TargetedTests(unittest.TestCase):
         for cid in ('probe_001', 'probe_002', 'probe_003', 'probe_007', 'probe_008'):
             provider = TargetedProvider(cid, P)
             cls.pairs[cid] = [capture(cid, flow, smoke_factory(provider), P, LIMITS,
-                                     provider_factory=TargetedProvider) for flow in ('single', 'multi')]
+                                     provider_factory=TargetedProvider, investigation_mode='agent') for flow in ('single', 'multi')]
 
     def setUp(self):
         temp = tempfile.TemporaryDirectory()
@@ -120,7 +120,7 @@ class TargetedTests(unittest.TestCase):
             return original(path, *args, **kwargs)
         with patch.object(Path, 'read_text', guard):
             result = capture('probe_001', 'single', smoke_factory(provider), P, LIMITS,
-                             provider_factory=TargetedProvider)
+                             provider_factory=TargetedProvider, investigation_mode='agent')
         self.assertGreater(result['run_summary']['tool_calls'], 0)
 
     def test_history_available_without_answer_leak_and_logs_preserve_time_scope(self):

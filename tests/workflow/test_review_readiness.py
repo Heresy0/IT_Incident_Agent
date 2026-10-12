@@ -40,7 +40,7 @@ class ReviewReadinessTests(unittest.TestCase):
             return json_response(data)
         models['diagnosis'] = AlterOutput(models['diagnosis'], diagnose)
         models['reviewer'] = AlterOutput(models['reviewer'], review)
-        return collaborate(models, provider, P), models
+        return collaborate(models, provider, P, investigation_mode='agent'), models
 
     def test_refuted_alternative_is_a_completed_investigation_result(self):
         def draft(data):
@@ -108,8 +108,10 @@ class ReviewReadinessTests(unittest.TestCase):
             with self.subTest(need_id=need_id):
                 result, _ = self.run_report(review_change=review)
                 self.assertEqual(result['status'], 'partial')
-                self.assertEqual(result['run_summary']['termination_reason'], 'MODEL_OUTPUT_INVALID')
-                self.assertEqual(result['repairs'], 1)
+                self.assertEqual(result['run_summary']['termination_reason'], 'REVIEW_INCOMPLETE')
+                self.assertEqual(result['repairs'], 0)
+                self.assertIsNone(next(n for n in result['evidence_needs'] if n['need_id'] == need_id)['blocking'])
+                self.assertTrue(any(e['type'] == 'reviewer_fields_ignored' for e in result['events']))
 
     def test_trigger_or_refuted_only_cannot_replace_a_supported_mechanism(self):
         for mode in ('trigger', 'refuted', 'uncertain'):

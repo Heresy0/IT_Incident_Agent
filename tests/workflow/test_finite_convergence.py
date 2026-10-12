@@ -74,7 +74,7 @@ class FiniteConvergenceTests(unittest.TestCase):
                 requires_approval=False, checks=[check])
             return json_response(data)
         models['diagnosis'] = AlterOutput(models['diagnosis'], advice)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['repairs'], 1)
         self.assertIn('READ_ONLY_ACTION_ALREADY_COVERED', histories[1][-1].content)
@@ -92,10 +92,10 @@ class FiniteConvergenceTests(unittest.TestCase):
                 data['need_assessments'][0].update(verdict='not_required', blocking=False)
             return json_response(data)
         models['reviewer'] = AlterOutput(models['reviewer'], invalid_once)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['repairs'], 1)
-        self.assertIn('need_assessments.0.blocking', history[1][-1].content)
+        self.assertIn('need_assessments.0.verdict', history[1][-1].content)
         self.assertIn('uncertain', history[1][-1].content)
 
     def test_exhausted_correction_preserves_observations_draft_and_failure_location(self):
@@ -111,13 +111,13 @@ class FiniteConvergenceTests(unittest.TestCase):
             data['need_assessments'][0].update(verdict='not_required', blocking=False)
             return json_response(data)
         models['reviewer'] = AlterOutput(models['reviewer'], invalid)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertTrue(result['unreviewed_observations'])
         self.assertTrue(result['drafts'])
         self.assertTrue(result['pending_actions'])
         self.assertFalse(result['output']['recommended_actions'])
-        self.assertIn('need_assessments.0.blocking', render(result))
+        self.assertIn('need_assessments.0.verdict', render(result))
         self.assertEqual(result['repairs'], 1)
 
 

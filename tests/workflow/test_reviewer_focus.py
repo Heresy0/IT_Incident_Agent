@@ -13,7 +13,7 @@ from workflow.coordinator import collaborate
 class ReviewerFocusTests(unittest.TestCase):
     def test_all_observations_and_execution_gaps_remain_visible(self):
         models = scripted_models()
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         body = json.loads(models['reviewer'].histories[0][1].content)
         view = body['input']
         originals = {row['evidence_id']: row for row in report['evidence']}
@@ -31,7 +31,7 @@ class ReviewerFocusTests(unittest.TestCase):
 
     def test_schema_keeps_coverage_and_core_rules_without_executable_plans(self):
         models = scripted_models()
-        collaborate(models, FixtureProvider('case_001', P), P)
+        collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         body = json.loads(models['reviewer'].histories[0][1].content)
         schema = body['output_schema']
         self.assertEqual(schema['properties']['assessments']['minItems'], len(body['input']['required_target_ids']))
@@ -39,7 +39,7 @@ class ReviewerFocusTests(unittest.TestCase):
         self.assertNotIn('ReadOnlyCheck', schema['$defs'])
         self.assertEqual(schema['$defs']['EvidenceRequest']['properties']['checks']['maxItems'], 0)
         self.assertEqual(schema['$defs']['ReviewBlocker']['properties']['resolution']['enum'], ['external_source', 'not_planned'])
-        self.assertEqual(schema['$defs']['NeedAssessment']['allOf'][0]['then']['properties']['blocking']['enum'], [True, None])
+        self.assertEqual(schema['$defs']['NeedAssessment']['allOf'][0]['then']['properties']['blocking']['enum'], [None])
         def check_refs(value):
             if isinstance(value, dict):
                 if '$ref' in value:
@@ -79,7 +79,7 @@ class ReviewerFocusTests(unittest.TestCase):
             return json_response(value)
         models['reviewer'] = AlterOutput(models['reviewer'], gap)
         models['supervisor'] = AlterOutput(models['supervisor'], plan)
-        report = collaborate(models, FixtureProvider('case_003', P), P)
+        report = collaborate(models, FixtureProvider('case_003', P), P, investigation_mode='agent')
         self.assertEqual(report['status'], 'completed')
         self.assertEqual(report['rework_rounds'], 1)
         self.assertEqual(len(planned), 2)
@@ -87,7 +87,7 @@ class ReviewerFocusTests(unittest.TestCase):
         self.assertLessEqual(report['run_summary']['tool_calls'], 8)
 
     def test_input_measurement_does_not_add_model_calls(self):
-        report = collaborate(scripted_models(), FixtureProvider('case_001', P), P)
+        report = collaborate(scripted_models(), FixtureProvider('case_001', P), P, investigation_mode='agent')
         events = [e for e in report['events'] if e['type'] == 'model_input' and e.get('schema_name') == 'ReviewDecision']
         self.assertEqual(len(events), 1)
         self.assertGreater(events[0]['input_chars'], events[0]['schema_chars'])

@@ -33,7 +33,7 @@ def json_response(value):
 
 class IncidentCollaborationTests(unittest.TestCase):
     def run_case(self, case="case_001", models=None, **kwargs):
-        return collaborate(models or scripted_models(), FixtureProvider(case, P), P, **kwargs)
+        return collaborate(models or scripted_models(), FixtureProvider(case, P), P, **kwargs, investigation_mode='agent')
 
     def test_review_coverage_repair_names_missing_duplicate_and_unknown_targets(self):
         histories = []

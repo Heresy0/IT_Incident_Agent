@@ -15,7 +15,7 @@ from tests.workflow.test_diagnosis_completion import WorkerObservationModel, Wor
 
 class DiagnosisReferenceTests(unittest.TestCase):
     def registry(self):
-        c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P)
+        c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P, investigation_mode='agent')
         ex = c.executors['investigation']
         ex.execute('get_service_metrics', {**window(ex), 'metrics': ['dependency_error_rate']})
         c.evidence.update(ex.evidence)
@@ -36,7 +36,7 @@ class DiagnosisReferenceTests(unittest.TestCase):
             histories.append(messages)
             return alter(response, messages, calls)
         models['diagnosis'] = AlterOutput(WorkerDiagnosisModel(False), output)
-        return collaborate(models, worker_provider(), P), histories
+        return collaborate(models, worker_provider(), P, investigation_mode='agent'), histories
 
     def test_schema_enumerates_only_exposed_references_and_unique_lists(self):
         result, histories = self.run_worker(lambda response, *_: response)

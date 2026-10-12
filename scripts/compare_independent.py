@@ -122,7 +122,8 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
             factory = smoke_factory(provider_factory(cid, principal))
         order = ('single', 'multi') if int(cid.rsplit('_', 1)[1]) % 2 else ('multi', 'single')
         for flow in order:
-            report = {**capture(cid, flow, factory, principal, limits, provider_factory=provider_factory),
+            report = {**capture(cid, flow, factory, principal, limits, provider_factory=provider_factory,
+                                investigation_mode='agent' if args.fake else 'programmatic'),
                       'execution_mode': config['execution_mode'], 'model': config['model'], 'provenance': provenance}
             path = directory / f"{report['run_id']}.json"
             write_json(path, report)

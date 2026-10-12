@@ -22,7 +22,7 @@ class Replies:
 class ReviewerStageBudgetTests(unittest.TestCase):
     def test_each_review_stage_corrects_once_without_stealing_other_stage(self):
         c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P,
-            reviewer_repair_mode='split')
+            reviewer_repair_mode='split', investigation_mode='agent')
         c.draft = DiagnosisDraft(findings=[], hypotheses=[], recommended_actions=[], missing_information=[], escalation_team=None)
         c.models['reviewer'] = Replies([
             {'directly_supported': [{'statement': 'unverified', 'refs': []}]}, {},
@@ -55,7 +55,7 @@ class ReviewerStageBudgetTests(unittest.TestCase):
 
     def test_extra_permission_never_increases_total_model_budget(self):
         c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P,
-            limits=Limits(model_calls=1), reviewer_repair_mode='split')
+            limits=Limits(model_calls=1), reviewer_repair_mode='split', investigation_mode='agent')
         c.draft = DiagnosisDraft(findings=[], hypotheses=[], recommended_actions=[], missing_information=[], escalation_team=None)
         c.models['reviewer'] = Replies([{}])
         from runtime.context import activate

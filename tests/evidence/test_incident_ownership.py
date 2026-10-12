@@ -87,7 +87,7 @@ class IncidentOwnershipTests(unittest.TestCase):
         return {'reference_id': next(o.reference_id for o in owner.reference_options if o.field_path == field)}
 
     def coordinator(self, ex):
-        c = Collaboration(scripted_models(), FixtureProvider('case_003', P), P)
+        c = Collaboration(scripted_models(), FixtureProvider('case_003', P), P, investigation_mode='agent')
         c.evidence.update(ex.evidence)
         c.references.update(ex.references)
         return c
@@ -147,7 +147,7 @@ class IncidentOwnershipTests(unittest.TestCase):
         models = scripted_models()
         models.update({role: OwnerFlowModel(role) for role in ('supervisor', 'investigation', 'diagnosis', 'reviewer')})
         result = collaborate(models, FixtureProvider('case_003', P), P,
-            limits=Limits(model_calls=20, tool_calls=9, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=20, tool_calls=9, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['review_status'], 'passed')
         self.assertEqual(result['repairs'], 1)

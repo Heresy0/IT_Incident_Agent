@@ -166,7 +166,7 @@ class InformationGainGraphTests(unittest.TestCase):
     def test_action_gap_can_request_rework_while_supported_hypothesis_stays_supported(self):
         provider = FixtureProvider('case_003', P)
         models = action_models(provider)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['rework_rounds'], result['repairs']), (1, 0))
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (11, 3))
@@ -184,7 +184,7 @@ class InformationGainGraphTests(unittest.TestCase):
 
     def test_follow_up_is_bounded_when_model_does_not_propose_a_check(self):
         provider = FixtureProvider('case_003', P)
-        result = collaborate(action_models(provider, respond=False), provider, P)
+        result = collaborate(action_models(provider, respond=False), provider, P, investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual(result['rework_rounds'], 0)
         self.assertEqual(result['run_summary']['model_calls'], 7)
@@ -193,7 +193,7 @@ class InformationGainGraphTests(unittest.TestCase):
 
     def test_explained_human_only_gap_does_not_trigger_extra_model_call(self):
         provider = FixtureProvider('case_003', P)
-        result = collaborate(action_models(provider, reason='需要人工容量实验，登记只读观测无法确认数据库总容量'), provider, P)
+        result = collaborate(action_models(provider, reason='需要人工容量实验，登记只读观测无法确认数据库总容量'), provider, P, investigation_mode='agent')
         self.assertEqual(result['run_summary']['model_calls'], 6)
         self.assertEqual(result['status'], 'partial')
         self.assertFalse(any(e['type'] == 'review_follow_up_correction' for e in result['events']))
@@ -201,7 +201,7 @@ class InformationGainGraphTests(unittest.TestCase):
     def test_small_budget_retains_gap_without_futile_review_clarification(self):
         provider = FixtureProvider('case_003', P)
         result = collaborate(action_models(provider), provider, P,
-            limits=Limits(model_calls=8, tool_calls=5, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=8, tool_calls=5, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (6, 2))
         self.assertFalse(any(e['type'] == 'review_follow_up_correction' for e in result['events']))
@@ -210,7 +210,7 @@ class InformationGainGraphTests(unittest.TestCase):
         for target in ('A4', 'H1'):
             provider = FixtureProvider('case_003', P)
             with self.subTest(target=target):
-                result = collaborate(action_models(provider, invalid=target), provider, P)
+                result = collaborate(action_models(provider, invalid=target), provider, P, investigation_mode='agent')
                 self.assertEqual(result['run_summary']['termination_reason'], 'MODEL_OUTPUT_INVALID')
                 self.assertEqual(result['run_summary']['tool_calls'], 2)
                 self.assertEqual(result['rework_rounds'], 0)
@@ -224,7 +224,7 @@ class InformationGainGraphTests(unittest.TestCase):
             'action': 'dispatch', 'reason': '先取证再检查', 'tasks': [
                 {'role': 'investigation', 'goal': '获取依赖观测', 'checks': [check]},
                 {'role': 'investigation', 'goal': '另一次同范围日志检查', 'checks': [check]}]}))
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(len(result['task_results']), 1)
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (5, 2))

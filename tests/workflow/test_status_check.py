@@ -22,7 +22,7 @@ class StatusCheckTests(unittest.TestCase):
         return provider
 
     def test_status_check_reviews_facts_without_cause_or_repair_and_renders_limits(self):
-        result = collaborate(scripted_models(), self.provider(), P)
+        result = collaborate(scripted_models(), self.provider(), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['review_status'], 'passed')
         self.assertEqual(result['business_result'], 'status_checked')
@@ -45,7 +45,7 @@ class StatusCheckTests(unittest.TestCase):
             return json_response(value)
         models = scripted_models()
         models['reviewer'] = AlterOutput(models['reviewer'], uncertain)
-        result = collaborate(models, self.provider(), P)
+        result = collaborate(models, self.provider(), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual(result['business_result'], 'needs_information')
         self.assertEqual(result['review_status'], 'needs_information')
@@ -60,7 +60,7 @@ class StatusCheckTests(unittest.TestCase):
             return json_response(value)
         models = scripted_models()
         models['diagnosis'] = AlterOutput(models['diagnosis'], extra_cause)
-        result = collaborate(models, self.provider(), P)
+        result = collaborate(models, self.provider(), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['repairs'], 1)
         self.assertEqual(result['output']['hypotheses'], [])
@@ -72,7 +72,7 @@ class StatusCheckTests(unittest.TestCase):
     def test_status_check_without_findings_cannot_complete(self):
         models = scripted_models()
         models['diagnosis'] = AlterOutput(models['diagnosis'], lambda *_: json_response({}))
-        result = collaborate(models, self.provider(), P)
+        result = collaborate(models, self.provider(), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual(result['review_status'], 'not_performed')
 
@@ -81,7 +81,7 @@ class StatusCheckTests(unittest.TestCase):
         fixture.setUp()
         provider = HTTPObservationProvider(fixture.binding, fixture.ticket, fixture.principal)
         models = scripted_models()
-        c = Collaboration(models, provider, fixture.principal)
+        c = Collaboration(models, provider, fixture.principal, investigation_mode='agent')
         executor = c.executors['investigation']
         item = executor.register_snapshot(executor.prepare_snapshot('get_service_metrics', provider._row(
             fixture.start.isoformat(), metric='queue_depth', value=0, unit='jobs', granularity='1m')))

@@ -120,7 +120,7 @@ def main(argv=None):
     demos = []
     for key, name, case, model_budget, tool_budget in scenarios:
         limits = Limits(model_calls=model_budget, tool_calls=tool_budget, reserve_model_calls=3, reserve_seconds=20)
-        report = {**capture(case, 'multi', lambda _: scripted_models(), principal, limits),
+        report = {**capture(case, 'multi', lambda _: scripted_models(), principal, limits, investigation_mode='agent'),
                   'execution_mode': 'scripted_control_only', 'model': 'scripted'}
         write_json(directory / f'{key}.json', report)
         (directory / f'{key}.md').write_text(render(report), encoding='utf-8')

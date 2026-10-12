@@ -57,7 +57,7 @@ class GapHandoffTests(unittest.TestCase):
 
         models['reviewer'] = AlterOutput(models['reviewer'], gap)
         models['supervisor'] = AlterOutput(models['supervisor'], plan)
-        return collaborate(models, provider, P, **({'limits': limits} if limits else {}))
+        return collaborate(models, provider, P, **({'limits': limits} if limits else {}), investigation_mode='agent')
 
     def test_bare_action_gap_is_planned_by_supervisor_and_reviewed_again(self):
         result = self.run_gap()
@@ -134,7 +134,7 @@ class GapHandoffTests(unittest.TestCase):
             return json_response(value)
 
         models['supervisor'] = AlterOutput(models['supervisor'], diagnose)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual(result['run_summary']['termination_reason'], 'DIAGNOSIS_WITHOUT_OBSERVATIONS')
         self.assertEqual(result['status'], 'failed')
         self.assertEqual(result['run_summary']['tool_calls'], 0)
@@ -187,7 +187,7 @@ class GapHandoffTests(unittest.TestCase):
 
         models['supervisor'] = AlterOutput(models['supervisor'], plan)
         models['investigation'] = FocusedLeaf()
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['run_summary']['tool_calls'], 2)
         self.assertEqual(sum(e['type'] == 'collection_follow_up' for e in result['events']), 1)

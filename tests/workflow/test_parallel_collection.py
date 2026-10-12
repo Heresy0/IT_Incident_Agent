@@ -62,7 +62,7 @@ class ParallelCollectionTests(unittest.TestCase):
                 return GatedModel(self.model.bind_tools(tools), self.barrier)
         for role in ('investigation', 'knowledge'):
             models[role] = FirstTaskGate(models[role], barrier)
-        result = collaborate(models, FixtureProvider('case_003', P), P)
+        result = collaborate(models, FixtureProvider('case_003', P), P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['collection_execution']['parallel_batches'], 1)
         events = result['events']
@@ -97,7 +97,7 @@ class ParallelCollectionTests(unittest.TestCase):
     def test_knowledge_failure_keeps_current_observations_and_runs_review(self):
         models = optional_knowledge_models()
         models['knowledge'] = FailingModel()
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertTrue(any(e['kind'] == 'observation' for e in result['evidence']))
         task = next(t for t in result['task_results'] if t['role'] == 'knowledge')
         self.assertEqual(task['termination_reason'], 'NETWORK_ERROR')
@@ -110,7 +110,7 @@ class ParallelCollectionTests(unittest.TestCase):
     def test_failed_observation_branch_cannot_diagnose_from_history_alone(self):
         models = scripted_models()
         models['investigation'] = FailingModel()
-        result = collaborate(models, FixtureProvider('case_003', P), P)
+        result = collaborate(models, FixtureProvider('case_003', P), P, investigation_mode='agent')
         self.assertTrue(result['evidence'])
         self.assertFalse(any(e['kind'] == 'observation' for e in result['evidence']))
         self.assertEqual(result['drafts'], [])
@@ -123,7 +123,7 @@ class ParallelCollectionTests(unittest.TestCase):
                 raise RuntimeError('synthetic-secret-canary')
         models = optional_knowledge_models()
         models['knowledge'] = BrokenBinding()
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertNotIn('synthetic-secret-canary', json.dumps(result))
         task = next(t for t in result['task_results'] if t['role'] == 'knowledge')
         self.assertEqual(task['termination_reason'], 'INTERNAL_ERROR')
@@ -131,7 +131,7 @@ class ParallelCollectionTests(unittest.TestCase):
         self.assertTrue(result['drafts'] and result['reviews'])
 
     def test_serial_comparison_switch_preserves_original_counts(self):
-        result = collaborate(scripted_models(), FixtureProvider('case_003', P), P, parallel_collection=False)
+        result = collaborate(scripted_models(), FixtureProvider('case_003', P), P, parallel_collection=False, investigation_mode='agent')
         self.assertEqual(result['collection_execution']['mode'], 'serial')
         self.assertEqual(result['collection_execution']['parallel_batches'], 0)
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
@@ -140,7 +140,7 @@ class ParallelCollectionTests(unittest.TestCase):
     def test_single_role_and_low_tool_budget_remain_serial(self):
         for case, limits in [('case_001', Limits(model_calls=6, tool_calls=2, reserve_model_calls=3)),
                              ('case_003', Limits(model_calls=16, tool_calls=2, reserve_model_calls=3))]:
-            result = collaborate(scripted_models(), FixtureProvider(case, P), P, limits=limits)
+            result = collaborate(scripted_models(), FixtureProvider(case, P), P, limits=limits, investigation_mode='agent')
             self.assertEqual(result['collection_execution']['parallel_batches'], 0)
             self.assertLessEqual(result['run_summary']['tool_calls'], limits.tool_calls)
             self.assertFalse(any(e['type'] == 'parallel_collection_started' for e in result['events']))
@@ -171,7 +171,7 @@ class ParallelCollectionTests(unittest.TestCase):
         self.assertEqual(fresh.stop_reason, '')
 
     def test_metadata_and_result_use_the_same_workflow_version(self):
-        result = collaborate(scripted_models(), FixtureProvider('case_001', P), P)
+        result = collaborate(scripted_models(), FixtureProvider('case_001', P), P, investigation_mode='agent')
         metadata = IncidentAdapter(None).metadata({'model_budget': 6, 'tool_budget': 2,
                                                   'execution_mode': 'scripted_control_only'})
         self.assertEqual(result['workflow_version'], WORKFLOW_VERSION)

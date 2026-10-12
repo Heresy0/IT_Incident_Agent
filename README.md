@@ -2,11 +2,11 @@
 
 模型通过 LangChain `ChatOpenAI` 调用 OpenAI 兼容的 Chat Completions 接口。配置 `MODEL`、`MODEL_BASE_URL`、`MODEL_API_KEY`（未设置则沿用 `DASHSCOPE_API_KEY`）；同服务内切换支持工具调用和 JSON 输出的模型通常只改 `MODEL`。跨服务需调整地址和密钥，厂商参数由 `MODEL_EXTRA_BODY` 的 JSON 对象提供：当前通义为 `{"enable_thinking":false}`，不支持此参数的服务使用 `{}`。单次超时 30 秒，SDK 自动重试为 0，程序继续校验输出结构与证据。服务需重启以加载配置。详见[兼容接口迁移记录](examples/showcase/openai-compatible.md)。
 
-已增加[程序执行调查检查的可切换实验](examples/showcase/investigation-stage.md)：保留原默认 Agent 方案，仅在显式 programmatic 模式下省去 Investigation 模型调用。原始证据交给 Diagnosis/Reviewer 判断，不将查询完成当作原因确认。
+默认采用[计划驱动取证与直接复核](examples/showcase/planned-investigation.md)：Supervisor 规划具体查询，Investigation 程序模块校验并执行，不调用独立取证模型。原始证据交给 Diagnosis/Reviewer 判断，查询完成不等于原因确认。旧 `agent` 模式与观测盲审仍可显式用于对照；免费脚本演示保留原控制流程。
 
 [Reviewer 分阶段纠正额度](examples/showcase/reviewer-stage-budget.md)亦可切换试验：split 模式盲审和最终复核各最多纠正一次，仍计入原总预算；默认保留共享一次。
 
-面向内部服务故障的诊断与处置辅助系统，主要展示 AI Agent 编排与 Harness 工程：自然语言生成工单、受限自主取证、证据诊断、独立复核、一次定向补查，以及人工审批后的受控修复。
+面向内部服务故障的诊断与处置辅助系统，主要展示 AI Agent 编排与 Harness 工程：自然语言生成工单、受限计划取证、证据诊断、独立复核、一次定向补查，以及人工审批后的受控修复。
 
 ## 快速体验
 
@@ -33,7 +33,7 @@
 flowchart TD
     U[自然语言描述或已有工单] --> S[Supervisor 调度与范围校验]
     S -->|两个独立角色且预算足够| P[并行取证准备]
-    P --> I[Investigation 当前观测]
+    P --> I[Investigation 程序执行查询]
     P --> K[Knowledge 手册与确认历史]
     I --> J[等待并汇总结果]
     K --> J
@@ -49,12 +49,12 @@ flowchart TD
     E --> H[人工确认解决与保存经验]
 ```
 
-- 五个业务角色使用同一基础模型的不同提示词与局部消息历史，由 LangGraph 节点编排。Investigation / Knowledge 同轮独立任务可并行，诊断、复核及定向补查顺序执行。
+- Supervisor、Diagnosis、Reviewer 与可选 Knowledge 使用同一基础模型的不同提示词和局部消息历史；Investigation 保留为执行已校验查询的程序模块。LangGraph 编排阶段，Investigation / Knowledge 同轮独立任务可并行，诊断、复核及定向补查顺序执行。
 - 六个只读工具：指标、日志、变更、负责人、手册检索、已确认历史工单检索。执行前检查身份、角色、服务、环境、版本与时间范围。
 - 取证按症状、机制与合理替代解释的问题覆盖决定收尾，聚焦查询不代替完整性；未解决问题在限次或预算耗尽时明确保留。Reviewer 提交证据缺口，Supervisor 可替换查询提示并规划具体补查，执行器只执行通过权限、去重和预算检查的调度计划。
 - RunContext 原子计数并约束模型、工具及时间预算；分支持有独立台账，汇总证据并保留失败缺口。严格输出契约、服务端来源引用、查询去重、任务检查与有界结构纠正构成 Harness。
 - 总上限由环境与已授权请求决定，当前配置示例为32次模型、48次工具、300秒。常规最多4次调度、6个任务、1轮补查；仅在明确区分价值、新查询及完整收尾预算通过门禁后，最多[追加一次补查](examples/showcase/additional-rework.md)，临时开放第5次调度/第7个任务位置。取证与诊断共享1次结构纠正，Reviewer另有1次，均消耗原模型总预算；单Agent仍最多1次。
-- 真实多Agent复核先独立读取观测范围，再核验草稿，两个阶段均计入原预算并保留审计记录。实施与完整真实迭代见[改进记录](examples/showcase/agent-improvement.md)。
+- 默认 Reviewer 直接核验原始证据、台账和草稿，输入不含已有问题状态、旧复核结论或取证模型的候选判断。观测盲审保留为可选对照，两种路径都保留引用校验和阻塞审计；症状、机制的阻塞属性由程序固定，模型只能评估证据是否支持。历史迭代见[改进记录](examples/showcase/agent-improvement.md)。
 - 阻塞复核须说明缺失观测、影响目标和判断变化；报告分开记录查询执行、机制支持与停止原因，合法补查交给调度者规划。实施及真实失败轨迹见[诊断审计记录](examples/showcase/diagnostic-audit.md)。
 - 当前在 v6 恢复点上[精简最终 Reviewer](examples/showcase/focused-review.md)，并校验[缺口归属、预留补查预算](examples/showcase/scope-rework-budget.md)：判断结论、下一步和证据缺口，补查参数由 Supervisor 规划。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查保留。恢复点见[版本回退记录](examples/showcase/rollback-v6.md)；逐项断言和决策分支实验已撤回，见[历史记录](examples/showcase/claim-decision-review.md)。
 - 工单与运行按服务端身份隔离，PostgreSQL 保存结果、事件与修复阶段，SSE 支持续读。JSON 日志位于 `logs/incident.log`，指标位于 `/metrics`。
@@ -68,7 +68,7 @@ flowchart TD
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |
-| `app/agents/` | 五角色契约与提示词、自主工具循环、单 Agent 对照路径 |
+| `app/agents/` | 模型契约与提示词、Knowledge / 旧取证工具循环、单 Agent 对照路径 |
 | `app/workflow/` | LangGraph、调度、问题台账、补查、复核与收尾 |
 | `app/runtime/` | 全局和分支预算、调用计数与追踪 |
 | `app/tools/`、`app/providers/` | 受限工具执行、登记来源、查询及历史适配 |

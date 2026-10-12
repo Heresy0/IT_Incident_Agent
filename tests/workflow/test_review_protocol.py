@@ -27,11 +27,11 @@ class ReviewProtocolTests(unittest.TestCase):
         def review(response, messages, calls):
             value = json.loads(response.content)
             if calls == 1:
-                value['need_assessments'][0]['blocking'] = False
+                value['need_assessments'][0]['verdict'] = 'not_required'
             return json_response(value)
         models['reviewer'] = AlterOutput(models['reviewer'], review)
         return collaborate(models, FixtureProvider('case_001', P), P,
-                           **({'limits': limits} if limits else {}))
+                           **({'limits': limits} if limits else {}), investigation_mode='agent')
 
     def test_collection_failure_does_not_consume_review_correction(self):
         report = self.double_correction()
@@ -62,7 +62,7 @@ class ReviewProtocolTests(unittest.TestCase):
 
     def test_reviewer_assesses_raw_evidence_without_prior_need_verdicts(self):
         models = scripted_models()
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         payload = json.loads(models['reviewer'].histories[0][1].content)
         view = payload['input']
         self.assertEqual(view['core_need_ids'], ['N1', 'N2'])
@@ -75,12 +75,12 @@ class ReviewProtocolTests(unittest.TestCase):
             self.assertNotIn('candidate_mechanisms', task)
             self.assertIn('completion', task)
         definition = payload['output_schema']['$defs']['NeedAssessment']
-        self.assertEqual(definition['allOf'][0]['then']['properties']['blocking']['enum'], [True, None])
+        self.assertEqual(definition['allOf'][0]['then']['properties']['blocking']['enum'], [None])
         self.assertEqual(report['status'], 'completed')
 
     def test_first_dispatch_cannot_advertise_unobserved_evidence_identifiers(self):
         models = scripted_models()
-        collaborate(models, FixtureProvider('case_001', P), P)
+        collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         first = json.loads(models['supervisor'].histories[0][1].content)['output_schema']
         self.assertEqual(first['$defs']['TaskRequest']['properties']['evidence_ids']['maxItems'], 0)
         self.assertEqual(first['$defs']['EvidenceNeedUpdate']['properties']['evidence_ids']['maxItems'], 0)
@@ -111,7 +111,7 @@ class ReviewProtocolTests(unittest.TestCase):
 
     def test_coordinator_keeps_argument_contract_once_with_role_catalog(self):
         models = scripted_models()
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         view = json.loads(models['supervisor'].histories[0][1].content)
         catalog = view['input']['read_only_tools']
         advertised = {tool['name'] for entries in catalog.values() for tool in entries}
@@ -133,7 +133,7 @@ class ReviewProtocolTests(unittest.TestCase):
                         'start': scope['start'], 'end': scope['end']}}]}])
             return json_response(data)
         models['supervisor'] = AlterOutput(models['supervisor'], wrong_role)
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         schema = json.loads(models['supervisor'].model.histories[0][1].content)['output_schema']
         rules = schema['$defs']['TaskRequest']['allOf']
         knowledge = next(r for r in rules if r['if']['properties']['role']['const'] == 'knowledge')
@@ -188,7 +188,7 @@ class ReviewProtocolTests(unittest.TestCase):
                     'question': '错误新增核心问题', 'reason': '错误枚举'}]
             return json_response(value)
         models['supervisor'] = AlterOutput(models['supervisor'], bad_update)
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertTrue(report['protocol_finalization_used'])
         self.assertEqual(report['review_status'], 'passed')
         self.assertTrue(report['output']['findings'])
@@ -232,7 +232,7 @@ class ReviewProtocolTests(unittest.TestCase):
 
     def test_blind_review_sees_no_draft_then_supplies_separate_evidence_limits(self):
         models = self.blind_models()
-        report = collaborate(models, FixtureProvider('case_001', P), P)
+        report = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         histories = models['reviewer'].histories
         self.assertEqual(len(histories), 2)
         blind = json.loads(histories[0][1].content)['input']
@@ -253,14 +253,14 @@ class ReviewProtocolTests(unittest.TestCase):
 
     def test_blind_review_does_not_promote_uncertain_cause_or_expand_budget(self):
         report = collaborate(self.blind_models(unsupported=True), FixtureProvider('case_001', P), P,
-            limits=Limits(model_calls=7, tool_calls=3, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=7, tool_calls=3, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual(report['status'], 'partial')
         self.assertEqual(report['output']['hypotheses'][0]['status'], 'unresolved')
         self.assertLessEqual(report['run_summary']['model_calls'], 7)
         self.assertEqual(report['run_summary']['tool_calls'], 2)
 
     def test_joined_blind_source_statement_remains_valid_after_server_rendering(self):
-        report = collaborate(self.blind_models(wide=True), FixtureProvider('case_001', P), P)
+        report = collaborate(self.blind_models(wide=True), FixtureProvider('case_001', P), P, investigation_mode='agent')
         audit = report['observation_reviews'][0]['review']
         rendered = ObservationReview.model_validate(audit)
         statement = rendered.directly_supported[0].statement

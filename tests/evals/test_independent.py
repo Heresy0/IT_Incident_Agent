@@ -29,7 +29,7 @@ class IndependentTests(unittest.TestCase):
     def setUpClass(cls):
         provider = IndependentProvider('eval_001', P)
         cls.pair = [capture('eval_001', flow, smoke_factory(provider), P, LIMITS,
-                            provider_factory=IndependentProvider) for flow in ('single', 'multi')]
+                            provider_factory=IndependentProvider, investigation_mode='agent') for flow in ('single', 'multi')]
 
     def setUp(self):
         temp = tempfile.TemporaryDirectory()
@@ -112,7 +112,7 @@ class IndependentTests(unittest.TestCase):
         provider = IndependentProvider('eval_002', P)
         with patch.object(Path, 'read_text', guard):
             report = capture('eval_002', 'single', smoke_factory(provider), P, LIMITS,
-                             provider_factory=IndependentProvider)
+                             provider_factory=IndependentProvider, investigation_mode='agent')
         self.assertGreater(report['run_summary']['tool_calls'], 0)
         with self.assertRaises(ProviderError):
             provider.authorize(Principal('other', 'cli_reader'), provider.ticket().scope)

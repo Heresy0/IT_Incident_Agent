@@ -1,0 +1,534 @@
+{
+  "baseline_commit": "ae6b964",
+  "final_source_version": "397dab6948cc1ba4",
+  "model": "qwen3.7-flash",
+  "verification_scope": "Frozen synthetic observations; real vendor model calls; author assessment, not independent human review.",
+  "selection_policy": "Three initial cases once; only affected fresh_001 repeated after bounded deterministic handoff change. All attempts retained; source versions not pooled for accuracy.",
+  "regression": {
+    "total": 464,
+    "passed": 457,
+    "skipped_db_integration": 7,
+    "duration_seconds": 62.916,
+    "log": "output/planned-investigation-final-regression.log"
+  },
+  "total_actual_model_calls": 25,
+  "total_actual_tool_calls": 16,
+  "estimated_cost": null,
+  "records": [
+    {
+      "case_id": "fresh_001",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "b23ea1271fa15435",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 7,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 44115,
+          "output_tokens": 5898,
+          "known_calls": 7,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 59094,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "supervisor"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/e87a45eb-a282-48cb-be30-15f80ef7c5e9/fresh_001-programmatic.json",
+      "report_sha256": "0b44141a06bf7b95c9e983102ea39db8012d1a216dc8e8eeecb05bc09b418c4d",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.2.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ]
+        },
+        {
+          "role": "supervisor",
+          "reason": "INVALID_REWORK_DISPATCH",
+          "details": [
+            {
+              "code": "DUPLICATE_TOOL",
+              "instruction": "补查没有新增覆盖；换有价值的新查询，或保留缺口收尾。"
+            }
+          ]
+        }
+      ],
+      "phase": "initial",
+      "declared_investigation_checks_attempted": true,
+      "attempted_reads": [
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": "ERROR",
+            "error_code": null
+          }
+        },
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          }
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 1,
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "supported",
+      "published_actions": [
+        {
+          "action": "人工核实远端对象存储服务的当前状态及近期变更记录。",
+          "condition": "需要访问远端服务管理控制台或联系远端服务负责人。",
+          "expected_result": "确认远端服务是否正常运行，是否存在已知故障或变更。",
+          "risk": "无操作风险，仅为信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "query_reuse_handoff_live_exercised": false
+    },
+    {
+      "case_id": "fresh_002",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "not_performed",
+      "source_version": "b23ea1271fa15435",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 5,
+        "web_calls": 0,
+        "tool_calls": 3,
+        "token_usage": {
+          "input_tokens": 28904,
+          "output_tokens": 4829,
+          "known_calls": 5,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 45328,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/e87a45eb-a282-48cb-be30-15f80ef7c5e9/fresh_002-programmatic.json",
+      "report_sha256": "591532646a50ff98e91a0bb21085ed4f98cabb6d87e1dbae3be81f9c77f1b0b9",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 1
+      },
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "instruction": "机制和替代问题评估当前机制或下一步；单独触发未知另列trigger。若影响行动条件用action_condition并指出未支持目标，不自动支持问题。"
+            }
+          ]
+        }
+      ],
+      "phase": "initial",
+      "declared_investigation_checks_attempted": true,
+      "attempted_reads": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "dependency_error_rate",
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          }
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 0,
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "unconfirmed",
+      "published_actions": [],
+      "query_reuse_handoff_live_exercised": false
+    },
+    {
+      "case_id": "fresh_003",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "b23ea1271fa15435",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 6,
+        "web_calls": 0,
+        "tool_calls": 4,
+        "token_usage": {
+          "input_tokens": 39350,
+          "output_tokens": 4559,
+          "known_calls": 6,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 49000,
+        "termination_reason": "NEEDS_INFORMATION",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/e87a45eb-a282-48cb-be30-15f80ef7c5e9/fresh_003-programmatic.json",
+      "report_sha256": "e8d353716df2baf52685c45b693c6396e3849519cbef1e5b4121a5f298f9c40d",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 0,
+        "reviewer": 0
+      },
+      "validation_failures": [],
+      "phase": "initial",
+      "declared_investigation_checks_attempted": true,
+      "attempted_reads": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate",
+              "request_latency_ms"
+            ],
+            "granularity": "1m"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "error",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          }
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 1,
+      "mechanism_status": "unconfirmed",
+      "next_step_status": "supported",
+      "published_actions": [
+        {
+          "action": "人工核实 catalog-preview 在 09:50-10:15 期间的依赖交互日志及配置加载日志。",
+          "condition": "系统自动日志查询持续不可用时。",
+          "expected_result": "确认是否存在 HTTP 拒绝、认证失败或协议错误等依赖问题，或配置加载错误。",
+          "risk": "无系统风险，仅涉及信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "query_reuse_handoff_live_exercised": false
+    },
+    {
+      "case_id": "fresh_001",
+      "arm": "programmatic",
+      "status": "partial",
+      "review_status": "needs_information",
+      "source_version": "397dab6948cc1ba4",
+      "contract_valid": true,
+      "run_summary": {
+        "model_calls": 7,
+        "web_calls": 0,
+        "tool_calls": 5,
+        "token_usage": {
+          "input_tokens": 46262,
+          "output_tokens": 5841,
+          "known_calls": 7,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 64516,
+        "termination_reason": "REWORK_NOT_EXECUTED",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "report_file": "output/investigation-stage/739607cb-cb52-4cd5-8dc7-6a6d4cdb7071/fresh_001-programmatic.json",
+      "report_sha256": "28a63231a19e97afc2c7e8ca6ce6a324011637ca38c95dcf2fb04589ca6fa57a",
+      "investigation_model_calls": 0,
+      "repair_policy": "collection_one_review_one_v1",
+      "repair_counts": {
+        "collection": 1,
+        "reviewer": 0
+      },
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        }
+      ],
+      "phase": "final_targeted",
+      "declared_investigation_checks_attempted": true,
+      "attempted_reads": [
+        {
+          "tool": "get_service_metrics",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "metrics": [
+              "request_error_rate"
+            ],
+            "granularity": "1m"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "dependency",
+            "level": null,
+            "error_code": null
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": null
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "empty",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "configuration",
+            "level": null,
+            "error_code": null
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "status": "ok",
+          "query_profile": {
+            "start": "2026-10-12T09:50:00Z",
+            "end": "2026-10-12T10:15:00Z",
+            "category": "resource",
+            "level": null,
+            "error_code": null
+          }
+        }
+      ],
+      "draft_count": 1,
+      "review_count": 1,
+      "mechanism_status": "supported",
+      "next_step_status": "supported",
+      "published_actions": [
+        {
+          "action": "清理归档卷空间或扩容",
+          "condition": "确认为本地磁盘满导致的写入阻塞，且无其他紧急依赖影响。",
+          "expected_result": "恢复归档服务的写入能力，降低request_error_rate。",
+          "risk": "清理操作可能误删重要历史数据；扩容可能需要停机或滚动重启。",
+          "requires_approval": true,
+          "kind": "manual_change",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "query_reuse_handoff_live_exercised": false
+    }
+  ],
+  "assessment": {
+    "execution_boundary_verified": true,
+    "diagnosis_quality_improvement_proven": false,
+    "initial_fresh_001": "Missed resource observations, unsupported remote cause retained uncertain; invalid duplicate rework plan interrupted workflow.",
+    "initial_fresh_002": "Certificate expiry observed; final Reviewer rejected twice for N3 blocker scope. Unreviewed actions remain pending.",
+    "initial_fresh_003": "Source-unavailable logs preserved, causes unresolved, supported human information collection step. Reasonable partial.",
+    "final_fresh_001": "Resource log obtained; ENOSPC mechanism and conditional human-approved cleanup/capacity action supported. Optional trigger uncertainty led to REWORK_NOT_EXECUTED; no completed-status claim.",
+    "remaining_issues": [
+      "Supervisor planning can omit necessary sources.",
+      "Reviewer can confuse trigger and alternative gap scope.",
+      "Successful remote probe cannot generally rule out write-specific quota or policy problems.",
+      "Direct review anchoring risk not measured.",
+      "Declared checks attempted does not establish semantic completeness."
+    ],
+    "causal_attribution_limit": "Changed plans and stochastic generation prevent attributing the final ENOSPC discovery to the handoff change. The new redundant-plan handoff branch was validated in tests, not triggered in this final live run."
+  }
+}

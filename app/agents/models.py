@@ -44,5 +44,5 @@ def build_model(api_key, model=DEFAULT_MODEL, *, base_url=None, extra_body=None)
 
 def build_roles(api_key, model=DEFAULT_MODEL, *, base_url=None, extra_body=None):
     chat = build_model(api_key, model, base_url=base_url, extra_body=extra_body)
-    chat.blind_review = True
+    chat.blind_review = False
     return {role: chat for role in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer')}

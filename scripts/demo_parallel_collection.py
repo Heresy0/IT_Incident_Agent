@@ -51,7 +51,7 @@ def main():
             models[role] = DelayedModel(models[role])
         started = time.perf_counter()
         report = collaborate(models, FixtureProvider('case_003', principal), principal,
-                             limits=limits, parallel_collection=parallel)
+                             limits=limits, parallel_collection=parallel, investigation_mode='agent')
         duration_ms = round((time.perf_counter() - started) * 1000)
         report['workflow'] = 'multi'
         report['execution_mode'] = 'scripted_control_only'

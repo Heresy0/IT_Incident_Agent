@@ -87,7 +87,7 @@ class DiagnosisCompletionTests(unittest.TestCase):
             return json_response(value)
         models = scripted_models()
         models['diagnosis'] = AlterOutput(models['diagnosis'], omit)
-        return collaborate(models, FixtureProvider('case_001', P), P), models
+        return collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent'), models
 
     def assert_incomplete(self, result):
         self.assertEqual(result['status'], 'partial')
@@ -134,7 +134,7 @@ class DiagnosisCompletionTests(unittest.TestCase):
 
     def test_supervisor_finish_cannot_bypass_content_gate(self):
         result, models = self.run_incomplete(['hypotheses', 'recommended_actions'])
-        c = Collaboration(models, FixtureProvider('case_001', P), P)
+        c = Collaboration(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         c.draft = DiagnosisDraft.model_validate_json(json.dumps(result['drafts'][0]['draft']))
         c.review = ReviewDecision.model_validate_json(json.dumps(result['reviews'][0]['review']))
         c.models['supervisor'] = AlterOutput(models['supervisor'], lambda *_:
@@ -148,7 +148,7 @@ class DiagnosisCompletionTests(unittest.TestCase):
         models = scripted_models()
         models['investigation'] = WorkerObservationModel()
         diagnosis = models['diagnosis'] = WorkerDiagnosisModel(facts_only)
-        return collaborate(models, worker_provider(), P), diagnosis
+        return collaborate(models, worker_provider(), P, investigation_mode='agent'), diagnosis
 
     def test_worker_stop_evidence_does_not_make_facts_only_a_complete_diagnosis(self):
         result, _ = self.run_worker(True)

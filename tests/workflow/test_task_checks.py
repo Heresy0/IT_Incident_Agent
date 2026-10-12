@@ -68,7 +68,7 @@ class TaskCoverageGraphTests(unittest.TestCase):
     def test_metric_only_task_cannot_pass_declared_log_goal_even_if_reviewer_approves(self):
         provider = FixtureProvider('case_001', P)
         models = models_with_checks(provider)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('partial', 'needs_information'))
         task = result['task_results'][0]
         self.assertEqual((task['execution_status'], task['status']), ('completed', 'partial'))
@@ -88,7 +88,7 @@ class TaskCoverageGraphTests(unittest.TestCase):
     def test_one_rework_executes_missing_check_and_closes_original_task_gap(self):
         provider = FixtureProvider('case_001', P)
         models = models_with_checks(provider, rework=True)
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['rework_rounds'], 1)
         self.assertEqual(len(result['reviews']), 2)
@@ -104,7 +104,7 @@ class TaskCoverageGraphTests(unittest.TestCase):
         provider = FixtureProvider('case_001', P)
         models = models_with_checks(provider)
         models['investigation'] = scripted_models()['investigation']
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['task_results'][0]['completion']['status'], 'checks_satisfied')
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (6, 2))
@@ -112,7 +112,7 @@ class TaskCoverageGraphTests(unittest.TestCase):
     def test_small_budget_preserves_gap_without_extra_calls(self):
         provider = FixtureProvider('case_001', P)
         result = collaborate(models_with_checks(provider, rework=True), provider, P,
-            limits=Limits(model_calls=6, tool_calls=2, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=6, tool_calls=2, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual((result['status'], result['rework_rounds']), ('partial', 0))
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (6, 1))
         self.assertTrue(result['task_results'][0]['completion']['missing_information'])
@@ -121,13 +121,13 @@ class TaskCoverageGraphTests(unittest.TestCase):
         provider = FixtureProvider('case_001', P)
         window = provider.ticket().scope.model_dump(mode='json', include={'start', 'end'})
         models = models_with_checks(provider, invalid_args={**window, 'category': 'dependency', 'user_id': 'forged'})
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual(result['run_summary']['tool_calls'], 0)
         self.assertEqual(result['run_summary']['termination_reason'], 'MODEL_OUTPUT_INVALID')
         self.assertTrue(any(e.get('reason') == 'INVALID_TASK_CHECK' for e in result['events']))
 
     def test_legacy_unscoped_goal_is_explicitly_not_verified(self):
-        result = collaborate(scripted_models(), FixtureProvider('case_001', P), P)
+        result = collaborate(scripted_models(), FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['task_results'][0]['completion']['status'], 'not_specified')
         self.assertIn('程序未核验目标完成', render(result))

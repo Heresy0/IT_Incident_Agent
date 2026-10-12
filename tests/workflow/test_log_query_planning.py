@@ -89,7 +89,7 @@ class LogQueryPlanningTests(unittest.TestCase):
 
         models['supervisor'] = AlterOutput(models['supervisor'], plan)
         models['investigation'] = FocusedLeaf()
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['run_summary']['tool_calls'], 3)
         review = json.loads(models['reviewer'].histories[0][1].content)['input']

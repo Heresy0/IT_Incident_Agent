@@ -42,7 +42,7 @@ class GeneralProgressTests(unittest.TestCase):
             models['supervisor'] = AlterOutput(models['supervisor'], schedule)
             models['investigation'] = FocusedLeaf()
             with self.subTest(tool=tool):
-                result = collaborate(models, provider, P)
+                result = collaborate(models, provider, P, investigation_mode='agent')
                 self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
                 self.assertEqual((result['supervisor_decisions'], result['run_summary']['model_calls'],
                     result['run_summary']['tool_calls']), (3, 9, 3))
@@ -74,7 +74,7 @@ class GeneralProgressTests(unittest.TestCase):
             return json_response(value)
         models.update(supervisor=AlterOutput(models['supervisor'], schedule), investigation=FocusedLeaf(),
                       diagnosis=MetricDiagnosis(), reviewer=AlterOutput(models['reviewer'], review))
-        result = collaborate(models, provider, P)
+        result = collaborate(models, provider, P, investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual((result['supervisor_decisions'], result['run_summary']['model_calls'],
             result['run_summary']['tool_calls']), (3, 7, 2))
@@ -100,7 +100,7 @@ class GeneralProgressTests(unittest.TestCase):
             return json_response(value)
         models['supervisor'] = AlterOutput(models['supervisor'], schedule)
         models['reviewer'] = AlterOutput(models['reviewer'], review)
-        result = collaborate(models, FixtureProvider('case_001', P), P)
+        result = collaborate(models, FixtureProvider('case_001', P), P, investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual(result['evidence_needs'][2]['status'], 'not_required')
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (7, 2))
@@ -125,7 +125,7 @@ class GeneralProgressTests(unittest.TestCase):
             models['reviewer'] = AlterOutput(models['reviewer'], review)
             with self.subTest(cap=cap):
                 result = collaborate(models, FixtureProvider('case_001', P), P,
-                    limits=Limits(model_calls=cap, tool_calls=3, reserve_model_calls=3, reserve_seconds=20))
+                    limits=Limits(model_calls=cap, tool_calls=3, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
                 self.assertEqual(result['status'], 'partial')
                 self.assertTrue(all(n['status'] == 'deferred' for n in result['evidence_needs']))
                 self.assertTrue(result['collection_exits'][0]['limited'])
@@ -135,7 +135,7 @@ class GeneralProgressTests(unittest.TestCase):
     def test_six_remaining_calls_allow_one_review_hint_and_approved_rework(self):
         provider = FixtureProvider('case_003', P)
         result = collaborate(action_models(provider), provider, P,
-            limits=Limits(model_calls=12, tool_calls=4, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=12, tool_calls=4, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual((result['status'], result['review_status']), ('completed', 'passed'))
         self.assertEqual((result['run_summary']['model_calls'], result['run_summary']['tool_calls']), (11, 3))
         self.assertEqual((result['rework_rounds'], result['repairs']), (1, 0))
@@ -148,7 +148,7 @@ class GeneralProgressTests(unittest.TestCase):
     def test_five_remaining_calls_do_not_spend_a_futile_review_hint(self):
         provider = FixtureProvider('case_003', P)
         result = collaborate(action_models(provider), provider, P,
-            limits=Limits(model_calls=11, tool_calls=4, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=11, tool_calls=4, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual(result['run_summary']['model_calls'], 6)
         self.assertFalse(any(e['type'] == 'review_follow_up_correction' for e in result['events']))
@@ -165,7 +165,7 @@ class GeneralProgressTests(unittest.TestCase):
             return json_response(value)
         models['reviewer'] = AlterOutput(models['reviewer'], two)
         result = collaborate(models, provider, P, limits=Limits(model_calls=12, tool_calls=3,
-            reserve_model_calls=3, reserve_seconds=20))
+            reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         self.assertEqual(result['status'], 'partial')
         self.assertEqual(result['run_summary']['tool_calls'], 2)
         self.assertEqual(result['rework_rounds'], 0)
@@ -173,7 +173,7 @@ class GeneralProgressTests(unittest.TestCase):
 
     def test_budget_and_next_check_guidance_are_read_only_and_respect_time_and_limits(self):
         c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P,
-            limits=Limits(model_calls=16, tool_calls=4, reserve_model_calls=3, reserve_seconds=20))
+            limits=Limits(model_calls=16, tool_calls=4, reserve_model_calls=3, reserve_seconds=20), investigation_mode='agent')
         window = c.ticket.scope.model_dump(mode='json', include={'start', 'end'})
         check = ReadOnlyCheck(tool='get_recent_changes', args=window)
         c.evidence_needs['N2'] = c.evidence_needs['N2'].model_copy(update={'next_check': check})

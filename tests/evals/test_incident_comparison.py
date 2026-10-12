@@ -32,7 +32,7 @@ class ComparisonTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Execute one representative pair once; the full six-case smoke belongs to the CLI.
-        cls.pair = [capture('case_005', flow, factory, P, LIMITS) for flow in ('single', 'multi')]
+        cls.pair = [capture('case_005', flow, factory, P, LIMITS, investigation_mode='agent') for flow in ('single', 'multi')]
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -98,7 +98,7 @@ class ComparisonTests(unittest.TestCase):
     def test_failed_attempt_is_retained_in_denominator(self):
         def failing(flow):
             raise ExecutionError('NETWORK_ERROR', 'model')
-        failed = capture('case_005', 'single', failing, P, LIMITS)
+        failed = capture('case_005', 'single', failing, P, LIMITS, investigation_mode='agent')
         summary, _ = evaluate(self.bundle([failed, self.pair[1]]), self.directory)
         self.assertEqual(summary['workflows']['single']['runs'], 1)
         self.assertEqual(summary['workflows']['single']['failed_runs'], 1)
@@ -143,7 +143,7 @@ class ComparisonTests(unittest.TestCase):
             return original(path, *args, **kwargs)
         with patch.object(Path, 'read_text', guarded):
             for flow in ('single', 'multi'):
-                result = capture('case_004', flow, factory, P, LIMITS)
+                result = capture('case_004', flow, factory, P, LIMITS, investigation_mode='agent')
                 self.assertEqual(result['status'], 'completed')
 
     def test_plan_and_invalid_live_never_initialize_models_or_authenticate(self):

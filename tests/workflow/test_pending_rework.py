@@ -22,7 +22,7 @@ class InterpretOnly:
 class PendingReworkTests(unittest.TestCase):
     def setup_rework(self, limits=None):
         c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P,
-            limits=limits or Limits(model_calls=16, tool_calls=8, reserve_model_calls=3))
+            limits=limits or Limits(model_calls=16, tool_calls=8, reserve_model_calls=3), investigation_mode='agent')
         window = c.ticket.scope.model_dump(mode='json', include={'start', 'end'})
         check = {'tool': 'get_service_metrics', 'args': {**window, 'metrics': ['db_cpu']}}
         c.evidence_needs['N2'] = c.evidence_needs['N2'].model_copy(update={

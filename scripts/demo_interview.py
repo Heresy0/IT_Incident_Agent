@@ -145,7 +145,7 @@ def main(argv=None):
     for scenario in SCENARIOS:
         provider = FixtureProvider if scenario['key'] == 'rework' else TargetedProvider
         report = {**capture(scenario['case'], 'multi', lambda _: interview_models(scenario['key']),
-            principal, limits, provider_factory=provider), 'execution_mode': 'scripted_control_only',
+            principal, limits, provider_factory=provider, investigation_mode='agent'), 'execution_mode': 'scripted_control_only',
             'model': 'authored_interview_control', 'quality_status': 'excluded_scripted',
             'provenance': {'implementation_sha256_prefix': implementation_version(),
                 'fixture_sha256': digest(ROOT / ('fixtures/incident' if scenario['key'] == 'rework'

@@ -17,7 +17,7 @@ from workflow.coordinator import Collaboration
 
 class ReviewScopeBudgetTests(unittest.TestCase):
     def reviewed(self):
-        c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P)
+        c = Collaboration(scripted_models(), FixtureProvider('case_001', P), P, investigation_mode='agent')
         c.run()
         c.draft = c.draft.model_copy(update={'hypotheses': [
             h.model_copy(update={'level': 'trigger'}) for h in c.draft.hypotheses]})
@@ -105,7 +105,7 @@ class ReviewScopeBudgetTests(unittest.TestCase):
         models['supervisor'] = AlterOutput(models['supervisor'], keep_collecting)
         c = Collaboration(models, provider, P,
             limits=Limits(model_calls=16, tool_calls=8, reserve_model_calls=3),
-            parallel_collection=False)
+            parallel_collection=False, investigation_mode='agent')
         report = c.run()
         self.assertTrue(any(e['type'] == 'collection_reserve_reached' for e in report['events']))
         self.assertEqual(report['rework_rounds'], 1)
