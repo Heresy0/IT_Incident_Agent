@@ -1,0 +1,830 @@
+{
+  "source_version": "64e3155a2fc7aa6c",
+  "implementation_commits": {
+    "context_recovery": "1187f27",
+    "programmatic_source_handoff": "9f99a3f"
+  },
+  "model": "qwen3.7-flash",
+  "plan": {
+    "source_version": "64e3155a2fc7aa6c",
+    "git_head": "9f99a3f758ba804bec379eea0545fbaeec19c2bd",
+    "model": "qwen3.7-flash",
+    "limits": {
+      "model_calls": 32,
+      "web_calls": 12,
+      "tool_calls": 48,
+      "seconds": 300,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 28000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "cases": [
+      "fr_001",
+      "fr_002",
+      "fr_003"
+    ],
+    "attempts_per_case": 1,
+    "maximum_model_calls": 96,
+    "estimated_cost": null,
+    "read_only_synthetic": true,
+    "forced_reference_fault": false,
+    "criteria_sent_to_models": false,
+    "independent_quality_benchmark": false,
+    "fixture_baseline": "examples/showcase/frozen-review-runs.json"
+  },
+  "records": [
+    {
+      "case_id": "fr_001",
+      "status": "partial",
+      "review_status": "not_performed",
+      "report_file": "output/context-recovery/b9290cfe-4d83-4ede-9910-b4270e72e499/fr_001.json",
+      "report_sha256": "3cede660367eb2b8f5e88de8103cd7eab21b4cdbfe5481217273fd1415e765f9",
+      "reference_fault_injected": false,
+      "run_summary": {
+        "model_calls": 4,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 24188,
+          "output_tokens": 3284,
+          "known_calls": 4,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 29610,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "diagnosis"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "unreviewed_observations": 7,
+      "correction_inputs": [
+        {
+          "run_id": "ee5d9239-4732-4318-8f01-b90875f76421",
+          "trace_id": "ee5d9239-4732-4318-8f01-b90875f76421",
+          "timestamp": 1791818426.1443806,
+          "type": "correction_input_rebuilt",
+          "role": "diagnosis",
+          "span_id": "74e6cae2-d37d-4a94-b96b-8d7299675a62",
+          "parent_span_id": "3021cde4-21da-4768-a333-d2e28850ab63",
+          "schema_name": "DiagnosisSelection",
+          "before_chars": 23528,
+          "after_chars": 22685,
+          "base_chars": 20220,
+          "previous_output_mode": "full",
+          "previous_output_chars": 2978,
+          "evidence_omitted": false,
+          "schema_changed": false,
+          "seq": 42
+        }
+      ],
+      "budget_rejections": [],
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "findings.0.refs.4.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.2.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.0.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ]
+        }
+      ],
+      "input_measurements": [
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 14857,
+          "schema_chars": 6914,
+          "payload_chars": 6423,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2,
+            "collection": 2,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2687,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 0
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 19549,
+          "schema_chars": 7192,
+          "payload_chars": 10837,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2318,
+            "collection": 699,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2687,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 7
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 1,
+          "input_chars": 20220,
+          "schema_chars": 8670,
+          "payload_chars": 9721,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2957,
+            "collection": 699,
+            "task_results": 1395,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2687,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 4
+          },
+          "source_rows": 7
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 2,
+          "input_chars": 22685,
+          "schema_chars": 8670,
+          "payload_chars": 9721,
+          "follow_up_chars": 2465,
+          "section_chars": {
+            "evidence": 2957,
+            "collection": 699,
+            "task_results": 1395,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2687,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 4
+          },
+          "source_rows": 7
+        }
+      ],
+      "facts_count": 0,
+      "hypothesis_states": [],
+      "published_actions": [],
+      "pending_actions": [],
+      "review_count": 0,
+      "rework_rounds": 0,
+      "repair_counts": {
+        "supervisor": 0,
+        "diagnosis": 1,
+        "reviewer": 0
+      },
+      "unreviewed_fields_validated": true
+    },
+    {
+      "case_id": "fr_002",
+      "status": "partial",
+      "review_status": "needs_information",
+      "report_file": "output/context-recovery/b9290cfe-4d83-4ede-9910-b4270e72e499/fr_002.json",
+      "report_sha256": "fe75d322a547627f63ef3cf703dec81d4f12dbbddcf87d4fdaaef0580c6b3599",
+      "reference_fault_injected": false,
+      "run_summary": {
+        "model_calls": 12,
+        "web_calls": 0,
+        "tool_calls": 6,
+        "token_usage": {
+          "input_tokens": 77322,
+          "output_tokens": 9438,
+          "known_calls": 12,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 90875,
+        "termination_reason": "REWORK_LIMIT",
+        "errors": [],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "unreviewed_observations": 1,
+      "correction_inputs": [
+        {
+          "run_id": "09c59df9-ebd0-40a9-b61c-a50302281770",
+          "trace_id": "09c59df9-ebd0-40a9-b61c-a50302281770",
+          "timestamp": 1791818457.5164893,
+          "type": "correction_input_rebuilt",
+          "role": "diagnosis",
+          "span_id": "c95d8fd0-8677-4695-b832-ab5e2f88b90a",
+          "parent_span_id": "ad7e7266-8e1f-4b26-b5c1-80967b1b5a87",
+          "schema_name": "DiagnosisSelection",
+          "before_chars": 23867,
+          "after_chars": 23144,
+          "base_chars": 21031,
+          "previous_output_mode": "full",
+          "previous_output_chars": 2555,
+          "evidence_omitted": false,
+          "schema_changed": false,
+          "seq": 66
+        }
+      ],
+      "budget_rejections": [],
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "input_measurements": [
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 14766,
+          "schema_chars": 6889,
+          "payload_chars": 6357,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2,
+            "collection": 2,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 0
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 18547,
+          "schema_chars": 7107,
+          "payload_chars": 9920,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 627,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 21358,
+          "schema_chars": 7107,
+          "payload_chars": 12731,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 1216,
+            "task_completion_gaps": 108,
+            "evidence_needs": 669,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 1,
+          "input_chars": 21031,
+          "schema_chars": 8523,
+          "payload_chars": 10679,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2127,
+            "collection": 1216,
+            "task_results": 2634,
+            "task_completion_gaps": 108,
+            "evidence_needs": 669,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 4
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 2,
+          "input_chars": 23144,
+          "schema_chars": 8523,
+          "payload_chars": 10679,
+          "follow_up_chars": 2113,
+          "section_chars": {
+            "evidence": 2127,
+            "collection": 1216,
+            "task_results": 2634,
+            "task_completion_gaps": 108,
+            "evidence_needs": 669,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 4
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "reviewer",
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 13233,
+          "schema_chars": 3850,
+          "payload_chars": 7761,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 1216,
+            "task_results": 1884,
+            "task_completion_gaps": 108,
+            "evidence_needs": 411,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 22086,
+          "schema_chars": 7107,
+          "payload_chars": 13459,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 1216,
+            "task_completion_gaps": 108,
+            "evidence_needs": 835,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 1,
+          "input_chars": 23174,
+          "schema_chars": 8523,
+          "payload_chars": 12822,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2127,
+            "collection": 1507,
+            "task_results": 3679,
+            "task_completion_gaps": 224,
+            "evidence_needs": 835,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 529
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "reviewer",
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 14791,
+          "schema_chars": 3850,
+          "payload_chars": 9319,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 1507,
+            "task_results": 2545,
+            "task_completion_gaps": 224,
+            "evidence_needs": 411,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 23792,
+          "schema_chars": 7107,
+          "payload_chars": 15165,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1670,
+            "collection": 1507,
+            "task_completion_gaps": 224,
+            "evidence_needs": 844,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 5
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 1,
+          "input_chars": 25064,
+          "schema_chars": 8907,
+          "payload_chars": 14328,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2565,
+            "collection": 1670,
+            "task_results": 4594,
+            "task_completion_gaps": 224,
+            "evidence_needs": 844,
+            "read_only_tools": 2635,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 433
+          },
+          "source_rows": 6
+        },
+        {
+          "role": "reviewer",
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 16034,
+          "schema_chars": 3880,
+          "payload_chars": 10532,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2108,
+            "collection": 1670,
+            "task_results": 3100,
+            "task_completion_gaps": 224,
+            "evidence_needs": 411,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2
+          },
+          "source_rows": 6
+        }
+      ],
+      "facts_count": 2,
+      "hypothesis_states": [
+        {
+          "level": "mechanism",
+          "status": "unresolved",
+          "cause": "依赖层交互异常导致超时与错误：应用向 mailbox-store 发起的请求遭遇拒绝、协议错误或连接等待，引发高延迟和错误率上升。"
+        },
+        {
+          "level": "mechanism",
+          "status": "unresolved",
+          "cause": "本地资源压力导致处理阻塞：进程出现内存溢出 (OOM)、GC 停顿过长、线程池拒绝或磁盘满等本地资源问题，导致请求堆积和超时。"
+        },
+        {
+          "level": "trigger",
+          "status": "unresolved",
+          "cause": "触发原因未知：无法确定故障为何在此时开始发生，可能源于远端依赖的突发变更、网络波动或未被记录的本地状态变化。"
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "人工核实 mail-exporter 在故障时间窗内的依赖交互及资源日志",
+          "condition": "由于自动查询 get_service_logs 返回 SOURCE_UNAVAILABLE 错误，需由具备相应权限的人工介入或通过其他渠道获取日志。",
+          "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+          "risk": "人工操作可能受限于访问权限或响应时间，且无法保证实时性。",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "pending_actions": [],
+      "review_count": 3,
+      "rework_rounds": 2,
+      "repair_counts": {
+        "supervisor": 0,
+        "diagnosis": 1,
+        "reviewer": 0
+      },
+      "unreviewed_fields_validated": true
+    },
+    {
+      "case_id": "fr_003",
+      "status": "partial",
+      "review_status": "not_performed",
+      "report_file": "output/context-recovery/b9290cfe-4d83-4ede-9910-b4270e72e499/fr_003.json",
+      "report_sha256": "30be00bd88f4a87f46d5ad4cf0861d343518fab1f0e1f872402afe7787e2fec2",
+      "reference_fault_injected": false,
+      "run_summary": {
+        "model_calls": 5,
+        "web_calls": 0,
+        "tool_calls": 2,
+        "token_usage": {
+          "input_tokens": 23544,
+          "output_tokens": 4378,
+          "known_calls": 5,
+          "status": "known"
+        },
+        "provider_http_attempts": "unknown_for_model_and_embedding",
+        "estimated_cost": null,
+        "duration_ms": 38235,
+        "termination_reason": "MODEL_OUTPUT_INVALID",
+        "errors": [
+          {
+            "code": "MODEL_OUTPUT_INVALID",
+            "provider": "workflow",
+            "message": "模型结构化输出校验失败。",
+            "retryable": false,
+            "node": "reviewer"
+          }
+        ],
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        }
+      },
+      "unreviewed_observations": 2,
+      "correction_inputs": [
+        {
+          "run_id": "412d7bf7-05cd-4b99-8da4-d96c51bd30d5",
+          "trace_id": "412d7bf7-05cd-4b99-8da4-d96c51bd30d5",
+          "timestamp": 1791818555.4818165,
+          "type": "correction_input_rebuilt",
+          "role": "reviewer",
+          "span_id": "65b8e3fd-4ab7-4557-a3e8-883104d235d2",
+          "parent_span_id": "9a29fcd3-986b-42d8-b19e-a627f2d7fbcd",
+          "schema_name": "ReviewDecision",
+          "before_chars": 14398,
+          "after_chars": 13679,
+          "base_chars": 11047,
+          "previous_output_mode": "full",
+          "previous_output_chars": 2998,
+          "evidence_omitted": false,
+          "schema_changed": false,
+          "seq": 51
+        }
+      ],
+      "budget_rejections": [],
+      "validation_failures": [
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker.affected_targets",
+              "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+            }
+          ]
+        },
+        {
+          "role": "reviewer",
+          "reason": "REVIEW_BLOCKER_SCOPE",
+          "details": [
+            {
+              "need_id": "N3",
+              "path": "need_assessments.blocker.affected_targets",
+              "instruction": "此问题须评估当前机制或会改变下一步的替代解释；纯trigger未知与已支持待办的未来结果不能阻塞该问题。重新独立评估此N，触发细节保留missing_information；真正影响行动条件时关联未支持A。不得自动提升结论。"
+            }
+          ]
+        }
+      ],
+      "input_measurements": [
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 14821,
+          "schema_chars": 6904,
+          "payload_chars": 6397,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 2,
+            "collection": 2,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2659,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 0
+        },
+        {
+          "role": "supervisor",
+          "schema_name": "SupervisorSelection",
+          "attempt": 1,
+          "input_chars": 17351,
+          "schema_chars": 7062,
+          "payload_chars": 8769,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 793,
+            "collection": 516,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2659,
+            "read_only_capabilities": 35
+          },
+          "source_rows": 2
+        },
+        {
+          "role": "diagnosis",
+          "schema_name": "DiagnosisSelection",
+          "attempt": 1,
+          "input_chars": 17642,
+          "schema_chars": 8447,
+          "payload_chars": 7366,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 1145,
+            "collection": 516,
+            "task_results": 1069,
+            "task_completion_gaps": 2,
+            "evidence_needs": 669,
+            "read_only_tools": 2659,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2,
+            "challenge": 4
+          },
+          "source_rows": 2
+        },
+        {
+          "role": "reviewer",
+          "schema_name": "ReviewDecision",
+          "attempt": 1,
+          "input_chars": 11047,
+          "schema_chars": 3917,
+          "payload_chars": 5508,
+          "follow_up_chars": 0,
+          "section_chars": {
+            "evidence": 793,
+            "collection": 516,
+            "task_results": 836,
+            "task_completion_gaps": 2,
+            "evidence_needs": 411,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2
+          },
+          "source_rows": 2
+        },
+        {
+          "role": "reviewer",
+          "schema_name": "ReviewDecision",
+          "attempt": 2,
+          "input_chars": 13679,
+          "schema_chars": 3917,
+          "payload_chars": 5508,
+          "follow_up_chars": 2632,
+          "section_chars": {
+            "evidence": 793,
+            "collection": 516,
+            "task_results": 836,
+            "task_completion_gaps": 2,
+            "evidence_needs": 411,
+            "read_only_capabilities": 35,
+            "repair_capabilities": 2
+          },
+          "source_rows": 2
+        }
+      ],
+      "facts_count": 0,
+      "hypothesis_states": [
+        {
+          "level": "mechanism",
+          "status": "tentative",
+          "cause": "近端服务使用的 token audience (report-console) 与远端接口要求的 audience (report-api) 不匹配，导致依赖调用被拒绝。"
+        },
+        {
+          "level": "trigger",
+          "status": "tentative",
+          "cause": "远端 report-gateway 的认证规则发生变更（如收紧或切换 audience 要求），导致原本有效的 token 不再被接受。"
+        },
+        {
+          "level": "alternative",
+          "status": "tentative",
+          "cause": "本地缓存了过期的旧 token，其 audience 字段未更新以适配新的远端要求。"
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "人工核实 report-gateway 在 09:06 至 09:12 期间的认证配置变更或发布记录，确认是否引入了 audience=report-api 的要求。",
+          "condition": "需要联系 report-gateway 团队负责人或通过内部变更管理系统查询该服务的近期部署/配置历史。",
+          "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+          "risk": "无系统风险，仅为信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "not_performed",
+          "review_reason": "尚未复核。",
+          "executable": false
+        }
+      ],
+      "review_count": 0,
+      "rework_rounds": 0,
+      "repair_counts": {
+        "supervisor": 0,
+        "diagnosis": 0,
+        "reviewer": 1
+      },
+      "unreviewed_fields_validated": true
+    }
+  ],
+  "regression": {
+    "stage1": {
+      "total": 490,
+      "passed": 483,
+      "skipped": 7,
+      "seconds": 67.557,
+      "log": "output/context-recovery-stage1-final-regression.log"
+    },
+    "stage2": {
+      "total": 495,
+      "passed": 488,
+      "skipped": 7,
+      "seconds": 67.234,
+      "log": "output/context-recovery-stage2-regression.log"
+    }
+  },
+  "model_requests_accounted": 21,
+  "tool_calls": 10,
+  "estimated_cost": null,
+  "assessment": {
+    "all_live_corrections_fit_input_limit": true,
+    "all_live_previous_outputs_retained_in_full": true,
+    "near_limit_error_context_mode_tested": "Free deterministic coordinator tests only; no raw evidence omitted.",
+    "successful_live_diagnosis_correction": "fr_002 READ_ONLY_ACTION_ALREADY_COVERED corrected; later report retained reviewed manual_check.",
+    "model_semantic_quality_improvement_proven": false,
+    "persistent_model_failures": [
+      "fr_001 reference formatting after correction",
+      "fr_003 REVIEW_BLOCKER_SCOPE after correction"
+    ],
+    "uncertain_causes_promoted": false,
+    "automatic_actions_executed": false,
+    "limitations": "Same frozen cases, one replay each. Query plans differ from the baseline; cannot attribute all outcome differences to the patch. Codex assistant review, not independent human scoring."
+  }
+}

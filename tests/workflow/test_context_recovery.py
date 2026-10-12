@@ -72,6 +72,8 @@ class ContextRecoveryTests(unittest.TestCase):
         self.assertEqual(c.evidence, snapshots)
         history = model.model.histories
         self.assertEqual(history[0][:2], history[1][:2])
+        rebuilt = next(e for e in c.events if e['type'] == 'correction_input_rebuilt' and e['role'] == 'diagnosis')
+        self.assertGreater(rebuilt['before_chars'], c.context.limits.input_chars)
         self.assertLessEqual(message_chars(history[1]), c.context.limits.input_chars)
         self.assertEqual(set(json.loads(history[1][1].content)['output_schema']['$defs']['ReferenceSelection']['properties']['reference_id']['enum']),
                          {o['reference_id'] for e in payload['evidence'] for o in e['reference_options']})
