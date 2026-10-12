@@ -22,6 +22,7 @@ from workflow.task_checks import completion, adds_information, log_query_feedbac
 from workflow.evidence_needs import CORE, initial_needs, update_needs, apply_need_updates, validate_assessments, reviewed_needs, limitations, is_blocking
 from workflow.diagnostic_audit import validate_blockers, diagnostic_audit, blocker_follow_up
 from workflow.review_outcome import review_policy, readiness_gaps, action_projection, nonblocking_trigger_request
+from workflow.model_input import input_sizes, rebuild_correction
 from agents.protocol import compact_schema, reviewer_schema, diagnosis_schema, supervisor_schema, bind_evidence_ids, bind_reference_ids, REPAIR_POLICY, REVIEW_STAGE_POLICY, ROLE_REPAIR_POLICY, parse_review_selection
 from evidence.observations import source_statement
 
@@ -316,12 +317,8 @@ class Collaboration:
         schema_version = hashlib.sha256(json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()[:12]
         while True:
             attempt += 1
-            if role == 'reviewer':
-                self.event('model_input', role, schema_name=schema.__name__, attempt=attempt,
-                    input_chars=sum(len(str(m.content)) for m in messages),
-                    system_chars=len(messages[0].content),
-                    schema_chars=len(json.dumps(output_schema, ensure_ascii=False, separators=(',', ':'))),
-                    source_rows=len(payload.get('evidence', [])))
+            self.event('model_input', role, schema_name=schema.__name__, attempt=attempt,
+                **input_sizes(messages, model_input, output_schema))
             response = invoke_chat_model(self.models[role], messages, role, terminal=terminal)
             deadline = self.context.limits.seconds - (0 if terminal else self.context.limits.reserve_seconds)
             if time.monotonic() - self.context.started >= deadline:
@@ -415,12 +412,14 @@ class Collaboration:
                     if details['reason'] in {'UNKNOWN_REFERENCE', 'DUPLICATE_REFERENCE', 'reference_mismatch'}:
                         instruction += ('。按 details.path 修正引用；REF_ 是字段引用编号，EV_ 是证据编号，不能混用。'
                             '同一编号可分别用于不同观测或假设，但每个 refs/support_refs/counter_refs 列表内不得重复。'
-                            '本次可用引用：' + json.dumps(reference_options, ensure_ascii=False)
-                            + '。选择与陈述含义相符的字段，不能用任意有效编号替换；证据不足则保留信息缺口。')
+                            '可用引用保持在原input.evidence.reference_options与输出Schema中，不重复列出。'
+                            '选择与陈述含义相符的字段，不能用任意有效编号替换；证据不足则保留信息缺口。')
                     if self.ticket.purpose == 'status_check':
                         instruction += '。当前是 status_check；hypotheses 和 recommended_actions 必须为空列表，只输出可引用的观测和信息缺口'
-                messages.extend([response, HumanMessage(content=instruction
-                    + '。仅返回 JSON，不调用工具，不增加身份字段。')])
+                messages, rebuilt = rebuild_correction(messages, response,
+                    instruction + '。仅返回 JSON，不调用工具，不增加身份字段。',
+                    details.get('details', []), self.context.limits.input_chars)
+                self.event('correction_input_rebuilt', role, schema_name=schema.__name__, **rebuilt)
 
     def expand_refs(self, refs):
         return expand_refs(refs, self)

@@ -64,6 +64,12 @@ def render_collaboration(result):
         lines.extend(['- ' + audit['meaning'], ''])
     if result.get("execution_mode") == "scripted_control_only":
         lines.extend(["这是脚本控制演示，复核与调度也是测试替身，不代表真实模型诊断质量。", ""])
+    for event in result.get('events', []):
+        if event['type'] == 'budget_rejected':
+            dimension = event['dimension']
+            label = {'input_chars': '模型输入字符数', 'model_calls': '模型调用次数',
+                     'tool_calls': '工具调用次数', 'web_calls': '联网调用次数', 'seconds': '运行时间（秒）'}[dimension]
+            lines.extend([f"停止限制：{label} {event['actual']} / {event['limit']}。", ''])
     lines.append("观测（无独立 Reviewer，语义待核查）：" if single else "已复核观测：")
     for finding in output["findings"]:
         lines.append(f"- {finding['statement']}")

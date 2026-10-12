@@ -105,8 +105,13 @@ class DiagnosisReferenceTests(unittest.TestCase):
         self.assertEqual(error['reason'], 'UNKNOWN_REFERENCE')
         self.assertIn('hypotheses.0.support_refs.0.reference_id', histories[1][-1].content)
         self.assertIn('不能混用', histories[1][-1].content)
+        body = json.loads(histories[1][1].content)
+        allowed = body['output_schema']['$defs']['ReferenceSelection']['properties']['reference_id']['enum']
+        visible = {o['reference_id'] for row in body['input']['evidence'] for o in row['reference_options']}
         for item in diagnosis_reference_options_from_result(result):
-            self.assertIn(item['reference_id'], histories[1][-1].content)
+            self.assertIn(item['reference_id'], allowed)
+            self.assertIn(item['reference_id'], visible)
+        self.assertEqual(histories[0][:2], histories[1][:2])
         self.assertEqual(len(histories), 2)
 
     def test_duplicate_counter_can_be_corrected_once_and_cross_section_reuse_is_valid(self):

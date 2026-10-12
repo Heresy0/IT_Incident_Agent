@@ -20,7 +20,7 @@ MESSAGES = {
     "MODEL_ERROR": "模型请求失败，请检查模型服务与账户状态。",
     "RAG_UNAVAILABLE": "本地知识库服务不可用。",
     "MEMORY_UNAVAILABLE": "本次记忆服务不可用，诊断将继续，但不会读写个人记忆。",
-    "BUDGET_EXCEEDED": "本次诊断已达到调用或时间预算。",
+    "BUDGET_EXCEEDED": "本次诊断已达到输入长度、调用次数或时间限制。",
     "NO_EVIDENCE": "没有取得可支持结论的证据。",
     "NO_TOOL_PROGRESS": "取证任务未执行声明的只读检查，有限纠正后仍无进展或没有足够纠正预算；已保留信息缺口。",
     "NO_NEW_QUERIES": "没有新的补搜查询，停止重复检索。",
@@ -130,6 +130,7 @@ class RunContext:
             self.tokens['known_calls'] += 1
 
     def reserve(self, kind, terminal=False):
+        rejected = []
         with self.lock:
             elapsed = time.monotonic() - self.started
             deadline = self.limits.seconds - (0 if terminal else self.limits.reserve_seconds)
@@ -139,10 +140,22 @@ class RunContext:
                 cap -= self.limits.reserve_model_calls
             if elapsed >= deadline or self.counts[key] >= cap or (kind == "web" and self.counts["web_calls"] >= self.limits.web_calls):
                 self.stop_reason = "BUDGET_EXCEEDED"
-                raise ExecutionError("BUDGET_EXCEEDED")
-            self.counts[key] += 1
-            if kind == "web":
-                self.counts["web_calls"] += 1
+                if elapsed >= deadline:
+                    rejected.append(('seconds', elapsed, deadline))
+                if self.counts[key] >= cap:
+                    rejected.append((key, self.counts[key], cap))
+                if kind == 'web' and self.counts['web_calls'] >= self.limits.web_calls:
+                    rejected.append(('web_calls', self.counts['web_calls'], self.limits.web_calls))
+            else:
+                self.counts[key] += 1
+                if kind == "web":
+                    self.counts["web_calls"] += 1
+        # Emit outside the accounting lock: callbacks may read the run summary.
+        for dimension, actual, limit in rejected:
+            self.emit({'type': 'budget_rejected', 'kind': kind,
+                       'dimension': dimension, 'actual': actual, 'limit': limit})
+        if rejected:
+            raise ExecutionError('BUDGET_EXCEEDED')
 
     def can_research(self):
         with self.lock:
@@ -226,8 +239,11 @@ def activate(context):
 def invoke_model(agent, messages, name, terminal=False, system_prompt=None):
     context = current()
     if context:
-        if sum(len(str(m.content)) for m in messages) + len(system_prompt or "") > context.limits.input_chars:
+        actual = sum(len(str(m.content)) for m in messages) + len(system_prompt or "")
+        if actual > context.limits.input_chars:
             context.stop_reason = "BUDGET_EXCEEDED"
+            context.emit({'type': 'budget_rejected', 'node': name, 'kind': 'model',
+                'dimension': 'input_chars', 'actual': actual, 'limit': context.limits.input_chars})
             raise ExecutionError("BUDGET_EXCEEDED")
         context.reserve("model", terminal)
     def call():
