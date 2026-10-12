@@ -15,7 +15,7 @@ from tools.executor import ToolExecutor
 
 from evidence.diagnosis import ProtocolError, expand_refs, expand_diagnosis, preserve_diagnosis, diagnosis_reference_options
 from evidence.observations import FACT_RENDERING, pool_control_gaps, log_control_gaps, gap_message
-from evidence.model_view import MODEL_VIEW_VERSION, evidence_view
+from evidence.model_view import MODEL_VIEW_VERSION, evidence_view, substantive
 from evidence.completion import diagnosis_gaps, required_sections
 from evidence.ownership import parse_owner_selection, resolve_owner, owner_options, owner_schema
 from workflow.task_checks import completion, adds_information, log_query_feedback
@@ -1331,6 +1331,23 @@ class Collaboration:
             return []
         seen = {(r['evidence_id'], r['field_path']) for f in approved_findings for r in f['refs']}
         result = []
+        if self.investigation_mode == 'programmatic':
+            # Program reads intentionally have no model-authored findings. Use
+            # the same server-owned field registry, never a causal summary.
+            for item in self.evidence.values():
+                if item.kind != 'observation':
+                    continue
+                refs = [self.references[o.reference_id].model_copy(deep=True)
+                        for o in item.reference_options
+                        if substantive(o.field_path) and o.reference_id in self.references
+                        and (item.evidence_id, o.field_path) not in seen]
+                for offset in range(0, len(refs), 8):
+                    selected = refs[offset:offset + 8]
+                    finding = Finding(statement=source_statement(selected, self.evidence), refs=selected)
+                    validate_output(InvestigationOutput(findings=[finding]), self.evidence)
+                    result.append(finding.model_dump(mode='json'))
+                    seen.update((ref.evidence_id, ref.field_path) for ref in selected)
+            return result
         for task in self.tasks:
             if task['role'] != 'investigation':
                 continue

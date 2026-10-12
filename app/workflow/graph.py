@@ -10,7 +10,7 @@ from langgraph.graph import StateGraph, START, END
 from runtime.context import ExecutionError
 from evidence.diagnosis import ProtocolError
 
-WORKFLOW_VERSION = 'incident_graph_v16_bounded_role_correction_inputs'
+WORKFLOW_VERSION = 'incident_graph_v17_programmatic_source_handoff'
 
 
 class IncidentState(TypedDict, total=False):
