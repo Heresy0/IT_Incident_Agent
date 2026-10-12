@@ -1,0 +1,34 @@
+{
+  "method": "Criteria fixed before live execution; newly authored synthetic cases; author assessment by Codex, not independent human scoring.",
+  "principle": "Human confirmation is the business objective. Useful evidence-bounded partial is acceptable. Internal completed does not prove correctness.",
+  "dimensions": [
+    "current facts and scope",
+    "necessary evidence coverage",
+    "causal limits and alternatives",
+    "next-step usefulness and conditionality",
+    "human handoff usability"
+  ],
+  "cases": [
+    {
+      "case_id": "fr_001",
+      "known": "当前连接池无空闲连接且请求获取连接超时；远端探测成功。",
+      "necessary": "取得资源日志或同等直接证据；区分近端连接获取失败与数据库CPU异常。",
+      "unknown": "为何连接被持有、是否泄漏、并发是否增长或容量是否不足均未确认；部署不能解释其之前的首次故障。",
+      "actions": "核查持有/归还轨迹、业务查询耗时、并发量或容量基线；变更须明确条件和审批。不要求证明唯一深层原因。"
+    },
+    {
+      "case_id": "fr_002",
+      "known": "存在指标异常，日志源不可用；无法确定应用还是依赖原因。",
+      "necessary": "识别日志查询失败和实际未取得的观测，提供能区分候选的人工交接。",
+      "unknown": "没有日志不是没有错误，不能将发布确认为原因或编造依赖健康状态。",
+      "actions": "人工取得故障请求trace、应用错误与依赖响应记录；没有有效新查询时及时交接，partial可通过。"
+    },
+    {
+      "case_id": "fr_003",
+      "known": "当前token audience与接口要求不匹配且返回401；TLS和配置加载成功。",
+      "necessary": "取得依赖拒绝记录；若推荐修改本地认证配置，核对当前配置或明确人工确认其前提。",
+      "unknown": "此前哪个audience有效、是谁何时修改了契约均未知，不能确认远端修改规则或本地配置加载失败。",
+      "actions": "人工核对正式接口契约与token配置；若确认契约且获批，可有条件调整配置并验证401。支持条件建议不等于条件已满足。"
+    }
+  ]
+}

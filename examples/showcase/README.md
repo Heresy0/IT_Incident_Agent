@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+[冻结版本新案例审阅](frozen-review.md)：三个未参与修改的新案例暴露输入纠正长度限制和因果排除问题；应用保持冻结。[运行与助手审阅](frozen-review-runs.json)保留网络失败、限定重试及全部结果，不将内部状态直接当作质量成绩。
+
 最新局部修改见[复核关键缺口与核查结果说明](review-materiality.md)：默认核查预期结果由程序规范，保留原文审计；Reviewer 的关键缺口判断继续独立进行。[全部真实试验](review-materiality-runs.json)保留漏判、误拦和最终结果，尚未证明整体质量提升。
 
 默认三个模型角色与两个程序取证模块见[取证执行和调度职责](collection-boundaries.md)，包含 Knowledge 检索、提前校验补查计划及按角色隔离纠正额度；全部失败与复测保存在[验证摘要](collection-boundaries-runs.json)。

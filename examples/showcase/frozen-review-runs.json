@@ -1,0 +1,624 @@
+{
+  "implementation_commit": "f18777c51edfe0a84c1c913fa46c79947aef7a53",
+  "source_version": "3bddfacd949ea956",
+  "model": "qwen3.7-flash",
+  "criteria_file": "evals/freeze_review/criteria.json",
+  "criteria_sha256": "50d630d1ac096c9b22d1be97da519178a37b9763469a67cd524beb92d44263b9",
+  "method": "One model-response evaluation per new case. Two initial pre-response network failures retained; only those two cases retried once in network-enabled execution. No app/prompt/criteria changes during evaluation.",
+  "transport_failure_count": 2,
+  "semantic_model_evaluation_count": 3,
+  "model_requests_accounted": 22,
+  "tool_calls": 13,
+  "estimated_cost": null,
+  "overall_quality_improvement_proven": false,
+  "conclusion": "冻结实现仍存在输入纠正长度门禁与因果排除质量问题。保留冻结点，当前不修改应用；不能将这三个partial全部视为合理谨慎或宣称已稳定。",
+  "batches": [
+    {
+      "directory": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c",
+      "plan": {
+        "source_version": "3bddfacd949ea956",
+        "implementation_commit": "f18777c51edfe0a84c1c913fa46c79947aef7a53",
+        "model": "qwen3.7-flash",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "cases": [
+          "fr_001",
+          "fr_002",
+          "fr_003"
+        ],
+        "attempts_per_case": 1,
+        "maximum_model_calls": 96,
+        "read_only_synthetic": true,
+        "estimated_cost": null,
+        "criteria_sent_to_models": false,
+        "review_mode": "direct",
+        "freeze_sha256": "86dff21d20c99c3ecbb827cf5f951413692ebd8454388f12cc51fb3952d242aa"
+      },
+      "records": [
+        {
+          "case_id": "fr_001",
+          "status": "failed",
+          "review_status": "not_performed",
+          "contract_valid": true,
+          "run_summary": {
+            "model_calls": 1,
+            "web_calls": 0,
+            "tool_calls": 0,
+            "token_usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "known_calls": 0,
+              "status": "partial_or_unknown"
+            },
+            "provider_http_attempts": "unknown_for_model_and_embedding",
+            "estimated_cost": null,
+            "duration_ms": 6125,
+            "termination_reason": "NETWORK_ERROR",
+            "errors": [
+              {
+                "code": "NETWORK_ERROR",
+                "provider": "model",
+                "message": "外部服务网络连接失败。",
+                "retryable": false,
+                "node": "supervisor"
+              }
+            ],
+            "limits": {
+              "model_calls": 32,
+              "web_calls": 12,
+              "tool_calls": 48,
+              "seconds": 300,
+              "reserve_model_calls": 2,
+              "reserve_seconds": 15,
+              "input_chars": 28000,
+              "snippet_chars": 1800,
+              "max_sources": 10
+            }
+          },
+          "report_file": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c/fr_001.json",
+          "report_sha256": "e0c3516797f888014d3f7706d734258b2fb50387f5a2534549735e1500d12243",
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "rework_rounds": 0,
+          "validation_failures": []
+        },
+        {
+          "case_id": "fr_002",
+          "status": "failed",
+          "review_status": "not_performed",
+          "contract_valid": true,
+          "run_summary": {
+            "model_calls": 1,
+            "web_calls": 0,
+            "tool_calls": 0,
+            "token_usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "known_calls": 0,
+              "status": "partial_or_unknown"
+            },
+            "provider_http_attempts": "unknown_for_model_and_embedding",
+            "estimated_cost": null,
+            "duration_ms": 5282,
+            "termination_reason": "NETWORK_ERROR",
+            "errors": [
+              {
+                "code": "NETWORK_ERROR",
+                "provider": "model",
+                "message": "外部服务网络连接失败。",
+                "retryable": false,
+                "node": "supervisor"
+              }
+            ],
+            "limits": {
+              "model_calls": 32,
+              "web_calls": 12,
+              "tool_calls": 48,
+              "seconds": 300,
+              "reserve_model_calls": 2,
+              "reserve_seconds": 15,
+              "input_chars": 28000,
+              "snippet_chars": 1800,
+              "max_sources": 10
+            }
+          },
+          "report_file": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c/fr_002.json",
+          "report_sha256": "7eca1049b7f5f494647bd9e4140ca833b0865bae48353024e9fde6617a7daad9",
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "rework_rounds": 0,
+          "validation_failures": []
+        },
+        {
+          "case_id": "fr_003",
+          "status": "partial",
+          "review_status": "needs_information",
+          "contract_valid": true,
+          "run_summary": {
+            "model_calls": 8,
+            "web_calls": 0,
+            "tool_calls": 3,
+            "token_usage": {
+              "input_tokens": 38148,
+              "output_tokens": 5115,
+              "known_calls": 8,
+              "status": "known"
+            },
+            "provider_http_attempts": "unknown_for_model_and_embedding",
+            "estimated_cost": null,
+            "duration_ms": 56797,
+            "termination_reason": "REWORK_LIMIT",
+            "errors": [],
+            "limits": {
+              "model_calls": 32,
+              "web_calls": 12,
+              "tool_calls": 48,
+              "seconds": 300,
+              "reserve_model_calls": 2,
+              "reserve_seconds": 15,
+              "input_chars": 28000,
+              "snippet_chars": 1800,
+              "max_sources": 10
+            }
+          },
+          "report_file": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c/fr_003.json",
+          "report_sha256": "c1f618c2475bc9f020f9289e26f7d771c91fc5823bf431ee94fc6fd6da857af3",
+          "repair_counts": {
+            "supervisor": 1,
+            "diagnosis": 0,
+            "reviewer": 0
+          },
+          "rework_rounds": 1,
+          "validation_failures": [
+            {
+              "role": "supervisor",
+              "reason": "INVALID_TASK_CHECK",
+              "details": [
+                {
+                  "code": "INVALID_ARGUMENTS",
+                  "path": "tasks.0.checks.0.args",
+                  "tool": "get_recent_changes",
+                  "role": "investigation",
+                  "allowed_tools": [
+                    "get_recent_changes",
+                    "get_service_logs",
+                    "get_service_metrics",
+                    "get_service_owner"
+                  ],
+                  "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "directory": "output/frozen-review/7725e1e3-f18c-4ef7-9f0a-5e5b37ef8325",
+      "plan": {
+        "source_version": "3bddfacd949ea956",
+        "implementation_commit": "f18777c51edfe0a84c1c913fa46c79947aef7a53",
+        "model": "qwen3.7-flash",
+        "limits": {
+          "model_calls": 32,
+          "web_calls": 12,
+          "tool_calls": 48,
+          "seconds": 300,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "cases": [
+          "fr_001",
+          "fr_002"
+        ],
+        "attempts_per_case": 1,
+        "maximum_model_calls": 64,
+        "read_only_synthetic": true,
+        "estimated_cost": null,
+        "criteria_sent_to_models": false,
+        "review_mode": "direct",
+        "freeze_sha256": "34988737da69d33fba322c4bea11e2d665b8e37ca0000123d42bc5609aa56656",
+        "transport_retry_of": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c"
+      },
+      "records": [
+        {
+          "case_id": "fr_001",
+          "status": "partial",
+          "review_status": "not_performed",
+          "contract_valid": true,
+          "run_summary": {
+            "model_calls": 4,
+            "web_calls": 0,
+            "tool_calls": 4,
+            "token_usage": {
+              "input_tokens": 27810,
+              "output_tokens": 2111,
+              "known_calls": 4,
+              "status": "known"
+            },
+            "provider_http_attempts": "unknown_for_model_and_embedding",
+            "estimated_cost": null,
+            "duration_ms": 24829,
+            "termination_reason": "BUDGET_EXCEEDED",
+            "errors": [
+              {
+                "code": "BUDGET_EXCEEDED",
+                "provider": "workflow",
+                "message": "本次诊断已达到调用或时间预算。",
+                "retryable": false,
+                "node": "diagnosis"
+              }
+            ],
+            "limits": {
+              "model_calls": 32,
+              "web_calls": 12,
+              "tool_calls": 48,
+              "seconds": 300,
+              "reserve_model_calls": 2,
+              "reserve_seconds": 15,
+              "input_chars": 28000,
+              "snippet_chars": 1800,
+              "max_sources": 10
+            }
+          },
+          "report_file": "output/frozen-review/7725e1e3-f18c-4ef7-9f0a-5e5b37ef8325/fr_001.json",
+          "report_sha256": "eccc9db83bdc47035d280c3716230865ef8ed5914e080a907fc8ae4b0fb420f4",
+          "repair_counts": {
+            "supervisor": 0,
+            "diagnosis": 1,
+            "reviewer": 0
+          },
+          "rework_rounds": 0,
+          "validation_failures": [
+            {
+              "role": "diagnosis",
+              "reason": "UNKNOWN_REFERENCE",
+              "details": [
+                {
+                  "path": "findings.1.refs.0.reference_id",
+                  "type": "unknown_reference",
+                  "instruction": "只能选择本次提供的 reference_options 中真实的 REF_ 编号，不能填写 EV_ 编号或自行构造。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "case_id": "fr_002",
+          "status": "partial",
+          "review_status": "not_performed",
+          "contract_valid": true,
+          "run_summary": {
+            "model_calls": 8,
+            "web_calls": 0,
+            "tool_calls": 6,
+            "token_usage": {
+              "input_tokens": 54361,
+              "output_tokens": 5882,
+              "known_calls": 8,
+              "status": "known"
+            },
+            "provider_http_attempts": "unknown_for_model_and_embedding",
+            "estimated_cost": null,
+            "duration_ms": 63735,
+            "termination_reason": "BUDGET_EXCEEDED",
+            "errors": [
+              {
+                "code": "BUDGET_EXCEEDED",
+                "provider": "workflow",
+                "message": "本次诊断已达到调用或时间预算。",
+                "retryable": false,
+                "node": "diagnosis"
+              }
+            ],
+            "limits": {
+              "model_calls": 32,
+              "web_calls": 12,
+              "tool_calls": 48,
+              "seconds": 300,
+              "reserve_model_calls": 2,
+              "reserve_seconds": 15,
+              "input_chars": 28000,
+              "snippet_chars": 1800,
+              "max_sources": 10
+            }
+          },
+          "report_file": "output/frozen-review/7725e1e3-f18c-4ef7-9f0a-5e5b37ef8325/fr_002.json",
+          "report_sha256": "162aa9f41c4efa3d166f357214b32b0ca8188488d760fceca6e1e689741f41c1",
+          "repair_counts": {
+            "supervisor": 1,
+            "diagnosis": 1,
+            "reviewer": 0
+          },
+          "rework_rounds": 1,
+          "validation_failures": [
+            {
+              "role": "supervisor",
+              "reason": "INVALID_TASK_CHECK",
+              "details": [
+                {
+                  "code": "TOOL_DENIED",
+                  "path": "tasks.1.checks.0.args",
+                  "tool": "search_incidents",
+                  "role": "investigation",
+                  "allowed_tools": [
+                    "get_recent_changes",
+                    "get_service_logs",
+                    "get_service_metrics",
+                    "get_service_owner"
+                  ],
+                  "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+                }
+              ]
+            },
+            {
+              "role": "diagnosis",
+              "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "details": [
+                {
+                  "path": "recommended_actions.0.checks.0",
+                  "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+                  "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "assistant_reviews": [
+    {
+      "case_id": "fr_001",
+      "reviewer_type": "codex_assistant",
+      "independent_human_review": false,
+      "report_file": "output/frozen-review/7725e1e3-f18c-4ef7-9f0a-5e5b37ef8325/fr_001.json",
+      "report_sha256": "eccc9db83bdc47035d280c3716230865ef8ed5914e080a907fc8ae4b0fb420f4",
+      "verdict": "failed_to_deliver_reviewed_report",
+      "evidence_coverage": "取得连接池无空闲连接、等待和获取连接超时的直接资源日志及池使用率；未取得db_cpu对照。",
+      "facts_and_causes": "最终findings、hypotheses均为空；无法评价被拒绝的原始诊断内容，不能把未发布等同于诊断正确。",
+      "next_step": "未发布有效下一步，无法完成面向人工的交接。",
+      "primary_issue": "Diagnosis UNKNOWN_REFERENCE触发纠正，纠正回复调用前被输入长度门禁拒绝。",
+      "budget_basis": "模型4/32、工具4/48、24.829/300秒均未达到总额度；最后事件为validation_repair后BUDGET_EXCEEDED，程序该入口的消息长度上限为28000字符。未记录实际超限字符数。",
+      "validation_failures": [
+        {
+          "role": "diagnosis",
+          "reason": "UNKNOWN_REFERENCE",
+          "details": [
+            {
+              "path": "findings.1.refs.0.reference_id",
+              "type": "unknown_reference",
+              "instruction": "只能选择本次提供的 reference_options 中真实的 REF_ 编号，不能填写 EV_ 编号或自行构造。"
+            }
+          ]
+        }
+      ],
+      "final_target_assessments": [],
+      "published_actions": [],
+      "pending_actions": []
+    },
+    {
+      "case_id": "fr_002",
+      "reviewer_type": "codex_assistant",
+      "independent_human_review": false,
+      "report_file": "output/frozen-review/7725e1e3-f18c-4ef7-9f0a-5e5b37ef8325/fr_002.json",
+      "report_sha256": "162aa9f41c4efa3d166f357214b32b0ca8188488d760fceca6e1e689741f41c1",
+      "verdict": "failed_to_finish_human_handoff",
+      "evidence_coverage": "取得异常指标与变更摘要，正确记录日志SOURCE_UNAVAILABLE；另有未登记池指标查询失败。",
+      "facts_and_causes": "保留未确认候选，但最终findings为空；没有将远端变更发布为已确认原因。",
+      "next_step": "人工协调取得日志与依赖指标的建议仍在pending_actions，最终review_verdict为not_performed。",
+      "primary_issue": "一次补查后Diagnosis提出已尝试/覆盖的核查，纠正消息达到输入长度门禁；此前Supervisor也需纠正工具角色错配。",
+      "budget_basis": "模型8/32、工具6/48、63.735/300秒未达到总额度；最后validation_repair后在Diagnosis入口BUDGET_EXCEEDED，指向28000字符输入长度门禁，实际字符数未记录。",
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "TOOL_DENIED",
+              "path": "tasks.1.checks.0.args",
+              "tool": "search_incidents",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        },
+        {
+          "role": "diagnosis",
+          "reason": "READ_ONLY_ACTION_ALREADY_COVERED",
+          "details": [
+            {
+              "path": "recommended_actions.0.checks.0",
+              "code": "READ_ONLY_ACTION_ALREADY_COVERED",
+              "instruction": "此检查已被本次完整查询覆盖或同参数已尝试；复用collection结果。换成能区分候选的新检查；无有效新检查时删除此建议并保留缺口，不编造变更建议。"
+            }
+          ]
+        }
+      ],
+      "final_target_assessments": [
+        {
+          "target_id": "F1",
+          "verdict": "supported",
+          "reason": "EV_04ce6fe245dfe762482671f7、EV_d8fa68c4a6fcd8e4a8abfa8a、EV_50d53cebf6773cb49d8bb774、EV_2d2ae918af73b10c5e47e81f 提供了指定时间点的错误率和延迟数据，与陈述一致。",
+          "evidence_ids": [
+            "EV_04ce6fe245dfe762482671f7",
+            "EV_d8fa68c4a6fcd8e4a8abfa8a",
+            "EV_50d53cebf6773cb49d8bb774",
+            "EV_2d2ae918af73b10c5e47e81f"
+          ]
+        },
+        {
+          "target_id": "F2",
+          "verdict": "supported",
+          "reason": "EV_a6c8517a3ff17dbdc78a61a0 的变更摘要明确记录了新增可观测性标签且未提供其他详情，与陈述一致。",
+          "evidence_ids": [
+            "EV_a6c8517a3ff17dbdc78a61a0"
+          ]
+        },
+        {
+          "target_id": "H1",
+          "verdict": "uncertain",
+          "reason": "虽然存在高延迟和高错误率现象（支持排队/超时可能），但缺乏连接池使用率、等待时间或数据库CPU等关键指标证据来确认资源竞争机制。",
+          "evidence_ids": [
+            "EV_04ce6fe245dfe762482671f7",
+            "EV_d8fa68c4a6fcd8e4a8abfa8a"
+          ]
+        },
+        {
+          "target_id": "H2",
+          "verdict": "uncertain",
+          "reason": "远端变更或故障是可能的触发原因，但依赖日志查询失败（SOURCE_UNAVAILABLE），无法获取具体错误码或认证状态，缺乏直接证据。",
+          "evidence_ids": []
+        },
+        {
+          "target_id": "H3",
+          "verdict": "uncertain",
+          "reason": "虽然部署了新的可观测性标签，但缺乏资源类别日志（内存/CPU压力）来证实序列化开销导致了性能下降。",
+          "evidence_ids": [
+            "EV_a6c8517a3ff17dbdc78a61a0"
+          ]
+        },
+        {
+          "target_id": "A1",
+          "verdict": "supported",
+          "reason": "在现有日志源不可用的情况下，申请人工协调获取 mailbox-store 指标和 mail-exporter 依赖日志是合理的下一步行动，风险低且具备可操作性。",
+          "evidence_ids": []
+        }
+      ],
+      "published_actions": [],
+      "pending_actions": [
+        {
+          "action": "查询 mail-exporter 的 dependency 类别日志及 mailbox-store 相关指标。",
+          "condition": "需要人工协调获取 mailbox-store 的指标访问权限或日志源，并执行只读查询。",
+          "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+          "risk": "低，仅涉及只读数据获取。",
+          "requires_approval": true,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null,
+          "target_id": "A1",
+          "review_verdict": "not_performed",
+          "review_reason": "尚未复核。",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "case_id": "fr_003",
+      "reviewer_type": "codex_assistant",
+      "independent_human_review": false,
+      "report_file": "output/frozen-review/9f5208e1-d94c-47ca-a4ab-0d98c6fcac7c/fr_003.json",
+      "report_sha256": "c1f618c2475bc9f020f9289e26f7d771c91fc5823bf431ee94fc6fd6da857af3",
+      "verdict": "needs_semantic_revision_before_trusting_cause_exclusions",
+      "evidence_coverage": "取得AUTH_AUDIENCE_REJECT日志和本地部署记录；当前audience不匹配已直接可见。未读取configuration日志，部署config_summary也记录当前audience。",
+      "facts_and_causes": "首轮H1正确描述当前不匹配，首轮Reviewer支持；补查后H1把远端规则变更及原token有效混入mechanism，最终保持unresolved。Reviewer却将本地配置候选标为refuted，其理由仅为没有近期本地变更证据，缺少真正反证。",
+      "next_step": "人工联系远端核对契约/变更记录有价值且未自动执行，但不应据错误排除而只聚焦远端；需同时核对当前本地token与正式契约。",
+      "primary_issue": "机制与触发混用、补查导致已知机制表达退化、缺少支持被当成反证。",
+      "budget_basis": "8次模型、3次工具、56.797秒；最终REWORK_LIMIT不是网络或总预算耗尽。",
+      "validation_failures": [
+        {
+          "role": "supervisor",
+          "reason": "INVALID_TASK_CHECK",
+          "details": [
+            {
+              "code": "INVALID_ARGUMENTS",
+              "path": "tasks.0.checks.0.args",
+              "tool": "get_recent_changes",
+              "role": "investigation",
+              "allowed_tools": [
+                "get_recent_changes",
+                "get_service_logs",
+                "get_service_metrics",
+                "get_service_owner"
+              ],
+              "instruction": "按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。"
+            }
+          ]
+        }
+      ],
+      "final_target_assessments": [
+        {
+          "target_id": "F1",
+          "verdict": "supported",
+          "reason": "EV_bdb81661029d136cdccc5f35明确记录了401错误及audience不匹配信息，时间戳与范围一致。",
+          "evidence_ids": [
+            "EV_bdb81661029d136cdccc5f35"
+          ]
+        },
+        {
+          "target_id": "F2",
+          "verdict": "supported",
+          "reason": "EV_59373a8b7bc6982d52221993证实部署未修改认证配置且发生在故障之后，支持该陈述。",
+          "evidence_ids": [
+            "EV_59373a8b7bc6982d52221993"
+          ]
+        },
+        {
+          "target_id": "H1",
+          "verdict": "uncertain",
+          "reason": "虽有证据显示上游拒绝，但缺乏远端变更记录或契约变更的直接观测，无法确认是上游主动修改规则还是其他原因（如Token过期）。",
+          "evidence_ids": [
+            "EV_bdb81661029d136cdccc5f35"
+          ]
+        },
+        {
+          "target_id": "H2",
+          "verdict": "not_supported",
+          "reason": "本地服务配置长期存在且本次部署未变，无证据表明近期发生了导致失效的本地配置变更或刷新策略变化。",
+          "evidence_ids": [
+            "EV_59373a8b7bc6982d52221993"
+          ]
+        },
+        {
+          "target_id": "H3",
+          "verdict": "uncertain",
+          "reason": "当前机制指向上游拒绝，触发源可能是上游变更，但缺乏上游侧的观测数据来证实或排除此假设。",
+          "evidence_ids": []
+        },
+        {
+          "target_id": "A1",
+          "verdict": "supported",
+          "reason": "作为获取未知信息的待办事项，其条件、风险和预期结果描述合理，无需新观测即可批准执行。",
+          "evidence_ids": []
+        }
+      ],
+      "published_actions": [
+        {
+          "action": "人工核实 report-gateway 在 09:00-09:30 期间的配置或部署变更记录，确认是否调整了 audience 接受列表。",
+          "condition": "需要联系 report-gateway 团队或通过其独立监控/变更系统获取记录。",
+          "expected_result": "取得上述人工核查的实际记录与结果，判断哪些候选原因得到支持或反证；无法确认的原因继续保留。",
+          "risk": "无操作风险，仅为信息收集。",
+          "requires_approval": false,
+          "kind": "manual_check",
+          "checks": [],
+          "repair": null
+        }
+      ],
+      "pending_actions": []
+    }
+  ]
+}

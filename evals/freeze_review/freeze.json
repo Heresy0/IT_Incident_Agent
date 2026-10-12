@@ -1,0 +1,28 @@
+{
+  "source_version": "3bddfacd949ea956",
+  "implementation_commit": "f18777c51edfe0a84c1c913fa46c79947aef7a53",
+  "model": "qwen3.7-flash",
+  "limits": {
+    "model_calls": 32,
+    "web_calls": 12,
+    "tool_calls": 48,
+    "seconds": 300,
+    "reserve_model_calls": 2,
+    "reserve_seconds": 15,
+    "input_chars": 28000,
+    "snippet_chars": 1800,
+    "max_sources": 10
+  },
+  "attempts_per_case": 1,
+  "transport_extra_body": {
+    "enable_thinking": false
+  },
+  "files": {
+    "scripts/run_frozen_review.py": "abc066ea34cce3cd794be13b60133441dda1d7bb0e81da43e07dffed849c2e82",
+    "evals/freeze_review/criteria.json": "50d630d1ac096c9b22d1be97da519178a37b9763469a67cd524beb92d44263b9",
+    "fixtures/incident_freeze_review/catalog.json": "f72f09bfae9b544140c12a21e3a976de3a22fedf05379512997b4d883b9a96b8",
+    "fixtures/incident_freeze_review/fr_001.json": "7e67dcc6c97a75f0b01c57f8999f4e57f639951507447e23a7f59dfa06b5fd36",
+    "fixtures/incident_freeze_review/fr_002.json": "0555ab1c944870bc1206c82d58fdb8087238ffb2e8e32ed03b6ba1090068a6ae",
+    "fixtures/incident_freeze_review/fr_003.json": "16a037defccf4a11a821e5b8f895bc7bc11b8637872d707b6650e326368035f5"
+  }
+}

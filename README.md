@@ -8,6 +8,8 @@
 
 [复核关键缺口与核查结果说明](examples/showcase/review-materiality.md)：按问题实际影响区分未知项，默认核查建议采用程序生成的中性预期结果，原文保留审计。真实验证保留失败与误拦；有条件变更复核仍偏保守。
 
+实现已保存为冻结点；[三个新案例的审阅](examples/showcase/frozen-review.md)发现两例在诊断纠正时受到输入长度门禁限制，另一例仍有机制与触发混用、错误排除候选的问题。保留冻结版本与全部失败记录，尚不能宣称整体效果稳定。
+
 [Reviewer 契约与收尾](examples/showcase/review-handoff.md)：程序按问题用途填充缺口类别；机制和有效下一步已复核、关键证据完整时，纯触发未知作为人工待核实限制保留。关键未知仍阻塞，原补查请求和未确认结论保留在运行记录。
 
 [Reviewer 分阶段纠正额度](examples/showcase/reviewer-stage-budget.md)亦可切换试验：split 模式盲审和最终复核各最多纠正一次，仍计入原总预算；默认保留共享一次。

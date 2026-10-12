@@ -1,0 +1,17 @@
+[
+  {
+    "case_id": "fr_001",
+    "file": "fr_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "fr_002",
+    "file": "fr_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "fr_003",
+    "file": "fr_003.json",
+    "visibility": "public_synthetic"
+  }
+]

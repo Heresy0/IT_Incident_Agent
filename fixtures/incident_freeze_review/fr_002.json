@@ -1,0 +1,159 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "fr_002",
+    "title": "合成故障审阅 fr_002",
+    "symptoms": "邮件导出偶发超时，错误率升高，希望区分应用自身和依赖原因。",
+    "scope": {
+      "service": "mail-exporter",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "start": "2026-10-12T09:00:00+00:00",
+      "end": "2026-10-12T09:30:00+00:00",
+      "allowed_dependencies": [
+        "mailbox-store"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.03,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.18,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 90,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 2200,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 90,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 2200,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 40,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 42,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [],
+  "changes": [
+    {
+      "id": "observability-change",
+      "timestamp": "2026-10-12T09:08:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "deployment",
+      "version": "2.1.0",
+      "summary": "变更摘要只记录新增可观测性标签，未提供代码差异、依赖协议或运行时错误详情。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "mail-exporter",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "aliases": [
+        "mail-exporter"
+      ],
+      "team": "Synthetic Review Ops",
+      "escalation": "合成测试人工值班队列"
+    }
+  ],
+  "runbooks": [],
+  "incidents": [],
+  "source_errors": {
+    "get_service_logs": "SOURCE_UNAVAILABLE"
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "fr_001",
+    "title": "合成故障审阅 fr_001",
+    "symptoms": "发票渲染请求延迟和错误率升高，部分请求等待后失败；请分析故障机制并给出人工下一步。",
+    "scope": {
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "start": "2026-10-12T09:00:00+00:00",
+      "end": "2026-10-12T09:30:00+00:00",
+      "allowed_dependencies": [
+        "render-store"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.44,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 150,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 3800,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 150,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 3800,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_usage-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_usage",
+      "value": 0.3,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_usage-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_usage",
+      "value": 1.0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_wait-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_wait",
+      "value": 0,
+      "unit": "requests",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "pool_wait-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "pool_wait",
+      "value": 45,
+      "unit": "requests",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 32,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "db_cpu-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "db_cpu",
+      "value": 30,
+      "unit": "percent",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "id": "pool-wait",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "resource",
+      "level": "WARN",
+      "error_code": "POOL_ACQUIRE_TIMEOUT",
+      "message": "invoice-renderer连接池pool_max=16、in_use=16、waiting=45；渲染请求等待获取连接2500ms后失败。当前无空闲连接，尚未取得连接持有时长与归还轨迹。"
+    },
+    {
+      "id": "store-probe",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "STORE_PROBE_OK",
+      "message": "render-store连接探测成功，ping耗时8ms；该探测不能代表所有业务查询耗时。"
+    },
+    {
+      "id": "pool-config",
+      "timestamp": "2026-10-12T09:01:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "POOL_CONFIG_LOADED",
+      "message": "已加载pool_max=16；没有此前容量基线或请求并发量对照。"
+    }
+  ],
+  "changes": [
+    {
+      "id": "log-change",
+      "timestamp": "2026-10-12T09:12:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "deployment",
+      "version": "2.1.0",
+      "summary": "仅新增渲染日志标签；09:05首次连接获取超时早于09:12部署。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "invoice-renderer",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "aliases": [
+        "invoice-renderer"
+      ],
+      "team": "Synthetic Review Ops",
+      "escalation": "合成测试人工值班队列"
+    }
+  ],
+  "runbooks": [],
+  "incidents": []
+}

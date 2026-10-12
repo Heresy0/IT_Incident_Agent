@@ -1,0 +1,195 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "fr_003",
+    "title": "合成故障审阅 fr_003",
+    "symptoms": "报表发布收到401，怀疑对方修改了认证规则；请核实原因并给出需人工确认的处理步骤。",
+    "scope": {
+      "service": "report-publisher",
+      "environment": "staging",
+      "service_version": "2.1.0",
+      "start": "2026-10-12T09:00:00+00:00",
+      "end": "2026-10-12T09:30:00+00:00",
+      "allowed_dependencies": [
+        "report-gateway"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_error_rate",
+      "value": 0.61,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "dependency_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "dependency_error_rate",
+      "value": 0.95,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 120,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency_ms-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency_ms",
+      "value": 125,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-before",
+      "timestamp": "2026-10-12T09:02:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 120,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_latency-after",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "metric": "request_latency",
+      "value": 125,
+      "unit": "ms",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "id": "audience-reject",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "dependency",
+      "level": "WARN",
+      "error_code": "AUTH_AUDIENCE_REJECT",
+      "message": "TLS握手成功；report-gateway返回HTTP 401：请求token audience=report-console，当前接口要求audience=report-api。未取得此前接口契约、旧token或远端变更记录。"
+    },
+    {
+      "id": "auth-config",
+      "timestamp": "2026-10-12T09:03:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "configuration",
+      "level": "INFO",
+      "error_code": "AUTH_CONFIG_LOADED",
+      "message": "report-publisher当前已加载auth_audience=report-console，配置加载成功；未记录该值此前是否有效。"
+    },
+    {
+      "id": "resource-ok",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "resource",
+      "level": "INFO",
+      "error_code": "RESOURCE_OK",
+      "message": "CPU与内存未达到告警阈值，未记录进程重启；此观测不证明认证正确。"
+    }
+  ],
+  "changes": [
+    {
+      "id": "format-change",
+      "timestamp": "2026-10-12T09:12:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "category": "deployment",
+      "version": "2.1.0",
+      "summary": "09:12部署仅调整报表日志格式，09:06已出现401；本次部署未改认证配置。",
+      "config_summary": {
+        "auth_audience": "report-console"
+      }
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner",
+      "timestamp": "2026-10-12T09:10:00+00:00",
+      "service": "report-publisher",
+      "environment": "staging",
+      "data_version": "freeze-review-v1",
+      "visibility": "public_synthetic",
+      "aliases": [
+        "report-publisher"
+      ],
+      "team": "Synthetic Review Ops",
+      "escalation": "合成测试人工值班队列"
+    }
+  ],
+  "runbooks": [],
+  "incidents": []
+}
