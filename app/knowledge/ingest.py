@@ -1,15 +1,11 @@
-"""Offline ingestion: embed first, then atomically replace a local index."""
+"""Offline ingestion: embed first, then transactionally replace scoped documents."""
 from datetime import datetime
 import hashlib
-import json
-import os
-import tempfile
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from knowledge.retrieval import index_path, configuration, embed, scope_fields
-from providers.fixtures import ProviderError
-from runtime.context import ExecutionError
+from knowledge.chunking import split_text
+from knowledge.retrieval import configuration, embed
+from knowledge.database import RunbookStore, scope_fields, scope_id
 
 
 class RunbookDocument(BaseModel):
@@ -18,6 +14,8 @@ class RunbookDocument(BaseModel):
     category: Literal['resource', 'dependency', 'configuration']
     text: str = Field(min_length=1, max_length=100000)
     updated_at: str
+    source_format: Literal['text', 'markdown'] = 'text'
+    source_name: str | None = Field(default=None, min_length=1, max_length=180)
 
     @field_validator('updated_at')
     @classmethod
@@ -31,8 +29,6 @@ class RunbookDocument(BaseModel):
 def prepare(binding, documents):
     from providers.http import safe_text
     config = configuration(binding)
-    splitter = RecursiveCharacterTextSplitter(chunk_size=config.chunk_size, chunk_overlap=config.chunk_overlap,
-        separators=['\n\n', '\n', '。', '！', '？', '；', '，', ' ', ''])
     ids, rows = set(), []
     for raw in documents:
         document = RunbookDocument.model_validate(raw)
@@ -41,44 +37,40 @@ def prepare(binding, documents):
         ids.add(document.document_id)
         # Redact before splitting so credentials spanning a chunk boundary
         # cannot survive as a partial value in the next chunk.
-        for index, text in enumerate(splitter.split_text(safe_text(document.text, max_chars=100000))):
+        for index, text in enumerate(split_text(safe_text(document.text, max_chars=100000), config, document.source_format)):
             rows.append({**scope_fields(binding), 'category': document.category,
                 'text': text, 'document_id': document.document_id, 'updated_at': document.updated_at,
                 'id': hashlib.sha256(f'{document.document_id}/{index}/{text}'.encode()).hexdigest()})
+            if document.source_name:
+                rows[-1]['source_name'] = safe_text(document.source_name, max_chars=180)
     if not rows or len(rows) > 200:
         raise ValueError('INDEX_REQUIRES_1_TO_200_CHUNKS')
     return config, rows
 
 
 def build_index(binding, documents, *, transport=None):
-    config, rows = prepare(binding, documents)
-    temporary = None
-    try:
-        # A failed embedding leaves the previous usable snapshot intact.
-        vectors = []
-        for offset in range(0, len(rows), 8):
-            vectors.extend(embed([r['text'] for r in rows[offset:offset+8]], config, transport=transport))
-        snapshot = {'scope': scope_fields(binding), 'embedding_model': config.embedding_model,
-            'embedding_dimension': config.embedding_dimension,
-            'rows': [{**r, 'vector': v} for r, v in zip(rows, vectors, strict=True)]}
-        name = index_path(binding, config)
-        name.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=name.parent,
-                                        suffix='.tmp', delete=False) as handle:
-            temporary = handle.name
-            json.dump(snapshot, handle, ensure_ascii=False, allow_nan=False)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, name)
-        temporary = None
-        return {'index': str(name), 'documents': len(documents), 'chunks': len(rows), 'status': 'ready'}
-    except (ProviderError, ExecutionError):
-        raise
-    except Exception:
-        raise ProviderError('RAG_UNAVAILABLE') from None
-    finally:
-        if temporary:
-            try:
-                os.unlink(temporary)
-            except OSError:
-                pass
+    config, rows = prepare(binding,documents)
+    store = RunbookStore(binding,config)
+    store.initialize()
+    expected = store.signature()
+    vectors = []
+    for offset in range(0,len(rows),8):
+        vectors.extend(embed([r['text'] for r in rows[offset:offset+8]],config,transport=transport))
+    store.replace(rows,vectors,expected)
+    return {'scope_id':scope_id(binding,config), 'documents':len(documents), 'chunks':len(rows),
+            'backend':'pgvector', 'status':'ready'}
+
+
+def upload_document(binding, document, expected_revision, *, transport=None):
+    """Single-document import: preflight before billing, atomic replacement after it."""
+    config, rows = prepare(binding, [document])
+    store = RunbookStore(binding, config)
+    store.initialize()
+    with store.snapshot() as snapshot:
+        store.check_document(snapshot.catalog(), rows[0]['document_id'], len(rows), expected_revision)
+    vectors = []
+    for offset in range(0, len(rows), 8):
+        vectors.extend(embed([row['text'] for row in rows[offset:offset+8]], config, transport=transport))
+    revision = store.upsert_document(rows, vectors, expected_revision)
+    return {'document_id': rows[0]['document_id'], 'revision': revision,
+            'chunks': len(rows), 'backend': 'pgvector', 'status': 'ready'}

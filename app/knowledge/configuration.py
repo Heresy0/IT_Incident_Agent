@@ -1,10 +1,10 @@
-"""Local index settings; none of these fields are model/tool arguments."""
+"""Operator-owned pgvector settings; none are model/tool arguments."""
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class RunbookRAGConfig(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True, allow_inf_nan=False)
-    index_dir: str = Field(default='app/data/runbooks', min_length=1, max_length=1000)
+    database_dsn_env: str = Field(default='POSTGRES_DSN', pattern=r'^[A-Za-z_][A-Za-z0-9_]{0,79}$')
     embedding_model: str = Field(default='text-embedding-v1', pattern=r'^[A-Za-z0-9_.-]{1,80}$')
     embedding_dimension: int = Field(default=1536, ge=2, le=4096)
     embedding_url: str = 'https://dashscope.aliyuncs.com'

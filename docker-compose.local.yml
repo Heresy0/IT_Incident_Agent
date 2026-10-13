@@ -1,7 +1,7 @@
 name: it-incident-local
 services:
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:0.8.7-pg16-bookworm
     environment:
       POSTGRES_USER: deepresearch
       POSTGRES_PASSWORD: deepresearch_local

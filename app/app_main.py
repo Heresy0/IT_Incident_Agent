@@ -12,6 +12,7 @@ from workflow.dependencies import get_workflow_service
 from api.auth import router as auth_router, get_current_principal, Principal
 from api.incidents import router as incident_router
 from api.repairs import router as repair_router
+from api.runbooks import router as runbook_router
 from api.runs import router as run_router, get_run, run_events
 from observability.telemetry import configure_logging, METRICS
 
@@ -51,6 +52,7 @@ def create_app(settings=None) -> FastAPI:
     app.add_api_route('/api/v1/research/runs/{run_id}/events', run_events, methods=['GET'], include_in_schema=False)
     app.include_router(incident_router)
     app.include_router(repair_router)
+    app.include_router(runbook_router)
     @app.get("/metrics", include_in_schema=False)
     def metrics(principal: Principal = Depends(get_current_principal)):
         if principal.role != "operator":

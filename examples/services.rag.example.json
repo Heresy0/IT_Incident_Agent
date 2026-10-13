@@ -5,7 +5,7 @@
     "dependencies": [], "repairs": {},
     "observations": {
       "runbook_rag": {
-        "index_dir": "app/data/runbooks",
+        "database_dsn_env": "POSTGRES_DSN",
         "embedding_model": "text-embedding-v1", "embedding_dimension": 1536,
         "embedding_api_key_env": "DASHSCOPE_API_KEY", "embedding_url": "https://dashscope.aliyuncs.com",
         "top_k": 3, "min_score": 0.35, "chunk_size": 500, "chunk_overlap": 50

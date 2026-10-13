@@ -1,8 +1,6 @@
-"""Small local vector indexes return scoped, cited runbook evidence."""
+"""pgvector results become ordinary scoped, cited runbook evidence."""
 from contextlib import nullcontext
 from datetime import datetime
-import hashlib
-import json
 import math
 import os
 
@@ -10,22 +8,11 @@ from knowledge.configuration import RunbookRAGConfig
 from providers.fixtures import ProviderError
 from runtime.context import current, ExecutionError
 
-SCHEMA = 'incident_runbook_v1'
+from knowledge.database import SCHEMA, RunbookStore, scope_fields, scope_id
 
 
 def configuration(binding):
     return RunbookRAGConfig.model_validate(binding.observations['runbook_rag'])
-
-
-def index_path(binding, config):
-    from pathlib import Path
-    identity = [SCHEMA, binding.tenant_id, binding.service, binding.environment,
-                binding.version, config.embedding_url, config.embedding_model, config.embedding_dimension]
-    name = hashlib.sha256(json.dumps(identity, ensure_ascii=False).encode()).hexdigest()[:32]
-    directory = Path(config.index_dir)
-    if not directory.is_absolute():
-        directory = Path(__file__).resolve().parents[2] / directory
-    return directory / (name + '.json')
 
 
 def valid_vector(vector, dimension):
@@ -70,76 +57,47 @@ def embed(texts, config, *, query=False, transport=None):
         return vectors
 
 
-def scope_fields(binding):
-    return {'tenant_id': binding.tenant_id, 'service': binding.service,
-            'environment': binding.environment, 'service_version': binding.version, 'schema_version': SCHEMA}
-
-
-def read_index(binding, config):
-    """Validate the whole snapshot before any paid query embedding."""
-    import re
-    path = index_path(binding, config)
-    if not path.exists():
-        raise ProviderError('RAG_INDEX_NOT_READY')
-    try:
-        with path.open('rb') as handle:
-            raw = handle.read(32_000_001)
-        if len(raw) > 32_000_000:
-            raise ValueError()
-        index = json.loads(raw)
-        if index['scope'] != scope_fields(binding):
-            raise ProviderError('RAG_SCOPE_MISMATCH')
-        if (index['embedding_model'] != config.embedding_model or
-                index['embedding_dimension'] != config.embedding_dimension):
-            raise ProviderError('RAG_INDEX_INCOMPATIBLE')
-        rows = index['rows']
-        if not isinstance(rows, list) or not 1 <= len(rows) <= 200:
-            raise ValueError()
-        seen = set()
-        for row in rows:
-            if any(row.get(k) != v for k, v in scope_fields(binding).items()):
-                raise ProviderError('RAG_SCOPE_MISMATCH')
-            if (not valid_vector(row['vector'], config.embedding_dimension)
-                    or row['id'] in seen or not re.fullmatch(r'[a-f0-9]{64}', row['id'])
-                    or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,79}', row['document_id'])
-                    or row['category'] not in {'resource', 'dependency', 'configuration'}
-                    or not isinstance(row['text'], str) or not row['text'].strip()
-                    or len(row['text']) > 1800 or datetime.fromisoformat(row['updated_at']).tzinfo is None):
-                raise ValueError()
-            seen.add(row['id'])
-        return rows, hashlib.sha256(raw).hexdigest()[:24]
-    except ProviderError:
-        raise
-    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError):
-        raise ProviderError('RAG_RESULT_INVALID') from None
-
-
-def cosine(left, right):
-    # hypot avoids overflow for otherwise finite vectors.
-    left_norm, right_norm = math.hypot(*left), math.hypot(*right)
-    return sum((a/left_norm)*(b/right_norm) for a, b in zip(left, right, strict=True))
-
-
 def search_runbooks(binding, scope, args, *, transport=None):
     from providers.http import safe_text
     if (scope.tenant_id, scope.service, scope.environment, scope.service_version) != (
             binding.tenant_id, binding.service, binding.environment, binding.version) or scope.user_id not in binding.users:
         raise ProviderError('SCOPE_DENIED')
     config = configuration(binding)
-    records, version = read_index(binding, config)
-    records = [r for r in records if not args.category or r['category'] == args.category]
-    if not records:
-        return [], False
-    vector = embed([args.query], config, query=True, transport=transport)[0]
-    ranked = sorted(((cosine(vector, r['vector']), r) for r in records),
-                    key=lambda item: (-item[0], item[1]['id']))
-    ranked = [(score, r) for score, r in ranked if score >= config.min_score]
-    rows = []
-    for score, record in ranked[:config.top_k]:
-        rows.append({'id': record['id'][:24], 'timestamp': record['updated_at'],
-            'service': binding.service, 'environment': binding.environment,
-            'data_version': SCHEMA+'/'+version, 'versions': [binding.version],
-            'category': record['category'], 'text': safe_text(record['text']),
-            'updated_at': record['updated_at'], 'document_id': record['document_id'],
-            'retrieval_score': score, 'content_truncated': False})
-    return rows, len(ranked) > config.top_k
+    with RunbookStore(binding,config).snapshot() as snapshot:
+        catalog = snapshot.catalog()
+        if not catalog:
+            raise ProviderError('RAG_INDEX_NOT_READY')
+        if not any(not args.category or row['category'] == args.category for row in catalog):
+            return [], False
+        vector = embed([args.query],config,query=True,transport=transport)[0]
+        records = snapshot.search(vector,args.category)
+        rows, seen = [], set()
+        for record in records:
+            if record.get('scope_id') != scope_id(binding,config) or any(record.get(key) != value for key,value in scope_fields(binding).items()):
+                raise ProviderError('RAG_SCOPE_MISMATCH')
+            if (record.get('embedding_model') != config.embedding_model
+                    or record.get('embedding_dimension') != config.embedding_dimension):
+                raise ProviderError('RAG_INDEX_INCOMPATIBLE')
+            try:
+                score, text, stamp = record['retrieval_score'],record['text'],record['updated_at']
+                document = next((row for row in catalog if row['document_id'] == record['document_id']),None)
+                if (type(score) not in (float,int) or not math.isfinite(score)
+                        or not isinstance(text,str) or not text.strip() or len(text) > 1800
+                        or not isinstance(stamp,datetime) or stamp.tzinfo is None
+                        or (args.category and record['category'] != args.category) or document is None
+                        or record['revision'] != document['revision']):
+                    raise ValueError()
+                import re
+                if not re.fullmatch(r'[a-f0-9]{64}',record['id']) or not re.fullmatch(r'[a-f0-9]{64}',record['revision']):
+                    raise ValueError()
+            except (KeyError,TypeError,ValueError):
+                raise ProviderError('RAG_RESULT_INVALID') from None
+            if score < config.min_score or record['id'] in seen:
+                continue
+            seen.add(record['id'])
+            rows.append({'id':record['id'][:24], 'timestamp':stamp.isoformat(), 'service':binding.service,
+                'environment':binding.environment, 'data_version':SCHEMA+'/'+record['revision'][:24],
+                'versions':[binding.version], 'category':record['category'], 'text':safe_text(text),
+                'updated_at':stamp.isoformat(), 'document_id':record['document_id'],
+                'retrieval_score':score, 'content_truncated':False})
+        return rows[:config.top_k],len(rows) > config.top_k

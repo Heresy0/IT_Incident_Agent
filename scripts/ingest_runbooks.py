@@ -1,4 +1,4 @@
-"""Plan by default; --execute atomically builds/replaces a local runbook index."""
+"""Plan by default; --execute transactionally replaces scoped pgvector runbooks."""
 import argparse
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'app'), str(ROOT)]
 from config.incident import load_environment
 from knowledge.ingest import prepare, build_index
-from knowledge.retrieval import index_path
+from knowledge.database import scope_id
 from providers.registry import ServiceRegistry
 from providers.fixtures import ProviderError
 from runtime.context import RunContext, Limits, activate, ExecutionError
@@ -37,7 +37,7 @@ def main(argv=None):
             raise ValueError('INVALID_DOCUMENT_MANIFEST')
         config, rows = prepare(binding, raw['documents'])
         if not args.execute:
-            print(json.dumps({'plan_only':True, 'index':str(index_path(binding,config)),
+            print(json.dumps({'plan_only':True, 'scope_id':scope_id(binding,config), 'backend':'pgvector',
                 'documents':len(raw['documents']), 'chunks':len(rows), 'embedding_requests':(len(rows)+7)//8,
                 'network_checked':False, 'existing_index_modified':False,
                 'execute_replaces_service_index':True},ensure_ascii=False,indent=2))

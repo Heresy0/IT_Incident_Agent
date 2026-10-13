@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import IncidentPanel from './IncidentPanel.vue'
+import RunbookPanel from './RunbookPanel.vue'
 
 type Identity = { tenant_id: string; user_id: string; role: string }
 const draftToken = ref(''), token = ref(''), identity = ref<Identity | null>(null)
@@ -67,6 +68,7 @@ onUnmounted(() => authController.abort())
     </aside>
     <div class="workspace">
       <header class="topbar"><div><span class="eyebrow">IT INCIDENT AGENT</span><h1>故障工单、诊断与修复</h1></div><span class="badge">开发调试版</span></header>
+      <RunbookPanel v-if="identity?.role === 'operator'" :key="`runbooks-${identityVersion}`" :fetcher="authenticatedFetch" />
       <IncidentPanel v-if="identity" :key="identityVersion" :ready="true" :tenant-id="identity.tenant_id" :user-id="identity.user_id" :role="identity.role" :fetcher="authenticatedFetch" />
       <main v-else class="welcome"><span class="welcome-mark">IT</span><h2>从一张故障工单开始</h2><p>在左侧验证访问令牌，然后选择已登记服务，查看五个 Agent 的排查过程与诊断结果。</p><div class="welcome-tags"><span>范围受限的只读工具</span><span>证据引用</span><span>显式调用预算</span></div></main>
     </div>

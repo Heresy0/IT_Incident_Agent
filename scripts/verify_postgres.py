@@ -44,14 +44,17 @@ def main():
             if command(COMPOSE + ['up', '-d', '--wait', '--wait-timeout', '90', 'postgres'], 180).returncode:
                 print('测试数据库启动失败。')
                 return 2
-        env = dict(os.environ, PYTHONPATH=str(ROOT / 'app'), INCIDENT_TEST_POSTGRES_DSN=dsn,
+        env = dict(os.environ, PYTHONPATH=str(ROOT / 'app'), INCIDENT_TEST_POSTGRES_DSN=dsn, INCIDENT_TEST_RUNBOOK_DSN=dsn,
                    DASHSCOPE_API_KEY='test-only', PYTHONIOENCODING='utf-8')
         destination = ROOT / 'output/postgres-acceptance.log'
         destination.parent.mkdir(exist_ok=True)
         with destination.open('w', encoding='utf-8') as log:
-            result = subprocess.run([sys.executable, '-m', 'unittest', 'tests.storage.test_incident_postgres', '-v'],
+            result = subprocess.run([sys.executable, '-m', 'unittest', 'tests.storage.test_incident_postgres', 'tests.storage.test_runbook_pgvector', '-v'],
                 cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=120)
         print('数据库验收通过。' if result.returncode == 0 else '数据库验收失败；请查看output/postgres-acceptance.log。')
+        if result.returncode == 0:
+            result = subprocess.run([sys.executable, str(ROOT/'scripts/verify_runbook_rag.py'),
+                '--execute', '--dsn-env', 'INCIDENT_TEST_RUNBOOK_DSN'], cwd=ROOT, env=env, timeout=120)
         return result.returncode
     except (OSError, subprocess.TimeoutExpired):
         print('验收环境不可用或超时，未转用业务数据库。')

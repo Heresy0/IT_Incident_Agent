@@ -38,9 +38,10 @@ jobs:
     env:
       PYTHONPATH: app
       INCIDENT_TEST_POSTGRES_DSN: postgresql://incident:incident@127.0.0.1:5432/incident_test
+      INCIDENT_TEST_RUNBOOK_DSN: postgresql://incident:incident@127.0.0.1:5432/incident_test
     services:
       postgres:
-        image: postgres:16
+        image: pgvector/pgvector:0.8.7-pg16-bookworm
         env:
           POSTGRES_USER: incident
           POSTGRES_PASSWORD: incident
@@ -56,4 +57,4 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m unittest tests.storage.test_incident_postgres -v
+      - run: python -m unittest tests.storage.test_incident_postgres tests.storage.test_runbook_pgvector -v

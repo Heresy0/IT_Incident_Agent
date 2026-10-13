@@ -1,1 +1,1 @@
-"""Optional service-scoped runbook retrieval; no research workflow imports."""
+"""Optional scoped pgvector runbook retrieval; no research imports."""

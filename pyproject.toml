@@ -21,3 +21,4 @@ where = ["app"]
 
 [tool.setuptools.package-data]
 storage = ["migrations/*.sql"]
+knowledge = ["migrations/*.sql"]

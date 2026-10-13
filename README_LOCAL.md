@@ -70,6 +70,10 @@ docker compose -f docker-compose.local.yml up -d --wait --wait-timeout 300 postg
 
 默认端口 PostgreSQL 5434、后端8003；Compose项目 it-incident-local，数据卷独立。现有数据库名和账号保留以兼容既有数据，不在目录清理时迁移；旧 Milvus 容器/卷没有删除。
 
+当前 Compose 使用 PostgreSQL 16 的 pgvector 0.8.7 镜像。轻量手册 RAG 通过 POSTGRES_DSN 复用数据库，首次显式导入创建扩展、手册表和片段表；普通后端初始化不创建知识表。原 RAG 配置中的 index_dir 改为 database_dsn_env，配置、导入和隔离验收步骤见[排障手册 RAG](examples/runbook-rag.md)。已有运行实例不会因源码变更自动切换，本次实现验证未改动业务数据库。
+
+前端使用 operator 身份后，展开“排障手册 · 上传与切分”即可上传 UTF-8 的 .md / .txt（最多 256 KiB）。先免费预览，确认向量化费用后导入；Markdown 按标题分节，TXT 按段落切分。同范围同名文件更新单篇资料，保留其他手册。服务必须已配置 runbook_rag，数据库账号需有初始化知识表权限或由管理员提前执行知识迁移。
+
 后端初始化执行运行表、工单迁移和新增002修复表迁移，不需要 Milvus、搜索 Key、个人记忆或研究 Agent。自由工单可通过INCIDENT_SERVICES_FILE绑定真实观测源；未绑定时返回信息缺口，不制造案例证据。后台仅支持单进程，诊断中断标记失败，修复中断转人工处理，不恢复外部写操作。
 
 ## 服务登记模板与免费预检
