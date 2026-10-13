@@ -1,0 +1,126 @@
+{
+  "services": [
+    {
+      "tenant_id": "maintenance_demo",
+      "users": [
+        "example_operator"
+      ],
+      "service": "example-api",
+      "environment": "staging",
+      "version": "v1",
+      "dependencies": [],
+      "observations": {
+        "prometheus": {
+          "url": "http://127.0.0.1:9090"
+        },
+        "loki": {
+          "url": "http://127.0.0.1:3100"
+        },
+        "metrics": {
+          "request_rate": {
+            "query": "sum(rate(http_requests_total{service=\"example-api\",environment=\"staging\"}[5m]))",
+            "unit": "requests_per_second",
+            "aggregation": "sum_rate"
+          },
+          "queue_depth": {
+            "query": "sum(queue_depth{service=\"example-api\",environment=\"staging\"})",
+            "unit": "jobs",
+            "freshness_query": "max(time()-timestamp(queue_depth{service=\"example-api\",environment=\"staging\"}))",
+            "aggregation": "sum"
+          }
+        },
+        "log_queries": {
+          "dependency": "{service=\"example-api\",environment=\"staging\"} | json | category=\"dependency\"",
+          "configuration": "{service=\"example-api\",environment=\"staging\"} | json | category=\"configuration\"",
+          "resource": "{service=\"example-api\",environment=\"staging\"} | json | category=\"resource\""
+        },
+        "changes": [],
+        "owners": [],
+        "runbooks": [],
+        "incidents": []
+      },
+      "repairs": {
+        "container": {
+          "executor": "docker_lifecycle_cli",
+          "actions": [
+            "start_service",
+            "resume_service"
+          ],
+          "context": "desktop-linux",
+          "container_id": "0000000000000000000000000000000000000000000000000000000000000000",
+          "verification_attempts": 4,
+          "verification_interval_seconds": 2,
+          "symptom_checks": [
+            {
+              "metric": "queue_depth",
+              "operator": "lte",
+              "threshold": 0,
+              "max_age_seconds": 60
+            }
+          ]
+        },
+        "config": {
+          "executor": "application_http",
+          "actions": [
+            "reload_config"
+          ],
+          "url": "http://127.0.0.1:8001",
+          "authorization_env": "INCIDENT_MAINTENANCE_AUTH",
+          "control_target": "api-config",
+          "control_scope": "maintenance_demo-example-api-staging",
+          "desired_config_version": "approved-v2",
+          "verification_attempts": 4,
+          "verification_interval_seconds": 2,
+          "symptom_checks": [
+            {
+              "metric": "queue_depth",
+              "operator": "lte",
+              "threshold": 0,
+              "max_age_seconds": 60
+            }
+          ]
+        },
+        "consumer": {
+          "executor": "application_http",
+          "actions": [
+            "resume_consumer"
+          ],
+          "url": "http://127.0.0.1:8001",
+          "authorization_env": "INCIDENT_MAINTENANCE_AUTH",
+          "control_target": "jobs-consumer",
+          "control_scope": "maintenance_demo-example-api-staging",
+          "verification_attempts": 4,
+          "verification_interval_seconds": 2,
+          "symptom_checks": [
+            {
+              "metric": "queue_depth",
+              "operator": "lte",
+              "threshold": 0,
+              "max_age_seconds": 60
+            }
+          ]
+        },
+        "cache": {
+          "executor": "application_http",
+          "actions": [
+            "refresh_cache"
+          ],
+          "url": "http://127.0.0.1:8001",
+          "authorization_env": "INCIDENT_MAINTENANCE_AUTH",
+          "control_target": "product-cache",
+          "control_scope": "maintenance_demo-example-api-staging",
+          "verification_attempts": 4,
+          "verification_interval_seconds": 2,
+          "symptom_checks": [
+            {
+              "metric": "queue_depth",
+              "operator": "lte",
+              "threshold": 0,
+              "max_age_seconds": 60
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

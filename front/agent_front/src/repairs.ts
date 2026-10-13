@@ -18,6 +18,7 @@ export type RepairResult = {
 export type SymptomCheck = { metric: string; operator: string; threshold: number; max_age_seconds: number; unit?: string }
 export type RepairCapability = {
   action: string; target: string; impact: string; rollback: string; success_condition: string; symptom_checks: SymptomCheck[]
+  risk_level?: string; configured_parameters?: { config_version: string }
 }
 export type RepairEvent = {
   seq: number; type: string; at: string; code?: string; attempt?: number; passed?: boolean
@@ -29,16 +30,17 @@ export type RepairPlan = {
     approval_details?: RepairApprovalDetails | null }
   recommendation_source?: { run_id: string; action_index: number }
   impact: string; rollback: string; success_condition: string; symptom_checks: SymptomCheck[]
+  configured_parameters?: { config_version: string }
   expires_at: string; created_at: string; approved_by?: string; execution_key?: string
   verification_budget: { attempts: number; interval_seconds: number; execution_seconds: number }
   events: RepairEvent[]
 }
 export const repairLabels: Record<string, string> = {
-  restart_service: '重启服务', pending_approval: '待审批', approved: '已批准，待执行', rejected: '已拒绝',
+  restart_service: '重启服务', reload_config: '热重载登记配置', resume_consumer: '恢复暂停消费', refresh_cache: '刷新指定缓存组', start_service: '启动已停止服务', resume_service: '恢复已暂停服务', pending_approval: '待审批', approved: '已批准，待执行', rejected: '已拒绝',
   executing: '执行与验证中', verified: '恢复验证通过', blocked: '执行前已阻止', manual_required: '需要人工处理',
   expired: '方案已过期', source_changed: '工单或诊断已变化', configuration_changed: '服务配置已变化',
   proposed: '方案已创建', execution_claimed: '已领取执行', preflight_passed: '执行预检完成',
-  action_started: '开始重启', action_completed: '重启请求完成', verification: '恢复验证', execution_error: '执行检查异常',
+  action_started: '开始执行动作', action_completed: '动作请求完成', verification: '恢复验证', execution_error: '执行检查异常',
   interrupted: '执行中断，转人工处理',
 }
 export const repairErrors: Record<string, string> = {
@@ -54,7 +56,16 @@ export const repairErrors: Record<string, string> = {
   REPAIR_TARGET_DENIED: '该目标或动作未登记，请核对服务配置。',
   REPAIR_ALREADY_ATTEMPTED: '此方案已尝试执行，请读取结果，不要再次发起新动作。',
   REPAIR_STATE_CONFLICT: '方案状态已变化，请刷新后操作。', SERVICE_NOT_REGISTERED: '该服务尚未登记修复来源。',
-  SYMPTOM_ALREADY_HEALTHY: '当前指标已满足恢复条件，没有执行重启。',
+  TARGET_NOT_STOPPED: '容器当前并非已停止状态，未发送启动请求。',
+  TARGET_NOT_PAUSED: '容器当前并非已暂停状态，未发送恢复请求。',
+  CONTROL_STATE_CHANGED: '执行前状态已变化，未发送变更请求，请重新核查。',
+  CONTROL_SCOPE_MISMATCH: '控制接口返回的目标或范围不匹配，已拒绝使用。',
+  CONFIG_RELOAD_NOT_READY: '登记配置尚未就绪或未通过应用校验。',
+  CONSUMER_RESUME_NOT_READY: '消费者并非暂停状态或应用不允许恢复。',
+  CACHE_REFRESH_NOT_READY: '缓存组暂不允许刷新或状态无效。',
+  TARGET_ALREADY_APPLIED: '登记配置已经加载，无需再次执行。',
+  CONTROL_RECEIPT_INVALID: '操作回执无效，结果不确定，请人工核实，勿重复执行。',
+  SYMPTOM_ALREADY_HEALTHY: '当前指标已满足恢复条件，没有执行修复。',
 }
 export function sourceMatches(incident: RepairIncident, result: RepairResult | null): boolean {
   return incident.business_status === 'awaiting_confirmation' && incident.purpose !== 'status_check'

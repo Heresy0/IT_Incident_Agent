@@ -67,6 +67,8 @@ class DockerCLIExecutor(DockerExecutor):
             arguments = [*command, 'inspect', '--type', 'container', container]
         elif method == 'POST' and suffix == '/restart':
             arguments = [*command, 'restart', '--time', '3', container]
+        elif method == 'POST' and suffix in {'/start', '/unpause'}:
+            arguments = [*command, suffix[1:], container]
         else:
             raise ProviderError('ACTION_UNSUPPORTED')
         try:
@@ -89,3 +91,57 @@ class DockerCLIExecutor(DockerExecutor):
             return rows[0]
         except (ValueError, TypeError):
             raise ProviderError('PROVIDER_FORMAT_INVALID') from None
+
+
+class DockerLifecycleHTTPExecutor(DockerExecutor):
+    """Start or unpause one registered container, with state-specific checks."""
+    name = 'docker_lifecycle_http'
+    actions = frozenset({'start_service', 'resume_service'})
+    verification = '运行且未暂停、HEALTHCHECK为healthy；启动时间符合动作预期，且业务症状指标通过。'
+
+    def preflight(self, target, action, parameters):
+        if action not in self.actions or parameters:
+            raise ProviderError('ACTION_UNSUPPORTED')
+        data = self._request(target, 'GET', '/json')
+        healthcheck = data.get('Config', {}).get('Healthcheck', {}).get('Test', [])
+        if data.get('Id') != target['container_id'] or not healthcheck or healthcheck[0] == 'NONE':
+            raise ProviderError('TARGET_HEALTHCHECK_REQUIRED')
+        state = data.get('State', {})
+        if state.get('Restarting') or state.get('Dead') or state.get('Status') == 'removing':
+            raise ProviderError('TARGET_BUSY')
+        if action == 'start_service':
+            if (state.get('Running') is not False or state.get('Paused') is not False
+                    or state.get('Status') not in {'created', 'exited'}):
+                raise ProviderError('TARGET_NOT_STOPPED')
+        elif (state.get('Running') is not True or state.get('Paused') is not True or not state.get('StartedAt')):
+            raise ProviderError('TARGET_NOT_PAUSED')
+        return {'started_at':state.get('StartedAt'), 'running':state.get('Running'),
+                'paused':state.get('Paused'), 'status':state.get('Status')}
+
+    def execute(self, target, action, parameters):
+        return self.execute_checked(target, action, parameters, self.preflight(target, action, parameters))
+
+    def execute_checked(self, target, action, parameters, before):
+        if self.preflight(target, action, parameters) != before:
+            raise ProviderError('CONTROL_STATE_CHANGED')
+        self._request(target, 'POST', '/start' if action == 'start_service' else '/unpause')
+        return {'accepted':True}
+
+    def verify(self, target, action, parameters, before):
+        if action not in self.actions or parameters:
+            raise ProviderError('ACTION_UNSUPPORTED')
+        data = self._request(target, 'GET', '/json')
+        state = data.get('State', {})
+        started = state.get('StartedAt')
+        transition = (bool(started) and started != before.get('started_at') if action == 'start_service'
+                      else bool(started) and started == before.get('started_at'))
+        return {'passed':data.get('Id') == target['container_id'] and state.get('Running') is True
+                and state.get('Paused') is False and not state.get('Restarting') and not state.get('Dead')
+                and state.get('Health', {}).get('Status') == 'healthy' and transition,
+                'running':state.get('Running'), 'paused':state.get('Paused'),
+                'health':state.get('Health', {}).get('Status', 'unknown')}
+
+
+class DockerLifecycleCLIExecutor(DockerLifecycleHTTPExecutor):
+    name = 'docker_lifecycle_cli'
+    _request = DockerCLIExecutor._request

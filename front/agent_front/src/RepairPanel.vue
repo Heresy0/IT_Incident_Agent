@@ -35,7 +35,7 @@ const recommendations = computed(() => (props.result?.output?.recommended_action
     && typeof item.condition === 'string' && item.condition.trim().length > 0
     && typeof item.risk === 'string' && item.risk.trim().length > 0
     && typeof item.expected_result === 'string' && item.expected_result.trim().length > 0
-    && item.repair.action === 'restart_service' && capabilities.value.some(cap => capabilityKey(cap) === capabilityKey(item.repair!))))
+    && ['restart_service', 'start_service', 'resume_service', 'reload_config', 'resume_consumer', 'refresh_cache'].includes(item.repair.action) && capabilities.value.some(cap => capabilityKey(cap) === capabilityKey(item.repair!))))
 const state = computed(() => {
   const plan = selectedPlan.value
   if (!plan) return ''
@@ -83,7 +83,7 @@ const load = async () => {
   try {
     const [available, history] = await Promise.all([api('repair-capabilities'), api('repairs')])
     if (!alive || current !== version) return
-    capabilities.value = available.items.filter((item: RepairCapability) => item.action === 'restart_service')
+    capabilities.value = available.items.filter((item: RepairCapability) => ['restart_service', 'start_service', 'resume_service', 'reload_config', 'resume_consumer', 'refresh_cache'].includes(item.action))
     plans.value = history.items
     const recovered = pending.value && plans.value.find(item => item.proposal.request_key === pending.value?.body.request_key)
     if (recovered) { selectedId.value = recovered.id; pending.value = null; notice.value = '已找到上次创建的方案，可继续查看和审批。' }
@@ -143,7 +143,7 @@ const approve = (decision: 'approve' | 'reject') => guarded(async () => {
   if (!plan || !operator.value || (decision === 'approve' && (!approveConsent.value || state.value !== 'pending_approval'))) return
   acceptPlan(await api(`repairs/${plan.id}/approval`, 'POST', { digest: plan.digest, decision }))
   approveConsent.value = false; executeConsent.value = false
-  notice.value = decision === 'approve' ? '方案已批准。需要单独确认并点击执行，才会重启目标。' : '方案已拒绝。'
+  notice.value = decision === 'approve' ? '方案已批准。需要单独确认并点击执行，才会执行所选动作。' : '方案已拒绝。'
 })
 const execute = () => guarded(async () => {
   const plan = selectedPlan.value
@@ -176,11 +176,11 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
 
 <template>
   <section class="repair-panel" aria-label="修复方案与执行">
-    <header><div><h3>修复方案与执行</h3><p class="hint">先创建方案，再审批，最后单独执行。读取方案和刷新结果不会启动诊断或重启服务。</p></div>
+    <header><div><h3>修复方案与执行</h3><p class="hint">先创建方案，再审批，最后单独执行。读取方案和刷新结果不会启动诊断或执行修复。</p></div>
       <button :disabled="busy || loading || parentBusy" @click="refresh">{{ loading ? '读取中…' : '刷新修复方案' }}</button></header>
     <p v-if="error" class="error" role="alert">{{ error }}</p><p v-if="notice" class="notice" role="status">{{ notice }}</p>
     <p v-if="!eligible" class="hint">创建真实修复方案需要：故障诊断完成且复核通过、来自真实服务，并与当前工单修订和最新运行一致。请先查看诊断结果。</p>
-    <p v-else-if="!loading && !capabilities.length" class="hint">此服务没有可用的已登记重启目标，请核对本地服务配置。</p>
+    <p v-else-if="!loading && !capabilities.length" class="hint">此服务没有可用的已登记修复目标，请核对本地服务配置。</p>
     <div v-if="pending" class="pending-request"><p>上次创建方案的结果尚未确认。请先刷新；重试会使用原请求内容。</p>
       <div class="actions"><button :disabled="blocked" @click="retryProposal">重试原创建请求</button><button :disabled="blocked" @click="abandonPending">放弃本地请求</button></div></div>
     <form v-if="eligible && capabilities.length" @submit.prevent="create">
@@ -190,7 +190,8 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
           <label v-if="recommendations.length">使用诊断建议<select v-model="suggestion" @change="useSuggestion"><option value="">人工提案</option><option v-for="row in recommendations" :key="row.index" :value="String(row.index)">{{ row.item.action }}</option></select></label>
         </div>
         <p v-if="chosenCapability" class="impact">影响：{{ chosenCapability.impact }}</p>
-        <label>处理依据<textarea v-model="reason" rows="2" maxlength="500" placeholder="说明为何需要对该目标执行重启" required /></label>
+        <p v-if="chosenCapability?.configured_parameters" class="hint">登记生效版本：{{ chosenCapability.configured_parameters.config_version }}</p>
+        <label>处理依据<textarea v-model="reason" rows="2" maxlength="500" placeholder="说明为何需要对该目标执行所选动作" required /></label>
         <label>适用条件与执行前确认<textarea v-model="condition" rows="2" maxlength="1000" placeholder="例如：确认不是计划维护，且启动条件满足后再执行" required /></label>
         <label>操作风险<textarea v-model="risk" rows="2" maxlength="1000" placeholder="说明中断、重试或重复处理等实际风险" required /></label>
         <label>预期结果与验证方法<textarea v-model="expectedResult" rows="2" maxlength="1000" placeholder="说明恢复标准以及执行后如何确认业务结果" required /></label>
@@ -207,6 +208,7 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
     <article v-if="selectedPlan" class="plan-card">
       <div class="plan-heading"><h4>{{ label(selectedPlan.proposal.action) }} · {{ selectedPlan.proposal.target }}</h4><span class="status" :class="state">{{ label(state) }}</span></div>
       <p>{{ selectedPlan.proposal.reason }}</p><p class="hint">{{ selectedPlan.live ? '真实操作' : '模拟操作' }} · 有效期至 {{ when(selectedPlan.expires_at) }}</p>
+      <p v-if="selectedPlan.configured_parameters" class="hint">本方案绑定的登记配置版本：{{ selectedPlan.configured_parameters.config_version }}</p>
       <div v-if="selectedPlan.proposal.approval_details" class="approval-details">
         <h4>审批依据</h4>
         <p class="hint">{{ selectedPlan.recommendation_source ? '来自已复核的诊断建议，按创建时的内容保存。' : '人工提案，须由审批人独立核对。' }}</p>
@@ -228,7 +230,7 @@ onUnmounted(() => { alive = false; version++; controller.abort(); window.clearIn
         <label class="check consent"><input v-model="executeConsent" type="checkbox" :disabled="blocked" /><span>我确认现在对 {{ selectedPlan.proposal.target }} 执行{{ label(selectedPlan.proposal.action) }}，已知晓上述影响。</span></label>
         <button class="execute" :disabled="!canExecute" @click="execute">{{ saved.executionKeys[selectedPlan.id] ? '确认原执行请求 / 读取结果' : '执行已批准方案' }}</button>
       </template>
-      <p v-if="running" class="notice" role="status">正在执行或验证恢复，页面只自动读取阶段进度；切勿通过其他方式重复重启。</p>
+      <p v-if="running" class="notice" role="status">正在执行或验证恢复，页面只自动读取阶段进度；切勿通过其他方式重复执行动作。</p>
       <p v-if="state === 'verified'" class="success">恢复验证通过。请再确认业务结果，之后在下方人工确认解决工单。</p>
       <p v-if="['expired', 'source_changed', 'configuration_changed'].includes(state)" class="hint">此方案已失效，需按当前工单和服务配置创建新方案并重新审批。</p>
       <p v-if="state === 'manual_required'" class="error">恢复未得到确认或执行已中断，请根据阶段记录人工处理。</p>

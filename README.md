@@ -71,7 +71,7 @@ flowchart TD
 - 当前在 v6 恢复点上[精简最终 Reviewer](examples/showcase/focused-review.md)，并校验[缺口归属、预留补查预算](examples/showcase/scope-rework-budget.md)：判断结论、下一步和证据缺口，补查参数由 Supervisor 规划。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查保留。恢复点见[版本回退记录](examples/showcase/rollback-v6.md)；逐项断言和决策分支实验已撤回，见[历史记录](examples/showcase/claim-decision-review.md)。
 - 工单与运行按服务端身份隔离，PostgreSQL 保存结果、事件与修复阶段，SSE 支持续读。JSON 日志位于 `logs/incident.log`，指标位于 `/metrics`。
 - 登记服务可接入 Prometheus/Loki 与私有确认历史；未登记渠道明确返回缺口。提供知识库 Worker、API、PostgreSQL、Redis 的配置示例，数据库与缓存示例目前只有运维日志。
-- 修复独立于诊断：Agent 候选或人工提案 → 绑定证据、工单版本及配置 → operator 审批 → 单次执行 → 有界恢复验证。当前默认执行器只支持精确登记 Docker 容器的重启，拒绝任意脚本、Shell、扩缩容与回滚。
+- 修复独立于诊断：Agent 候选或人工提案 → 绑定证据、工单版本及配置 → operator 审批 → 单次执行 → 有界恢复验证。原 Docker 执行器支持精确登记容器的重启；可选[维护执行器](examples/maintenance-executors.md)增加启动、恢复暂停、配置热重载、恢复消费和指定缓存组刷新。三个应用动作需目标应用提供约定控制接口；拒绝任意脚本、Shell、全库清理，真实扩缩容与回滚尚未实现。
 
 `completed` 表示诊断流程完成，`passed` 表示本次复核通过；二者都不表示工单已解决、唯一根因已确认或修复已批准。修复验证通过也不会自动关闭工单。
 

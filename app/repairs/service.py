@@ -10,7 +10,8 @@ from incidents.support import IncidentError, now
 from providers.fixtures import ProviderError
 from pydantic import ValidationError
 from repairs.contracts import ACTIONS, RepairProposal, RepairApprovalDetails
-from repairs.executors import DockerExecutor, DockerCLIExecutor
+from repairs.executors import DockerExecutor, DockerCLIExecutor, DockerLifecycleHTTPExecutor, DockerLifecycleCLIExecutor
+from repairs.application import ApplicationHTTPExecutor
 from storage.repairs import guard_active
 from repairs.verification import SymptomVerifier, validate_checks
 
@@ -19,7 +20,9 @@ class RepairService:
     def __init__(self, workflow, executors=None, symptom_verifier=None):
         self.workflow = workflow
         self.executors = dict(executors) if executors is not None else {
-            'docker_http': DockerExecutor(), 'docker_cli': DockerCLIExecutor()}
+            'docker_http': DockerExecutor(), 'docker_cli': DockerCLIExecutor(),
+            'docker_lifecycle_http': DockerLifecycleHTTPExecutor(),
+            'docker_lifecycle_cli': DockerLifecycleCLIExecutor(), 'application_http': ApplicationHTTPExecutor()}
         self.capacity = BoundedSemaphore(2)
         self.symptom_verifier = symptom_verifier or SymptomVerifier()
 
@@ -75,10 +78,13 @@ class RepairService:
                 continue
             for action in config.get('actions', []):
                 if action in executor.actions and action in ACTIONS:
-                    items.append({'action': action, 'target': target_name, **ACTIONS[action],
+                    item = {'action': action, 'target': target_name, **ACTIONS[action],
                         'max_replicas': config.get('max_replicas', 1), 'versions': config.get('versions', []),
                         'success_condition': executor.verification, 'requires_approval': True,
-                        'symptom_checks': deepcopy(checks)})
+                        'symptom_checks': deepcopy(checks)}
+                    if action == 'reload_config':
+                        item['configured_parameters'] = {'config_version':config.get('desired_config_version')}
+                    items.append(item)
         return items
 
     def incident_capabilities(self, iid, principal):
@@ -124,6 +130,8 @@ class RepairService:
 
     def _propose(self, iid, payload, principal, *, recommendation_source=None):
         payload = RepairProposal.model_validate(payload).model_dump(exclude_none=True)
+        if payload['action'] in {'start_service', 'resume_service', 'reload_config', 'resume_consumer', 'refresh_cache'} and not payload.get('approval_details'):
+            raise IncidentError('REPAIR_RECOMMENDATION_INCOMPLETE', 422)
         run = self.workflow.get_run(payload['run_id'], principal)
         if run and (run.get('result') or {}).get('purpose') == 'status_check':
             raise IncidentError('REPAIR_REQUIRES_INCIDENT_DIAGNOSIS', 422)
@@ -166,6 +174,8 @@ class RepairService:
                     'expires_at': (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat(), 'events': []}
             if recommendation_source is not None:
                 plan['recommendation_source'] = deepcopy(recommendation_source)
+            if payload['action'] == 'reload_config':
+                plan['configured_parameters'] = {'config_version':target['desired_config_version']}
             plan['digest'] = hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()
             self._event(plan, 'proposed')
             plans.append(plan)
@@ -279,10 +289,18 @@ class RepairService:
             checkpoint('preflight_passed', observation=before, symptoms=baseline)
             if baseline is not None and baseline['passed'] is True:
                 raise ProviderError('SYMPTOM_ALREADY_HEALTHY')
-            checkpoint('action_started')
+            operation = str(uuid4()) if getattr(executor, 'operation_id_required', False) else None
+            if operation:
+                before = {**before, 'operation_id':operation}
+            checkpoint('action_started', operation_id=operation)
             attempted = True
-            executor.execute(target, proposal['action'], proposal['parameters'])
-            checkpoint('action_completed')
+            checked = getattr(executor, 'execute_checked', None)
+            receipt = (checked(target, proposal['action'], proposal['parameters'], before) if callable(checked)
+                       else executor.execute(target, proposal['action'], proposal['parameters']))
+            operation = receipt.get('operation_id') if isinstance(receipt, dict) else None
+            if operation:
+                before = {**before, 'operation_id':operation}
+            checkpoint('action_completed', operation_id=operation)
             status = 'manual_required'
             attempts, interval = target.get('verification_attempts', 3), target.get('verification_interval_seconds', 1)
             for attempt in range(attempts):

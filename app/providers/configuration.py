@@ -71,9 +71,12 @@ class SymptomCheck(ConfigModel):
 
 
 class RepairTarget(ConfigModel):
-    executor: Literal['docker_cli', 'docker_http']
-    actions: list[Literal['restart_service']] = Field(min_length=1, max_length=1)
-    container_id: str = Field(pattern=r'^[0-9a-f]{64}$')
+    executor: Literal['docker_cli', 'docker_http', 'docker_lifecycle_cli', 'docker_lifecycle_http', 'application_http']
+    actions: list[Literal['restart_service', 'start_service', 'resume_service', 'reload_config', 'resume_consumer', 'refresh_cache']] = Field(min_length=1, max_length=2)
+    container_id: str | None = Field(default=None, pattern=r'^[0-9a-f]{64}$')
+    control_target: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$')] | None = None
+    control_scope: Name | None = None
+    desired_config_version: Name | None = None
     context: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$')] | None = None
     url: Query | None = None
     authorization_env: EnvName | None = None
@@ -82,6 +85,22 @@ class RepairTarget(ConfigModel):
     symptom_checks: list[SymptomCheck] = Field(min_length=1, max_length=4)
     max_replicas: int = Field(default=1, ge=1, le=10)
     versions: list[Name] = Field(default_factory=list)
+
+    @model_validator(mode='after')
+    def supported_actions(self):
+        allowed = ({'reload_config', 'resume_consumer', 'refresh_cache'} if self.executor == 'application_http'
+                   else {'start_service', 'resume_service'} if self.executor.startswith('docker_lifecycle_')
+                   else {'restart_service'})
+        if len(set(self.actions)) != len(self.actions) or not set(self.actions).issubset(allowed):
+            raise ValueError('REPAIR_EXECUTOR_ACTION_MISMATCH')
+        if self.executor == 'application_http':
+            if (self.container_id is not None or self.control_target is None or self.control_scope is None
+                    or len(self.actions) != 1 or 'reload_config' in self.actions and self.desired_config_version is None):
+                raise ValueError('CONTROL_TARGET_INVALID')
+        elif (self.container_id is None or self.control_target is not None or self.control_scope is not None
+              or self.desired_config_version is not None):
+            raise ValueError('CONTAINER_ID_REQUIRED')
+        return self
 
     @field_validator('url')
     @classmethod
@@ -242,9 +261,9 @@ def validate_configuration(data):
                         results.append(issue(path + '.' + field, 'LIST_REQUIRED', '须填写非空文本列表。'))
         for number, (target_name, target) in enumerate(row.repairs.items()):
             path = base + f'.repairs[{number}]'
-            if target.executor == 'docker_cli' and target.context is None:
+            if target.executor.endswith('_cli') and target.context is None:
                 results.append(issue(path + '.context', 'DOCKER_CONTEXT_REQUIRED', 'CLI执行器须登记固定Docker context。'))
-            if target.executor == 'docker_http' and target.url is None:
+            if target.executor.endswith('_http') and target.url is None:
                 results.append(issue(path + '.url', 'DOCKER_URL_REQUIRED', 'HTTP执行器须登记固定Docker基础地址。'))
             if target.container_id == '0' * 64:
                 results.append(issue(path + '.container_id', 'TARGET_PLACEHOLDER', '容器标识仍为模板占位值，真实接入前须替换。', 'warning'))
