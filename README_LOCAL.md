@@ -27,15 +27,17 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 .\.venv\Scripts\python.exe scripts/setup_demo_auth.py
 ```
 
-requirements.txt 为67个锁定的 IT 运行包，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。本轮使用现有独立环境完成验证，未强制卸载额外包或重新创建环境。
+requirements.txt 为73个锁定的 IT 运行包，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。收尾使用现有独立环境完成验证，未强制卸载额外包或重新创建环境。
 
 Python 构建配置 `pyproject.toml` 复用同一锁定依赖，只打包 `app/` 下的 IT 模块及数据库迁移。`.env.example` 为统一的 IT 配置模板，前端地址覆盖使用 `INCIDENT_API_TARGET`；未设置时按 `PORT` 自动连接。已有真实环境、身份与登记文件不会被模板覆盖。
 
-免费脚本模式无需模型 Key。显式执行真实模型时，在本项目 .env 配置 DASHSCOPE_API_KEY、MODEL=qwen3.7-plus 和 INCIDENT_BEARER_TOKEN。默认模型为 qwen3.7-plus，使用 DashScope 多模态接口处理文本与工具调用，并关闭思考模式以保持现有调用时限和输出协议。身份初始化脚本不会覆盖现有 .auth.local.json 和 .demo-credentials.local.json；不要把它们提交到 Git。
+免费脚本模式无需模型 Key。真实模型在本项目 .env 配置 MODEL、MODEL_BASE_URL、MODEL_API_KEY（未设置则沿用 DASHSCOPE_API_KEY）；默认 qwen3.7-plus，通过 LangChain ChatOpenAI 调用 OpenAI 兼容的 Chat Completions 接口。通义可配置 MODEL_EXTRA_BODY='{"enable_thinking":false}'，其他服务不支持时使用 '{}'。真实 CLI 的身份令牌使用 INCIDENT_BEARER_TOKEN。身份初始化脚本不会覆盖现有 .auth.local.json 和 .demo-credentials.local.json；不要把它们提交到 Git。
 
 运行配置统一读取 `.env`，`config.json` 作为兼容回退；运行配置仅使用模型、Key和 PostgreSQL DSN。旧研究开关、记忆字段和向量配置不会恢复研究功能。
 
 后端与真实模型 CLI 共用配置读取逻辑：进程环境变量优先于根目录 `.env`，再回退到 `config.json` 和代码默认值。CLI 的 `--model` 可显式覆盖模型；评测计划显示相同的模型配置，但不会初始化模型、验证身份或发送请求。`CONFIG_PATH` 可指定兼容 JSON 文件。修改配置后重启后端及前端开发服务器。
+
+`local_run.py` 额外先读取 `.env.local`，该文件会覆盖已有进程环境变量，再补充 `.env`；使用这一入口时请一并核对本地覆盖文件。隔离收尾验收使用专用脚本和显式测试配置，避免沿用日常运行配置。
 
 ## 免费 CLI
 

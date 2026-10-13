@@ -1,0 +1,73 @@
+{
+  "version_kind": "internal_trial_prototype",
+  "release_tag": "codex/prototype-closeout-2026-10-13",
+  "application_code_parent_commit": "aa7a71e",
+  "application_fingerprint": "073d92c4f426514f",
+  "normalized_lf_application_fingerprint": "74d2a4b23c5f901d",
+  "regression": {
+    "total": 643,
+    "passed": 623,
+    "skipped": 20,
+    "failed": 0
+  },
+  "isolated_database_tests": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  },
+  "frontend_typecheck_and_build": "passed",
+  "browser_witness": {
+    "markdown_chunks": 3,
+    "text_chunks": 1,
+    "diagnosis_case": "case_001",
+    "diagnosis_mode": "scripted_control_only",
+    "proposal_method": "existing_authenticated_HTTP_API",
+    "approval_method": "browser_UI",
+    "execution_method": "browser_UI",
+    "resolution_method": "browser_UI",
+    "repair_status": "verified",
+    "incident_status": "resolved",
+    "approval_does_not_execute": true,
+    "full_reload_restores_records": true,
+    "full_reload_does_not_execute": true,
+    "simulated_actions": 1
+  },
+  "database_versions": {
+    "postgres": "16.15 (Debian 16.15-1.pgdg12+2)",
+    "pgvector": "0.8.6"
+  },
+  "paid_model_calls": 0,
+  "live_repair_actions": 0,
+  "private_configuration_modified": false,
+  "business_database_modified": false,
+  "deployment_performed": false,
+  "quality_measured": false,
+  "helper_initial_startup": {
+    "status": "failed_then_repaired",
+    "reason": "lifespan_factory_not_overridden; connection_timeout_before_initialization"
+  },
+  "synthetic_scope_cleanup": "completed",
+  "test_container_cleanup": "completed",
+  "runtime": {
+    "python": "3.12.2",
+    "locked_dependencies": 73,
+    "dependency_version_mismatches": []
+  },
+  "local_evidence_sha256": {
+    "output/closeout-regression.log": "a5b861bf26929241ebd30f154212f4a5ca1005c66712d66e512252c44b78f515",
+    "output/postgres-acceptance.log": "fb85d735a9350c84b2e7684933d34a498bbbf0dcf40ed6b0ffaf1a47cba598c4",
+    "output/closeout-ui/api-walkthrough.json": "68ab714f8e9cdb7b7ef4fac3bbf23eb9a7bed29c2c5302996bfb35c317a9ffe0",
+    "output/closeout-ui/server-summary.json": "362657b53347cee9366ab06e9bd281200d4aa5009938c891f85d834f956dca32",
+    "output/closeout-ui/full-walkthrough.png": "59fcb0c2f4ab74639a86e9e9ff85f4260d9be6c35126f8aee60b244725ef7f6f",
+    "output/closeout-ui/closeout-proof.png": "e1e0f9bf7aea483ee949a4b51cfdeef71c899c8add3994b0472723190a0710c4",
+    "scripts/closeout_demo_server.py": "746386f8d674d544d42da8088e87684a57aad8f6afa1811801b19a55cbf9614a",
+    "examples/showcase/closeout-runbook.md": "16735599936e177112c998397cebe39c132f124164ca16bbfb20061b3c026107",
+    "examples/showcase/closeout-runbook.txt": "8c68e94ead2dbcbcaf72d4adb1dcc8f44f8901e2fc19c779c6c38c6e7115075e"
+  },
+  "frontend_asset_sha256": {
+    "front/agent_front/dist/assets/index-CPrTTHbC.css": "40d6263cb6cfa03de2d59f9144a0efc2dfad4ad5e470beaef62a0f936d018503",
+    "front/agent_front/dist/assets/index-CrargyFZ.js": "8818ef930efffa710ce3c92e239a98f1698ba00f3957f3bf2c1a31321a16a2fd",
+    "front/agent_front/dist/favicon.ico": "db74ab0b78338c1f778f8398c45f4103c99aea0e845a3118a7750b4eeafd3445",
+    "front/agent_front/dist/index.html": "0eaa6a47c813d746717a06e1a6a710647a3bcda40809fc751959911827f25786"
+  }
+}

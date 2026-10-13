@@ -1,6 +1,8 @@
 # IT Incident Agent
 
-当前默认流程已冻结为 `codex/default-flow-2026-10-13`，默认规则、轻量 RAG、验证成绩和已知限制见[冻结基线](examples/showcase/default-flow-baseline.md)。后续比较以该标签为对照；历史实验记录保留当时的配置，不代替当前默认行为。
+当前交付按可演示、可评测、可内部试用的运维辅助原型收尾，使用步骤、固定案例、验收成绩和维护边界见[阶段收尾说明](examples/showcase/prototype-closeout.md)，交付标签为 `codex/prototype-closeout-2026-10-13`。当前知识存储为 pgvector，支持 .md / .txt 前端上传。
+
+诊断规则保留 `codex/default-flow-2026-10-13` 作为[历史冻结基线](examples/showcase/default-flow-baseline.md)。该历史标签使用的本地 JSON 索引已在当前交付中替换；历史报告保留当时配置，不代替当前运行行为。
 
 模型通过 LangChain `ChatOpenAI` 调用 OpenAI 兼容的 Chat Completions 接口。配置 `MODEL`、`MODEL_BASE_URL`、`MODEL_API_KEY`（未设置则沿用 `DASHSCOPE_API_KEY`）；同服务内切换支持工具调用和 JSON 输出的模型通常只改 `MODEL`。跨服务需调整地址和密钥，厂商参数由 `MODEL_EXTRA_BODY` 的 JSON 对象提供：当前通义为 `{"enable_thinking":false}`，不支持此参数的服务使用 `{}`。单次超时 30 秒，SDK 自动重试为 0，程序继续校验输出结构与证据。服务需重启以加载配置。详见[兼容接口迁移记录](examples/showcase/openai-compatible.md)。
 
