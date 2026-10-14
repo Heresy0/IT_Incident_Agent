@@ -9,6 +9,7 @@ from typing import Annotated, TypedDict
 from langgraph.graph import StateGraph, START, END
 from runtime.context import ExecutionError
 from evidence.diagnosis import ProtocolError
+from workflow.collection import ParallelOutcome
 
 WORKFLOW_VERSION = 'incident_graph_v17_programmatic_source_handoff'
 
@@ -23,7 +24,7 @@ class IncidentState(TypedDict, total=False):
     review_count: int
     rework_rounds: int
     counts: dict[str, int]
-    collection_results: Annotated[dict[str, dict], or_]
+    collection_results: Annotated[dict[str, ParallelOutcome], or_]
 
 
 def build_graph(coordinator):

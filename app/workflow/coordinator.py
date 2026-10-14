@@ -2,16 +2,16 @@
 import hashlib
 import json
 import time
-from uuid import uuid4
 from runtime.context import RunContext, ExecutionError, activate
-from evidence.contracts import InvestigationOutput
 from agents.contracts import SupervisorSelection, DiagnosisSelection, Hypothesis, ReviewDecision, ObservationReview
 from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER
-from agents.investigation import INCIDENT_LIMITS, investigate
+from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
 from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output
 from workflow.planning import PlanningContext, validate_plan
+from workflow.collection import (CollectionRequest, CollectionOutcome, CollectionRunner,
+                                 execute_planned_reads, task_record, join_parallel)
 from workflow.reporting import (PublicationInput, ReportSnapshot, publish_diagnosis, build_report,
                                 unreviewed_observations, status_check_coverage)
 
@@ -828,79 +828,34 @@ class Collaboration:
             "collection": self.collection()[-12:], "observation_gaps": self.observation_gaps(),
             "challenge": self.pending if follow_up else None}
 
+    def collection_runner(self):
+        return CollectionRunner(self.models, self.provider, self.principal, self.repairs,
+            modes={'investigation': self.investigation_mode, 'knowledge': self.knowledge_mode})
+
     def collect_task(self, task, objective, executor, context, events, steps):
-        before = dict(context.counts)
         mode = self.investigation_mode if task.role == 'investigation' else self.knowledge_mode
-        if mode == 'programmatic':
-            result = self.execute_planned_reads(objective, executor, context, role=task.role)
-        else:
-            result = investigate(self.models[task.role], self.provider, self.principal, context=context,
-                event_log=events, executor=executor, objective=objective,
-                role=task.role, repair_state=self.repairs, max_steps=max(1, steps),
-                approved_checks=objective['approved_checks'],
-                system_prompt=INVESTIGATION_TASK if task.role == 'investigation' else None)
-        result['task_counts'] = {key: context.counts[key] - before[key] for key in before}
-        return result
+        request = CollectionRequest(task, objective, mode, steps)
+        return self.collection_runner().collect(request, executor=executor, context=context,
+                                                 event_log=events).result
 
     def execute_planned_reads(self, objective, executor, context, *, role='investigation'):
-        """Execute validated planned reads; Diagnosis owns evidence interpretation."""
-        task_id, stop = str(uuid4()), ''
-        checks = objective['required_checks']
-        with activate(context), context.span('task', role) as span:
-            def event(kind, **fields):
-                context.emit({'type': kind, 'role': role, 'task_id': task_id,
-                              'span_id': span['span_id'], 'parent_span_id': span['parent_span_id'], **fields})
-            event('task_created', execution_mode='programmatic')
-            event('task_started')
-            for check in checks:
-                # Do not automatically retry failures/truncation or re-read a superset.
-                if completion([check], executor)['checks'][0]['status'] != 'not_executed':
-                    event('planned_check_reused', name=check['tool'])
-                    continue
-                if not context.can_research():
-                    stop = 'BUDGET_EXCEEDED'
-                    break
-                event('tool_selected', name=check['tool'], execution_source=objective.get('execution_source', 'validated_supervisor_plan'))
-                result = executor.execute(check['tool'], check['args'])
-                event('tool_result', name=check['tool'], status=result.status,
-                      evidence_ids=[e.evidence_id for e in result.evidence],
-                      query_profile=dict(executor.last_query_profile), sample_order=result.sample_order,
-                      truncated=result.truncated, error=result.error.model_dump() if result.error else None,
-                      execution_source=objective.get('execution_source', 'validated_supervisor_plan'))
-                if result.error and result.error.code == 'BUDGET_EXCEEDED':
-                    stop = 'BUDGET_EXCEEDED'
-                    break
-            coverage = completion(checks, executor)
-            gaps = [*coverage['missing_information'], *coverage['limitations']]
-            if not checks:
-                gaps.append('No validated concrete checks were supplied; the program cannot execute a goal alone.')
-                stop = 'NO_TOOL_PROGRESS'
-            status = 'partial' if stop or coverage['missing_information'] or not checks else 'completed'
-            event('task_completed', status=status, cause_confirmation='not_performed')
-        return {'task_id': task_id, 'status': status, 'prompt_version': 'programmatic_reads_v1',
-                'output': InvestigationOutput(findings=[], tentative_hypotheses=[],
-                    missing_information=gaps[:8], escalation_team=None).model_dump(mode='json'),
-                'evidence': [e.model_dump(mode='json') for e in executor.evidence.values()],
-                'run_summary': {**context.summary(), 'termination_reason': stop or 'FINISHED'}}
+        return execute_planned_reads(objective, executor, context, role=role)
 
     def record_task(self, task, objective, result):
-        self.tasks.append({"task_id": result["task_id"], "role": task.role, "goal": task.goal,
-            'need_ids': objective['need_ids'],
-            "expected_value": objective['expected_value'],
-            "challenge_id": self.pending["challenge_id"] if self.dispatch_follow_up else None,
-            "status": result["status"], "execution_status": result['status'], "output": result["output"],
-            "required_checks": objective['required_checks'],
-            "model_calls": result['task_counts']['model_calls'],
-            "tool_calls": result['task_counts']['tool_calls'],
-            "prompt_version": result["prompt_version"], "termination_reason": result["run_summary"]["termination_reason"],
-            "evidence_ids": [e["evidence_id"] for e in result["evidence"]]})
-        coverage = completion(objective['required_checks'], self.executors[task.role])
-        self.event('task_coverage', task.role, task_id=result['task_id'],
+        mode = self.investigation_mode if task.role == 'investigation' else self.knowledge_mode
+        outcome = CollectionOutcome(CollectionRequest(task, objective, mode, 0), result, self.executors[task.role])
+        self.record_collection(outcome)
+
+    def record_collection(self, outcome):
+        role, result = outcome.request.task.role, outcome.result
+        challenge_id = self.pending['challenge_id'] if self.dispatch_follow_up else None
+        self.tasks.append(task_record(outcome, challenge_id))
+        coverage = outcome.coverage
+        self.event('task_coverage', role, task_id=result['task_id'],
                    execution_status=result['status'], completion_status=coverage['status'],
                    check_statuses=[c['status'] for c in coverage['checks']])
-        executor = self.executors[task.role]
-        self.evidence.update({k: v.model_copy(deep=True) for k, v in executor.evidence.items()})
-        self.references.update({k: v.model_copy(deep=True) for k, v in executor.references.items()})
+        self.evidence.update({k: v.model_copy(deep=True) for k, v in outcome.evidence.items()})
+        self.references.update({k: v.model_copy(deep=True) for k, v in outcome.references.items()})
         if self.diagnostic_pack_result is not None:
             from workflow.diagnostic_pack import refresh
             refresh(self)
@@ -925,8 +880,12 @@ class Collaboration:
         reserve = self.context.limits.reserve_model_calls if follow_up else self.collection_reserve()
         available_steps = self.context.limits.model_calls - reserve - self.context.counts['model_calls']
         steps = min(4, available_steps - 2 * len(self.dispatch_queue))
-        result = self.collect_task(task, objective, self.executors[role], self.context, self.events, steps)
-        self.record_task(task, objective, result)
+        collector = self.collection_runner()
+        request = CollectionRequest(task, objective, collector.modes[role], steps)
+        outcome = collector.collect(request, executor=self.executors[role], context=self.context,
+                                    event_log=self.events)
+        result = outcome.result
+        self.record_collection(outcome)
         if result['run_summary']['termination_reason'] == 'NO_TOOL_PROGRESS':
             self.event('collection_stalled', task.role, reason='declared_checks_not_executed', task_id=result['task_id'])
             for deferred in self.dispatch_queue:
@@ -950,81 +909,45 @@ class Collaboration:
             self.next_node = 'diagnosis' if follow_up else 'supervisor'
 
     def prepare_parallel(self):
-        """Freeze both objectives and independent ledgers before graph fan-out."""
-        from runtime.branch import BranchContext
-        if (self.dispatch_follow_up or len(self.dispatch_queue) != 2 or
-                {t.role for t in self.dispatch_queue} != {'investigation', 'knowledge'}):
+        if self.dispatch_follow_up:
             raise ProtocolError('INVALID_TASK_ROUTE')
-        with self.context.lock:
-            available_models = self.context.limits.model_calls - self.collection_reserve() - self.context.counts['model_calls']
-            available_tools = self.context.limits.tool_calls - self.context.counts['tool_calls']
-        if available_models < 4 or available_tools < 2 or not self.context.can_research():
-            raise ExecutionError('BUDGET_EXCEEDED')
-        self.parallel_batch = str(uuid4())
-        self.parallel_plans = {}
-        # Stable ordering for budget slices and result publication, independent
-        # of completion order. Unused slices are available in later rounds.
-        tasks = sorted(self.dispatch_queue, key=lambda t: t.role != 'investigation')
-        for index, task in enumerate(tasks):
-            model_cap = min(4, available_models // 2 + (available_models % 2 if index == 0 else 0))
-            tool_cap = available_tools // 2 + (available_tools % 2 if index == 0 else 0)
-            child = BranchContext(self.context, model_calls=model_cap, tool_calls=tool_cap)
-            self.parallel_plans[task.role] = {'task': task, 'objective': self.task_objective(task, False),
-                'context': child, 'executor': self.executors[task.role].fork(child), 'steps': model_cap}
+        batch = self.collection_runner().prepare_parallel(self.dispatch_queue, context=self.context,
+            executors=self.executors, model_reserve=self.collection_reserve(),
+            objective_for=lambda task: self.task_objective(task, False))
+        self.parallel_batch, self.parallel_plans = batch.batch_id, batch.plans
         self.parallel_batches += 1
         self.event('parallel_collection_started', batch_id=self.parallel_batch,
-            roles=list(self.parallel_plans), allocations={role: {'model_calls': p['steps'],
-                'tool_calls': p['context'].tool_cap} for role, p in self.parallel_plans.items()})
+            roles=list(self.parallel_plans), allocations={role: {'model_calls': plan.request.steps,
+                'tool_calls': plan.context.tool_cap} for role, plan in self.parallel_plans.items()})
 
     def collect_parallel_role(self, role):
-        plan = self.parallel_plans[role]
-        child, executor = plan['context'], plan['executor']
-        try:
-            result = self.collect_task(plan['task'], plan['objective'], executor, child, child.events, plan['steps'])
-        except Exception as exc:
-            code = exc.code if isinstance(exc, (ExecutionError, ProtocolError)) else 'INTERNAL_ERROR'
-            child.error(ExecutionError(code), role)
-            task_id = next((e['task_id'] for e in child.events if e['type'] == 'task_started'), str(uuid4()))
-            result = {'task_id': task_id, 'status': 'failed', 'prompt_version': 'parallel_branch_failure',
-                'output': InvestigationOutput(missing_information=[f'{role}任务未完成（{code}）；保留已取得证据。']).model_dump(mode='json'),
-                'evidence': [e.model_dump(mode='json') for e in executor.evidence.values()],
-                'task_counts': dict(child.counts), 'run_summary': {**child.summary(), 'termination_reason': code}}
-            child.emit({'type': 'task_completed', 'role': role, 'task_id': task_id, 'status': 'failed', 'reason': code})
-        return {'batch_id': self.parallel_batch, 'result': result}
+        return self.collection_runner().collect_parallel(self.parallel_plans[role], self.parallel_batch)
 
     def merge_parallel(self, outcomes):
-        if set(outcomes) != set(self.parallel_plans) or any(
-                row['batch_id'] != self.parallel_batch for row in outcomes.values()):
-            raise ProtocolError('INVALID_TASK_ROUTE')
-        stops, incomplete = [], False
-        for role, plan in self.parallel_plans.items():
-            result = outcomes[role]['result']
-            executor = plan['executor']
-            executor.context = self.context
-            self.executors[role] = executor
-            self.record_task(plan['task'], plan['objective'], result)
+        joined = join_parallel(self.parallel_batch, self.parallel_plans, outcomes)
+        for outcome in joined.collections:
+            role, result = outcome.request.task.role, outcome.result
+            # Only the join installs branch ledgers and commits cross-stage state.
+            outcome.executor.context = self.context
+            self.executors[role] = outcome.executor
+            self.record_collection(outcome)
             if result['status'] != 'completed':
-                incomplete = True
                 code = result['run_summary']['termination_reason']
-                stops.append(code)
                 self.extra_gaps.extend(result['output']['missing_information'])
                 self.event('parallel_branch_incomplete', role, batch_id=self.parallel_batch, code=code)
         self.event('parallel_collection_joined', batch_id=self.parallel_batch,
-                   roles=list(self.parallel_plans), incomplete=incomplete)
+                   roles=list(self.parallel_plans), incomplete=joined.incomplete)
         self.dispatch_queue.clear()
         self.parallel_batch = None
         self.parallel_plans = {}
-        # A failed branch never discards the sibling's observations. Current
-        # observations still receive diagnosis/review; knowledge alone cannot.
-        fatal = next((code for code in stops if code in {'AUTH_ERROR', 'QUOTA_EXCEEDED',
-            'SCOPE_DENIED', 'TOOL_DENIED', 'WINDOW_DENIED'}), None)
-        if fatal:
-            self.stop = fatal
-        elif incomplete:
+        # Failed branches retain sibling evidence; history alone cannot establish a current diagnosis.
+        if joined.fatal_code:
+            self.stop = joined.fatal_code
+        elif joined.incomplete:
             if any(e.kind == 'observation' for e in self.evidence.values()):
                 self.next_node = 'diagnosis'
             else:
-                self.stop = stops[0] if stops else 'NEEDS_INFORMATION'
+                self.stop = joined.stop_codes[0] if joined.stop_codes else 'NEEDS_INFORMATION'
         else:
             self.next_node = 'supervisor'
 
