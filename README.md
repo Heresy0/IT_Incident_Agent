@@ -79,6 +79,8 @@ flowchart TD
 
 ## 源码目录
 
+当前协作流程已将模型请求、计划校验与报告发布提取为独立组件，入口与诊断规则保持兼容。模块职责、状态归属及面试讲解见 [Agent 架构说明](examples/showcase/architecture.md)。
+
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |
