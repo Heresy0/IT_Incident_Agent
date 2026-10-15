@@ -63,3 +63,7 @@
 /fixtures/incident_closeout_unseen/closeout_003.json -text
 /evals/interview_consolidation/**/*.json -text
 /examples/showcase/interview-consolidation-validation.json -text
+/evals/interview_minimal_repairs/**/*.json -text
+/examples/showcase/interview-minimal-repairs-validation.json -text
+/examples/showcase/interview-consolidation.md -text
+/evals/interview_consolidation/README.md -text

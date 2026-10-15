@@ -344,6 +344,7 @@ class Collaboration:
             'action_condition': '区分核查为何值得做与变更前提是否满足；核查结果未知不等于核查待办不成立。',
         }
         for need in needs:
+            need['blocking_default'] = is_blocking(self.evidence_needs[need['need_id']])
             if need['purpose'] in scopes:
                 need['review_scope'] = scopes[need['purpose']]
         tasks = [{k: row[k] for k in ('task_id', 'role', 'goal', 'need_ids', 'completion',
@@ -353,6 +354,10 @@ class Collaboration:
         return {"targets": targets, "required_target_ids": list(targets),
                 **self.diagnostic_pack_input(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
+                'uncertain_need_rule': '每个uncertain且阻塞的问题须给自己的blocker，或由request_evidence.need_id明确指向同一个N。'
+                    '核心symptom/mechanism始终阻塞；其它问题blocking省略/null使用blocking_default，false须有非阻塞理由。'
+                    'blocker填写affected_targets、missing_observation、decision_impact、resolution；reason不能替代这些字段。'
+                    'cause_level由程序绑定，不输出；不得为满足格式改判supported。',
                 'core_need_ids': [n.need_id for n in self.evidence_needs.values()
                                   if n.purpose in {'symptom', 'mechanism'}],
                 'independent_observation_review': self.observation_reviews[-1]['review']
@@ -617,6 +622,9 @@ class Collaboration:
         for task in proposed:
             self.evidence_ids(task.evidence_ids)
             key = (task.role, " ".join(task.goal.casefold().split()), tuple(sorted(task.evidence_ids)))
+            mode = self.investigation_mode if task.role == 'investigation' else self.knowledge_mode
+            if mode == 'programmatic':
+                key += (tuple(sorted((check.tool, json.dumps(check.args, sort_keys=True)) for check in task.checks)),)
             if key in self.seen_tasks or key in keys:
                 raise ProtocolError("DUPLICATE_TASK")
             keys.append(key)

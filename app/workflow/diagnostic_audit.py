@@ -16,6 +16,20 @@ def validate_blockers(needs, review, executors, *, required=False, targets=None,
     if conservative:
         review = normalize_blocker_scope(needs, review, executors, targets, event)
     verdicts = {a.target_id: a.verdict for a in review.assessments}
+    missing = []
+    if required:
+        for index, assessment in enumerate(review.need_assessments):
+            need = needs[assessment.need_id]
+            blocking = is_blocking(need.model_copy(update={} if assessment.blocking is None
+                                                   else {'blocking': assessment.blocking}))
+            requested = review.request_evidence and review.request_evidence.need_id == need.need_id
+            if assessment.verdict == 'uncertain' and blocking and assessment.blocker is None and not requested:
+                missing.append({'need_id': need.need_id, 'path': f'need_assessments.{index}.blocker',
+                    'required_fields': ['affected_targets', 'missing_observation', 'decision_impact', 'resolution'],
+                    'instruction': '为此N单独描述真实缺失观测、受影响目标及判断影响；或由request_evidence.need_id指向此N。'
+                        '另一个N的请求不能替代，reason不能替代blocker；cause_level程序绑定，不输出，不得自动提升支持。'})
+        if missing:
+            raise ProtocolError('REVIEW_BLOCKER_REQUIRED', missing)
     for assessment in review.need_assessments:
         need = needs[assessment.need_id]
         blocking = is_blocking(need.model_copy(update={} if assessment.blocking is None
@@ -23,12 +37,7 @@ def validate_blockers(needs, review, executors, *, required=False, targets=None,
         if assessment.verdict != 'uncertain' or not blocking:
             continue
         blocker = assessment.blocker
-        requested = review.request_evidence and review.request_evidence.need_id == need.need_id
         if blocker is None:
-            if required and not requested:
-                raise ProtocolError('REVIEW_BLOCKER_REQUIRED', [{'need_id': need.need_id,
-                    'path': 'need_assessments.blocker',
-                    'instruction': '阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。'}])
             continue
         if len(set(blocker.affected_targets)) != len(blocker.affected_targets) or not set(blocker.affected_targets) <= set(verdicts):
             raise ProtocolError('REVIEW_BLOCKER_TARGET', [{'need_id': need.need_id, 'allowed': list(verdicts)}])

@@ -23,9 +23,17 @@ def initial_needs(ticket):
             for n, (purpose, question) in enumerate(questions, 1)}
 
 
-def check_ids(ids, evidence):
-    if len(ids) != len(set(ids)) or any(eid not in evidence for eid in ids):
-        raise ProtocolError('UNKNOWN_OR_DUPLICATE_EVIDENCE')
+def check_ids(ids, evidence, path='evidence_ids'):
+    errors, seen = [], set()
+    for index, eid in enumerate(ids):
+        if eid not in evidence or eid in seen:
+            errors.append({'path': f'{path}.{index}',
+                'type': 'unknown_evidence_id' if eid not in evidence else 'duplicate_evidence_id',
+                'allowed': list(evidence),
+                'instruction': '逐字选择当前input.evidence中的EV编号；不猜测或近似匹配。REF/RD不能填入evidence_ids，同一列表不重复。'})
+        seen.add(eid)
+    if errors:
+        raise ProtocolError('UNKNOWN_OR_DUPLICATE_EVIDENCE', errors[:5])
 
 
 def current_support(ids, evidence):
@@ -124,7 +132,7 @@ def validate_assessments(needs, assessments, evidence):
     result = []
     violations = []
     for index, assessment in enumerate(assessments):
-        check_ids(assessment.evidence_ids, evidence)
+        check_ids(assessment.evidence_ids, evidence, f'need_assessments.{index}.evidence_ids')
         need = needs[assessment.need_id]
         if assessment.blocking is False and need.purpose in {'symptom', 'mechanism'}:
             violations.append({'need_id': need.need_id,

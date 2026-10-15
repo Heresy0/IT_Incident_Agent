@@ -87,8 +87,8 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
             'duplicate_target_ids': sorted({key for key in ids if ids.count(key) > 1}),
         }])
     checked = []
-    for assessment in review.assessments:
-        check_ids(assessment.evidence_ids, view.evidence)
+    for index, assessment in enumerate(review.assessments):
+        check_ids(assessment.evidence_ids, view.evidence, f'assessments.{index}.evidence_ids')
         target = targets[assessment.target_id]
         if assessment.verdict == "supported" and assessment.target_id.startswith("H"):
             if not any(view.evidence[r.evidence_id].kind == "observation" for r in target.support_refs):
@@ -107,7 +107,7 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
     request = review.request_evidence
     audit.hint_status = []
     if request:
-        check_ids(request.evidence_ids, view.evidence)
+        check_ids(request.evidence_ids, view.evidence, 'request_evidence.evidence_ids')
         if request.need_id is not None and request.need_id not in view.needs:
             raise ProtocolError('UNKNOWN_OR_DUPLICATE_NEED')
         disputed = request.target_id or request.hypothesis_id

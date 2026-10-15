@@ -361,6 +361,9 @@ def correction_instruction(role, schema, details, purpose):
         instruction += ('。refs只选实际观测字段REF，未确认原因保留在unverified_causes。'
             if schema is ObservationReview else
             '。必须完整覆盖 required_target_ids，每个编号恰好一次；证据不足时评估为 uncertain，不得省略条目')
+        if schema is not ObservationReview:
+            instruction += ('。纠正引用时同时核对全部uncertain问题：实际阻塞的N必须有自己的blocker，'
+                '或request_evidence.need_id指向该N。按input.uncertain_need_rule填写，不为通过自动改判supported。')
     elif role == 'diagnosis':
         if details['reason'] in {'UNKNOWN_REFERENCE', 'DUPLICATE_REFERENCE', 'reference_mismatch'}:
             instruction += ('。按 details.path 修正引用；REF_ 是字段引用编号，EV_ 是证据编号，不能混用。'
