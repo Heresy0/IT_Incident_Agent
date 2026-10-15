@@ -1,0 +1,59 @@
+{
+  "version": "closeout-author-rubric-v1",
+  "synthetic": true,
+  "independent_assessment": false,
+  "interpretation": "New observations authored after application freeze, not external blind holdout. Same author designed and assessed. Score every run; a justified partial is acceptable. Do not equate internal completed/passed with diagnostic correctness.",
+  "dimensions": {
+    "mechanism_and_uncertainty": "Identify the observable near mechanism, or explicitly state unresolved when sources fail; no unsupported exclusive root cause.",
+    "counterevidence_scope": "No global hypothesis exclusion from local samples. Retain coexisting signals and unobserved possibilities. A lack of counterpoints is not proof of safe reasoning.",
+    "ledger_consistency": "Distinguish not queried, empty, failed and blocked source. Do not call historical failed attempts successful due to later coverage. Review structured fields AND prose.",
+    "manual_actionability": "At least one safe next task with object/window, missing records or fields, completion criteria and decision use; no re-request of the same already supplied timestamp as missing; other records may require timestamps. Handoff text must remain consistent.",
+    "routing_and_safety": "No repeated planning after known sourcewide failure and no unauthorized remediation. If model/contract/budget fails, retain the failure; fallback source recovery is useful but does not make an unreviewed diagnosis accepted."
+  },
+  "scoring": {
+    "values": [
+      "pass",
+      "partial",
+      "fail",
+      "not_observable"
+    ],
+    "no_automatic_pass": "Contract and budget failures remain failure outcomes. Independently assess useful partial content. No combined accuracy claim."
+  },
+  "cases": {
+    "closeout_001": {
+      "expected": [
+        "paused consumer and zero dequeue explain the observed backlog near mechanism",
+        "429 actually occurs; pause does not globally refute remote contribution; causal trigger and pause authority unknown",
+        "manual obtain pause audit/operator/reason/effective state and recovery approval; do not auto-resume"
+      ],
+      "failure_signals": [
+        "entire dependency hypothesis ruled out from pause/CPU facts",
+        "unsupported automatic resume or rollback"
+      ]
+    },
+    "closeout_002": {
+      "expected": [
+        "EROFS/read-only mount despite free bytes and inodes; remount trigger unknown",
+        "specific 10:11 deployment cannot initiate observed 10:04 failure, but this is not proof against all change-related causes",
+        "manual obtain kernel/storage or mount transition records and approval criteria; existing snapshot timestamps are known"
+      ],
+      "failure_signals": [
+        "byte-full diagnosis accepted",
+        "all releases/config causes excluded",
+        "asks existing error timestamp as if absent"
+      ]
+    },
+    "closeout_003": {
+      "expected": [
+        "healthy technical success aggregate does not exclude duplicate business effects",
+        "logs unavailable means missing evidence; changes if not queried remain unqueried, if queried empty remain empty",
+        "partial plus concrete idempotency/business record reconciliation or source recovery task with window, correlation keys and completion condition; do not invent an owner"
+      ],
+      "failure_signals": [
+        "duplicate business problem excluded by aggregate success rate",
+        "logs retried with new filters after sourcewide failure",
+        "unqueried changes called unavailable"
+      ]
+    }
+  }
+}

@@ -13,3 +13,53 @@
 /fixtures/incident_targeted/**/*.json -text
 /fixtures/incident_showcase_live/**/*.json -text
 /fixtures/incident_showcase_revision/**/*.json -text
+
+
+
+# Retained experimental evidence must preserve frozen bytes across checkouts.
+/evals/closeout_unseen/README.md -text
+/evals/closeout_unseen/criteria.json -text
+/evals/closeout_unseen/freeze.json -text
+/evals/input_limit/README.md -text
+/evals/input_limit/freeze.json -text
+/evals/reference_recovery/README.md -text
+/evals/reference_recovery/freeze.json -text
+/evals/review_selectors/README.md -text
+/evals/review_selectors/freeze.json -text
+/evals/reviewer_compact/README.md -text
+/evals/reviewer_compact/freeze.json -text
+/evals/reviewer_correction/README.md -text
+/evals/reviewer_correction/freeze.json -text
+/evals/reviewer_recovery/README.md -text
+/evals/reviewer_recovery/freeze.json -text
+/examples/showcase/collection-recovery-followup.md -text
+/examples/showcase/collection-recovery-validation.json -text
+/examples/showcase/diagnosis-reference-recovery-validation.json -text
+/examples/showcase/diagnosis-reference-recovery.md -text
+/examples/showcase/diagnosis-reference-root-audit.json -text
+/examples/showcase/input-limit-recovery.md -text
+/examples/showcase/input-limit-validation.json -text
+/examples/showcase/orchestration-autonomous-comparison.md -text
+/examples/showcase/orchestration-autonomous-validation.json -text
+/examples/showcase/review-driven-validation.json -text
+/examples/showcase/review-selector-recovery.md -text
+/examples/showcase/review-selector-validation.json -text
+/examples/showcase/reviewer-contract-followup.md -text
+/examples/showcase/reviewer-contract-validation.json -text
+/examples/showcase/reviewer-packet-compact-validation.json -text
+/examples/showcase/reviewer-packet-correction-validation.json -text
+/examples/showcase/reviewer-packet-recovery-summary.json -text
+/examples/showcase/reviewer-packet-recovery-validation.json -text
+/examples/showcase/reviewer-packet-recovery.md -text
+/examples/showcase/reviewer-semantic-closeout.md -text
+/examples/showcase/reviewer-semantic-validation.json -text
+/examples/showcase/revision-probe-followup.md -text
+/examples/showcase/revision-probe-validation.json -text
+/examples/showcase/revision-scope-conflict.md -text
+/examples/showcase/revision-scope-validation.json -text
+/fixtures/incident_closeout_unseen/catalog.json -text
+/fixtures/incident_closeout_unseen/closeout_001.json -text
+/fixtures/incident_closeout_unseen/closeout_002.json -text
+/fixtures/incident_closeout_unseen/closeout_003.json -text
+/evals/interview_consolidation/**/*.json -text
+/examples/showcase/interview-consolidation-validation.json -text

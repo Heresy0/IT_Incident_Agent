@@ -160,6 +160,25 @@ class ToolExecutor:
                     raise ExecutionError('METRIC_NOT_REGISTERED')
         return args
 
+    @staticmethod
+    def argument_errors(name, raw_args):
+        """Public fixed field names/types only; never echo rejected values or input."""
+        if name not in TOOL_ARGS:
+            return []
+        fields = TOOL_ARGS[name].model_json_schema().get('properties', {})
+        try:
+            TOOL_ARGS[name].model_validate_json(json.dumps(raw_args))
+        except ValidationError as exc:
+            return [{'path': '.'.join(str(part) if isinstance(part, int) or part in fields else '<unknown_field>'
+                         for part in error['loc']), 'type': error['type'],
+                     'expected': fields.get(error['loc'][0], {}) if error['loc'] else {},
+                     'instruction': 'category为必填类别，未过滤只省略level/error_code。' if error['loc'] == ('category',)
+                                    and name == 'get_service_logs' else '按此工具参数契约修正，不得改变授权范围。'}
+                    for error in exc.errors(include_input=False)][:5]
+        except (TypeError, ValueError):
+            return [{'path': 'args', 'type': 'invalid_json_arguments'}]
+        return []
+
     def metric_point_limit(self, args):
         # Plan sampling before the read, counting full snapshots and REF catalogs rather
         # than only compact model messages. Keep the existing 12,000-character boundary.

@@ -1,0 +1,17 @@
+[
+  {
+    "case_id": "closeout_001",
+    "file": "closeout_001.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "closeout_002",
+    "file": "closeout_002.json",
+    "visibility": "public_synthetic"
+  },
+  {
+    "case_id": "closeout_003",
+    "file": "closeout_003.json",
+    "visibility": "public_synthetic"
+  }
+]

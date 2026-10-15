@@ -1,0 +1,500 @@
+{
+  "date": "2026-10-15",
+  "branch": "codex/review-driven-orchestration",
+  "base_commit": "fe4a263",
+  "rollout": "explicit_experiment_legacy_default_retained",
+  "report_orchestration": "review_driven_v2",
+  "final_application_version": "35deb82f73525bb3",
+  "validation_session": "reviewer_contract_followup",
+  "prior_record": "examples/showcase/revision-scope-validation.json",
+  "paid_model_attempts_total": 18,
+  "maximum_paid_model_attempts": 36,
+  "paid_cap_per_case": 12,
+  "final_review_reserve_per_case": 2,
+  "paid_case_counts": {
+    "wording": 6,
+    "trigger_unknown": 4,
+    "unsupported_mechanism": 8
+  },
+  "model": "qwen3.7-flash",
+  "synthetic_observations": true,
+  "seeded_feedback": true,
+  "replayed_revision_turns": 0,
+  "independent_quality_score": null,
+  "estimated_cost": null,
+  "live_repairs": 0,
+  "business_database_writes": 0,
+  "regression": {
+    "total": 738,
+    "passed": 718,
+    "skipped_database": 20,
+    "failed": 0,
+    "log_sha256": "90fd87cec1a1ad8f1d1d3c0b86bed2b6e53a82380c9eeaff9af0c76957a49994"
+  },
+  "targeted_regression": {
+    "total": 80,
+    "passed": 80
+  },
+  "legacy_behavior_baselines": 15,
+  "schema_verification": {
+    "source_version": "35deb82f73525bb3",
+    "dialect": "Draft202012",
+    "schema_valid": true,
+    "pending_revision_valid": true,
+    "mixed_blocker_rejected": true,
+    "mismatched_gap_kind_rejected": true
+  },
+  "schema_verification_log_sha256": "f9b46712c5eeb73bb9e51cfefdce816b2e7ba3ce0dbe807c36d4040f2650ca1c",
+  "frontend_changes": false,
+  "frontend_checks_this_turn": "not_repeated",
+  "root_causes": [
+    "revision_marker_and_evidence_blocker_mixed",
+    "trigger_origin_misassigned_to_current_mechanism",
+    "missing_blocker_guidance_skipped_need_scope_reassessment",
+    "supported_mechanism_used_to_pad_trigger_blocker",
+    "implicit_annotation_only_drift_generated_unnecessary_scope_proposal",
+    "prior_case_paid_cap_prevented_final_review"
+  ],
+  "final_findings": {
+    "unsupported_mechanism": "A1 edit, isolated H1 proposal, independent scope authorization, one H1 reasoning rewrite, complete final review of draft 3 and N2. Four fresh paid attempts, no corrections or rework.",
+    "wording": "Neutral A1 edit and complete draft 2 review. Two fresh paid attempts, no scope extension or rework.",
+    "trigger_unknown": "Complete draft 2 review; H1 supported, H2 unresolved, nonblocking human follow-up retained. Two fresh paid attempts, no rework."
+  },
+  "limitations": [
+    "First implementation wording partial and contract failure retained; not replaced by final version results.",
+    "Initial plans, drafts and first review judgments are seeded, including deliberately false initial mechanism support.",
+    "All post-seed calls fresh; no paid reply replay. Still not autonomous end-to-end diagnosis accuracy.",
+    "Small synthetic probes do not establish production reliability or general cost/latency gains.",
+    "Implicit annotation restoration covered by control tests; final wording model did not generate that drift, so no single-change causal attribution.",
+    "Database tests skipped and no frontend build repeated because no frontend changes."
+  ],
+  "batches": [
+    {
+      "summary_file": "output/revision-probe/46934f3c-8c7e-4a32-998f-6c23e26c40b9/summary.json",
+      "summary_sha256": "ae07dd3525dd725c4b1390b602ebb4df03b0c3dd98a93ce328b3ad5fd0e379d5",
+      "plan": {
+        "source_version": "e055590a677eb941",
+        "script_hashes": {
+          "verify_revision_probe.py": "40aeb80aa04bb3e8c68a17780e8745129294a71b8adc973df1374887af9e6188",
+          "verify_review_driven.py": "9b56ef66f9e5a5b0977e37b84bdd0d6c7985da66f349849111460eba7f945eb4",
+          "compare_incident.py": "69216187e5b85fb980c3a6cfc5e74331d4525ec07a0a73522acf090abfddd311"
+        },
+        "fixture_hashes": {
+          "fixtures/incident/case_001.json": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+          "fixtures/incident/case_002.json": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+          "fixtures/incident/case_003.json": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+          "fixtures/incident/case_004.json": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+          "fixtures/incident/case_005.json": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+          "fixtures/incident/case_006.json": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa",
+          "fixtures/incident/catalog.json": "e0a637eba427b6eb1de5a6607daa387a2e19fc4b2738b728b4067fb560d63b2d"
+        },
+        "model": "qwen3.7-flash",
+        "variants": [
+          "wording",
+          "trigger_unknown",
+          "unsupported_mechanism"
+        ],
+        "execution_order": [
+          "unsupported_mechanism",
+          "wording",
+          "trigger_unknown"
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 6,
+          "seconds": 360,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "paid_cap_per_case": 12,
+        "maximum_paid_attempts": 36,
+        "final_review_reserve_per_case": 2,
+        "seeded_feedback": true,
+        "attempts_per_variant": 1,
+        "independent_quality_score": false,
+        "synthetic_observations": true,
+        "live_repairs": 0,
+        "validation_session": "reviewer_contract_followup",
+        "estimated_cost": null,
+        "prior_case_paid_attempts": {
+          "wording": 0,
+          "trigger_unknown": 0,
+          "unsupported_mechanism": 0
+        },
+        "remaining_case_paid_attempts": {
+          "wording": 12,
+          "trigger_unknown": 12,
+          "unsupported_mechanism": 12
+        },
+        "previous_summary": null,
+        "replayed_initial_revision": null,
+        "boundary_control": "unsupported_mechanism is deliberately false preliminary seed judgment; final review must be independent"
+      },
+      "paid_attempts": 10,
+      "runs": [
+        {
+          "variant": "unsupported_mechanism",
+          "status": "completed",
+          "stop": "FINISHED",
+          "paid_attempts": 4,
+          "role_paid_attempts": {
+            "supervisor": 0,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 2,
+            "reviewer": 2
+          },
+          "model_calls": 7,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 1,
+          "final_review_paid_attempts": 1,
+          "replayed_revision_turns": 0,
+          "handoff_reason": null,
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [],
+          "report_file": "output/revision-probe/46934f3c-8c7e-4a32-998f-6c23e26c40b9/unsupported_mechanism.json",
+          "report_sha256": "4131036ca5a2fda5f0c51338cdd9a3148a28045611431dd1b4b31ebc563cdd42",
+          "draft_revisions": [
+            1,
+            2,
+            3
+          ],
+          "reviewed_revisions": [
+            1,
+            2,
+            3
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory-api连接被拒导致checkout-api依赖请求超时失败",
+              "status": "supported"
+            }
+          ]
+        },
+        {
+          "variant": "wording",
+          "status": "partial",
+          "stop": "NEEDS_INFORMATION",
+          "paid_attempts": 4,
+          "role_paid_attempts": {
+            "supervisor": 1,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 1,
+            "reviewer": 2
+          },
+          "model_calls": 7,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 0,
+          "final_review_paid_attempts": 0,
+          "replayed_revision_turns": 0,
+          "handoff_reason": "NEEDS_INFORMATION",
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [
+            "REVISION_SCOPE_DECISION"
+          ],
+          "report_file": "output/revision-probe/46934f3c-8c7e-4a32-998f-6c23e26c40b9/wording.json",
+          "report_sha256": "39b6a3131b8af1088ac19ec907a48c8a31623a8542e0057cd6966e405366689b",
+          "draft_revisions": [
+            1,
+            2
+          ],
+          "reviewed_revisions": [
+            1,
+            2
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory 依赖不可达",
+              "status": "unresolved"
+            }
+          ]
+        },
+        {
+          "variant": "trigger_unknown",
+          "status": "completed",
+          "stop": "FINISHED",
+          "paid_attempts": 2,
+          "role_paid_attempts": {
+            "supervisor": 0,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 1,
+            "reviewer": 1
+          },
+          "model_calls": 5,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 0,
+          "final_review_paid_attempts": 1,
+          "replayed_revision_turns": 0,
+          "handoff_reason": "nonblocking_unknown",
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [],
+          "report_file": "output/revision-probe/46934f3c-8c7e-4a32-998f-6c23e26c40b9/trigger_unknown.json",
+          "report_sha256": "b565a46bddc69d55698c0b1505f73a98b376d2f60d84fe29b0b549d6bf42a664",
+          "draft_revisions": [
+            1,
+            2
+          ],
+          "reviewed_revisions": [
+            1,
+            2
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory 依赖不可达",
+              "status": "supported"
+            },
+            {
+              "target_id": "H2",
+              "cause": "为何开始发生尚未确认，不能推定远端策略变更",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "summary_file": "output/revision-probe/87249cb0-05f5-441d-881a-a624e6760cec/summary.json",
+      "summary_sha256": "ecec08657ed9d5b39fc5017db3b281a098da3e59cad108db9410404c4acad91b",
+      "plan": {
+        "source_version": "35deb82f73525bb3",
+        "script_hashes": {
+          "verify_revision_probe.py": "40aeb80aa04bb3e8c68a17780e8745129294a71b8adc973df1374887af9e6188",
+          "verify_review_driven.py": "9b56ef66f9e5a5b0977e37b84bdd0d6c7985da66f349849111460eba7f945eb4",
+          "compare_incident.py": "69216187e5b85fb980c3a6cfc5e74331d4525ec07a0a73522acf090abfddd311"
+        },
+        "fixture_hashes": {
+          "fixtures/incident/case_001.json": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1",
+          "fixtures/incident/case_002.json": "74cb91201b383529939f98663f453924d5ca5a3c52392f7447f2eafe63f2c30e",
+          "fixtures/incident/case_003.json": "57dbdc2af772bded50213098a66a06daa08216cc29abe08b2a1f048df35c9945",
+          "fixtures/incident/case_004.json": "725701139e72c3e31708f8797c35d27d463ca220901632de4bb9f17f5de8900c",
+          "fixtures/incident/case_005.json": "c96be745c7f7ee51b809716ef04a02f23f2fafbbb5ff373f71153f9339639f65",
+          "fixtures/incident/case_006.json": "c93a65857c80ca5354a267e8b1ece6d524005f3c09c4fd33c75d840837c0fefa",
+          "fixtures/incident/catalog.json": "e0a637eba427b6eb1de5a6607daa387a2e19fc4b2738b728b4067fb560d63b2d"
+        },
+        "model": "qwen3.7-flash",
+        "variants": [
+          "wording",
+          "trigger_unknown",
+          "unsupported_mechanism"
+        ],
+        "execution_order": [
+          "unsupported_mechanism",
+          "wording",
+          "trigger_unknown"
+        ],
+        "limits": {
+          "model_calls": 16,
+          "web_calls": 12,
+          "tool_calls": 6,
+          "seconds": 360,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 20,
+          "input_chars": 28000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "paid_cap_per_case": 12,
+        "maximum_paid_attempts": 36,
+        "final_review_reserve_per_case": 2,
+        "seeded_feedback": true,
+        "attempts_per_variant": 1,
+        "independent_quality_score": false,
+        "synthetic_observations": true,
+        "live_repairs": 0,
+        "validation_session": "reviewer_contract_followup",
+        "estimated_cost": null,
+        "prior_case_paid_attempts": {
+          "wording": 4,
+          "trigger_unknown": 2,
+          "unsupported_mechanism": 4
+        },
+        "remaining_case_paid_attempts": {
+          "wording": 8,
+          "trigger_unknown": 10,
+          "unsupported_mechanism": 8
+        },
+        "previous_summary": {
+          "path": "D:\\code\\it_incident_agent\\output\\revision-probe\\46934f3c-8c7e-4a32-998f-6c23e26c40b9\\summary.json",
+          "sha256": "ae07dd3525dd725c4b1390b602ebb4df03b0c3dd98a93ce328b3ad5fd0e379d5"
+        },
+        "replayed_initial_revision": null,
+        "boundary_control": "unsupported_mechanism is deliberately false preliminary seed judgment; final review must be independent"
+      },
+      "paid_attempts": 18,
+      "runs": [
+        {
+          "variant": "unsupported_mechanism",
+          "status": "completed",
+          "stop": "FINISHED",
+          "paid_attempts": 4,
+          "role_paid_attempts": {
+            "supervisor": 0,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 2,
+            "reviewer": 2
+          },
+          "model_calls": 7,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 1,
+          "final_review_paid_attempts": 1,
+          "replayed_revision_turns": 0,
+          "handoff_reason": null,
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [],
+          "report_file": "output/revision-probe/87249cb0-05f5-441d-881a-a624e6760cec/unsupported_mechanism.json",
+          "report_sha256": "fa3c46363c0c2a89d092cedfcdd73412f2ca857f5512fd789cd714a850ae9be3",
+          "draft_revisions": [
+            1,
+            2,
+            3
+          ],
+          "reviewed_revisions": [
+            1,
+            2,
+            3
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory-api不可达或无响应，导致checkout-api上游调用超时。",
+              "status": "supported"
+            }
+          ]
+        },
+        {
+          "variant": "wording",
+          "status": "completed",
+          "stop": "FINISHED",
+          "paid_attempts": 2,
+          "role_paid_attempts": {
+            "supervisor": 0,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 1,
+            "reviewer": 1
+          },
+          "model_calls": 5,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 0,
+          "final_review_paid_attempts": 1,
+          "replayed_revision_turns": 0,
+          "handoff_reason": null,
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [],
+          "report_file": "output/revision-probe/87249cb0-05f5-441d-881a-a624e6760cec/wording.json",
+          "report_sha256": "66bc2d6ee5d77e370f22c887f4f86a03f2d5e5c423f7ae90cdb52ec6e2081d8f",
+          "draft_revisions": [
+            1,
+            2
+          ],
+          "reviewed_revisions": [
+            1,
+            2
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory 依赖不可达",
+              "status": "supported"
+            }
+          ]
+        },
+        {
+          "variant": "trigger_unknown",
+          "status": "completed",
+          "stop": "FINISHED",
+          "paid_attempts": 2,
+          "role_paid_attempts": {
+            "supervisor": 0,
+            "investigation": 0,
+            "knowledge": 0,
+            "diagnosis": 1,
+            "reviewer": 1
+          },
+          "model_calls": 5,
+          "tool_calls": 2,
+          "pure_revisions": 1,
+          "reworks": 0,
+          "scope_revisions": 0,
+          "final_review_paid_attempts": 1,
+          "replayed_revision_turns": 0,
+          "handoff_reason": "nonblocking_unknown",
+          "controls": {
+            "revised_draft_committed": true,
+            "untargeted_sections_preserved": true,
+            "action_changed": true,
+            "final_review_completed": true
+          },
+          "validation_failures": [],
+          "report_file": "output/revision-probe/87249cb0-05f5-441d-881a-a624e6760cec/trigger_unknown.json",
+          "report_sha256": "313f8535629d706c46314ce00cabf731c938a59d963fa928985d1a6c0ec1dc90",
+          "draft_revisions": [
+            1,
+            2
+          ],
+          "reviewed_revisions": [
+            1,
+            2
+          ],
+          "published_hypotheses": [
+            {
+              "target_id": "H1",
+              "cause": "inventory 依赖不可达",
+              "status": "supported"
+            },
+            {
+              "target_id": "H2",
+              "cause": "为何开始发生尚未确认，不能推定远端策略变更",
+              "status": "unresolved"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

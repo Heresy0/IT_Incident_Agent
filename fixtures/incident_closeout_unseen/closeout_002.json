@@ -1,0 +1,139 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "closeout_002",
+    "title": "closeout_002",
+    "symptoms": "用户称新版本发布后索引文件写入失败，想知道是否因空间用尽或新版本引入，需要回滚吗？",
+    "scope": {
+      "service": "media-index-writer",
+      "environment": "staging",
+      "service_version": "2.6.0",
+      "start": "2026-10-15T10:00:00+00:00",
+      "end": "2026-10-15T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.78,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-before",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-after",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "id": "first-write-failure",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:04:00+00:00",
+      "category": "resource",
+      "level": "ERROR",
+      "error_code": "EROFS",
+      "message": "写入/data/index/shard-7失败：errno=30 EROFS。该进程命名空间内/data挂载标志ro；可用空间58GiB，占用率42%，inode使用率18%。快照未包含内核重挂载或底层存储事件。"
+    },
+    {
+      "id": "mount-state",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:13:00+00:00",
+      "category": "configuration",
+      "level": "WARN",
+      "error_code": "READ_ONLY_MOUNT",
+      "message": "进程命名空间/data仍为ro，应用配置的索引路径/data/index未改变。无法从本快照判断谁或什么导致挂载变成只读。"
+    },
+    {
+      "id": "dep-ok",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "category": "dependency",
+      "level": "INFO",
+      "error_code": "DEPENDENCY_SAMPLE_OK",
+      "message": "索引元信息依赖近1分钟抽样请求均返回2xx；不覆盖其它时段或所有请求。"
+    }
+  ],
+  "changes": [
+    {
+      "id": "release",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:11:00+00:00",
+      "category": "deployment",
+      "version": "2.6.0",
+      "summary": "本次已记录部署在10:11完成，变更摘要为索引状态展示字段；首条现有写入错误在10:04。未提供更早变更历史与内核事件。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner",
+      "service": "media-index-writer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "aliases": [
+        "media-index-writer"
+      ],
+      "team": "Synthetic Closeout Service Oncall",
+      "escalation": "合成业务服务值班队列；观测平台归属未提供"
+    }
+  ],
+  "runbooks": [],
+  "incidents": []
+}

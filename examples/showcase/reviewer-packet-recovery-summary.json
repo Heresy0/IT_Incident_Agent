@@ -1,0 +1,83 @@
+{
+  "application_commit": "78bd522ae65246220ba49e6fbc83e9a68ece7790",
+  "source_version": "ed732d858816af11",
+  "total_runs": 30,
+  "actual_paid_attempts": 130,
+  "known_usage_attempts": 130,
+  "input_tokens": 839447,
+  "output_tokens": 133925,
+  "total_tokens": 973372,
+  "validation_failure_events": 39,
+  "input_budget_stops": 3,
+  "reviewer_length_responses": 0,
+  "default_orchestration": "legacy",
+  "estimated_cost": null,
+  "archives": [
+    {
+      "path": "examples/showcase/reviewer-packet-recovery-validation.json",
+      "sha256": "66c15c365c13001d7dbd8d1c2bb3e028b0335e39a7a18ad288be3e957b719df4",
+      "runs": 21
+    },
+    {
+      "path": "examples/showcase/reviewer-packet-correction-validation.json",
+      "sha256": "78e53dfc627aefdc1c6850e72c18a5c2b57bbbd582fb552ae31819da104b8621",
+      "runs": 6
+    },
+    {
+      "path": "examples/showcase/reviewer-packet-compact-validation.json",
+      "sha256": "263f09343dfd601b39ae869823082911ea6bbd63f48c01db2e77c2a7085cf313",
+      "runs": 3
+    }
+  ],
+  "final_checks": {
+    "runs": 3,
+    "paid_attempts": 12,
+    "tool_calls": 10,
+    "input_tokens": 87936,
+    "output_tokens": 17262,
+    "known_usage_attempts": 12,
+    "usage_complete": true,
+    "request_errors": 0,
+    "estimated_cost": null,
+    "statuses": {
+      "partial": 2,
+      "completed": 1
+    },
+    "review_statuses": {
+      "not_performed": 1,
+      "passed": 1,
+      "needs_information": 1
+    },
+    "termination_reasons": {
+      "BUDGET_EXCEEDED": 1,
+      "FINISHED": 1,
+      "REVIEW_INCOMPLETE": 1
+    },
+    "requests_by_role": {
+      "supervisor": 3,
+      "diagnosis": 3,
+      "reviewer": 6
+    },
+    "valid_diagnosis_runs": 3,
+    "reviewer_reached_runs": 3,
+    "any_valid_review_runs": 3,
+    "final_valid_review_runs": 2,
+    "reviewer_length_responses": 0,
+    "validation_failure_types": {
+      "REVIEW_PACKET_H_VERDICT": 1,
+      "COUNTERPOINT_CLAIM_SCOPE": 1,
+      "REVIEW_SOURCE_HINT_INVALID": 1
+    },
+    "validation_failures_by_role": {
+      "reviewer": 3
+    },
+    "duration_ms": 188422
+  },
+  "limits": [
+    "Seen development cases, same author, not independent blind assessment.",
+    "Initial comparison remains; follow-ups are not replacements or paired quality claims.",
+    "No token-price or overall diagnostic accuracy claim.",
+    "Final case1 valid review routes to revision, then Diagnosis input35844 exceeds28000.",
+    "Standard remains default; residual semantic and handoff quality issues remain."
+  ]
+}

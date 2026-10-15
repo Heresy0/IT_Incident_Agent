@@ -1,0 +1,60 @@
+{
+  "created_at": "2026-10-15T09:47:02.758488+00:00",
+  "application_commit": "875facc93306b1d956b401a57b2591b8c22ccba0",
+  "source_version": "681065966428639c",
+  "model": "qwen3.7-flash",
+  "files": {
+    "evals/closeout_unseen/criteria.json": "fb3ec89961c653378b638f4bab96dbbb0fd90f58f9f79e78adf3ea9dbdf6e716",
+    "fixtures/incident_closeout_unseen/catalog.json": "93c439241b725fe72d84999909546857fad0884cf15ead99f35e2b36eda104c7",
+    "fixtures/incident_closeout_unseen/closeout_001.json": "90f976d52b33c3666dcdb09a11fc0144be3958573686163af2a37850694484c8",
+    "fixtures/incident_closeout_unseen/closeout_002.json": "4cdc5b68a4feb83f2ef154a9057551ac2ab67b79468113e5bcd0c0923a00f4a6",
+    "fixtures/incident_closeout_unseen/closeout_003.json": "bfc902bdcc9a5d09daded77f3488cb15b70efb6fa9114b81cdfaa8bf84a7dcf5"
+  },
+  "driver_files": {
+    "scripts/verify_input_limit.py": "4e64c98effcee41d1103aa5a6fdb5889c68d1c12ed3f1a5fcbb09364eeb4eaa9",
+    "scripts/verify_reviewer_compact.py": "97cbcc2da883b6948998a9e678936110dcb7d89950214e6eb0776ccf577d4b8f",
+    "evals/live_batch.py": "c7ae98dc7fb49f86b41ccfdf8f83d166552530274ec121a784223efae065bb18",
+    "scripts/verify_reviewer_correction.py": "46cf1becab79c8320bf70e79671522369aafdf06fa6d78c872b09055d93abfb5",
+    "scripts/compare_reviewer_recovery.py": "e5b896e13ceb2411ed44118641d26787b5100fdc23275fb107c940faa3614ce9",
+    "scripts/compare_orchestration_live.py": "1a57bb6671fbee8debc381b901f2519212e032391c8bdb6a52462c8d279723ae",
+    "scripts/compare_incident.py": "69216187e5b85fb980c3a6cfc5e74331d4525ec07a0a73522acf090abfddd311",
+    "scripts/run_fresh_validation.py": "5f25b3427596cb7fb96b1cfacca6bf7b709d56bb9443d5898768711b9ff26458",
+    "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+    "evals/reference_recovery/freeze.json": "f2bff7156a9fc11a58eac6d4a261eb075f78c00eb1fbdeb892583397b9eab4a8",
+    "evals/closeout_unseen/freeze.json": "15fdf4dff9a21b1116292fd1383fe9f249c4fc2ab1f83fd80b8c73118a2de944",
+    "evals/reviewer_recovery/freeze.json": "ccf93f7cdfe9a237e6517a6bcee81826de832a7c6a807b6fb802795a0b9699db",
+    "evals/reviewer_correction/freeze.json": "ed7b3117e368f2efd47aca20f4bf4b2b3098bbde2f1c92403ee74e6678a823dd",
+    "evals/reviewer_compact/freeze.json": "7568076e16f030bca2805ad2329791495d97c46a53580477e9b3dbbf27b02ef9"
+  },
+  "previous_batches": [
+    {
+      "summary_file": "output/orchestration-autonomous/a46daf3a-d738-47e0-a2f8-14ab0f861016/summary.json",
+      "summary_sha256": "0c293bdda5a0554190ad2c627a8c5200223f93d0765b6d5e21274f9d62ce4e92",
+      "runs": 21,
+      "paid_attempts": 96
+    },
+    {
+      "summary_file": "output/orchestration-autonomous/74bc2192-0513-4f6f-b0bf-c035546257f7/summary.json",
+      "summary_sha256": "86a92b7e9b337b127ae5afc9dede9cf81825b141c54e9f5119e5f62ba780c630",
+      "runs": 6,
+      "paid_attempts": 22
+    },
+    {
+      "summary_file": "output/orchestration-autonomous/41bdffae-3a04-4098-a456-315c335bba86/summary.json",
+      "summary_sha256": "e98b32dbae60f81383495ca68a1df293d96af88b7305b84835e42f39f253a10b",
+      "runs": 3,
+      "paid_attempts": 12
+    }
+  ],
+  "previous_archive_hashes": {
+    "examples/showcase/reviewer-packet-recovery-summary.json": "4eb379e1d76ad92e3c26d3562342292301d88b2fda328b255a0b9626f76f1bfd",
+    "examples/showcase/reviewer-packet-recovery-validation.json": "66c15c365c13001d7dbd8d1c2bb3e028b0335e39a7a18ad288be3e957b719df4",
+    "examples/showcase/reviewer-packet-correction-validation.json": "78e53dfc627aefdc1c6850e72c18a5c2b57bbbd582fb552ae31819da104b8621",
+    "examples/showcase/reviewer-packet-compact-validation.json": "263f09343dfd601b39ae869823082911ea6bbd63f48c01db2e77c2a7085cf313",
+    "examples/showcase/reviewer-packet-recovery.md": "48dca5fb755df7d3ba2e47b192207a1eec10887460a52b85ec599b1ecd6151bb"
+  },
+  "protocol": "3 seen autonomous cases at input48000; only input cap changed from previous code; Reviewer4800/60s, other2200/30s, run16models/8tools/600s reserve3models/90s. Prioractual130 + maximum48=178 below cumulative336. Preserve all old failures; no seeded model feedback, no replay, no tuning during batch.",
+  "application_frozen_during_batch": true,
+  "independent_blind_holdout": false,
+  "rubric_defect_preserved": "Case 2 records deployment completion, not start; do not claim temporal exclusion proves correctness."
+}

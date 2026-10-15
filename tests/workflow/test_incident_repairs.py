@@ -102,7 +102,7 @@ class IncidentRepairTests(unittest.TestCase):
                 if isinstance(m,ToolMessage):
                     self.assertTrue(all('hash' not in e and 'excerpt' not in e and 'allowed_field_paths' not in e
                         for e in json.loads(m.content)['evidence']))
-        self.assertEqual(result['run_summary']['limits']['input_chars'],28000)
+        self.assertEqual(result['run_summary']['limits']['input_chars'],48000)
 
     def test_context_rollup_keeps_registered_sources_and_never_breaks_tool_pairs(self):
         ex = executor('case_003')
