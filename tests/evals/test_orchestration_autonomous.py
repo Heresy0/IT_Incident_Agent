@@ -15,6 +15,16 @@ from scripts.compare_orchestration_live import (ROOT, LiveRecorder, RequestLedge
 
 
 class AutonomousComparisonTests(unittest.TestCase):
+    def test_recovery_suite_freezes_additional_cases_and_has_independent_run_caps(self):
+        plan = execution_plan(IncidentConfig(model='fixture'), 'collection_recovery')
+        self.assertEqual(plan['maximum_paid_attempts'], 160)
+        self.assertEqual(len(plan['execution_order']), 10)
+        self.assertEqual({j['case_id'] for j in plan['execution_order']},
+                         {'fresh_001', 'fresh_002', 'fresh_003', 'eval_005', 'eval_008'})
+        self.assertIn('evals/independent/answers/eval_005.json', plan['fixture_and_criteria_hashes'])
+        self.assertEqual(plan['seeded_turns'], 0)
+        self.assertEqual(plan['replayed_turns'], 0)
+
     def test_plan_only_does_not_construct_models_and_alternates_arm_order(self):
         out = io.StringIO()
         with patch('scripts.compare_orchestration_live.IncidentConfig.from_file', return_value=IncidentConfig(model='fixture')):

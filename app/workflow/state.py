@@ -34,6 +34,7 @@ class ControlState:
 
 @dataclass
 class CollectionState:
+    local_coverage_attempted: bool = False
     tasks: list[dict[str, Any]] = field(default_factory=list)
     reused_requests: list[dict[str, Any]] = field(default_factory=list)
     evidence: dict[str, Evidence] = field(default_factory=dict)

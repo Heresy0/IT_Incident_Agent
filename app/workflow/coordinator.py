@@ -13,7 +13,9 @@ from workflow.planning import PlanningContext, validate_plan
 from workflow.state import WorkflowState, state_property
 from workflow.policy import WorkflowPolicy, BudgetView, policy_property
 from workflow.revision import make_revision_task, collection_exit, basis_id, scope_revision_authorized, scope_review_schema
-from workflow.routing import review_disposition
+from workflow.routing import review_disposition, ReviewDisposition
+from workflow.collection_recovery import (channel_inventory, local_checks, failed_request_channel,
+                                          boundary_task, RECOVERY_GUIDANCE, POLICY as RECOVERY_POLICY)
 from workflow.handoff import build_handoff
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
     validate_observation_review, additional_rework_eligible, needs_review_follow_up,
@@ -63,6 +65,7 @@ class Collaboration:
     parallel_plans = state_property('collection', 'parallel_plans')
     parallel_batches = state_property('collection', 'parallel_batches')
     collection_exits = state_property('collection', 'collection_exits')
+    local_coverage_attempted = state_property('collection', 'local_coverage_attempted')
     diagnostic_pack = state_property('collection', 'diagnostic_pack')
     diagnostic_pack_result = state_property('collection', 'diagnostic_pack_result')
     diagnostic_pack_exit = state_property('collection', 'diagnostic_pack_exit')
@@ -229,6 +232,8 @@ class Collaboration:
                 prompt += BOUNDED_REVIEW
         if self.policy.review_driven and role == 'reviewer' and issubclass(schema, ReviewDecision):
             prompt += REVIEW_DRIVEN
+        if self.policy.review_driven:
+            prompt += RECOVERY_GUIDANCE
         request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal)
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
@@ -386,6 +391,7 @@ class Collaboration:
                  for row in self.task_input()]
         rework_budget = self.rework_budget(pending_model_calls=1, additional=self.reworks == 1)
         return {"targets": targets, "required_target_ids": list(targets),
+                **self.recovery_input(),
                 **self.diagnostic_pack_input(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
                 'core_need_ids': [n.need_id for n in self.evidence_needs.values()
@@ -449,7 +455,7 @@ class Collaboration:
                 'next_check': proposal,
                 'adds_information': adds_information([proposal], self.executors[need.role]) if proposal else None,
                 'role': need.role})
-        return {'unresolved_core_needs': unresolved,
+        return {'unresolved_core_needs': unresolved, **self.recovery_input(),
                 'log_query_feedback': log_query_feedback(self.executors['investigation']),
                 'recent_reused_requests': self.reused_requests[-2:],
                 'follow_up_used': self.collection_follow_up_used,
@@ -545,6 +551,7 @@ class Collaboration:
             return
         self.review = None  # A previous revision's review never approves a new draft.
         payload = {"ticket": self.ticket.model_dump(mode="json", exclude={"scope": {"tenant_id", "user_id"}}),
+                   **self.recovery_input(),
                    **self.diagnostic_pack_input(),
                    'diagnosis_policy': review_policy(),
                    'evidence_needs': self.need_input(),
@@ -672,6 +679,16 @@ class Collaboration:
             can_revise=lambda: self.policy.can_revise(self.budget_view(),
                 revisions=self.pure_revisions, scope_revisions=self.scope_revisions, scope_authorized=scope_extension),
             evidence_gaps=[*self.observation_gaps(), *self.task_gaps()])
+        request = resolve_handoff(self.review_routing_context(), reviewed_gaps=self.reviewed_gaps).request
+        fallback = self.local_review_fallback(request)
+        failure = failed_request_channel(self.review, self.executors) if request else None
+        if fallback:
+            disposition = ReviewDisposition('collect', 'untried_local_boundaries')
+        elif failure and disposition.route == 'collect':
+            disposition = ReviewDisposition('handoff', 'source_recovery_required')
+            self.event('failed_channel_handoff', 'reviewer', tool=failure['tool'],
+                       error_code=failure['error'], planning_model_call_saved=True,
+                       verdicts_changed=False)
         self.reviews.append({'revision': revision, 'review': self.review.model_dump(mode='json')})
         self.event('evidence_needs_reviewed', 'reviewer', revision=revision, evidence_needs=self.need_input(),
                    blocking_gaps=limitations(self.evidence_needs, blocking_only=True))
@@ -709,6 +726,14 @@ class Collaboration:
             self.phase, self.next_node = 'rework', 'supervisor'
             self.note('request_evidence', 'reviewer', 'supervisor', hypothesis_id=request.hypothesis_id,
                 evidence_ids=request.evidence_ids, reason=request.missing_observation, check=request.proposed_check)
+            if fallback:
+                selection = SupervisorSelection(action='dispatch', reason='核查尚未尝试的登记本地观测边界。',
+                    tasks=[boundary_task(fallback, self.evidence_needs)])
+                decision = self.supervisor_decision(selection)
+                self.event('local_coverage_selected', checks=fallback, policy=RECOVERY_POLICY,
+                           planning_source='program_registered_boundaries', model_call_saved=True,
+                           total_budget_changed=False)
+                self.prepare_dispatch(decision)
         else:
             self.handoff_reason = disposition.reason if disposition.route != 'publish' else None
             if disposition.deferred_request:
@@ -725,7 +750,40 @@ class Collaboration:
             self.note('accept' if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} else 'escalate',
                       'reviewer', 'supervisor')
 
+    def recovery_input(self):
+        return {'channel_inventory': channel_inventory(self.executors, self.ticket.scope)} if self.policy.review_driven else {}
+
+    def local_review_fallback(self, request):
+        if (not request or self.reworks or self.ticket.purpose != 'diagnosis'
+                or self.protocol_fallback_used or not any(
+                    self.evidence_needs[a.need_id].purpose == 'mechanism' and a.verdict == 'uncertain'
+                    and getattr(a, 'gap_kind', 'evidence') == 'evidence'
+                    for a in self.review.need_assessments)):
+            return []
+        # Explicit external ownership must not be silently reinterpreted as a
+        # ticket-service read. A validated targeted check also takes priority
+        # over the generic local boundary fallback.
+        if any(a.blocker and a.blocker.resolution == 'external_source' and
+               (a.need_id == request.need_id or request.target_id in a.blocker.affected_targets)
+               for a in self.review.need_assessments):
+            return []
+        need = self.evidence_needs.get(request.need_id)
+        proposals = [c.model_dump(mode='json') for c in request.checks]
+        if need and need.next_check:
+            proposals.append(need.next_check.model_dump(mode='json'))
+        if any(completion([c], self.executors[request.target_role])['checks'][0]['status'] == 'not_executed'
+               and adds_information([c], self.executors[request.target_role]) for c in proposals):
+            return []
+        checks = local_checks(self.executors['investigation'], self.ticket.scope)
+        # Take only a complete affordable batch, with diagnosing/reviewing and
+        # correction reserve intact. Deferred coverage never increases quota.
+        while checks and not self.rework_budget(tool_calls=len(checks), supervisor_completed=True)['can_collect']:
+            checks.pop()
+        return checks
+
     def route_collection(self):
+        if self.select_initial_local_coverage():
+            return
         outcome = collection_exit(self.evidence, self.executors, initial_replans=self.initial_replans,
                                   can_replan=self.can_replan())
         self.event('collection_exit_routed', route=outcome.route, reason=outcome.reason)
@@ -735,6 +793,32 @@ class Collaboration:
             self.stop, self.handoff_reason = 'NEEDS_INFORMATION', outcome.reason
         else:
             self.next_node = outcome.route
+
+    def select_initial_local_coverage(self):
+        if (self.local_coverage_attempted or self.ticket.purpose != 'diagnosis'
+                or self.phase != 'collect' or self.diagnostic_pack is not None):
+            return False
+        self.local_coverage_attempted = True
+        checks = local_checks(self.executors['investigation'], self.ticket.scope)
+        # One local baseline batch; leave a tool slot for a targeted review
+        # challenge and preserve all original task/model/time bounds.
+        spare = max(0, self.context.limits.tool_calls - self.context.counts['tool_calls'] - 1)
+        checks = checks[:spare]
+        view = self.budget_view()
+        if (not checks or len(self.tasks) >= self.policy.task_limit() or
+                view.model_calls + 2 + self.context.limits.reserve_model_calls > self.context.limits.model_calls
+                or view.elapsed >= self.context.limits.seconds - 60 - self.context.limits.reserve_seconds
+                or not self.context.can_research() or self.dispatch_capacity() < 1):
+            if checks:
+                self.event('local_coverage_deferred', reason='original_budget_or_task_limit', verdicts_changed=False)
+            return False
+        selection = SupervisorSelection(action='dispatch', reason='补足登记本服务的基本观测边界。',
+            tasks=[boundary_task(checks, self.evidence_needs)])
+        decision = self.supervisor_decision(selection)
+        self.event('local_coverage_selected', stage='initial', checks=checks, policy=RECOVERY_POLICY,
+                   planning_source='program_registered_boundaries', model_call_saved=True, total_budget_changed=False)
+        self.prepare_dispatch(decision)
+        return True
 
     def diagnose_and_review(self):
         """Compatibility helper for direct callers; graph uses separate role nodes."""
@@ -874,6 +958,8 @@ class Collaboration:
         need_ids = list(dict.fromkeys([*task.need_ids,
             *([self.pending['need_id']] if follow_up and self.pending.get('need_id') else [])]))
         return {"goal": ('Perform the approved read-only checks.' if follow_up else task.goal),
+            **({'execution_source': task.planning_source} if hasattr(task, 'planning_source') else {}),
+            **({'channel_recovery_policy': RECOVERY_POLICY} if self.policy.review_driven else {}),
             'need_ids': need_ids, 'evidence_needs': self.need_input(),
             "expected_value": self.pending['expected_value'] if follow_up else task.expected_value,
             "read_only_capabilities": self.executors[task.role].capabilities(),
@@ -1295,11 +1381,12 @@ class Collaboration:
         }
         if self.policy.review_driven:
             metadata.update(orchestration='review_driven_v2', pure_revision_rounds=self.pure_revisions,
-                            scope_revision_rounds=self.scope_revisions, initial_replans=self.initial_replans)
+                            scope_revision_rounds=self.scope_revisions, initial_replans=self.initial_replans,
+                            collection_recovery_policy=RECOVERY_POLICY)
             if status != 'completed' or self.handoff_reason:
                 metadata['handoff'] = build_handoff(run_id=self.context.run_id, revision=len(self.drafts),
                     reason=self.handoff_reason or self.stop, publication=publication, needs=self.evidence_needs,
-                    evidence=self.evidence, executors=self.executors, review=self.review)
+                    evidence=self.evidence, executors=self.executors, review=self.review, scope=self.ticket.scope)
         return build_report(ReportSnapshot(metadata, publication))
 
     def prompt_version(self):

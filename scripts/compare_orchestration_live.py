@@ -21,6 +21,7 @@ from api.auth import Principal
 from config.incident import IncidentConfig
 from evidence.render import render
 from evals.common import write_json
+from evals.independent.provider import IndependentProvider
 from runtime.context import ExecutionError, Limits
 from runtime.version import implementation_version
 from scripts.compare_incident import capture
@@ -29,6 +30,7 @@ from scripts.run_fresh_validation import FreshProvider
 LIMITS = Limits(model_calls=16, tool_calls=8, seconds=360,
                 reserve_model_calls=3, reserve_seconds=20)
 CASES = ('fresh_001', 'fresh_002', 'fresh_003')
+RECOVERY_CASES = (*CASES, 'eval_005', 'eval_008')
 CAP_PER_RUN = 16
 
 
@@ -36,18 +38,33 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def execution_plan(config):
+def provider_for(case):
+    return FreshProvider if case in CASES else IndependentProvider
+
+
+def execution_plan(config, suite='baseline'):
     lock = json.loads((ROOT / 'evals/fresh_validation/freeze.json').read_text(encoding='utf-8'))
-    for relative, expected in lock['files'].items():
+    files = dict(lock['files'])
+    if suite == 'collection_recovery':
+        independent = json.loads((ROOT / 'evals/independent/freeze.json').read_text(encoding='utf-8'))
+        files.update({path: value for path, value in independent['files'].items() if
+            path in {'evals/independent/manifest.json', 'evals/independent/rubric.json',
+                     'fixtures/incident_independent/catalog.json'} or
+            any(path.endswith(f'{case}.json') for case in RECOVERY_CASES if case.startswith('eval_'))})
+    elif suite != 'baseline':
+        raise ValueError('Unknown benchmark suite')
+    cases = RECOVERY_CASES if suite == 'collection_recovery' else CASES
+    for relative, expected in files.items():
         path = (ROOT / relative).resolve()
         if not path.is_relative_to(ROOT.resolve()) or digest(path) != expected:
             raise ValueError('Frozen benchmark input changed')
     scripts = ('scripts/compare_orchestration_live.py', 'scripts/compare_incident.py',
                'scripts/run_fresh_validation.py', 'evals/independent/provider.py')
-    jobs = [{'case_id': case, 'orchestration': mode} for index, case in enumerate(CASES)
+    jobs = [{'case_id': case, 'orchestration': mode} for index, case in enumerate(cases)
             for mode in (('legacy', 'review_driven') if index % 2 == 0 else ('review_driven', 'legacy'))]
-    return {'source_version': implementation_version(), 'script_hashes': {p: digest(ROOT / p) for p in scripts},
-        'fixture_and_criteria_hashes': lock['files'], 'historical_dataset_lock': digest(ROOT / 'evals/fresh_validation/freeze.json'),
+    return {'suite': suite, 'source_version': implementation_version(), 'script_hashes': {p: digest(ROOT / p) for p in scripts},
+        'fixture_and_criteria_hashes': files, 'historical_dataset_lock': digest(ROOT / 'evals/fresh_validation/freeze.json'),
+        **({'additional_dataset_lock': digest(ROOT / 'evals/independent/freeze.json')} if suite == 'collection_recovery' else {}),
         'model': config.model, 'effective_settings_hash': hashlib.sha256(json.dumps(
             {'base_url': config.base_url, 'extra_body': config.extra_body}, sort_keys=True).encode()).hexdigest(),
         'model_settings': {'temperature': 0, 'max_output_tokens': 2200, 'max_retries': 0, 'timeout': 30},
@@ -128,7 +145,7 @@ def summarize(report, ledger):
         'request_errors': [row for row in ledger.records if 'error_code' in row], 'recorded_token_usage': usage,
         'run_summary': report['run_summary'], 'draft_count': len(report.get('drafts', [])),
         'review_count': len(report.get('reviews', [])), 'event_counts': dict(Counter(e['type'] for e in events)),
-        'routes': [e for e in events if e['type'] in {'review_routed', 'collection_routed'}],
+        'routes': [e for e in events if e['type'] in {'review_routed', 'collection_exit_routed'}],
         'validation_failures': [e for e in events if e['type'] == 'validation_failure'],
         'handoff': report.get('handoff'), 'error': report.get('error'), 'estimated_cost': None}
 
@@ -136,12 +153,13 @@ def summarize(report, ledger):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
+    parser.add_argument('--suite', choices=('baseline', 'collection_recovery'), default='baseline')
     args = parser.parse_args(argv)
     config = IncidentConfig.from_file()
-    plan = execution_plan(config)
+    plan = execution_plan(config, args.suite)
     principal = Principal('synthetic_demo', 'cli_reader')
-    for case in CASES:
-        provider = FreshProvider(case, principal)
+    for case in dict.fromkeys(j['case_id'] for j in plan['execution_order']):
+        provider = provider_for(case)(case, principal)
         provider.authorize(principal, provider.ticket().scope)
     if not args.execute_live:
         print(json.dumps({'plan_only': True, **plan}, ensure_ascii=False, indent=2))
@@ -153,7 +171,7 @@ def main(argv=None):
     write_json(directory / 'execution-plan.json', plan)
     bundle = {'plan': plan, 'paid_attempts': 0, 'runs': []}
     for job in plan['execution_order']:
-        if execution_plan(config) != plan:
+        if execution_plan(config, args.suite) != plan:
             raise ValueError('Implementation or benchmark changed during execution')
         stem = f"{job['case_id']}-{job['orchestration']}"
         print(json.dumps({'starting': job, 'directory': str(directory)}), flush=True)
@@ -163,7 +181,7 @@ def main(argv=None):
         def factory(_):
             models = build_roles(config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body)
             return {role: LiveRecorder(model, ledger, role) for role, model in models.items()}
-        report = capture(job['case_id'], 'multi', factory, principal, LIMITS, provider_factory=FreshProvider,
+        report = capture(job['case_id'], 'multi', factory, principal, LIMITS, provider_factory=provider_for(job['case_id']),
             investigation_mode='programmatic', knowledge_mode='programmatic', blind_review=False,
             orchestration=job['orchestration'])
         report.update(model=config.model, execution_mode='live', source_version=plan['source_version'])
@@ -183,7 +201,7 @@ def main(argv=None):
         print(json.dumps({'completed': job, 'status': entry['status'], 'review_status': entry['review_status'],
             'paid_attempts': ledger.attempts, 'token_usage': entry['recorded_token_usage'],
             'duration_ms': entry['run_summary']['duration_ms']}, ensure_ascii=False), flush=True)
-        if execution_plan(config) != plan:
+        if execution_plan(config, args.suite) != plan:
             raise ValueError('Implementation or benchmark changed during execution')
     print(json.dumps({'summary_file': str(directory / 'summary.json'), 'paid_attempts': bundle['paid_attempts']}), flush=True)
     return 0

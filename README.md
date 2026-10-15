@@ -93,6 +93,8 @@ flowchart TD
 
 [无预置反馈的自主对照](examples/showcase/orchestration-autonomous-comparison.md)使用三个冻结合成场景，各运行两条流程一次，规划、草稿和复核均由真实模型生成。实际32次请求，标准18次、新编排14次；新编排未表现出稳定诊断优势，遗漏本地资源观测与来源失败后的交接行动仍需完善。标准流程继续默认。`scripts/compare_orchestration_live.py` 默认仅打印免费计划，显式 `--execute-live` 才开始新批次，每轮上限16次请求、整批96次，全部失败与token记录保留；不与此前种子探针混算。
 
+[本地取证与渠道恢复优化](examples/showcase/collection-recovery-followup.md)在新路径中增加最多两项预算内的登记本地日志检查，按真实失败台账阻止重复读取和无增量补查规划，并提供带完成条件的人工恢复渠道任务；程序任务与模型已复核行动分开记录。`--suite collection_recovery` 的五场景自主对照实际42次模型请求，标准26次、新编排16次；新编排补到关键本地观测，来源失败时保持partial并交接，宽泛反证与建议精确性仍有限制。该扩展套件每轮最多16次请求、整批160次，默认只显示免费计划；标准流程继续默认。
+
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |

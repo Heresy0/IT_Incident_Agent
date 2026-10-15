@@ -191,6 +191,18 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
         normalized = normalized.model_copy(update={'request_evidence': handoff})
         # A legacy blocker-derived request must pass the same ownership gate.
         return validate_review(normalized, view, audit=audit, emit=emit)
+    source = getattr(normalized, 'request_source', None)
+    if view.strict_need_scope and source:
+        request = normalized.request_evidence
+        if (not request or source.tool not in view.executors[request.target_role].allowed_tools()
+                or source.category is not None and source.tool != 'get_service_logs'):
+            raise ProtocolError('REVIEW_SOURCE_HINT_INVALID', [{'path': 'request_source',
+                'instruction': '仅标识request_evidence所需的本角色渠道；category仅用于日志，范围外信息用null。'}])
+        if any(a.blocker and a.blocker.resolution == 'external_source' and
+               (a.need_id == request.need_id or request.target_id in a.blocker.affected_targets)
+               for a in normalized.need_assessments):
+            raise ProtocolError('REVIEW_SOURCE_HINT_INVALID', [{'path': 'request_source',
+                'instruction': '范围外远端内部信息不是本服务登记渠道，request_source应为null。'}])
     return normalized
 
 

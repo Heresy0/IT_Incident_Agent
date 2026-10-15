@@ -184,7 +184,7 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['status'], 'completed')
         self.assertEqual(report['scope_revision_rounds'], 1)
         self.assertEqual(report['rework_rounds'], 0)
-        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual(report['run_summary']['tool_calls'], 4)
         pending = next(row for row in report['reviews'][1]['review']['need_assessments'] if row['need_id'] == 'N2')
         self.assertEqual(pending['verdict'], 'uncertain')
         self.assertEqual(pending['gap_kind'], 'revision')
@@ -269,7 +269,7 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['scope_revision_rounds'], 1)
         self.assertEqual(report['rework_rounds'], 0)
         self.assertEqual(report['run_summary']['model_calls'], 7)
-        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual(report['run_summary']['tool_calls'], 4)
         self.assertEqual([row['revision'] for row in report['reviews']], [1, 2, 3])
         self.assertEqual(report['drafts'][1]['draft']['hypotheses'][0]['cause'], 'Unproven quota reduction')
         self.assertEqual(report['output']['hypotheses'][0]['cause'], 'Observed dependency unreachable')
@@ -344,9 +344,11 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['status'], 'completed')
         self.assertEqual(report['run_summary']['model_calls'], 3)
         self.assertEqual(baseline['run_summary']['model_calls'], 4)
-        self.assertEqual(report['run_summary']['tool_calls'], baseline['run_summary']['tool_calls'])
+        self.assertEqual(report['run_summary']['tool_calls'], baseline['run_summary']['tool_calls'] + 2)
         self.assertEqual(len(c.models['supervisor'].model.histories), 1)
-        self.assertEqual(report['output'], baseline['output'])
+        self.assertEqual({k: v for k, v in report['output'].items() if k != 'missing_information'},
+                         {k: v for k, v in baseline['output'].items() if k != 'missing_information'})
+        self.assertEqual(sum(e['type'] == 'local_coverage_selected' for e in report['events']), 1)
 
     def test_revision_uses_no_queries_and_every_new_target_is_reviewed(self):
         c = make_coordinator(review_models())
@@ -355,7 +357,7 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['pure_revision_rounds'], 1)
         self.assertEqual(report['rework_rounds'], 0)
         self.assertEqual(report['run_summary']['model_calls'], 5)
-        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual(report['run_summary']['tool_calls'], 4)
         self.assertEqual(len(report['drafts']), 2)
         self.assertEqual(len(report['reviews']), 2)
         self.assertEqual(len(c.models['supervisor'].model.histories), 1)
@@ -395,7 +397,7 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['rework_rounds'], 1)
         self.assertEqual(report['pure_revision_rounds'], 0)
         self.assertEqual(len(report['drafts']), 2)
-        self.assertEqual(report['run_summary']['tool_calls'], 3)
+        self.assertEqual(report['run_summary']['tool_calls'], 5)
         self.assertEqual(len(c.models['supervisor'].model.histories), 1)
         payload = json.loads(c.models['diagnosis'].model.histories[1][1].content)['input']
         self.assertEqual(payload['revision_task']['requests'][0]['target_id'], 'A1')
@@ -521,6 +523,9 @@ class ReviewDrivenTests(unittest.TestCase):
         c = make_coordinator(review_models(gap='not_planned'))
         c.supervise()
         c.execute_task('investigation')
+        # Complete the program-selected local baseline before entering judging.
+        while c.next_node == 'investigation' and not c.stop:
+            c.execute_task('investigation')
         c.diagnose()
         c.review_draft()
         c.drafts.append({'revision': 2})
@@ -615,7 +620,7 @@ class ReviewDrivenTests(unittest.TestCase):
         self.assertEqual(report['status'], 'completed')
         self.assertEqual(report['pure_revision_rounds'], 1)
         self.assertEqual(report['rework_rounds'], 0)
-        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual(report['run_summary']['tool_calls'], 4)
         self.assertEqual(report['repair_counts']['diagnosis'], 1)
         self.assertEqual(len(report['drafts'][1]['draft']['hypotheses']), 1)
         self.assertIn('REVISION_SCOPE_CHANGED', [e.get('reason') for e in report['events'] if e['type'] == 'validation_failure'])

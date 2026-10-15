@@ -241,7 +241,16 @@ class RevisionNeedAssessment(NeedAssessment):
         description='For gap_kind=revision only: existing H/A requiring an authorized edit, not a new observation.')
 
 
+class RequestedSource(Contract):
+    tool: Literal['get_service_logs', 'get_service_metrics', 'get_recent_changes',
+                  'get_service_owner', 'search_runbooks', 'search_incidents']
+    category: Literal['dependency', 'configuration', 'resource'] | None = None
+
+
 class RevisionReviewDecision(ReviewDecision):
+    request_source: RequestedSource | None = Field(default=None,
+        description='For request_evidence seeking a ticket-service channel: identify its tool and log category if known. '
+                    'This is a channel hint, not permission or query parameters. External-service information leaves this null.')
     need_assessments: list[RevisionNeedAssessment] = Field(default_factory=list, max_length=6)
     revision_requests: list[RevisionRequest] = Field(default_factory=list, max_length=4,
         description='Only unsupported H/A wording or reasoning fixable with existing evidence. '

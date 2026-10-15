@@ -202,6 +202,14 @@ def execute_planned_reads(objective: dict, executor: ToolExecutor, context: RunC
         event('task_created', execution_mode='programmatic')
         event('task_started')
         for check in checks:
+            if objective.get('channel_recovery_policy'):
+                from workflow.collection_recovery import channel_failure
+                failure = channel_failure(executor, check['tool'])
+                if failure:
+                    event('planned_check_channel_blocked', name=check['tool'],
+                          query_profile=check['args'], error_code=failure['error'],
+                          status='not_executed', source_args=failure['args'])
+                    continue
             # Do not automatically retry failures/truncation or re-read a superset.
             if completion([check], executor)['checks'][0]['status'] != 'not_executed':
                 event('planned_check_reused', name=check['tool'])
