@@ -1,0 +1,16 @@
+{
+  "created_at": "2026-10-15T06:55:38.444460+00:00",
+  "application_commit": "6e04ca3ff8c895bc9b08bbd1e3d3ad0e5626c5b1",
+  "source_version": "e58ec12322a023da",
+  "model": "qwen3.7-flash",
+  "protocol": "3 new cases x 3 repetitions x 2 arms; no tuning after first live call; preserve all attempts",
+  "author_assessed": true,
+  "independent_blind_holdout": false,
+  "files": {
+    "evals/closeout_unseen/criteria.json": "fb3ec89961c653378b638f4bab96dbbb0fd90f58f9f79e78adf3ea9dbdf6e716",
+    "fixtures/incident_closeout_unseen/catalog.json": "93c439241b725fe72d84999909546857fad0884cf15ead99f35e2b36eda104c7",
+    "fixtures/incident_closeout_unseen/closeout_001.json": "90f976d52b33c3666dcdb09a11fc0144be3958573686163af2a37850694484c8",
+    "fixtures/incident_closeout_unseen/closeout_002.json": "4cdc5b68a4feb83f2ef154a9057551ac2ab67b79468113e5bcd0c0923a00f4a6",
+    "fixtures/incident_closeout_unseen/closeout_003.json": "bfc902bdcc9a5d09daded77f3488cb15b70efb6fa9114b81cdfaa8bf84a7dcf5"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "closeout_001",
+    "title": "closeout_001",
+    "symptoms": "业务报告事件迟迟未投递，10:06左右看到上游429，团队怀疑上游限流或刚才的发布。请判断积压原因及下一步。",
+    "scope": {
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "service_version": "2.6.0",
+      "start": "2026-10-15T10:00:00+00:00",
+      "end": "2026-10-15T10:20:00+00:00",
+      "allowed_dependencies": [
+        "notification-gateway"
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.24,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-before",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-after",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0.06,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [
+    {
+      "id": "pause-state",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:05:00+00:00",
+      "category": "configuration",
+      "level": "WARN",
+      "error_code": "CONSUMER_PAUSED",
+      "message": "消费组delivery-main运行状态paused=true，active_consumers=0；仅为状态快照，未记录操作者、暂停原因或批准单。"
+    },
+    {
+      "id": "queue-growth",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "category": "resource",
+      "level": "ERROR",
+      "error_code": "QUEUE_BACKLOG",
+      "message": "delivery-main队列深度从10:03的120增至10:12的8640，dequeue_rate=0；CPU 21%，内存43%。未说明暂停前的消费速率。"
+    },
+    {
+      "id": "intermittent-429",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:06:00+00:00",
+      "category": "dependency",
+      "level": "WARN",
+      "error_code": "HTTP_429",
+      "message": "到notification-gateway的100次已发送请求中6次返回429，94次2xx。此记录覆盖已发送请求，不覆盖滞留队列的事件。"
+    }
+  ],
+  "changes": [
+    {
+      "id": "release",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:09:00+00:00",
+      "category": "deployment",
+      "version": "2.6.0",
+      "summary": "更新事件模板布局；提交摘要未记载消费组状态修改，不能代替实际运行配置和暂停审计。",
+      "config_summary": {}
+    }
+  ],
+  "owners": [
+    {
+      "id": "owner",
+      "service": "event-delivery-worker",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "aliases": [
+        "event-delivery-worker"
+      ],
+      "team": "Synthetic Closeout Service Oncall",
+      "escalation": "合成业务服务值班队列；观测平台归属未提供"
+    }
+  ],
+  "runbooks": [],
+  "incidents": []
+}

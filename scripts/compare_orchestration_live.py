@@ -32,6 +32,13 @@ LIMITS = Limits(model_calls=16, tool_calls=8, seconds=360,
 CASES = ('fresh_001', 'fresh_002', 'fresh_003')
 RECOVERY_CASES = (*CASES, 'eval_005', 'eval_008')
 CAP_PER_RUN = 16
+UNSEEN_CASES = ('closeout_001', 'closeout_002', 'closeout_003')
+
+
+class CloseoutProvider(IndependentProvider):
+    """Only observations, never the separately stored assessment criteria."""
+    name = 'closeout_new_synthetic_fixture'
+    data_root = ROOT / 'fixtures/incident_closeout_unseen'
 
 
 def digest(path):
@@ -39,11 +46,19 @@ def digest(path):
 
 
 def provider_for(case):
+    if case in UNSEEN_CASES:
+        return CloseoutProvider
     return FreshProvider if case in CASES else IndependentProvider
 
 
 def execution_plan(config, suite='baseline'):
-    lock = json.loads((ROOT / 'evals/fresh_validation/freeze.json').read_text(encoding='utf-8'))
+    unseen = suite == 'unseen_closeout'
+    lock_path = ROOT / ('evals/closeout_unseen/freeze.json' if unseen else 'evals/fresh_validation/freeze.json')
+    lock = json.loads(lock_path.read_text(encoding='utf-8'))
+    if unseen and implementation_version() != lock['source_version']:
+        raise ValueError('Application changed after unseen-case freeze')
+    if unseen and config.model != lock['model']:
+        raise ValueError('Model changed after unseen-case freeze')
     files = dict(lock['files'])
     if suite == 'collection_recovery':
         independent = json.loads((ROOT / 'evals/independent/freeze.json').read_text(encoding='utf-8'))
@@ -51,27 +66,32 @@ def execution_plan(config, suite='baseline'):
             path in {'evals/independent/manifest.json', 'evals/independent/rubric.json',
                      'fixtures/incident_independent/catalog.json'} or
             any(path.endswith(f'{case}.json') for case in RECOVERY_CASES if case.startswith('eval_'))})
-    elif suite != 'baseline':
+    elif suite not in ('baseline', 'unseen_closeout'):
         raise ValueError('Unknown benchmark suite')
-    cases = RECOVERY_CASES if suite == 'collection_recovery' else CASES
+    cases = UNSEEN_CASES if unseen else RECOVERY_CASES if suite == 'collection_recovery' else CASES
     for relative, expected in files.items():
         path = (ROOT / relative).resolve()
         if not path.is_relative_to(ROOT.resolve()) or digest(path) != expected:
             raise ValueError('Frozen benchmark input changed')
     scripts = ('scripts/compare_orchestration_live.py', 'scripts/compare_incident.py',
                'scripts/run_fresh_validation.py', 'evals/independent/provider.py')
-    jobs = [{'case_id': case, 'orchestration': mode} for index, case in enumerate(cases)
-            for mode in (('legacy', 'review_driven') if index % 2 == 0 else ('review_driven', 'legacy'))]
+    repeats = 3 if unseen else 1
+    jobs = [{'case_id': case, 'orchestration': mode, **({'repetition': rep + 1} if unseen else {})}
+            for rep in range(repeats) for index, case in enumerate(cases)
+            for mode in (('legacy', 'review_driven') if (index + rep) % 2 == 0 else ('review_driven', 'legacy'))]
     return {'suite': suite, 'source_version': implementation_version(), 'script_hashes': {p: digest(ROOT / p) for p in scripts},
-        'fixture_and_criteria_hashes': files, 'historical_dataset_lock': digest(ROOT / 'evals/fresh_validation/freeze.json'),
+        'fixture_and_criteria_hashes': files, 'dataset_lock': digest(lock_path),
+        **({'application_commit_before_new_cases': lock['application_commit']} if unseen else
+           {'historical_dataset_lock': digest(lock_path)}),
         **({'additional_dataset_lock': digest(ROOT / 'evals/independent/freeze.json')} if suite == 'collection_recovery' else {}),
         'model': config.model, 'effective_settings_hash': hashlib.sha256(json.dumps(
             {'base_url': config.base_url, 'extra_body': config.extra_body}, sort_keys=True).encode()).hexdigest(),
         'model_settings': {'temperature': 0, 'max_output_tokens': 2200, 'max_retries': 0, 'timeout': 30},
         'limits': asdict(LIMITS), 'paid_cap_per_run': CAP_PER_RUN, 'maximum_paid_attempts': CAP_PER_RUN * len(jobs),
-        'execution_order': jobs, 'attempts_per_case_arm': 1, 'synthetic_observations': True,
+        'execution_order': jobs, 'attempts_per_case_arm': repeats, 'synthetic_observations': True,
         'seeded_turns': 0, 'replayed_turns': 0, 'independent_quality_score': False,
-        'benchmark_type': 'previously_seen_development_cases', 'estimated_cost': None,
+        'benchmark_type': 'new_cases_after_application_freeze_author_assessed' if unseen else 'previously_seen_development_cases',
+        'independent_blind_holdout': False, 'estimated_cost': None,
         'workflow_settings': {'investigation_mode': 'programmatic', 'knowledge_mode': 'programmatic',
             'blind_review': False, 'reviewer_repair_mode': 'shared', 'review_protection': 'default'},
         'assessment': 'Frozen criteria; author review after every run finishes. Partial may be appropriate. No retry-until-pass.'}
@@ -123,7 +143,8 @@ class LiveRecorder:
                   'input_chars': sum(len(str(m.content)) for m in messages), 'token_usage': None}
         try:
             response = self.model.invoke(messages)
-            record.update(content=response.content, token_usage=reported_usage(response))
+            record.update(content=response.content, token_usage=reported_usage(response),
+                          finish_reason=getattr(response, 'response_metadata', {}).get('finish_reason'))
             return response  # Preserve the original usage metadata for RunContext.
         except Exception as exc:
             record['error_code'] = getattr(exc, 'code', type(exc).__name__)
@@ -153,7 +174,7 @@ def summarize(report, ledger):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
-    parser.add_argument('--suite', choices=('baseline', 'collection_recovery'), default='baseline')
+    parser.add_argument('--suite', choices=('baseline', 'collection_recovery', 'unseen_closeout'), default='baseline')
     args = parser.parse_args(argv)
     config = IncidentConfig.from_file()
     plan = execution_plan(config, args.suite)
@@ -174,6 +195,8 @@ def main(argv=None):
         if execution_plan(config, args.suite) != plan:
             raise ValueError('Implementation or benchmark changed during execution')
         stem = f"{job['case_id']}-{job['orchestration']}"
+        if 'repetition' in job:
+            stem += f"-r{job['repetition']}"
         print(json.dumps({'starting': job, 'directory': str(directory)}), flush=True)
         ledger_path = directory / f'{stem}-requests.json'
         ledger = RequestLedger(path=ledger_path)
@@ -184,7 +207,7 @@ def main(argv=None):
         report = capture(job['case_id'], 'multi', factory, principal, LIMITS, provider_factory=provider_for(job['case_id']),
             investigation_mode='programmatic', knowledge_mode='programmatic', blind_review=False,
             orchestration=job['orchestration'])
-        report.update(model=config.model, execution_mode='live', source_version=plan['source_version'])
+        report.update(model=config.model, execution_mode='live', source_version=plan['source_version'], **job)
         path = directory / f'{stem}.json'
         write_json(path, report)
         try:

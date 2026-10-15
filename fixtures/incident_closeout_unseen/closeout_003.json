@@ -1,0 +1,92 @@
+{
+  "synthetic": true,
+  "ticket": {
+    "incident_id": "closeout_003",
+    "title": "closeout_003",
+    "symptoms": "业务反馈部分订单被重复记入结算明细，但监控成功率仍高。需要核查重复处理与幂等链路，当前日志采集不可用。",
+    "scope": {
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "service_version": "2.6.0",
+      "start": "2026-10-15T10:00:00+00:00",
+      "end": "2026-10-15T10:20:00+00:00",
+      "allowed_dependencies": []
+    }
+  },
+  "metrics": [
+    {
+      "id": "request_error_rate-before",
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.01,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "request_error_rate-after",
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "request_error_rate",
+      "value": 0.003,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-before",
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:01:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    },
+    {
+      "id": "dependency_error_rate-after",
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "metric": "dependency_error_rate",
+      "value": 0.002,
+      "unit": "ratio",
+      "aggregation": "sample",
+      "granularity": "1m"
+    }
+  ],
+  "logs": [],
+  "changes": [],
+  "owners": [
+    {
+      "id": "owner",
+      "service": "settlement-event-consumer",
+      "environment": "staging",
+      "data_version": "closeout-new-after-freeze-v1",
+      "visibility": "public_synthetic",
+      "timestamp": "2026-10-15T10:12:00+00:00",
+      "aliases": [
+        "settlement-event-consumer"
+      ],
+      "team": "Synthetic Closeout Service Oncall",
+      "escalation": "合成业务服务值班队列；观测平台归属未提供"
+    }
+  ],
+  "runbooks": [],
+  "incidents": [],
+  "source_errors": {
+    "get_service_logs": "SOURCE_UNAVAILABLE"
+  }
+}
