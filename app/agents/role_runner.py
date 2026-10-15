@@ -23,6 +23,7 @@ class RoleRequest:
     model_input: dict
     prompt: str
     terminal: bool = False
+    reject_truncated: bool = False
 
 
 class RoleRunner:
@@ -53,6 +54,9 @@ class RoleRunner:
                 raise ExecutionError("TIME_BUDGET_EXCEEDED")
             emit("model_output", role, output_chars=len(str(response.content)))
             try:
+                if request.reject_truncated and getattr(response,'response_metadata',{}).get('finish_reason')=='length':
+                    raise ProtocolError('MODEL_OUTPUT_TRUNCATED',[{'path':'response',
+                        'instruction':'响应触及输出上限，不能作为完整复核；在原额度内重写精简且完整的JSON。'}])
                 if response.tool_calls or getattr(response, "invalid_tool_calls", None) or len(str(response.content)) > 12000:
                     raise ProtocolError("ROLE_OUTPUT_INVALID")
                 content = response.content

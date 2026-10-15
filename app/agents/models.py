@@ -32,10 +32,10 @@ class ClassifiedChat:
             raise ExecutionError(reason, 'model') from None
 
 
-def build_model(api_key, model=DEFAULT_MODEL, *, base_url=None, extra_body=None, max_output_tokens=2200):
+def build_model(api_key, model=DEFAULT_MODEL, *, base_url=None, extra_body=None, max_output_tokens=2200, request_timeout=30):
     config = IncidentConfig.from_file()
     chat = ChatOpenAI(model=model, api_key=api_key, base_url=base_url or config.base_url,
-                     temperature=0, timeout=30, max_retries=0, max_tokens=max_output_tokens,
+                     temperature=0, timeout=request_timeout, max_retries=0, max_tokens=max_output_tokens,
                      extra_body={**(config.extra_body if extra_body is None else extra_body),
                                  'response_format': {'type': 'json_object'}},
                      use_responses_api=False)

@@ -95,7 +95,7 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     schema = deepcopy(schema)
     need_definition = 'RevisionNeedAssessment' if 'RevisionNeedAssessment' in schema['$defs'] else 'NeedAssessment'
     assessment = schema['$defs']['Assessment']
-    if bounded_refutation:
+    if bounded_refutation and 'refutation_basis' in assessment['properties']:
         assessment.setdefault('allOf', []).append({
             'if': {'properties': {'target_id': {'enum': [k for k in targets if k.startswith('H')]},
                                   'verdict': {'const': 'not_supported'}},
@@ -158,14 +158,14 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     # A blocker belongs to an existing question. Its category is derived from
     # that question, rather than asking the model to classify it a second time.
     blocker.pop('cause_level', None)
-    schema['$defs']['ReviewBlocker']['required'].remove('cause_level')
+    schema['$defs']['ReviewBlocker']['required'] = [key for key in schema['$defs']['ReviewBlocker']['required'] if key!='cause_level']
     blocker.pop('target_role', None)
     blocker['checks'] = {'type': 'array', 'maxItems': 0, 'default': []}
     blocker['resolution']['enum'] = ['external_source', 'not_planned']
     return review_contract_view(schema)
 
 
-def revision_review_generation(schema, needs, targets, evidence):
+def revision_review_generation(schema, needs, targets, evidence, *, materiality_aligned=False):
     """Present mutually exclusive need rows; never supply semantic verdicts."""
     schema = deepcopy(schema)
     observation_ids = [key for key, item in evidence.items() if item.kind == 'observation']
@@ -197,8 +197,14 @@ def revision_review_generation(schema, needs, targets, evidence):
             'revision_targets': {'maxItems': 0}, 'blocker': {'allOf': [{'$ref': '#/$defs/ReviewBlocker'},
                 {'properties': {'affected_targets': {'contains': {'enum': eligible}, 'minContains': 1}}}]}},
             'required': ['blocker']}
+        forms = [settled,pending_edit,pending_evidence]
+        if materiality_aligned and need.purpose not in {'symptom','mechanism'}:
+            pending_evidence['properties']['blocking'] = {'enum':[True,None]}
+            forms.append({'properties':{'verdict':{'const':'uncertain'},'gap_kind':{'const':'evidence'},
+                'blocking':{'const':False},'blocker':{'type':'null'},'revision_targets':{'maxItems':0}},
+                'required':['blocking']})
         rows.append({'type': 'object', 'properties': row_properties, 'required': ['need_id', 'verdict', 'reason'],
-                     'additionalProperties': False, 'oneOf': [settled, pending_edit, pending_evidence]})
+                     'additionalProperties': False, 'oneOf': forms})
     schema['properties']['need_assessments'].update(prefixItems=rows, items=False,
                                                     minItems=len(rows), maxItems=len(rows))
     return review_contract_view(schema)
@@ -311,13 +317,13 @@ class RoleContractContext:
     review_protection: str
 
 
-def role_output_schema(role, schema, view: RoleContractContext):
+def role_output_schema(role, schema, view: RoleContractContext, *, output_base=None):
     """Bind the role contract to currently visible sources and capabilities."""
     from agents.contracts import SupervisorRequest, ReviewDecision, ObservationReview
     from evidence.diagnosis import diagnosis_reference_options
     from evidence.ownership import owner_schema
     from workflow.review_protection import conservative, BOUNDED_POLICY
-    output_schema = owner_schema(SupervisorRequest if role == 'supervisor' else schema, view)
+    output_schema = deepcopy(output_base) if output_base is not None else owner_schema(SupervisorRequest if role == 'supervisor' else schema, view)
     reference_options = diagnosis_reference_options(view) if role == 'diagnosis' else []
     if role == 'diagnosis':
         reference_ids = [option['reference_id'] for option in reference_options]

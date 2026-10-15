@@ -9,6 +9,7 @@ from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
 from agents.reference_transport import ReferenceTransport, GUIDANCE as REFERENCE_GUIDANCE, POLICY as REFERENCE_POLICY
+from agents.reviewer_packet import ReviewerFrame, PROMPT as PACKET_GUIDANCE, POLICY as PACKET_POLICY
 from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output, revision_review_generation, revision_review_focus
 from workflow.planning import PlanningContext, validate_plan
 from workflow.state import WorkflowState, state_property
@@ -219,14 +220,20 @@ class Collaboration:
             purpose=self.ticket.purpose, phase=self.phase, planning_only=self.planning_only,
             investigation_mode=self.investigation_mode, knowledge_mode=self.knowledge_mode,
             review_protection=self.review_protection)
-        output_schema = role_output_schema(role, schema, view)
+        frame = (ReviewerFrame(view) if self.policy.review_driven and schema is RevisionReviewDecision
+                 and getattr(self.models[role],'json_output',False) else None)
+        output_schema = role_output_schema(role, schema, view, output_base=frame.base_schema() if frame else None)
         if role == 'diagnosis' and self.revision_task:
             output_schema = self.revision_task.output_schema(output_schema, self.references)
         if role == 'reviewer' and schema is RevisionReviewDecision:
             output_schema = scope_review_schema(output_schema, self.current_revision_concerns())
-            output_schema = revision_review_generation(output_schema, self.evidence_needs, self.targets(), self.evidence)
+            output_schema = revision_review_generation(output_schema, self.evidence_needs, self.targets(), self.evidence,
+                materiality_aligned=frame is not None)
             output_schema = semantic_schema(output_schema, self.targets(), self.evidence)
         model_input = role_model_input(role, schema, payload, view)
+        if frame:
+            output_schema = frame.finalize_schema(output_schema)
+            model_input = {**model_input,'output_contract':frame.rules()}
         prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
         if self.review_protection == BOUNDED_POLICY:
             from agents.prompts import BOUNDED_DIAGNOSIS, BOUNDED_REVIEW
@@ -240,6 +247,12 @@ class Collaboration:
             prompt += RECOVERY_GUIDANCE
         if self.policy.review_driven and role == 'reviewer' and issubclass(schema, ReviewDecision):
             prompt = SCOPED_REVIEWER
+            if frame:
+                prompt = PACKET_GUIDANCE
+                self.event('reviewer_packet',role,policy=PACKET_POLICY,
+                    bound_manual_actions={key:target.action for key,target in frame.targets.items()
+                        if key.startswith('A') and target.kind=='manual_check'},
+                    verdicts_supplied=False,wire_schema_sha256=hashlib.sha256(json.dumps(output_schema,sort_keys=True).encode()).hexdigest())
         transport = (ReferenceTransport(view) if self.policy.review_driven and role == 'diagnosis'
                      and getattr(self.models[role], 'json_output', False) else None)
         if transport:
@@ -247,14 +260,14 @@ class Collaboration:
             prompt += REFERENCE_GUIDANCE
             self.event('diagnosis_reference_transport', role, policy=REFERENCE_POLICY,
                 scope='request_and_correction_only', mappings=list(transport.rows))
-        request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal)
+        request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal, reject_truncated=frame is not None)
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
         return runner.run(request, self.models[role], emit=self.event,
-            parse=lambda content: parse_role_output(role, schema, transport.decode(content) if transport else content, view, emit=self.event), validate=validate,
+            parse=lambda content: parse_role_output(role, schema, frame.decode(content) if frame else transport.decode(content) if transport else content, view, emit=self.event), validate=validate,
             follow_up=lambda result: self.role_follow_up(role, schema, result),
             exhausted=lambda exc, details, value: self.role_failure(role, schema, exc, details, value),
-            correction=transport.correction if transport else None)
+            correction=frame.correction if frame else transport.correction if transport else None)
 
     def role_follow_up(self, role, schema, result):
         if role == 'supervisor' and self.needs_collection_follow_up(result):
@@ -1408,6 +1421,7 @@ class Collaboration:
                             scope_revision_rounds=self.scope_revisions, initial_replans=self.initial_replans,
                             collection_recovery_policy=RECOVERY_POLICY)
             metadata.update(semantic_scope_policy=SEMANTIC_POLICY,
+                reviewer_packet_policy=PACKET_POLICY if getattr(self.models['reviewer'],'json_output',False) else 'canonical_scripted_compatibility',
                 reference_transport_policy=REFERENCE_POLICY if getattr(self.models['diagnosis'], 'json_output', False) else 'canonical_scripted_compatibility',
                 claim_counterpoints=counterpoint_view(self.review, self.evidence) if self.review else [],
                 reviewed_manual_tasks=manual_task_view(self.review, self.executors, self.ticket.scope, self.evidence))
@@ -1428,7 +1442,8 @@ class Collaboration:
                    *[ex.schemas() for ex in self.executors.values()]]
         if self.policy.review_driven:
             payload.extend([REVIEW_DRIVEN, REVISION_DIAGNOSIS, RevisionDiagnosisSelection.model_json_schema(),
-                            SCOPED_REVIEWER, RECOVERY_GUIDANCE, SEMANTIC_POLICY, REFERENCE_GUIDANCE, REFERENCE_POLICY])
+                            SCOPED_REVIEWER, RECOVERY_GUIDANCE, SEMANTIC_POLICY, REFERENCE_GUIDANCE, REFERENCE_POLICY,
+                            PACKET_GUIDANCE, PACKET_POLICY])
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
 
