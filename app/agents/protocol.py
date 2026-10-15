@@ -165,13 +165,19 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     return review_contract_view(schema)
 
 
-def revision_review_generation(schema, needs, targets, evidence, *, materiality_aligned=False):
+def revision_review_generation(schema, needs, targets, evidence, *, materiality_aligned=False, compact_rows=False):
     """Present mutually exclusive need rows; never supply semantic verdicts."""
     schema = deepcopy(schema)
     observation_ids = [key for key, item in evidence.items() if item.kind == 'observation']
     source_rule = {'minItems': 1, 'uniqueItems': True,
                    'contains': {'enum': observation_ids}, 'minContains': 1}
     properties = deepcopy(schema['$defs']['RevisionNeedAssessment']['properties'])
+    if compact_rows:
+        # Match the old inline row fields exactly. Its conditions live in the
+        # per-question forms below; referring to the older need definition
+        # would reintroduce additional duplicate allOf conditions.
+        schema['$defs']['NeedRowFields'] = {'type': 'object', 'properties': properties,
+            'required': ['need_id', 'verdict', 'reason'], 'additionalProperties': False}
     rows = []
     for need in needs.values():
         eligible = [key for key, target in targets.items()
@@ -203,8 +209,18 @@ def revision_review_generation(schema, needs, targets, evidence, *, materiality_
             forms.append({'properties':{'verdict':{'const':'uncertain'},'gap_kind':{'const':'evidence'},
                 'blocking':{'const':False},'blocker':{'type':'null'},'revision_targets':{'maxItems':0}},
                 'required':['blocking']})
-        rows.append({'type': 'object', 'properties': row_properties, 'required': ['need_id', 'verdict', 'reason'],
-                     'additionalProperties': False, 'oneOf': forms})
+        if compact_rows:
+            # The shared definition already owns field types, citation enums,
+            # and extra-field rejection. Keep per-question forms and identity
+            # constraints without copying those properties into every row.
+            row = {'allOf': [{'$ref': '#/$defs/NeedRowFields'}],
+                   'properties': {'need_id': {'const': need.need_id}}, 'oneOf': forms}
+            if need.purpose in {'symptom', 'mechanism'}:
+                row['not'] = {'required': ['blocking']}
+            rows.append(row)
+        else:
+            rows.append({'type': 'object', 'properties': row_properties, 'required': ['need_id', 'verdict', 'reason'],
+                         'additionalProperties': False, 'oneOf': forms})
     schema['properties']['need_assessments'].update(prefixItems=rows, items=False,
                                                     minItems=len(rows), maxItems=len(rows))
     return review_contract_view(schema)

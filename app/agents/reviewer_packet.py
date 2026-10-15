@@ -7,7 +7,7 @@ from agents.contracts import (Assessment, ReviewBlocker, RevisionNeedAssessment,
     ManualHandoffTask, RevisionReviewDecision, RequestedSource)
 from evidence.diagnosis import ProtocolError
 
-POLICY = 'concise_reviewer_packet_v2'
+POLICY = 'concise_reviewer_packet_v3'
 
 
 class BriefAssessment(Assessment):

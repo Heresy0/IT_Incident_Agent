@@ -228,7 +228,7 @@ class Collaboration:
         if role == 'reviewer' and schema is RevisionReviewDecision:
             output_schema = scope_review_schema(output_schema, self.current_revision_concerns())
             output_schema = revision_review_generation(output_schema, self.evidence_needs, self.targets(), self.evidence,
-                materiality_aligned=frame is not None)
+                materiality_aligned=frame is not None, compact_rows=frame is not None)
             output_schema = semantic_schema(output_schema, self.targets(), self.evidence)
         model_input = role_model_input(role, schema, payload, view)
         if frame:
