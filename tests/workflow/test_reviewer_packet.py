@@ -4,6 +4,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from langchain_core.messages import AIMessage
+from pydantic import ValidationError
+from agents.investigation import validation_details
 from agents.contracts import RevisionReviewDecision
 from agents.protocol import RoleContractContext,role_output_schema,revision_review_generation,parse_role_output
 from agents.reviewer_packet import ReviewerFrame,ReviewerPacket
@@ -129,6 +131,25 @@ class ReviewerPacketTests(unittest.TestCase):
             self.assertEqual(model.call_args.kwargs['max_tokens'],2200)
             self.assertEqual(model.call_args.kwargs['timeout'],30)
             self.assertEqual(model.call_args.kwargs['max_retries'],0)
+
+    def test_conciseness_is_guidance_and_original_length_guard_still_applies(self):
+        self.data['assessments'][0]['reason'] = '证' * 150
+        value = self.decoded(self.data)
+        self.assertEqual(value.assessments[0].reason, '证' * 150)
+        self.data['assessments'][0]['reason'] = '证' * 501
+        with self.assertRaises(ValidationError):
+            self.decoded(self.data)
+
+    def test_packet_errors_identify_known_misplaced_fields_and_redact_unknown_keys(self):
+        self.data['assessments'][0].update(blocker={'secret': 'not exposed'}, private_response_key='not exposed')
+        with self.assertRaises(ValidationError) as caught:
+            self.decoded(self.data)
+        original = validation_details(caught.exception, RevisionReviewDecision)
+        precise = validation_details(caught.exception, RevisionReviewDecision, extra_fields=self.frame.validation_fields)
+        self.assertTrue(all(d['path'].endswith('<extra>') for d in original['details']))
+        self.assertEqual([d['path'] for d in precise['details']], ['assessments.0.blocker', 'assessments.0.<extra>'])
+        self.assertNotIn('private_response_key', json.dumps(precise))
+        self.assertNotIn('not exposed', json.dumps(precise))
 
 
 if __name__=='__main__':unittest.main()

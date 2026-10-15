@@ -53,7 +53,7 @@ def literal_options(schema, location):
         if isinstance(value, str)))
 
 
-def validation_details(exc, schema=None):
+def validation_details(exc, schema=None, *, extra_fields=()):
     if isinstance(exc, json.JSONDecodeError):
         return {"reason": "invalid_json", "details": []}
     if isinstance(exc, ValidationError):
@@ -69,6 +69,9 @@ def validation_details(exc, schema=None):
                   "support_refs", "counter_refs", "pending_checks", "level", "evidence_explanation",
                   "recommended_actions", "condition", "expected_result", "risk", "requires_approval",
                   "kind", "repair"}
+        # A request may expose additional fixed public contract field names.
+        # Arbitrary response keys and values remain redacted.
+        fields.update(extra_fields)
         errors = exc.errors(include_input=True, include_context=False, include_url=False)[:5]
         details = []
         for error in errors:

@@ -24,6 +24,7 @@ class RoleRequest:
     prompt: str
     terminal: bool = False
     reject_truncated: bool = False
+    validation_fields: tuple[str, ...] = ()
 
 
 class RoleRunner:
@@ -68,7 +69,7 @@ class RoleRunner:
                     continue
                 return result
             except (ValidationError, ValueError, TypeError) as exc:
-                details = {"reason": exc.code, "details": exc.details} if isinstance(exc, ProtocolError) else validation_details(exc, schema)
+                details = {"reason": exc.code, "details": exc.details} if isinstance(exc, ProtocolError) else validation_details(exc, schema, extra_fields=request.validation_fields)
                 emit("validation_failure", role, **details, attempt=attempt,
                            model_call_index=self.context.counts['model_calls'],
                            repair_count=self.repairs['repairs'], schema_name=schema.__name__,

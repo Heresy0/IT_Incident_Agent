@@ -260,7 +260,8 @@ class Collaboration:
             prompt += REFERENCE_GUIDANCE
             self.event('diagnosis_reference_transport', role, policy=REFERENCE_POLICY,
                 scope='request_and_correction_only', mappings=list(transport.rows))
-        request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal, reject_truncated=frame is not None)
+        request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal,
+            reject_truncated=frame is not None, validation_fields=frame.validation_fields if frame else ())
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
         return runner.run(request, self.models[role], emit=self.event,

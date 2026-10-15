@@ -7,24 +7,20 @@ from agents.contracts import (Assessment, ReviewBlocker, RevisionNeedAssessment,
     ManualHandoffTask, RevisionReviewDecision, RequestedSource)
 from evidence.diagnosis import ProtocolError
 
-POLICY = 'concise_reviewer_packet_v1'
+POLICY = 'concise_reviewer_packet_v2'
 
 
 class BriefAssessment(Assessment):
     refutation_basis: ClassVar[None] = None
-    reason: str = Field(min_length=1, max_length=140)
 
 
 class BriefBlocker(ReviewBlocker):
     cause_level: ClassVar[str] = 'program_bound'
     target_role: ClassVar[str] = 'investigation'
     checks: ClassVar[tuple] = ()
-    missing_observation: str = Field(min_length=1, max_length=180)
-    decision_impact: str = Field(min_length=1, max_length=140)
 
 
 class BriefNeed(RevisionNeedAssessment):
-    reason: str = Field(min_length=1, max_length=140)
     blocker: BriefBlocker | None = None
 
 
@@ -34,15 +30,10 @@ class BriefRequest(EvidenceRequest):
     target_role: ClassVar[str] = 'investigation'
     checks: ClassVar[tuple] = ()
     source: RequestedSource | None = None
-    missing_observation: str = Field(min_length=1, max_length=180)
-    expected_value: str = Field(default='', max_length=140)
 
 
 class BoundManualTask(ManualHandoffTask):
     action_quote: ClassVar[str] = 'program_bound'
-    question: str = Field(min_length=1, max_length=180)
-    completion_criteria: str = Field(min_length=1, max_length=180)
-    decision_use: str = Field(min_length=1, max_length=140)
 
 
 class ReviewerPacket(RevisionReviewDecision):
@@ -60,6 +51,9 @@ class ReviewerFrame:
         self.targets = {key: value.model_copy(deep=True) for key, value in view.targets.items()}
         self.needs = {key: value.model_copy(deep=True) for key, value in view.evidence_needs.items()}
         self.roles = {s['function']['name']: role for role, executor in view.executors.items() for s in executor.schemas()}
+        canonical = RevisionReviewDecision.model_json_schema()
+        self.validation_fields = tuple(sorted({field for definition in [canonical, *canonical['$defs'].values()]
+            for field in definition.get('properties', {})} | {'source'}))
 
     def base_schema(self):
         # Existing generation guards address canonical definition names. DTO
@@ -88,10 +82,33 @@ class ReviewerFrame:
                 'if':{'properties':{'assessments':{'contains':supported}},'required':['assessments']},
                 'then':{'properties':{'manual_tasks':{'contains':match}},'required':['manual_tasks']},
                 'else':{'properties':{'manual_tasks':{'not':{'contains':match}}}}})
+        triggers = [key for key, target in self.targets.items()
+                    if key.startswith('H') and target.level == 'trigger']
+        nontriggers = [key for key in self.targets if key not in triggers]
+        scoped_needs = [key for key, need in self.needs.items()
+                        if need.purpose in {'symptom', 'mechanism', 'alternative'}]
+        if triggers and nontriggers and scoped_needs:
+            # Equivalent to the existing validate_need_scope relationship, not
+            # an answer: the model still chooses every target/need verdict.
+            # Target coverage is independently required and validated. For
+            # covered outputs, "no unresolved nontrigger" avoids repeating a
+            # contains clause for every supported finding and action.
+            no_unresolved = {'not': {'contains': {'properties': {'target_id': {'enum': nontriggers},
+                'verdict': {'enum': ['uncertain', 'not_supported']}}, 'required': ['target_id', 'verdict']}}}
+            unresolved_trigger = {'contains': {'properties': {'target_id': {'enum': triggers},
+                'verdict': {'enum': ['uncertain', 'not_supported']}}, 'required': ['target_id', 'verdict']}}
+            schema.setdefault('allOf', []).append({
+                'if': {'properties': {'assessments': {'allOf': [no_unresolved, unresolved_trigger]}},
+                       'required': ['assessments']},
+                'then': {'properties': {'need_assessments': {'items': {
+                    'if': {'properties': {'need_id': {'enum': scoped_needs}}, 'required': ['need_id']},
+                    'then': {'properties': {'verdict': {'enum': ['supported', 'not_required']}}}}}}}})
         return schema
 
     def rules(self):
         return {'policy':POLICY,
+            'field_ownership': 'assessments每行只有target_id/verdict/reason/evidence_ids；'
+                'blocker只在need_assessments行内；counterpoints、ledger_assertions、manual_tasks均在根级。',
             'need_blocker_targets':{key:[tid for tid,target in self.targets.items()
                 if not (need.purpose in {'symptom','mechanism','alternative'} and tid.startswith('H') and target.level=='trigger')]
                 for key,need in self.needs.items()},
@@ -133,7 +150,8 @@ class ReviewerFrame:
         return json.dumps(data,ensure_ascii=False)
 
     def correction(self, details):
-        text = ('。本次仍输出ReviewerPacket，reason各≤140字；可省略空数组、null和默认字段，不复述原稿。'
+        text = ('。本次仍输出ReviewerPacket，reason建议各≤140字，硬上限以schema为准；可省略空数组、null和默认字段，不复述原稿。'
+                'assessments仅target_id/verdict/reason/evidence_ids，blocker只在need_assessments；counterpoints/manual_tasks仅根级。'
                 'need每行必须有自己的reason。action_quote由程序绑定，refutation_basis/cause_level/checks/'
                 'target_role及顶层request_source不输出；来源只写request_evidence.source。')
         if details['reason']=='MODEL_OUTPUT_TRUNCATED':
@@ -165,7 +183,8 @@ manual_tasks只给本次supported的manual_check，说明对象、缺失字段�
 非核心非阻塞未知可blocking=false、blocker=null并说明限制；核心缺口仍阻塞，不能为通过编造支持。
 revision_concerns只是未提交提案，有时逐项scope_assessments独立keep/revise/evidence；revise对应未支持H及reasoning请求。
 缺口无可行读取或仅非关键未知时follow_up_reason说明；status_check只核对观测，不要求机制/行动。
-输出reason各≤140字，省略空数组/null/默认字段，不复述原稿。refutation_basis/cause_level/target_role/checks不输出。
+assessments每行仅target_id/verdict/reason/evidence_ids；blocker只在need_assessments，counterpoints/ledger_assertions/manual_tasks仅根级。
+reason建议各≤140字，硬上限按schema；省略空数组/null/默认字段，不复述原稿。refutation_basis/cause_level/target_role/checks不输出。
 action_quote程序绑定当前A原文，manual_tasks不抄写；顶层request_source不输出，使用request_evidence.source。
 部署完成时间不证明开始或生效时间也晚于故障，不能据此作严格时序排除。所有判断仍须通过原校验和预算。
 """
