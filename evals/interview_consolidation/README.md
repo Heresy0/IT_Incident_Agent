@@ -11,6 +11,6 @@
 .\.venv\Scripts\python.exe scripts/verify_interview_flow.py --execute-live
 ```
 
-第一条仅展示计划；第二条使用已配置模型执行。结果见[收敛交付记录](../../examples/showcase/interview-consolidation.md)及[完整原始记录](../../examples/showcase/interview-consolidation-validation.json)。这三个已见案例不是独立盲测，不能计算泛化准确率。第二例发布记录仅表示完成时间，不能用于严格推断开始／生效时间。
+第一条仅展示计划；第二条使用已配置模型执行。结果见[收敛交付记录](../../examples/showcase/architecture-consolidation.md)及[完整原始记录](../../examples/showcase/interview-consolidation-validation.json)。这三个已见案例不是独立盲测，不能计算泛化准确率。第二例发布记录仅表示完成时间，不能用于严格推断开始／生效时间。
 
 `preservation.json`列出原实验分支、固定提交、44份新增历史资料哈希以及本地2607文件清单的摘要。原实验脚本需切回 `codex/review-driven-orchestration` 及相应冻结版本运行，保留的历史协议不表示当前主流程支持这些实验接口。

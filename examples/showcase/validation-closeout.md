@@ -1,6 +1,8 @@
-# 面试版本收尾与展示
+# 标准流程验证与案例复现
 
-展示主线是三个模型角色：Supervisor规划、Diagnosis诊断、Reviewer核验；Investigation与Knowledge按计划执行受限只读取证。架构见[当前说明](interview-architecture.md)，不要把旧五模型角色演示当作当前默认。
+原始JSON、数据集和冻结协议保留原标识符、路径与哈希。历史复现使用对应冻结提交，当前说明文档只作技术分析，不覆盖或重算旧结果。
+
+执行主线是三个模型角色：Supervisor规划、Diagnosis诊断、Reviewer核验；Investigation与Knowledge按计划执行受限只读取证。架构见[当前说明](system-architecture.md)，不要把旧五模型角色演示当作当前默认。
 
 ## 人工评估的四个问题
 
@@ -15,11 +17,11 @@
 
 近端机制可以有依据，触发来源仍未知。有效人工核查待办不要求预先取得结果；核查成功也不等于服务已恢复。
 
-## 两个固定展示案例
+## 两个固定验证案例
 
 这里选择既有、完整留档的两次真实模型运行用于报告展示，不重新抽取通过样本计算准确率，也不重跑付费请求。两次均使用合成只读工具数据。
 
-**机制案例：只读写入。** 来源为[首批最小修复档案](interview-minimal-repairs-validation.json)的closeout_002，4次真实请求、2次工具执行，completed／passed。展示EROFS与进程命名空间内挂载ro如何支持近端写入受阻，再展示为何变成只读仍待人工核实。原报告对竞争解释的排除偏强，部署完成时间不能证明开始／生效时间；面试时主动指出此限制。它展示诊断流程与机制依据，不代表整份报告语义全对或服务已恢复。
+**机制案例：只读写入。** 来源为[首批最小修复档案](interview-minimal-repairs-validation.json)的closeout_002，4次真实请求、2次工具执行，completed／passed。展示EROFS与进程命名空间内挂载ro如何支持近端写入受阻，再展示为何变成只读仍待人工核实。原报告对竞争解释的排除偏强，部署完成时间不能证明开始／生效时间；该限制需与运行结果一并解释。它展示诊断流程与机制依据，不代表整份报告语义全对或服务已恢复。
 
 **交接案例：业务重复。** 来源为[补充复验档案](interview-blocker-followup-validation.json)的closeout_003，6次真实请求、3次工具执行，partial／needs_information，终止NEEDS_INFORMATION。展示原始查询、复核缺口和人工待办；程序允许保留未知并结束。原报告N1仍用技术指标支持业务重复，H2因果方向也有问题，因此交接有效与诊断准确分开讲。这是有缺陷的真实结果，不将其美化成理想交接。
 
@@ -44,7 +46,7 @@ sources = [
     ('handoff', 'interview-blocker-followup-validation.json',
      '593d2e2e3a208821cb3d2547e99279e09bf88dddae9268a45e7a593f177265b7')
 ]
-folder = root / 'output/interview-closeout-display' / str(uuid4())
+folder = root / 'output/standard-flow-display' / str(uuid4())
 folder.mkdir(parents=True, exist_ok=False)
 for name, filename, expected in sources:
     path = root / 'examples/showcase' / filename
@@ -65,18 +67,10 @@ print(folder.resolve())
 需要现场运行实际标准图时，沿用免费命令：
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/demo_interview_flow.py
+.\.venv\Scripts\python.exe scripts/demo_standard_flow.py
 ```
 
 该命令使用脚本模型与合成工具，验证程序取证、引用、预算及报告链路；不是一次新的自主诊断。两个真实案例的输入、响应、原始报告和失败记录在上述档案中保留。
-
-## 三分钟讲解顺序
-
-第一分钟讲模型与程序边界：计划经工具、参数、授权范围校验后执行，证据再交给诊断与复核；修复需要独立审批。
-
-第二分钟打开机制案例，沿日志来源、候选机制、Reviewer评估和人工核查建议讲一条完整链路，明确触发未知。
-
-第三分钟打开交接案例，指出语义缺陷与缺证据，解释为什么partial是可接受的交付，以及为什么没有继续增加角色和仲裁状态。可以说：“我保留失败记录，结构校验负责可确定的边界，语义质量单独评估；收益没有明确超过副作用的改动不进入默认流程。”
 
 ## 本轮限定试验结论
 
@@ -97,4 +91,4 @@ print(folder.resolve())
 
 本轮免费标准图排练完成，4次脚本模型步骤、2次工具执行、0次取证模型调用、0次付费请求；两个历史报告离线展示配方已实际运行。运行时代码指纹仍为fa6e3b3b76224064，本轮未修改app或测试，沿用上一轮701项回归（681通过、20项数据库跳过），不把它标成新增测试成绩。对2699份旧输出与验证档案的字节检查通过，原实验分支保留。
 
-此处结束开发收尾。后续只有新增真实业务记录、可复现的确定性缺陷或明确改变展示需求时，才重新评估修改；不以偶发模型失败启动新一轮编排扩展。
+本次验证已经结束。后续只有新增真实业务记录、可复现的确定性缺陷或明确改变业务需求时，才重新评估修改；不以偶发模型失败启动新一轮编排扩展。

@@ -120,7 +120,3 @@ $env:PYTHONPATH='app'
 .\.venv\Scripts\python.exe -m unittest tests.architecture.test_state_policy
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -p 'test_*.py'
 ```
-
-## 面试讲解
-
-“我把模型协议、执行约束和业务流程分开：Supervisor 提出查询，Planning 校验计划，Collection 组织受限取证，ToolExecutor 校验并执行工具；RoleRunner 负责结构化调用、有限纠正和审计，Review 检查复核结果、缺口和补查资格。Coordinator 根据 WorkflowPolicy 做额度判断，将有效结果提交到 WorkflowState 并推进阶段；RunContext 负责真实调用时的原子预算执行，Reporting 依据复核结果发布内容。并行分支使用独立台账和共享总预算，汇总节点统一提交状态。独立复核是职责和上下文分离，同基础模型仍可能出现相关错误，因此我保留单 Agent 对照及外部评测。”

@@ -113,7 +113,7 @@ def render_page(summary):
             f'<details><summary>实际节点与工具轨迹</summary><ol>{timeline}</ol></details>'
             f'<p class="links"><a href="{esc(demo["key"])}.md">诊断报告</a> · <a href="{esc(demo["key"])}.json">完整合成运行记录</a></p></section>')
     return '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IT 故障 Agent · 面试演示</title><style>
+<title>IT 故障 Agent · 流程演示</title><style>
 *{box-sizing:border-box}body{margin:0;background:#f0f4f8;color:#183149;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif}
 main{max-width:1040px;margin:auto;padding:38px 24px 60px}header{padding:30px;background:#112d43;color:#fff;border-radius:18px}
 h1{font-size:32px;margin:5px 0 14px}h2{font-size:24px;margin:4px 0 10px}p{margin:12px 0}.eyebrow{font-size:13px;letter-spacing:1px;color:#478580}

@@ -1,10 +1,10 @@
 # Agent 编排与 Harness 项目展示
 
-当前优先阅读[面试版本收尾与两个固定案例](interview-closeout.md)。限定提示试验未进入默认版本；完整记录和保守停止理由一并保留。
+当前优先阅读[标准流程验证与两个固定案例](validation-closeout.md)。限定提示试验未进入默认版本；完整记录和保守停止理由一并保留。
 
-[标准流程最小修复及全部失败](interview-minimal-repairs.md)：五个局部文件、无新增编排；首批三个案例与一次固定补充检查分别留档，引用合法不等于业务语义正确。
+[标准流程最小修复及全部失败](standard-flow-repairs.md)：五个局部文件、无新增编排；首批三个案例与一次固定补充检查分别留档，引用合法不等于业务语义正确。
 
-当前展示入口：[面试架构与90秒讲解](interview-architecture.md)、[收敛交付与验证](interview-consolidation.md)、[完整真实检查记录](interview-consolidation-validation.json)。免费标准流程排练运行 `python scripts/demo_interview_flow.py`。
+当前展示入口：[系统架构与执行流程](system-architecture.md)、[收敛交付与验证](architecture-consolidation.md)、[完整真实检查记录](interview-consolidation-validation.json)。免费标准流程排练运行 `python scripts/demo_standard_flow.py`。
 
 原实验源码保留在 `codex/review-driven-orchestration`。本目录保留的Reviewer／修稿实验报告及对应冻结协议均为历史证据，不代表当前分支支持这些接口或已证明质量收益。
 
@@ -28,9 +28,9 @@
 
 支持[Investigation / Knowledge 并行取证](parallel-collection.md)：同轮独立任务分叉、受共享预算约束、汇总后诊断，复核补查保持顺序。免费串并行演示使用人工延迟和相同脚本响应，验证调度行为；此前真实对照保留原版本属性。
 
-最新[定向真实对照及面试话术](curated-live-guide.md)：两个展示案例与一个修订版，6次真实运行，47模型/16合成工具。保留每轮结果、版本和报告哈希。真实Reviewer将没有直接业务错误证据的具体候选保留为unresolved，展示独立复核对发布的影响；本批未证明整体诊断优势。参见[全部配对](curated-live-comparison.json)、[助手辅助分析](curated-live-assistant-review.json)、[草稿—复核—发布证据](curated-review-evidence.json)。
+最新[定向真实对照分析](curated-live-analysis.md)：两个展示案例与一个修订版，6次真实运行，47模型/16合成工具。保留每轮结果、版本和报告哈希。真实Reviewer将没有直接业务错误证据的具体候选保留为unresolved，展示独立复核对发布的影响；本批未证明整体诊断优势。参见[全部配对](curated-live-comparison.json)、[助手辅助分析](curated-live-assistant-review.json)、[草稿—复核—发布证据](curated-review-evidence.json)。
 
-面试优先阅读[五分钟讲解、复现步骤与追问回答](interview-guide.md)。新增 `scripts/demo_interview.py` 复用两个冻结专项案例和原连接池案例，生成三条完整合成报告、草稿/复核变化、工具轨迹和本地展示页。[交付记录](interview-demo-result.json)保留11/6、9/4、12/5的脚本调用计数；不是自主模型成绩，不修改历史真实结果。
+免费脚本演示使用真实图和合成观测，[交付记录](interview-demo-result.json)保留原计数；不作为自主模型成绩。
 
 2026-10-10 最新[Supervisor 协议容错实施说明](supervisor-protocol-resilience.md)：局部证据问题更新、冗余任务审计、一次预算内诊断收尾及未复核观测保留。九项新增免费回放通过，全量343项中336通过、7项隔离数据库集成跳过。没有新增付费调用，不代表多Agent质量优势，详见[验证记录](supervisor-protocol-validation.json)。
 
@@ -144,25 +144,9 @@ Codex 已逐项辅助审阅这两份报告的十二项 F/H/A 陈述，见 [assis
 
 这是项目业务落地证据，不用于统计整体修复成功率。命令行展示还会运行模拟闭环：零真实写操作，一次模拟执行；重复相同执行请求返回原结果，不重复执行；修复 verified 后工单仍需人工确认。
 
-## 五分钟讲解顺序
+## 验证边界
 
-| 时间 | 内容 |
-| --- | --- |
-| 0–1 分钟 | 说明问题与架构：模型决定调度和工具，Harness 限制权限、预算与可信输出 |
-| 1–2 分钟 | 打开正常演示，说明一条观测怎样进入事实与原因引用 |
-| 2–3 分钟 | 打开补查演示，指出历史与当前证据冲突、具体检查与新观测 |
-| 3–4 分钟 | 打开预算不足结果，说明 partial、停止原因、结构校验不保证因果正确 |
-| 4–5 分钟 | 展示真实业务闭环与历史对照，说明多角色成本和当前限制 |
-
-## 简历表述与面试边界
-
-可按个人实际参与情况选择以下表述，不添加未测量的提升百分比：
-
-- 基于 LangGraph 实现五角色故障诊断编排，支持模型选择只读工具、证据驱动诊断、逐项复核及一次有界补查。
-- 构建统一执行 Harness，约束工具权限与服务范围，管理调用预算、去重和有限重试，使用结构化契约与来源引用校验保留可追溯运行记录。
-- 实现人工审批与受限执行器的修复闭环，并建立同预算单／多 Agent 对照与失败案例分析；本地 Worker 恢复及文档入库由用户确认。
-
-面试时能直接指出：模型选择工具的位置是 Investigation 循环；路由执行在 LangGraph，业务协调在 Collaboration；权限与计数在程序侧，不依赖提示词承诺。五角色不是五种模型，复核不是独立真值。对照只有小样本，尚未证明多角色准确率提升。SSE 回放不等于 checkpoint 恢复。
+角色阶段复核不等于独立真值；小样本对照尚未证明总体诊断质量提升。SSE事件回放不等于checkpoint恢复。
 
 ## 当前完成范围
 

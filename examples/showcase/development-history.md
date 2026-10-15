@@ -10,9 +10,9 @@
 
 ## Agent 编排与 Harness 展示
 
-新增[定向真实对照与面试讲解](curated-live-guide.md)：两个展示场景加一次工单修订，共6次真实运行、47次模型/16次合成工具。实际展示Reviewer拒绝为不充分候选背书，保留完整对照和原报告哈希；没有证明多Agent完整诊断质量领先，不能把目的性展示集当独立准确率测试。[配对记录](curated-live-comparison.json)与[真实复核片段](curated-review-evidence.json)可核查。
+新增[定向真实对照分析](curated-live-analysis.md)：两个展示场景加一次工单修订，共6次真实运行、47次模型/16次合成工具。实际展示Reviewer拒绝为不充分候选背书，保留完整对照和原报告哈希；没有证明多Agent完整诊断质量领先，不能把目的性展示集当独立准确率测试。[配对记录](curated-live-comparison.json)与[真实复核片段](curated-review-evidence.json)可核查。
 
-面试展示入口：[五分钟讲解与追问](interview-guide.md)。运行 `.\.venv\Scripts\python.exe scripts/demo_interview.py` 可生成历史经验核查、冲突证据与复核补查三个本地演示及展示页。真实LangGraph与工具执行器配合脚本角色响应和合成观测，付费调用为零；展示协作机制，不作为模型胜率结论。
+免费演示可运行 `.\.venv\Scripts\python.exe scripts/demo_interview.py`。真实图与工具执行器配合脚本角色响应和合成观测，不作为模型质量成绩。
 
 项目重点是**模型驱动的任务与工具选择，以及程序控制的权限、预算、证据和审批边界**。五角色使用同一底层模型的不同提示词；LangGraph 支持 Investigation / Knowledge 同轮独立任务并行取证、汇总后诊断，复核和补查仍顺序执行，没有 checkpoint 恢复。格式与引用正确不能保证因果判断正确。
 
@@ -26,7 +26,7 @@
 
 不需要数据库、Docker 或密钥，不调用真实模型，不执行真实修复。输出路径会显示在终端，打开其中的 `index.html` 查看任务和节点轨迹；原始控制报告及 `summary.json` 同时保留。正常诊断、实际执行一次复核补查、预算不足受控退出均已验证。模拟结果只证明程序控制行为，模型质量标为 `excluded_scripted`。
 
-展示材料可随仓库阅读：[演示与五分钟讲解](README.md)、[设计取舍](design.md)、[Harness 证据](harness.md)、[历史真实模型对照](historical-comparison.json)。历史对照是一组旧版本合成开发案例：单 Agent 6 次模型/24.234 秒，多 Agent 13 次模型/62.672 秒，两者均 partial；未证明多 Agent 质量提升。报告哈希和机械检查已核验，逐项助手分析与正式人工评分分开，人工评分仍待确认，不宣称生产准确率。
+验证材料可随仓库阅读：[验证与演示入口](README.md)、[设计取舍](design.md)、[Harness 证据](harness.md)、[历史真实模型对照](historical-comparison.json)。历史对照是一组旧版本合成开发案例：单 Agent 6 次模型/24.234 秒，多 Agent 13 次模型/62.672 秒，两者均 partial；未证明多 Agent 质量提升。报告哈希和机械检查已核验，逐项助手分析与正式人工评分分开，人工评分仍待确认，不宣称生产准确率。
 
 2026-10-10 经用户授权补充[当前版本真实对照](current-comparison.json)：同一 case_003、qwen-turbo、每条16模型/8工具上限，各运行一次。单 Agent 2模型/4工具、10.438秒、completed/not_performed，必要检查4/4；多 Agent 6模型/1工具、18.328秒、completed/passed，必要检查3/4，未查询获取连接超时日志。当前单 Agent 更快、取证更全，多 Agent 建议更谨慎；内部复核通过不等于完整诊断，未证明综合质量领先。总共8次模型调用，没有追加重测；正式人工评分仍待审阅。
 

@@ -11,4 +11,4 @@
 .\.venv\Scripts\python.exe scripts/compare_showcase_revision.py --live --execute-live --cases show_101 --model-budget 16 --tool-budget 8
 ```
 
-详见[完整结果和面试讲解](../../examples/showcase/curated-live-guide.md)。本轮已停止追加调用，旧报告、失败结果和原测试集均保留。
+详见[完整结果分析](../../examples/showcase/curated-live-analysis.md)。本轮已停止追加调用，旧报告、失败结果和原测试集均保留。

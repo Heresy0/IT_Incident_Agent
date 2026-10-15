@@ -2,7 +2,7 @@
 
 新增[离线分类统计](run-statistics.md)：按模型、执行模式、源码/数据版本与预算分组，分别统计协议错误、取证执行缺口、耗时、调用及显式价格下的Token费用。关键漏查、错误结论、无依据建议、复核误拦、有效交接和人工工时采用绑定原报告哈希的正式人类评价；未知为 null，脚本与助手评价不计业务质量。入口 `scripts/summarize_runs.py` 只读取已保存报告或bundle，不调用模型。
 
-新增[定向真实模型展示集](showcase_live/README.md)，与原独立集、专项集和脚本演示分开：首批show_001/show_002及一次工单修订show_101共6条真实运行、47模型/16合成只读工具，所有结果保留。当前只取得独立复核拒绝不充分候选的片段，没有完整诊断质量优势。[结果与面试讲解](../examples/showcase/curated-live-guide.md)记录完整边界。`scripts/compare_showcase_live.py`、`scripts/compare_showcase_revision.py`默认免费计划，`scripts/evaluate_showcase_live.py`只离线核验已保存报告。
+新增[定向真实模型展示集](showcase_live/README.md)，与原独立集、专项集和脚本演示分开：首批show_001/show_002及一次工单修订show_101共6条真实运行、47模型/16合成只读工具，所有结果保留。当前只取得独立复核拒绝不充分候选的片段，没有完整诊断质量优势。[结果分析](../examples/showcase/curated-live-analysis.md)记录完整边界。`scripts/compare_showcase_live.py`、`scripts/compare_showcase_revision.py`默认免费计划，`scripts/evaluate_showcase_live.py`只离线核验已保存报告。
 
 当前评估入口是 evals/incident，真值与 Agent 可见 fixtures/incident 分离。评分、结构检查和同预算单/多对照都不调用模型；真实运行必须通过脚本的显式 live 入口和预算。
 

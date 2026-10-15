@@ -1,6 +1,6 @@
-# 面试展示版本收敛交付
+# 架构收敛与历史验证
 
-当前分支：`codex/interview-consolidation`，从 `fc01b2b` 新建。原实验分支 `codex/review-driven-orchestration` 仍指向 `9805e88`，没有回退、改写或合并它的历史。当前主流程恢复基础重构完成后的结构，面试讲解见[架构与执行流程](interview-architecture.md)。
+当前分支：`codex/interview-consolidation`，从 `fc01b2b` 新建。原实验分支 `codex/review-driven-orchestration` 仍指向 `9805e88`，没有回退、改写或合并它的历史。该历史版本的主流程恢复基础重构完成后的结构，职责说明见[架构与执行流程](system-architecture.md)。
 
 ## 保留与收敛范围
 
@@ -26,7 +26,7 @@
 ```powershell
 $env:PYTHONPATH='app;.'
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t .
-.\.venv\Scripts\python.exe scripts/demo_interview_flow.py
+.\.venv\Scripts\python.exe scripts/demo_standard_flow.py
 ```
 
 第二条是免费标准流程排练：真实LangGraph、程序取证和合成工单，决策由脚本提供。此次得到completed／passed，模拟模型调用4次、工具2次、取证模型0次，付费请求0次；报告和轨迹存入独立UUID目录。它展示实际控制流程，不证明模型推理质量，不使用真实服务、数据库或生产修复。
