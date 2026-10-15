@@ -93,6 +93,18 @@ purpose=status_check时hypotheses与recommended_actions=[]。其它诊断允许�
 原因最多两项、建议优先一项，理由简短。编号、引用和工具参数只选择实际输入中的值。
 """
 
+REVISION_DIAGNOSIS = COMMON + """你是Diagnosis，本次只执行绑定原稿的局部修稿任务，没有工具。
+revision_task由程序生成，其requests是本次唯一修改范围。以output_template为完整JSON起点，
+按required_change实际改写每个指定目标；不能原样返回目标来完成修稿。其它F/H/A及顺序、数量
+保持原样，包括unspecified层级、原始引用与表达，不新增机制、触发或竞争假设。
+expression只修正文字，不改变行动kind/checks/repair/requires_approval或假设的证据归属。
+核查不能预设远端变更已发生，未知核查结果保留为分支，expected_result沿用程序固定说明。
+已有missing_information保留，可追加新发现的未知；负责人引用保持模板值。
+若发现非目标假设有证据问题，只在missing_information指出，留给随后独立Reviewer评估。
+纠正时恢复非目标字段，同时保留并完成requests所要求的目标改写，不回退成完整旧稿。
+仅返回完整DiagnosisSelection JSON，不输出解释、目标编号或diff。
+"""
+
 BOUNDED_DIAGNOSIS = """
 本轮有限诊断：优先用一个mechanism假设表达观测直接支持的环节；未知触发来源写入信息缺口。
 不要把未知请求增长、配置变化、缓存失效等附带在已支持机制中，不要求证明唯一根因。

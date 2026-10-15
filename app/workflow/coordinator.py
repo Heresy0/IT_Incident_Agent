@@ -4,7 +4,7 @@ import json
 import time
 from runtime.context import RunContext, ExecutionError, activate
 from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview, RevisionReviewDecision
-from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER, REVIEW_DRIVEN
+from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER, REVIEW_DRIVEN, REVISION_DIAGNOSIS
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
@@ -212,6 +212,8 @@ class Collaboration:
             investigation_mode=self.investigation_mode, knowledge_mode=self.knowledge_mode,
             review_protection=self.review_protection)
         output_schema = role_output_schema(role, schema, view)
+        if role == 'diagnosis' and self.revision_task:
+            output_schema = self.revision_task.output_schema(output_schema, self.references)
         model_input = role_model_input(role, schema, payload, view)
         prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
         if self.review_protection == BOUNDED_POLICY:
@@ -265,7 +267,7 @@ class Collaboration:
         return None
 
     def role_failure(self, role, schema, exc, details, value):
-        if role == 'diagnosis' and isinstance(exc, ProtocolError) and exc.code in {
+        if role == 'diagnosis' and self.revision_task is None and isinstance(exc, ProtocolError) and exc.code in {
                 'READ_ONLY_ACTION_ALREADY_COVERED', 'READ_ONLY_ACTION_INVALID', 'ACTION_KIND_MISMATCH'}:
             preserved = preserve_diagnosis(value, self)
             self.event('diagnosis_actions_quarantined', role,
@@ -292,7 +294,11 @@ class Collaboration:
         if self.ticket.purpose == 'status_check' and (selection.hypotheses or selection.recommended_actions):
             raise ProtocolError('STATUS_CHECK_SCOPE', [{'purpose': 'status_check',
                 'instruction': '状态核查只输出观测和信息缺口，hypotheses、recommended_actions 均使用空列表。'}])
-        return expand_diagnosis(selection, self)
+        draft = expand_diagnosis(selection, self)
+        if self.revision_task:
+            draft = draft.model_copy(update={'rejected_actions': self.revision_task.draft.rejected_actions})
+            self.revision_task.validate_candidate(draft)
+        return draft
 
     def targets(self):
         return {f"{prefix}{n}": item for prefix, items in (("F", self.draft.findings),
@@ -490,7 +496,7 @@ class Collaboration:
             executors=self.executors, targets=self.targets(), scope=self.ticket.scope,
             observation_gaps=self.observation_gaps(), protection=self.review_protection,
             require_blockers=self.blind_review or getattr(self.models['reviewer'], 'json_output', False),
-            existing_gaps=tuple(self.extra_gaps))
+            existing_gaps=tuple(self.extra_gaps), strict_need_scope=self.policy.review_driven)
 
     def review_routing_context(self, review=None):
         return ReviewRoutingContext(draft=self.draft, review=self.review if review is None else review,
@@ -529,11 +535,12 @@ class Collaboration:
                    "read_only_tools": {r: ex.schemas() for r, ex in self.executors.items()},
                    "task_results": self.task_input(), "task_completion_gaps": self.task_gaps()}
         if revision_task:
-            payload['revision_task'] = revision_task.model_input()
+            payload['revision_task'] = revision_task.model_input(self.references)
         elif self.pending_revision_requests and self.draft:
             payload['revision_task'] = make_revision_task(len(self.drafts), self.draft,
                 self.pending_revision_requests, self.evidence, self.executors).model_input()
-        candidate = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
+        candidate = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis,
+                             system_prompt=REVISION_DIAGNOSIS if revision_task else None)
         if revision_task:
             revision_task.assert_current(len(self.drafts), self.evidence, self.executors)
         self.draft = candidate

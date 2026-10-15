@@ -110,11 +110,12 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
                                 'blocking': {'enum': [None]}}}}]
     # Expose the existing blocker ownership guard before generation. This only
     # restricts contradictory edges; it does not decide any semantic verdict.
-    for purpose in ('mechanism', 'alternative'):
+    strict_scope = 'RevisionRequest' in schema['$defs']
+    for purpose in ('mechanism', 'alternative', *(['symptom'] if strict_scope else [])):
         need_ids = [n.need_id for n in needs.values() if n.purpose == purpose]
         eligible = [key for key, target in targets.items()
                     if not (key.startswith('H') and target.level == 'trigger')]
-        if need_ids and not conservative:
+        if need_ids and (not conservative or strict_scope):
             schema['$defs']['NeedAssessment']['allOf'].append({
                 'if': {'properties': {'need_id': {'enum': need_ids}}, 'required': ['need_id']},
                 'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'}, {

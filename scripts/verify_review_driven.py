@@ -30,13 +30,16 @@ CASES = ('fresh_001', 'fresh_003')
 
 
 class PaidBudget:
-    def __init__(self):
+    def __init__(self, maximum=PAID_CAP):
+        if type(maximum) is not int or not 1 <= maximum <= PAID_CAP:
+            raise ValueError('Invalid paid request cap')
+        self.maximum = maximum
         self.used = 0
         self.lock = Lock()
 
     def claim(self):
         with self.lock:
-            if self.used >= PAID_CAP:
+            if self.used >= self.maximum:
                 raise ExecutionError('BUDGET_EXCEEDED')
             self.used += 1
 
@@ -77,7 +80,9 @@ class SeedThenLive:
         return AIMessage(content=json.dumps(self.mutate(data, messages), ensure_ascii=False))
 
 
-def probe_models(live):
+def probe_models(live, variant='wording'):
+    if variant not in {'wording', 'trigger_unknown', 'unsupported_mechanism'}:
+        raise ValueError('Unknown revision probe variant')
     models = scripted_models()
     def plan(data, messages):
         scope = json.loads(messages[1].content)['input']['ticket']['scope']
@@ -91,6 +96,14 @@ def probe_models(live):
         data['recommended_actions'][0].update(kind='manual_check', checks=[], repair=None,
             action='要求维护方确认已经下调的远端策略', condition='当前依赖请求失败',
             expected_result='核实当前配置和协议记录', risk='只读核实', requires_approval=False)
+        if variant == 'trigger_unknown':
+            data['hypotheses'].append({'cause': '为何开始发生尚未确认，不能推定远端策略变更',
+                'level': 'trigger', 'support_refs': [], 'counter_refs': [],
+                'pending_checks': ['人工取得远端变更与运行记录']})
+            data['missing_information'].append('远端触发来源未知，需人工核实')
+        elif variant == 'unsupported_mechanism':
+            data['hypotheses'][0].update(cause='inventory-api维护方主动下调账户配额，导致当前请求失败',
+                                       level='mechanism')
         return data
     def review(data, messages):
         next(item for item in data['assessments'] if item['target_id'] == 'A1').update(
@@ -100,6 +113,11 @@ def probe_models(live):
             'required_change': '基于现有证据核对当前协议与配置，不预设远端发生变更；保留未知'}]
         data['request_evidence'] = None
         data['follow_up_reason'] = '只需修正建议表达，不需要新增观测'
+        if variant == 'trigger_unknown':
+            next(item for item in data['assessments'] if item['target_id'] == 'H2').update(
+                verdict='uncertain', evidence_ids=[], reason='触发来源未知仍保留')
+            next(item for item in data['need_assessments'] if item['need_id'] == 'N3').update(
+                verdict='not_required', evidence_ids=[], reason='种子边界设置：触发未知不是竞争机制；最终模型独立重评')
         return data
     models['supervisor'] = SeedThenLive(models['supervisor'], live['supervisor'], plan)
     models['diagnosis'] = SeedThenLive(models['diagnosis'], live['diagnosis'], draft)

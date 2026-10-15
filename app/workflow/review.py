@@ -31,6 +31,7 @@ class ReviewContext:
     protection: str
     require_blockers: bool
     existing_gaps: Sequence[str]
+    strict_need_scope: bool = False
 
 
 @dataclass
@@ -167,6 +168,8 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
     normalized = review.model_copy(update={'assessments': checked, 'need_assessments': need_assessments,
                                            'request_evidence': request})
     validate_revision_requests(normalized, targets)
+    if view.strict_need_scope:
+        validate_need_scope(normalized, view.needs, targets)
     normalized = validate_blockers(view.needs, normalized, view.executors,
         required=view.require_blockers, targets=targets,
         conservative=conservative(view.protection), event=emit)
@@ -185,6 +188,27 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
         # A legacy blocker-derived request must pass the same ownership gate.
         return validate_review(normalized, view, audit=audit, emit=emit)
     return normalized
+
+
+def validate_need_scope(review, needs, targets):
+    """Reject contradictory metadata; only the reviewer may reassess the verdict."""
+    verdicts = {item.target_id: item.verdict for item in review.assessments}
+    for assessment in review.need_assessments:
+        blocker = assessment.blocker
+        if (assessment.verdict != 'uncertain' or blocker is None
+                or needs[assessment.need_id].purpose not in {'symptom', 'mechanism', 'alternative'}):
+            continue
+        ids = blocker.affected_targets
+        if ids and all(key in targets and (
+            key.startswith('H') and targets[key].level == 'trigger'
+            or key.startswith('A') and verdicts.get(key) == 'supported') for key in ids):
+            raise ProtocolError('REVIEW_BLOCKER_SCOPE', [{
+                'path': f'need_assessments.{assessment.need_id}.blocker.affected_targets',
+                'need_id': assessment.need_id, 'purpose': needs[assessment.need_id].purpose,
+                'actual': ids, 'target_levels': {key: getattr(targets[key], 'level', None) for key in ids},
+                'instruction': '此问题属于当前症状、机制或竞争解释，不能只用触发未知或已支持待办阻塞。'
+                    '独立重评该问题：若确实缺关键机制证据，保持uncertain并关联实际受影响的机制/行动；'
+                    '若仅触发来源未知，保留该未知与人工核查，不混入当前机制。不得为通过而改判supported。'}])
 
 
 def validate_observation_review(value, view: ReviewContext):

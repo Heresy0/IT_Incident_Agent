@@ -85,6 +85,8 @@ flowchart TD
 
 `scripts/verify_review_driven.py` 默认只显示免费验证计划；显式 `--execute-live` 对冻结合成观测做新旧编排对照和标注的修稿探针。跨实现批次通过 `--previous-summary` 继承已用请求数，累计最多 50 次真实模型请求尝试，包含失败。所有批次与回复保留，不执行真实修复，不将种子反馈探针计入自主诊断质量。
 
+修稿定向优化采用目标范围门禁：程序生成完整输出模板，仅允许指定 H/A 修改，拒绝新增候选、改变未指定目标或原样返回目标；表达修改保留执行类型与核查参数。新路径复核拒绝仅用触发未知阻塞机制问题，仍由 Reviewer 独立重评。详见[修稿探针分析与复验](examples/showcase/revision-probe-followup.md)。`scripts/verify_revision_probe.py` 默认免费计划，显式 `--execute-live` 验证三个种子场景，每个最多 8 次真实请求；跨修复版本使用 `--previous-summary` 继承各场景已用计数，本次会话累计上限 24 次。
+
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |

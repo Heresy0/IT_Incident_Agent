@@ -2,6 +2,7 @@
 import json
 import unittest
 from unittest.mock import patch
+from copy import deepcopy
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from agents.contracts import ReadOnlyCheck, RevisionReviewDecision
@@ -270,6 +271,127 @@ class ReviewDrivenTests(unittest.TestCase):
         failed = next(e for e in report['events'] if e['type'] == 'validation_failure')
         self.assertEqual(failed['details'][0]['path'], 'revision_requests.0.target_id')
         self.assertIn('allowed_target_ids', failed['details'][0])
+
+    def test_revision_template_uses_current_reference_selectors_and_restores_draft(self):
+        from agents.contracts import DiagnosisSelection
+        c = self.prepare_revision()
+        task = c.revision_task
+        view = task.model_input(c.references)
+        refs = view['output_template']['findings'][0]['refs']
+        self.assertTrue(all(set(item) == {'reference_id'} and item['reference_id'] in c.references for item in refs))
+        self.assertEqual(view['editable_target_ids'], ['A1'])
+        from evidence.diagnosis import expand_diagnosis
+        restored = expand_diagnosis(DiagnosisSelection.model_validate(view['output_template']), c)
+        self.assertEqual(restored, task.draft)
+
+    def test_unchanged_requested_target_cannot_finish_revision(self):
+        c = self.prepare_revision()
+        task = c.revision_task
+        with self.assertRaises(ProtocolError) as error:
+            task.validate_candidate(task.draft)
+        self.assertEqual(error.exception.details[0]['code'], 'REQUESTED_TARGET_UNCHANGED')
+        action = task.draft.recommended_actions[0].model_copy(update={'action': '核对当前协议与配置，未知结果保留'})
+        task.validate_candidate(task.draft.model_copy(update={'recommended_actions': [action]}))
+
+    def test_generation_schema_exposes_fixed_unrequested_targets_and_expression_fields(self):
+        from agents.contracts import DiagnosisSelection
+        c = self.prepare_revision()
+        task = c.revision_task
+        original = DiagnosisSelection.model_json_schema()
+        schema = task.output_schema(original, c.references)
+        template = task.model_input(c.references)['output_template']
+        self.assertNotIn('prefixItems', original['properties']['hypotheses'])
+        self.assertEqual(schema['properties']['hypotheses']['prefixItems'], [{'const': template['hypotheses'][0]}])
+        self.assertEqual(schema['properties']['hypotheses']['maxItems'], 1)
+        self.assertFalse(schema['properties']['recommended_actions']['items'])
+        action = schema['properties']['recommended_actions']['prefixItems'][0]['allOf']
+        self.assertEqual(action[1], {'not': {'const': template['recommended_actions'][0]}})
+        self.assertEqual(action[2]['properties']['kind'], {'const': 'manual_check'})
+
+    def test_pure_edit_rejects_new_hypothesis_or_changed_unrequested_mechanism(self):
+        c = self.prepare_revision()
+        task = c.revision_task
+        original = task.draft
+        for changes in ({'hypotheses': [*original.hypotheses, original.hypotheses[0]]},
+                        {'hypotheses': [original.hypotheses[0].model_copy(update={'cause': 'Invented remote trigger'})]}):
+            with self.subTest(changes=list(changes)), self.assertRaises(ProtocolError) as error:
+                task.validate_candidate(original.model_copy(update=changes))
+            self.assertEqual(error.exception.code, 'REVISION_SCOPE_CHANGED')
+
+    def test_expression_edit_cannot_change_action_type_or_remove_prior_gap(self):
+        c = self.prepare_revision()
+        task = c.revision_task
+        action = task.draft.recommended_actions[0].model_copy(update={'kind': 'read_only_check'})
+        with self.assertRaises(ProtocolError):
+            task.validate_candidate(task.draft.model_copy(update={'recommended_actions': [action]}))
+        from dataclasses import replace
+        with_gap = replace(task, draft=task.draft.model_copy(update={'missing_information': ['Keep unresolved origin']}))
+        with self.assertRaises(ProtocolError):
+            with_gap.validate_candidate(task.draft)
+
+    def test_scope_violation_is_corrected_using_original_slot_without_tools(self):
+        models = review_models()
+        def drift(response, messages, calls):
+            data = json.loads(response.content)
+            if calls == 2:
+                data['hypotheses'].append({'cause': 'Invented cause', 'level': 'trigger', 'support_refs': []})
+            return json_response(data)
+        models['diagnosis'] = AlterOutput(models['diagnosis'], drift)
+        report = make_coordinator(models).run()
+        self.assertEqual(report['status'], 'completed')
+        self.assertEqual(report['pure_revision_rounds'], 1)
+        self.assertEqual(report['rework_rounds'], 0)
+        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual(report['repair_counts']['diagnosis'], 1)
+        self.assertEqual(len(report['drafts'][1]['draft']['hypotheses']), 1)
+        self.assertIn('REVISION_SCOPE_CHANGED', [e.get('reason') for e in report['events'] if e['type'] == 'validation_failure'])
+
+    def test_persistent_revision_scope_drift_never_commits_partial_candidate(self):
+        models = review_models()
+        def drift(response, messages, calls):
+            data = json.loads(response.content)
+            if calls >= 2:
+                data['hypotheses'].append({'cause': 'Invented cause', 'level': 'trigger', 'support_refs': []})
+            return json_response(data)
+        models['diagnosis'] = AlterOutput(models['diagnosis'], drift)
+        report = make_coordinator(models).run()
+        self.assertEqual(report['status'], 'partial')
+        self.assertEqual(len(report['drafts']), 1)
+        self.assertEqual(report['handoff']['reason'], 'MODEL_OUTPUT_INVALID')
+        self.assertFalse(report['output']['recommended_actions'])
+
+    def test_trigger_unknown_cannot_block_mechanism_in_new_review(self):
+        c = make_coordinator()
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        from agents.contracts import Hypothesis
+        c.draft.hypotheses.append(Hypothesis(hypothesis_id='H2', cause='Unknown origin', level='trigger',
+            support_refs=[], counter_refs=[], pending_checks=['Ask remote owner']))
+        response = c.models['reviewer'].invoke([SystemMessage(content='test'),
+            HumanMessage(content=json.dumps({'input': c.reviewer_input()}))])
+        data = json.loads(response.content)
+        next(item for item in data['assessments'] if item['target_id'] == 'H2').update(
+            verdict='uncertain', evidence_ids=[], reason='Unknown origin')
+        need = next(item for item in data['need_assessments'] if item['need_id'] == 'N2')
+        need.update(verdict='uncertain', blocker={'cause_level': 'mechanism', 'affected_targets': ['H2'],
+            'missing_observation': 'Remote change history', 'decision_impact': 'Explain why it started',
+            'resolution': 'not_planned'})
+        data['request_evidence'] = {'target_id': 'H2', 'missing_observation': 'Remote change history'}
+        review = RevisionReviewDecision.model_validate(data)
+        previous = deepcopy(c.evidence_needs)
+        with self.assertRaises(ProtocolError) as error:
+            c.validate_review(review)
+        self.assertEqual(error.exception.code, 'REVIEW_BLOCKER_SCOPE')
+        self.assertEqual(c.evidence_needs, previous)
+        self.assertIsNone(c.review)
+
+    def test_target_only_request_for_real_mechanism_unknown_remains_blocking(self):
+        c = make_coordinator(review_models(gap='not_planned'))
+        report = c.run()
+        self.assertEqual(report['status'], 'partial')
+        self.assertTrue(report['handoff']['blocking'])
+        self.assertNotEqual(report['output']['hypotheses'][0]['status'], 'supported')
 
 
 if __name__ == '__main__':

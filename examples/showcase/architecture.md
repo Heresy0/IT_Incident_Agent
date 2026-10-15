@@ -35,7 +35,7 @@ flowchart TD
 | `app/workflow/collection.py` | `CollectionRequest` → `CollectionOutcome` 执行程序或兼容 Agent 取证，返回结果、证据与引用台账、查询覆盖和调用统计。`ParallelBatch` / `ParallelOutcome` / `CollectionJoin` 明确分支准备、执行和汇总边界，不持有 Coordinator。 |
 | `app/workflow/review.py` | `ReviewContext` 提供草稿目标、证据、问题及查询台账的读取视图。校验目标覆盖、当前支持、反证、缺口归属和查询提示；`ReviewRoutingContext` → `ReviewHandoff` / `ReworkDecision` 决定交接或补查资格，完成门禁返回停止原因。 |
 | `app/workflow/routing.py` | 新编排的 `ReviewDisposition` 在有效复核之后返回 publish / revise / collect / handoff / stop；优先关键取证缺口，不从自由文本猜路由，不增加模型角色。 |
-| `app/workflow/revision.py` | `RevisionTask` 复制原稿和修稿要求，并绑定稿次及证据／查询台账指纹；调用前和提交前检查是否过期。提供新编排的机械取证出口判断，不确认语义充分性。 |
+| `app/workflow/revision.py` | `RevisionTask` 复制原稿和要求，绑定稿次及证据／查询台账指纹；生成可直接输出的引用选择模板，限制修改范围并拒绝原样修稿，调用前和提交前检查过期。提供机械取证出口判断，不确认语义充分性。 |
 | `app/workflow/handoff.py` | 根据已发布内容、未知问题与实际查询台账生成交接材料；包含停止原因、人工待办、登记负责人及操作边界，不增加模型调用。 |
 | `app/workflow/reporting.py` | `PublicationInput` → `Publication` 发布复核支持的内容；`ReportSnapshot` → 报告。保留暂定原因、待确认建议、未复核观测及缺口，响应与输入审计数据解除可变引用共享。 |
 | `app/runtime/context.py` | 原子计数、原始调用与时间预算、纠正额度领取、用量与追踪。所有后续请求仍计入原预算。 |
@@ -107,6 +107,10 @@ Reviewer 使用 `RevisionReviewDecision`，继承旧判定和证据缺口契约�
 
 纯修稿全运行最多一次，不执行工具、不领取新预算，保留关键问题和原始证据。新稿清除旧复核并完整复核全部新目标。RevisionTask 在调用前、提交前核对稿次与台账指纹；补查请求也绑定原稿和台账，在规划及派发前校验。全运行角色纠正额度不因稿次重置，split Reviewer 继续使用原 ReviewDecision 纠正槽位。
 
+纯修稿采用独立的 Diagnosis 系统提示和程序生成的 `output_template`，模板使用实际 REF 选择项而非展开后的来源对象。F/H/A 的数量和顺序不变，未指定条目逐字段保留，每个指定目标必须发生内容修改；表达修稿还锁定行动执行类型／checks／repair／审批要求和假设层级／引用／pending_checks。动态 Schema 暴露相同范围，服务端候选校验独立执行。越界或空修稿通过原有一次纠正槽处理，持续无效候选不提交，不能借行动隔离回调保留部分稿。补查后的新证据稿继续完整重建，不套用纯修稿冻结规则。
+
+新编排的复核范围校验拒绝将仅关联 trigger 或已支持待办的未知项用作 symptom／mechanism／alternative 的阻塞理由，输出精确归属诊断让 Reviewer 独立重评。该门禁只识别结构矛盾，不自动将未知改为 supported，也不确认语义正确性。标准模式保留原保守兼容规则；具体问题、失败记录和真实复验见[修稿探针分析](revision-probe-followup.md)。
+
 普通补查及追加补查资格沿用原上限；已有合法未执行计划可复用，仍占用调度位置但不调用规划模型。补查之后直接重新诊断；失败、已执行或已覆盖查询不能伪装成新增信息。新预算按规划、可能的查询 Embedding、诊断、复核与纠正预留计算，移除旧取证解释阶段；并行纯程序分支允许零模型额度，真实模型调用仍受分支及总额度约束。Embedding 按工具允许的两次尝试保守预留，不能消耗受保护的收尾额度。
 
 交接材料保留已支持内容、待确认建议、未知问题、实际查询状态、停止原因和人工待办；只使用实际取得的 team 作为接手方，没有负责人时明确未解析。关键缺口保持 partial，非关键未知交接沿用带限制完成语义。生成交接不发送通知、不批准操作、不关闭工单。
@@ -127,7 +131,7 @@ Reviewer 使用 `RevisionReviewDecision`，继承旧判定和证据缺口契约�
 | fresh_003 日志渠道失败 | partial / NEEDS_INFORMATION，7 模型、4 工具 | partial / REVIEW_INCOMPLETE，8 模型、3 工具，1 轮补查 | 新路径保留未知机制、失败渠道及具体人工获取日志的交接；没有在该场景减少模型调用或耗时。 |
 | 预置修稿反馈探针 | 不属于完整配对 | 纯修稿 1 次，后续请求补查，最终达到跨批次付费上限 | 种子草稿／反馈不能作为自主效果，最终复核未完整通过；源码报告中的 model_calls 包含脚本请求和被总上限拒绝的已领取调用，真实请求单独统计为 paid_attempts。 |
 
-首批与最终批次、全部成功／partial／失败均保留，后续没有为取得成功重跑探针或突破 50 次上限。当前结果不足以证明质量、成本或延迟收益，因此新编排保持显式试验选择，标准流程不切换默认。
+该 50 次对照验证会话的首批与最终批次、全部成功／partial／失败均保留，未突破会话上限。用户随后授权继续分析并定向复验，另设每场景 8 次、累计 24 次的修稿会话，跨实现修复继承已用计数并保留中间失败，见[后续记录](revision-probe-followup.md)。当前结果不足以证明总体质量、成本或延迟收益，因此新编排保持显式试验选择，标准流程不切换默认。
 
 提示词、输出契约、原预算、错误码、Graph 路由及报告字段保持兼容。模型请求失败后的有限纠正与业务补查提醒分开处理，两者均受原预算约束。报告模块不直接改写运行状态，由 Coordinator 显式提交缺口及升级团队。
 
