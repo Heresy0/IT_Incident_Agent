@@ -1,5 +1,9 @@
 # Agent 编排与 Harness 项目展示
 
+当前展示入口：[面试架构与90秒讲解](interview-architecture.md)、[收敛交付与验证](interview-consolidation.md)、[完整真实检查记录](interview-consolidation-validation.json)。免费标准流程排练运行 `python scripts/demo_interview_flow.py`。
+
+原实验源码保留在 `codex/review-driven-orchestration`。本目录保留的Reviewer／修稿实验报告及对应冻结协议均为历史证据，不代表当前分支支持这些接口或已证明质量收益。
+
 [输入纠正与程序取证交接修复](context-recovery.md)：两个独立工程提交，纠正请求保持原始证据，失败时从程序台账展示未复核来源观测。[三个真实回放](context-recovery-runs.json)保留输入长度、成功纠正和持续失败；未证明整体语义质量提升。
 
 [冻结版本新案例审阅](frozen-review.md)：三个未参与修改的新案例暴露输入纠正长度限制和因果排除问题；应用保持冻结。[运行与助手审阅](frozen-review-runs.json)保留网络失败、限定重试及全部结果，不将内部状态直接当作质量成绩。

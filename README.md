@@ -1,6 +1,10 @@
 # IT Incident Agent
 
-当前交付按可演示、可评测、可内部试用的运维辅助原型收尾，使用步骤、固定案例、验收成绩和维护边界见[阶段收尾说明](examples/showcase/prototype-closeout.md)，交付标签为 `codex/prototype-closeout-2026-10-13`。当前知识存储为 pgvector，支持 .md / .txt 前端上传。
+当前面试展示分支为 `codex/interview-consolidation`，以 `fc01b2b` 恢复基础架构并保留少量通用修复。先读[架构与讲解材料](examples/showcase/interview-architecture.md)及[收敛交付记录](examples/showcase/interview-consolidation.md)。690项回归中670通过、20项数据库跳过；免费标准流程演示通过，三个真实检查仍保留失败与缺信息结果。
+
+免费排练：`python scripts/demo_interview_flow.py`。原实验分支 `codex/review-driven-orchestration`、全部历史失败和报告保留；当前分支不加载复杂Reviewer传输与多阶段修稿仲裁。
+
+此前原型收尾的步骤、固定案例、验收成绩和维护边界见[阶段收尾说明](examples/showcase/prototype-closeout.md)，历史标签为 `codex/prototype-closeout-2026-10-13`。当前仍保留 pgvector 知识存储及 .md / .txt 前端上传。
 
 诊断规则保留 `codex/default-flow-2026-10-13` 作为[历史冻结基线](examples/showcase/default-flow-baseline.md)。该历史标签使用的本地 JSON 索引已在当前交付中替换；历史报告保留当时配置，不代替当前运行行为。
 
