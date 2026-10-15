@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+新编排的[Reviewer 语义范围与人工交接收尾](examples/showcase/reviewer-semantic-closeout.md)：反证绑定原命题及真实字段，查询状态来自程序台账，人工核查写明缺失记录、完成条件与用途。冻结后以三个新合成案例各三轮完成十八次真实模型对照，实际84次请求；新路径八次协议失败、一次有效复核后缺信息交接，尚未证明稳定收益。全部失败保留，标准流程仍默认，准则与限制见[验证协议](evals/closeout_unseen/README.md)。
+
 当前交付按可演示、可评测、可内部试用的运维辅助原型收尾，使用步骤、固定案例、验收成绩和维护边界见[阶段收尾说明](examples/showcase/prototype-closeout.md)，交付标签为 `codex/prototype-closeout-2026-10-13`。当前知识存储为 pgvector，支持 .md / .txt 前端上传。
 
 诊断规则保留 `codex/default-flow-2026-10-13` 作为[历史冻结基线](examples/showcase/default-flow-baseline.md)。该历史标签使用的本地 JSON 索引已在当前交付中替换；历史报告保留当时配置，不代替当前运行行为。
