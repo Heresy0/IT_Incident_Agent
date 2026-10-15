@@ -1,126 +1,116 @@
 # IT Incident Agent
 
-面试版本已[完成收尾](examples/showcase/interview-closeout.md)：提供机制与缺证据交接两个固定展示案例及人工评估标准；两句候选提示经限定真实对照未保留，运行时代码保持原版。全部失败、预算拒绝和试验记录留档。
+基于 **LangGraph 的 AI Agent 故障调查与诊断辅助系统**。从自然语言工单出发，规划少量有价值的查询，执行受限取证，形成可追溯的候选解释，再复核结论与信息缺口；证据不足时交给人工核查，修复通过独立审批流程执行。
 
-最新[收敛版最小修复](examples/showcase/interview-minimal-repairs.md)：精确引用错误路径、按实际查询区分任务、解释阻塞及supported缺引用降级。终版701项回归中681通过、20项跳过；两批4次真实运行共24次请求，原失败全保留，流程仍为标准编排。
+项目面向运维调查中**观测来源分散、查询重复、结论缺少依据**的问题。当前 `main` 为收尾版，默认采用 **3 个模型角色 + 2 类程序取证模块**，重点展示规划、工具使用、证据交接、有限反馈闭环与执行边界。
 
-当前面试展示分支为 `codex/interview-consolidation`，以 `fc01b2b` 恢复基础架构并保留少量通用修复。先读[架构与讲解材料](examples/showcase/interview-architecture.md)及[收敛交付记录](examples/showcase/interview-consolidation.md)。690项回归中670通过、20项数据库跳过；免费标准流程演示通过，三个真实检查仍保留失败与缺信息结果。
+[架构与90秒讲解](examples/showcase/interview-architecture.md) · [两个案例与离线展示](examples/showcase/interview-closeout.md) · [本地启动](README_LOCAL.md) · [全部验证材料](examples/showcase/README.md)
 
-免费排练：`python scripts/demo_interview_flow.py`。原实验分支 `codex/review-driven-orchestration`、全部历史失败和报告保留；当前分支不加载复杂Reviewer传输与多阶段修稿仲裁。
+技术栈：Python 3.12 · LangGraph · LangChain · Pydantic · FastAPI · PostgreSQL / pgvector · Vue / TypeScript。
 
-此前原型收尾的步骤、固定案例、验收成绩和维护边界见[阶段收尾说明](examples/showcase/prototype-closeout.md)，历史标签为 `codex/prototype-closeout-2026-10-13`。当前仍保留 pgvector 知识存储及 .md / .txt 前端上传。
-
-诊断规则保留 `codex/default-flow-2026-10-13` 作为[历史冻结基线](examples/showcase/default-flow-baseline.md)。该历史标签使用的本地 JSON 索引已在当前交付中替换；历史报告保留当时配置，不代替当前运行行为。
-
-模型通过 LangChain `ChatOpenAI` 调用 OpenAI 兼容的 Chat Completions 接口。配置 `MODEL`、`MODEL_BASE_URL`、`MODEL_API_KEY`（未设置则沿用 `DASHSCOPE_API_KEY`）；同服务内切换支持工具调用和 JSON 输出的模型通常只改 `MODEL`。跨服务需调整地址和密钥，厂商参数由 `MODEL_EXTRA_BODY` 的 JSON 对象提供：当前通义为 `{"enable_thinking":false}`，不支持此参数的服务使用 `{}`。单次超时 30 秒，SDK 自动重试为 0，程序继续校验输出结构与证据。服务需重启以加载配置。详见[兼容接口迁移记录](examples/showcase/openai-compatible.md)。
-
-默认采用[计划驱动取证与直接复核](examples/showcase/planned-investigation.md)：Supervisor 规划具体查询，Investigation 程序模块校验并执行，不调用独立取证模型。原始证据交给 Diagnosis/Reviewer 判断，查询完成不等于原因确认。旧 `agent` 模式与观测盲审仍可显式用于对照；免费脚本演示保留原控制流程。
-
-最新[取证执行和调度职责](examples/showcase/collection-boundaries.md)：Knowledge 也按计划执行检索；Supervisor 收窄为规划职责，证据支持程度交给诊断与复核。补查任务数量在派发前校验，三个核心模型角色各有全运行一次纠正额度，均计入原总预算。
-
-[复核关键缺口与核查结果说明](examples/showcase/review-materiality.md)：按问题实际影响区分未知项，默认核查建议采用程序生成的中性预期结果，原文保留审计。真实验证保留失败与误拦；有条件变更复核仍偏保守。
-
-实现已保存为冻结点；[三个新案例的审阅](examples/showcase/frozen-review.md)发现两例在诊断纠正时受到输入长度门禁限制，另一例仍有机制与触发混用、错误排除候选的问题。保留冻结版本与全部失败记录，尚不能宣称整体效果稳定。
-
-后续[输入纠正与程序取证交接修复](examples/showcase/context-recovery.md)分别提交输入重建和失败观测展示，保留全部证据、原契约与预算。真实回放未再触发输入长度门禁，但引用格式及 Reviewer 契约失败仍保留在[验证记录](examples/showcase/context-recovery-runs.json)中。
-
-[Reviewer 契约与收尾](examples/showcase/review-handoff.md)：程序按问题用途填充缺口类别；机制和有效下一步已复核、关键证据完整时，纯触发未知作为人工待核实限制保留。关键未知仍阻塞，原补查请求和未确认结论保留在运行记录。
-
-[Reviewer 分阶段纠正额度](examples/showcase/reviewer-stage-budget.md)亦可切换试验：split 模式盲审和最终复核各最多纠正一次，仍计入原总预算；默认保留共享一次。
-
-面向内部服务故障的诊断与处置辅助系统，主要展示 AI Agent 编排与 Harness 工程：自然语言生成工单、受限计划取证、证据诊断、独立复核、一次定向补查，以及人工审批后的受控修复。
-
-## 快速体验
-
-使用 Python 3.12，在项目独立虚拟环境中安装 `requirements.txt`。免费演示不需要模型 Key、数据库或 Docker：
-
-```powershell
-.\.venv\Scripts\python.exe scripts/demo_interview.py
-.\.venv\Scripts\python.exe scripts/demo_parallel_collection.py
-```
-
-第一条命令生成历史经验核查、冲突证据、复核补查三个演示及本地展示页；第二条比较相同脚本响应的串行与并行取证。输出保存在被 Git 忽略的 `output/` 批次目录。
-
-演示使用真实 LangGraph 和工具执行器，但模型响应预设、观测合成。它验证控制流程，不能作为自主推理准确率。并行演示使用人工延迟，不能外推真实模型提速比例。完整免费检查与模拟审批闭环可运行：
-
-```powershell
-.\.venv\Scripts\python.exe scripts/showcase_incident.py
-```
-
-实际后端、数据库、身份及前端启动步骤见 [Windows 本地启动](README_LOCAL.md)。真实模型诊断需要显式授权和预算，修复需要独立审批及执行确认。
-
-## 当前能力与执行流程
+## AI Agent 架构与执行流程
 
 ```mermaid
 flowchart TD
-    U[自然语言描述或已有工单] --> S[Supervisor 调度与范围校验]
-    S -->|两个独立角色且预算足够| P[并行取证准备]
-    P --> I[Investigation 程序执行查询]
-    P --> K[Knowledge 手册与确认历史]
-    I --> J[等待并汇总结果]
-    K --> J
-    J --> S
-    S -->|单任务或小预算| T[顺序取证]
-    T --> S
-    S -->|形成诊断| D[Diagnosis 证据与假设]
-    D --> R[Reviewer 逐项复核]
-    R -->|证据缺口 交由调度者规划一次补查| S
-    R --> F[报告 建议或信息缺口]
-    F --> A[人工提案与 operator 审批]
-    A --> E[登记执行器与恢复验证]
-    E --> H[人工确认解决与保存经验]
+    T["工单与授权范围"] --> S["Supervisor：模型规划"]
+    S --> V["程序校验：工具、参数、权限与范围"]
+    V --> I["Investigation：程序查询"]
+    V --> K["Knowledge：程序检索，按需执行"]
+    I --> E["证据台账与字段引用"]
+    K --> E
+    E --> D["Diagnosis：事实、候选机制与建议"]
+    D --> R["Reviewer：原始证据复核"]
+    R -->|新取证有价值且预算允许| S
+    R --> O["报告：结论、限制与信息缺口"]
+    O --> H["人工核查／修复提案与审批"]
 ```
 
-- 默认 Supervisor、Diagnosis、Reviewer 使用同一基础模型的不同提示词和局部消息历史；Investigation 与可选 Knowledge 为执行已校验查询的程序模块。LangGraph 编排阶段，两类取证同轮独立任务可并行，诊断、复核及定向补查顺序执行。
-- 六个只读工具：指标、日志、变更、负责人、手册检索、已确认历史工单检索。执行前检查身份、角色、服务、环境、版本与时间范围。
-- 取证按症状、机制与合理替代解释的问题覆盖决定收尾，聚焦查询不代替完整性；未解决问题在限次或预算耗尽时明确保留。Reviewer 提交证据缺口，Supervisor 可替换查询提示并规划具体补查，执行器只执行通过权限、去重和预算检查的调度计划。
-- RunContext 原子计数并约束模型、工具及时间预算；分支持有独立台账，汇总证据并保留失败缺口。严格输出契约、服务端来源引用、查询去重、任务检查与有界结构纠正构成 Harness。
-- 总上限由环境与已授权请求决定，当前配置示例为32次模型、48次工具、300秒。常规最多4次调度、6个任务、1轮补查；仅在明确区分价值、新查询及完整收尾预算通过门禁后，最多[追加一次补查](examples/showcase/additional-rework.md)，临时开放第5次调度/第7个任务位置。默认 Supervisor、Diagnosis、Reviewer 全运行各最多纠正1次，均消耗原模型总预算；旧 Agent 模式保留共享取证/诊断1次及 Reviewer 1次，单 Agent 仍最多1次。
-- 默认 Reviewer 直接核验原始证据、台账和草稿，输入不含已有问题状态、旧复核结论或取证模型的候选判断。观测盲审保留为可选对照，两种路径都保留引用校验和阻塞审计；症状、机制的阻塞属性由程序固定，模型只能评估证据是否支持。历史迭代见[改进记录](examples/showcase/agent-improvement.md)。
-- 阻塞复核须说明缺失观测、影响目标和判断变化；报告分开记录查询执行、机制支持与停止原因，合法补查交给调度者规划。实施及真实失败轨迹见[诊断审计记录](examples/showcase/diagnostic-audit.md)。
-- 当前在 v6 恢复点上[精简最终 Reviewer](examples/showcase/focused-review.md)，并校验[缺口归属、预留补查预算](examples/showcase/scope-rework-budget.md)：判断结论、下一步和证据缺口，补查参数由 Supervisor 规划。Qwen 调用、严格 JSON、证据引用、阻塞审计和有界补查保留。恢复点见[版本回退记录](examples/showcase/rollback-v6.md)；逐项断言和决策分支实验已撤回，见[历史记录](examples/showcase/claim-decision-review.md)。
-- 工单与运行按服务端身份隔离，PostgreSQL 保存结果、事件与修复阶段，SSE 支持续读。JSON 日志位于 `logs/incident.log`，指标位于 `/metrics`。
-- 登记服务可接入 Prometheus/Loki 与私有确认历史；未登记渠道明确返回缺口。提供知识库 Worker、API、PostgreSQL、Redis 的配置示例，数据库与缓存示例目前只有运维日志。
-- 修复独立于诊断：Agent 候选或人工提案 → 绑定证据、工单版本及配置 → operator 审批 → 单次执行 → 有界恢复验证。原 Docker 执行器支持精确登记容器的重启；可选[维护执行器](examples/maintenance-executors.md)增加启动、恢复暂停、配置热重载、恢复消费和指定缓存组刷新。三个应用动作需目标应用提供约定控制接口；拒绝任意脚本、Shell、全库清理，真实扩缩容与回滚尚未实现。
+| 角色或模块 | 职责 | 执行方式 |
+| --- | --- | --- |
+| Supervisor | 选择能改变判断的检查，输出登记工具、具体参数和预期信息价值 | 模型规划，程序验证后执行 |
+| Investigation | 查询指标、日志、变更与负责人，记录真实查询结果 | 程序取证，无额外取证模型调用 |
+| Knowledge | 按需检索排障手册与已确认历史工单 | 程序检索；历史相似性仅作线索 |
+| Diagnosis | 基于来源形成事实、候选机制、未知项和下一步 | 模型诊断，无工具权限 |
+| Reviewer | 核对事实、整个因果陈述、建议条件和关键证据需求 | 模型复核，无工具权限 |
 
-`completed` 表示诊断流程完成，`passed` 表示本次复核通过；二者都不表示工单已解决、唯一根因已确认或修复已批准。修复验证通过也不会自动关闭工单。
+三个模型角色使用同一基础模型配置，按职责组织请求；Reviewer直接读取原始证据与程序台账，独立阶段复核仍可能共享模型偏差。独立取证任务可并行，诊断与复核顺序执行。
 
-## 源码目录
+常规最多一轮补查，追加一轮须满足新查询、区分价值与完整收尾预算门禁。三个模型角色各有全运行一次结构纠正额度，计入原总预算。预算或证据不足时允许以 `partial` 结束。
 
-当前协作流程已将模型请求、计划校验、取证执行与并行汇总、复核校验与补查交接决策、报告发布提取为独立组件；WorkflowState 按职责保存运行状态，WorkflowPolicy 集中模式及预算准入判断，入口与诊断规则保持兼容。模块职责、状态归属及面试讲解见 [Agent 架构说明](examples/showcase/architecture.md)。
+## 核心技术亮点
 
-| 路径 | 职责 |
+| 能力 | 实现与工程价值 | 源码入口 |
+| --- | --- | --- |
+| 结构化规划与契约 | Pydantic契约约束计划、工具参数与角色输出；格式失败提供字段级反馈并有限纠正 | [Protocol](app/agents/protocol.py)、[Planning](app/workflow/planning.py) |
+| 受控工具执行 | 六类只读能力覆盖指标、日志、变更、负责人、手册与历史；程序校验身份、角色及工单范围 | [ToolExecutor](app/tools/executor.py)、[Providers](app/providers/) |
+| 证据可追溯 | 服务端生成EV证据编号与REF字段引用；事实绑定实质来源，Reviewer核对原始观测和查询状态 | [Evidence](app/evidence/)、[Review](app/workflow/review.py) |
+| 预算与查询台账 | RunContext统一计数、原子领取预算并预留收尾；规范化查询用于去重，避免同目标不同查询被误拦 | [RunContext](app/runtime/context.py)、[Coordinator](app/workflow/coordinator.py) |
+| 知识检索与适用性 | 排障手册切分、Embedding与pgvector检索，支持上传 `.md` / `.txt`；历史背景与当前观测分开使用 | [Knowledge](app/knowledge/)、[RAG说明](examples/runbook-rag.md) |
+| 人工审批与恢复验证 | 诊断建议与服务变更分开；登记动作经权限与审批后执行，再进行有界恢复验证 | [Repairs](app/repairs/)、[维护执行器](examples/maintenance-executors.md) |
+
+查询台账区分成功、查空、失败和截断。引用合法只证明来源身份有效，不能自动证明因果；业务现象仍需要业务记录支持。PostgreSQL保存运行结果与事件，SSE支持事件续读，JSON日志与指标用于追踪；当前没有checkpoint恢复或跨进程调度。
+
+## 两个固定展示案例
+
+以下为已保存的**真实模型请求 + 合成只读工具数据**，来自不同验证批次，用于展示机制与限制，不汇总为准确率。完整输入、响应、复核、失败及预算事件均留档。
+
+### 案例一：只读挂载导致索引写入受阻
+
+- **观测**：日志记录 `EROFS`，进程命名空间内挂载标志为 `ro`；空间与inode数据未显示容量耗尽。
+- **可展示链路**：原始日志 → 字段来源 → 近端写入机制 → Reviewer评估 → 人工核实触发原因。
+- **运行结果**：4次模型请求、2次工具执行，`completed / passed`。
+- **解释边界**：为什么变成只读仍未知；原报告对竞争解释排除偏强，部署完成时间不能证明开始／生效时间。流程完成不等于服务恢复。
+
+[完整记录：closeout_002](examples/showcase/interview-minimal-repairs-validation.json)
+
+### 案例二：业务重复投诉，日志不可用
+
+- **调查条件**：用户报告订单重复处理，日志渠道不可用，已有技术指标不足以建立业务因果。
+- **可展示链路**：查询失败台账 → 复核缺口 → 保留未知 → 人工待办与交接。
+- **运行结果**：6次模型请求、3次工具执行，`partial / needs_information`，停止原因 `NEEDS_INFORMATION`。
+- **已知缺陷**：原报告仍用技术指标支持业务现象，部分候选的因果方向也不充分。交接结果有效与诊断准确分开评估；需人工关联订单、请求、幂等键、消费尝试和成功结果。
+
+[完整记录：closeout_003](examples/showcase/interview-blocker-followup-validation.json) · [离线展示步骤与讲解顺序](examples/showcase/interview-closeout.md)
+
+`completed` 表示诊断流程完成，`passed` 表示内部复核通过。两者均不表示唯一根因已确认、工单已解决或修复已批准；修复验证通过也不会自动关闭工单。
+
+## 快速体验
+
+免费标准流程排练不需要模型Key、数据库或Docker。使用Python 3.12，在仓库根目录安装依赖并运行：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe scripts/demo_interview_flow.py
+```
+
+该演示使用真实LangGraph与工具执行器，但模型决策由脚本提供、观测合成。收尾时排练结果为4次脚本模型步骤、2次工具执行、0次取证模型调用、0次付费请求；输出写入新的 `output/` UUID目录。它验证控制流程，不作为自主诊断质量成绩。
+
+两个真实案例的报告可按[离线配方](examples/showcase/interview-closeout.md#离线复现报告展示)生成Markdown与JSON，无需再次付费调用。实际后端、数据库、身份及前端启动见[Windows本地启动](README_LOCAL.md)，模型接口配置见[兼容接口说明](examples/showcase/openai-compatible.md)。
+
+## 验证结果与设计取舍
+
+| 验证 | 已确认结果 | 适用边界 |
+| --- | --- | --- |
+| 收尾运行时代码回归 | 701项：681通过、20项数据库检查跳过 | 工程回归，不能替代真实服务、数据库或诊断质量验收 |
+| 最小修复真实检查 | 两批4次运行、24次请求；保留复核失败与缺信息结果 | 两批源码版本不同，不宣称终版三个案例全部通过 |
+| 最后提示对照 | 两个已见案例，原提示／候选各一次，共24次请求；候选未保留 | 局部收益伴随命题反转与无效渠道重试建议，小样本不证明因果或稳定收益 |
+
+各项成绩绑定对应源码和记录，两个24请求批次分别统计；没有证明多角色整体质量领先，也不宣称生产规模、SLA或根因准确率。
+
+曾尝试更复杂的修稿范围约束、补查分流与仲裁，规则之间产生冲突，真实验证未证明稳定收益。收尾版恢复基础架构，只保留参数定位、输入额度配置、查询标识及阻塞反馈等通用修复。最后的提示候选没有清晰整体收益，恢复原提示后停止优化。
+
+实验分支 [codex/review-driven-orchestration](https://github.com/Heresy0/IT_Incident_Agent/tree/codex/review-driven-orchestration)、收尾分支 [codex/interview-consolidation](https://github.com/Heresy0/IT_Incident_Agent/tree/codex/interview-consolidation)及全部失败档案保留。旧实验能力与成绩按当时版本解释，不作为当前默认成绩。
+
+## 继续阅读
+
+| 入口 | 内容 |
 | --- | --- |
-| `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |
-| `app/agents/` | 模型契约与提示词、Knowledge / 旧取证工具循环、单 Agent 对照路径 |
-| `app/workflow/` | LangGraph、调度、问题台账、补查、复核与收尾 |
-| `app/runtime/` | 全局和分支预算、调用计数与追踪 |
-| `app/tools/`、`app/providers/` | 受限工具执行、登记来源、查询及历史适配 |
-| `app/knowledge/` | 轻量手册切分、向量化、pgvector 存储与 SQL 相似度检索 |
-| `app/evidence/` | 来源、引用、诊断完整性与报告渲染 |
-| `app/repairs/` | 提案、审批、固定执行器及恢复验证 |
-| `app/storage/`、`app/observability/` | PostgreSQL 与迁移、JSON 日志和指标 |
-| `front/agent_front/` | Vue / TypeScript 调试台、报告、审批及执行进度 |
-| `scripts/` | 本地演示、登记预检、只读试连与显式评测入口 |
-| `tests/`、`evals/`、`fixtures/` | 免费回归、冻结对照数据和受控评测 |
-| `examples/` | 服务登记示例、面试材料和公开验证摘要 |
-| `archive/research/` | 只供追溯的原研究成果，不参与当前运行和安装 |
+| [面试架构](examples/showcase/interview-architecture.md) | 模块职责、状态与预算归属、90秒讲解 |
+| [面试收尾](examples/showcase/interview-closeout.md) | 两个案例、人工评估标准、展示步骤及停止理由 |
+| [最小修复](examples/showcase/interview-minimal-repairs.md) | 证据编号、任务误拦、阻塞说明与真实验证 |
+| [完整收尾对照](examples/showcase/interview-closeout-validation.json) | 原始计划、消息、响应、两次校验失败与预算拒绝 |
+| [源码架构](examples/showcase/architecture.md) | 基础模块拆分与职责；当前默认以面试架构为准 |
+| [验证与历史入口](examples/showcase/README.md) | 保留的实验、失败、对照和开发记录 |
 
-后端入口为 `main.py` 与 `local_run.py`。结果读取使用 `/api/v1/runs/{run_id}`；旧研究运行 URL 仅保留只读兼容。Python 包构建与 `requirements.txt` 使用相同的锁定基础依赖；轻量手册 RAG 复用 PostgreSQL，增加 pgvector 扩展，无需独立向量服务，不安装旧研究或 Redis 检查点依赖。
-
-## 验证与面试材料
-
-- [轻量排障手册 RAG](examples/runbook-rag.md)：支持前端上传 .md / .txt、免费切分预览、单篇更新、Embedding、pgvector 与证据引用；包含批量导入命令和免费链路验证。
-
-- [服务基础取证包独立实验](evals/diagnostic_packs/README.md)：显式可选的基础查询入口及同配置免费机械对照；保留额外调用、上下文压力与小预算观测损失，尚未验证端到端诊断质量，默认流程不启用。
-- [离线分类统计](evals/run-statistics.md)：分别统计协议错误、查询与计划执行缺口、耗时、调用和成本；通过原报告哈希绑定的人类评价统计关键漏查、错误结论、无依据建议、复核误拦与有效交接。入口 `scripts/summarize_runs.py` 不调用模型，输出 JSON 汇总、Markdown 报表与评价模板。
-- [五分钟讲解与追问](examples/showcase/interview-guide.md)、[编排与 Harness 设计](examples/showcase/design.md)、[Harness 证据](examples/showcase/harness.md)。
-- [并行取证与免费验证](examples/showcase/parallel-collection.md)、[完整公开展示入口](examples/showcase/README.md)。
-- [调查覆盖与复核缺口调度](examples/showcase/coverage-rework-planning.md)：当前补查职责、覆盖退出、预算及免费验证。
-- [定向真实模型对照](examples/showcase/curated-live-guide.md)：保留失败、partial、版本及报告哈希。当前结果未证明多 Agent 整体诊断质量领先。
-- [历史开发说明](examples/showcase/development-history.md)：集中保留此前实施过程、真实对照和验收限制，不用旧阶段结果替代当前验证。
-- [本次清理与收尾](examples/showcase/cleanup-closeout.md)：删除项、历史归档、打包与免费验证结果。
-
-GitHub Actions 检查免费后端控制、前端类型与构建、隔离 PostgreSQL 集成。各次验证成绩绑定对应源码与记录；不把脚本结果当作真实模型成绩，不宣称生产规模或 SLA。当前没有 checkpoint 恢复、跨进程调度、服务管理页面或索引任务查询工具。
-
-真实 `.env`、身份令牌、`services.local.json`、数据库与原始运行数据不提交。`docs/` 继续本地维护并由 `.gitignore` 排除。已提交的研究覆盖与审计源码和历史验收证据保留，未删除或恢复旧草稿。
+核心源码位于 `app/agents/`、`app/workflow/`、`app/runtime/`、`app/tools/`、`app/evidence/`、`app/knowledge/`和 `app/repairs/`；前端位于 `front/agent_front/`。GitHub Actions配置免费后端检查、前端构建与隔离PostgreSQL集成，具体运行结果以对应Actions记录为准。
