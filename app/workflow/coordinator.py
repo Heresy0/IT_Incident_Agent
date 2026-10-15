@@ -10,6 +10,8 @@ from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
 from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output
 from workflow.planning import PlanningContext, validate_plan
+from workflow.state import WorkflowState, state_property
+from workflow.policy import WorkflowPolicy, BudgetView, policy_property
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
     validate_observation_review, additional_rework_eligible, needs_review_follow_up,
     resolve_handoff, decide_rework, completion_reason)
@@ -32,29 +34,82 @@ from workflow.review_protection import conservative, BOUNDED_POLICY, DEFAULT_REV
 
 
 class Collaboration:
+    # Explicit legacy aliases share the aggregate; no duplicate attribute storage.
+    phase = state_property('control', 'phase')
+    next_node = state_property('control', 'next_node')
+    stop = state_property('control', 'stop')
+    supervisor_calls = state_property('control', 'supervisor_calls')
+    reworks = state_property('control', 'reworks')
+    pending = state_property('control', 'pending')
+    additional_rework_authorized = state_property('control', 'additional_rework_authorized')
+    review_follow_up_used = state_property('control', 'review_follow_up_used')
+    collection_follow_up_used = state_property('control', 'collection_follow_up_used')
+    protocol_fallback_used = state_property('control', 'protocol_fallback_used')
+    last_supervisor_failure = state_property('control', 'last_supervisor_failure')
+
+    tasks = state_property('collection', 'tasks')
+    reused_requests = state_property('collection', 'reused_requests')
+    evidence = state_property('collection', 'evidence')
+    references = state_property('collection', 'references')
+    seen_tasks = state_property('collection', 'seen_tasks')
+    dispatch_queue = state_property('collection', 'dispatch_queue')
+    dispatch_follow_up = state_property('collection', 'dispatch_follow_up')
+    dispatch_previous = state_property('collection', 'dispatch_previous')
+    dispatch_reads = state_property('collection', 'dispatch_reads')
+    parallel_batch = state_property('collection', 'parallel_batch')
+    parallel_plans = state_property('collection', 'parallel_plans')
+    parallel_batches = state_property('collection', 'parallel_batches')
+    collection_exits = state_property('collection', 'collection_exits')
+    diagnostic_pack = state_property('collection', 'diagnostic_pack')
+    diagnostic_pack_result = state_property('collection', 'diagnostic_pack_result')
+    diagnostic_pack_exit = state_property('collection', 'diagnostic_pack_exit')
+
+    draft = state_property('diagnosis', 'draft')
+    review = state_property('diagnosis', 'review')
+    evidence_needs = state_property('diagnosis', 'evidence_needs')
+    drafts = state_property('diagnosis', 'drafts')
+    reviews = state_property('diagnosis', 'reviews')
+    observation_reviews = state_property('diagnosis', 'observation_reviews')
+    deferred_review_requests = state_property('diagnosis', 'deferred_review_requests')
+    review_hint_status = state_property('diagnosis', 'review_hint_status')
+    extra_gaps = state_property('diagnosis', 'extra_gaps')
+    team = state_property('diagnosis', 'team')
+
+    events = state_property('audit', 'events')
+    negotiation = state_property('audit', 'negotiation')
+    decisions = state_property('audit', 'decisions')
+    repairs = state_property('audit', 'repairs')
+    workflow_span = state_property('audit', 'workflow_span')
+
+    investigation_mode = policy_property('investigation_mode')
+    knowledge_mode = policy_property('knowledge_mode')
+    reviewer_repair_mode = policy_property('reviewer_repair_mode')
+    review_protection = policy_property('review_protection')
+    parallel_collection = policy_property('parallel_collection')
+    blind_review = policy_property('blind_review')
+
+    @property
+    def planning_only(self):
+        return self.policy.planning_only
+
+    @property
+    def role_corrections(self):
+        return self.policy.role_corrections
+
     def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None,
                  event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
-        from workflow.review_protection import MODES
-        if review_protection not in MODES:
-            raise ValueError('Unregistered review protection mode')
-        self.review_protection = review_protection
-        if investigation_mode not in {'agent', 'programmatic'}:
-            raise ValueError('unregistered investigation mode')
-        self.investigation_mode = investigation_mode
-        self.knowledge_mode = investigation_mode if knowledge_mode is None else knowledge_mode
-        if self.knowledge_mode not in {'agent', 'programmatic'}:
-            raise ValueError('unregistered knowledge mode')
-        self.planning_only = self.investigation_mode == self.knowledge_mode == 'programmatic'
-        self.role_corrections = self.planning_only and reviewer_repair_mode == 'shared'
-        if reviewer_repair_mode not in {'shared', 'split'}:
-            raise ValueError('unregistered reviewer repair mode')
-        self.reviewer_repair_mode = reviewer_repair_mode
+        self.state = WorkflowState()
+        self.policy = WorkflowPolicy(
+            investigation_mode=investigation_mode,
+            knowledge_mode=investigation_mode if knowledge_mode is None else knowledge_mode,
+            reviewer_repair_mode=reviewer_repair_mode, review_protection=review_protection,
+            parallel_collection=parallel_collection,
+            blind_review=getattr(models.get('reviewer'), 'blind_review', False) if blind_review is None else blind_review)
         if set(models) != {"supervisor", "investigation", "knowledge", "diagnosis", "reviewer"}:
             raise ValueError("five registered models required")
         self.models, self.provider, self.principal = models, provider, principal
         self.ticket = provider.ticket()
         provider.authorize(principal, self.ticket.scope)
-        self.diagnostic_pack, self.diagnostic_pack_result, self.diagnostic_pack_exit = None, None, None
         if diagnostic_pack is not None:
             from workflow.diagnostic_pack import DiagnosticPack
             if not self.planning_only:
@@ -63,8 +118,6 @@ class Collaboration:
             self.diagnostic_pack = DiagnosticPack.model_validate_json(json.dumps(raw))
             self.diagnostic_pack.assert_scope(self.ticket)
         self.evidence_needs = initial_needs(self.ticket)
-        self.events, self.tasks, self.negotiation, self.drafts, self.reviews = [], [], [], [], []
-        self.decisions = []
         def sink(event):
             event = {**event, "seq": len(self.events) + 1}
             self.events.append(event)
@@ -78,31 +131,7 @@ class Collaboration:
             self.context, self.events = context, event_log
         self.executors = {role: ToolExecutor(provider, principal, self.ticket.scope, self.context, role=role)
                           for role in ("investigation", "knowledge")}
-        self.repairs = {"repairs": 0}
-        self.review_follow_up_used = False
-        self.collection_follow_up_used = False
-        self.reused_requests = []
-        self.evidence, self.references, self.seen_tasks = {}, {}, set()
-        self.supervisor_calls = self.reworks = 0
-        self.additional_rework_authorized = False
-        self.pending, self.draft, self.review = None, None, None
-        self.phase, self.stop, self.extra_gaps, self.team = "collect", "", [], None
         self.workflow_span = self.context.root_span
-        self.dispatch_queue = []
-        self.dispatch_follow_up = False
-        self.dispatch_previous = set()
-        self.dispatch_reads = set()
-        self.next_node = 'supervisor'
-        self.protocol_fallback_used = False
-        self.last_supervisor_failure = None
-        self.parallel_batch = None
-        self.parallel_plans = {}
-        self.parallel_batches = 0
-        self.parallel_collection = parallel_collection
-        self.collection_exits = []
-        self.blind_review = getattr(models['reviewer'], 'blind_review', False) if blind_review is None else blind_review
-        self.observation_reviews = []
-        self.deferred_review_requests = []
 
     def event(self, kind, role="supervisor", **fields):
         self.context.emit({"type": kind, "role": role, "span_id": self.workflow_span,
@@ -339,35 +368,24 @@ class Collaboration:
                 "budget": {key: rework_budget[key] for key in
                            ('can_collect', 'remaining_model_calls', 'remaining_tools')}}
 
+    def budget_view(self):
+        # Read current runtime counters; WorkflowState never owns their copies.
+        with self.context.lock:
+            counts = dict(self.context.counts)
+        return BudgetView(self.context.limits, counts['model_calls'], counts['tool_calls'],
+            time.monotonic() - self.context.started, self.supervisor_calls, len(self.tasks),
+            self.reworks, self.additional_rework_authorized)
+
     def rework_budget(self, *, pending_model_calls=0, tool_calls=1, supervisor_completed=False, additional=False):
-        # Approved checks run before one interpretation call. Count future steps
-        # once, while retaining the original finalization and time reserves.
-        remaining = self.context.limits.model_calls - self.context.counts['model_calls']
-        steps = {'pending_model_calls': pending_model_calls, 'supervisor': int(not supervisor_completed),
-                 'interpretation': 1, 'finalization_reserve': max(2, self.context.limits.reserve_model_calls)}
-        extended = additional or self.additional_rework_authorized
-        if extended:
-            steps['finalization_reserve'] = max(2 + int(self.blind_review), self.context.limits.reserve_model_calls)
-            steps['correction_reserve'] = self.context.limits.reserve_model_calls
-        needed = sum(steps.values())
-        tools = self.context.limits.tool_calls - self.context.counts['tool_calls']
-        model_turns = int(not supervisor_completed) + 3 + int(self.blind_review)
-        time_required = (30 * model_turns + self.context.limits.reserve_seconds if extended
-                         else self.context.limits.reserve_seconds)
-        affordable = (remaining >= needed and tools >= tool_calls
-            and self.supervisor_calls < (5 if extended else 4) and len(self.tasks) < (7 if extended else 6)
-            and self.reworks < (2 if extended else 1)
-            and time.monotonic() - self.context.started < self.context.limits.seconds - time_required)
-        return {'can_collect': affordable, 'model_steps': steps, 'required_model_calls': needed,
-                'remaining_model_calls': remaining, 'required_tool_calls': tool_calls, 'remaining_tools': tools}
+        return self.policy.rework_budget(self.budget_view(), pending_model_calls=pending_model_calls,
+            tool_calls=tool_calls, supervisor_completed=supervisor_completed, additional=additional)
 
     def additional_rework_eligible(self):
         return additional_rework_eligible(self.review_routing_context())
 
     def can_replan(self):
-        return (self.supervisor_calls < 3 and len(self.tasks) < 6
-            and self.dispatch_capacity(pending_model_call=1) > 0
-            and time.monotonic() - self.context.started < self.context.limits.seconds - self.context.limits.reserve_seconds)
+        return self.policy.can_replan(self.budget_view(),
+            dispatch_capacity=self.dispatch_capacity(pending_model_call=1))
 
     def needs_collection_follow_up(self, decision):
         if self.planning_only:
@@ -580,7 +598,7 @@ class Collaboration:
             self.review_draft()
 
     def prepare_dispatch(self, decision):
-        if not decision.tasks or len(self.tasks) + len(decision.tasks) > (7 if self.additional_rework_authorized else 6):
+        if not decision.tasks or len(self.tasks) + len(decision.tasks) > self.policy.task_limit(self.additional_rework_authorized):
             raise ProtocolError("TASK_LIMIT")
         if self.phase == "rework" and len(decision.tasks) != 1:
             raise ProtocolError("INVALID_REWORK_DISPATCH")
@@ -748,7 +766,7 @@ class Collaboration:
         objective = self.task_objective(task, follow_up)
         reserve = self.context.limits.reserve_model_calls if follow_up else self.collection_reserve()
         available_steps = self.context.limits.model_calls - reserve - self.context.counts['model_calls']
-        steps = min(4, available_steps - 2 * len(self.dispatch_queue))
+        steps = min(self.policy.collector_steps, available_steps - 2 * len(self.dispatch_queue))
         collector = self.collection_runner()
         request = CollectionRequest(task, objective, collector.modes[role], steps)
         outcome = collector.collect(request, executor=self.executors[role], context=self.context,
@@ -821,34 +839,22 @@ class Collaboration:
             self.next_node = 'supervisor'
 
     def collection_reserve(self):
-        # First diagnosis/review, then one Supervisor-planned read/interpretation
-        # and a revised diagnosis/review. No extra calls or budget enlargement.
-        base = self.context.limits.reserve_model_calls
-        if self.ticket.purpose != 'diagnosis':
-            return base
-        required = 2 * (2 + int(self.blind_review)) + 2
-        # Tiny budgets still permit the initial collection and finalization;
-        # they cannot promise a full rework path.
-        return max(base, required) if self.context.limits.model_calls >= required + 3 else base
+        return self.policy.collection_reserve(self.context.limits, self.ticket.purpose)
 
     def dispatch_capacity(self, pending_model_call=False):
-        available = self.context.limits.model_calls - self.context.counts["model_calls"] - int(pending_model_call)
-        tools = self.context.limits.tool_calls - self.context.counts["tool_calls"]
+        checks = 0
         if self.phase == 'rework':
             checks = 1 if self.pending.get('planning_required') else len(self.pending['checks'])
-            return int(tools >= checks and available >= max(2, self.context.limits.reserve_model_calls) + 1)
-        diagnosis = self.ticket.purpose == 'diagnosis'
-        keep_tool = (diagnosis and self.collection_reserve() > self.context.limits.reserve_model_calls
-                     and any(e.kind == 'observation' for e in self.evidence.values()))
-        return max(0, min(2, tools - int(keep_tool),
-            (available - self.collection_reserve()) // 2,
-            (5 if diagnosis else 6) - len(self.tasks)))
+        return self.policy.dispatch_capacity(self.budget_view(), phase=self.phase,
+            purpose=self.ticket.purpose, pending_checks=checks,
+            has_observations=any(e.kind == 'observation' for e in self.evidence.values()),
+            pending_model_call=pending_model_call)
 
     def supervise(self):
         if (self.phase == 'collect' and self.ticket.purpose == 'diagnosis'
                 and any(e.kind == 'observation' for e in self.evidence.values())
                 and self.collection_reserve() > self.context.limits.reserve_model_calls
-                and (self.supervisor_calls >= 3
+                and (self.supervisor_calls >= self.policy.replan_supervisor_limit
                     or self.context.limits.model_calls - self.context.counts['model_calls']
                         <= self.collection_reserve())):
             self.event('collection_reserve_reached', remaining_model_calls=
@@ -857,7 +863,7 @@ class Collaboration:
                 supervisor_slot_reserved=True, tool_slot_reserved=True)
             self.next_node = 'diagnosis'
             return
-        if self.supervisor_calls >= (5 if self.additional_rework_authorized else 4):
+        if self.supervisor_calls >= self.policy.supervisor_limit(self.additional_rework_authorized):
             self.stop = "SUPERVISOR_LIMIT"
             return
         reusable = self.pending_rework_selection()
@@ -988,11 +994,18 @@ class Collaboration:
             investigation_mode=self.investigation_mode, evidence=self.evidence,
             references=self.references, tasks=self.tasks)
 
+    def graph_snapshot(self):
+        with self.context.lock:
+            counts = dict(self.context.counts)
+        return self.state.graph_projection(counts)
+
     def run(self):
         from workflow.graph import build_graph
         with activate(self.context), self.context.span("workflow", "incident_collaboration") as span:
             self.workflow_span = span['span_id']
-            build_graph(self).invoke({}, config={"recursion_limit": 40, 'max_concurrency': 2})
+            build_graph(self).invoke({}, config={
+                'recursion_limit': self.policy.recursion_limit,
+                'max_concurrency': self.policy.max_parallel_roles})
         return self.result()
 
     def status(self):

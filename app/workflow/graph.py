@@ -32,10 +32,7 @@ def build_graph(coordinator):
     c = coordinator
 
     def snapshot():
-        return IncidentState(phase=c.phase, next_node='finish' if c.stop else c.next_node,
-            termination_reason=c.stop, evidence_ids=list(c.evidence), task_count=len(c.tasks),
-            draft_revision=len(c.drafts), review_count=len(c.reviews),
-            rework_rounds=c.reworks, counts=dict(c.context.counts))
+        return IncidentState(**c.graph_snapshot())
 
     def guarded(name, operation):
         def node(state):

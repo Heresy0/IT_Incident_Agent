@@ -79,7 +79,7 @@ flowchart TD
 
 ## 源码目录
 
-当前协作流程已将模型请求、计划校验、取证执行与并行汇总、复核校验与补查交接决策、报告发布提取为独立组件，入口与诊断规则保持兼容。模块职责、状态归属及面试讲解见 [Agent 架构说明](examples/showcase/architecture.md)。
+当前协作流程已将模型请求、计划校验、取证执行与并行汇总、复核校验与补查交接决策、报告发布提取为独立组件；WorkflowState 按职责保存运行状态，WorkflowPolicy 集中模式及预算准入判断，入口与诊断规则保持兼容。模块职责、状态归属及面试讲解见 [Agent 架构说明](examples/showcase/architecture.md)。
 
 | 路径 | 职责 |
 | --- | --- |
