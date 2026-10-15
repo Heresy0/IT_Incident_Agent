@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+[Reviewer 输出容量与契约复验](examples/showcase/reviewer-packet-recovery.md)：精简输出、确定性字段绑定、范围关系和 schema 去重。三批共30次运行、130次真实请求，新流程截断为零；终版三例均曾有效复核、末稿两例有效，另一次修稿输入超限。全部失败与成本记录保留，仍未证明端到端稳定收益，标准流程继续默认。
+
 [Diagnosis引用交付修复与回归](examples/showcase/diagnosis-reference-recovery.md)：引入请求内短标签、精确恢复原引用和有界纠正提示。十八次已见案例对照实际84次请求，新路径九次均首次交付有效Diagnosis、引用错误零；Reviewer仍八次协议失败，其中出现十二条2200输出token截断响应，未证明整体收益。全部旧、新失败留档，未知引用仍拒绝，标准流程仍默认。
 
 新编排的[Reviewer 语义范围与人工交接收尾](examples/showcase/reviewer-semantic-closeout.md)：反证绑定原命题及真实字段，查询状态来自程序台账，人工核查写明缺失记录、完成条件与用途。冻结后以三个新合成案例各三轮完成十八次真实模型对照，实际84次请求；新路径八次协议失败、一次有效复核后缺信息交接，尚未证明稳定收益。全部失败保留，标准流程仍默认，准则与限制见[验证协议](evals/closeout_unseen/README.md)。

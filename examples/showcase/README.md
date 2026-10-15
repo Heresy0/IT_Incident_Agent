@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+[Reviewer 输出容量与契约复验](reviewer-packet-recovery.md)：精简接口、字段归属、生成与运行时契约对齐、共享 schema，以及三十次真实运行的完整失败分流。标准流程仍默认；[三批总索引](reviewer-packet-recovery-summary.json)保留全部原始档案链接与哈希。
+
 [Diagnosis引用交付修复与回归](diagnosis-reference-recovery.md)：原始失败根因、短标签与原引用的精确映射、一次纠正和修稿边界，以及固定十八次自主回归对照。标准流程默认不变，全部旧失败继续留档。
 
 [Reviewer 语义范围与人工交接收尾](reviewer-semantic-closeout.md)：模块职责、核心执行路径、命题反证与查询台账、可核查人工任务，以及冻结后新案例的十八次真实模型对照。标准流程继续默认，保留全部失败与剩余边界。
