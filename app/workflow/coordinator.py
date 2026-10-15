@@ -9,6 +9,7 @@ from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
 from agents.reference_transport import ReferenceTransport, GUIDANCE as REFERENCE_GUIDANCE, POLICY as REFERENCE_POLICY
+from agents.reviewer_references import ReviewerReferences, GUIDANCE as REVIEW_REFERENCE_GUIDANCE
 from agents.reviewer_packet import ReviewerFrame, PROMPT as PACKET_GUIDANCE, POLICY as PACKET_POLICY
 from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output, revision_review_generation, revision_review_focus
 from workflow.planning import PlanningContext, validate_plan
@@ -172,7 +173,8 @@ class Collaboration:
             references=self.references, evidence_needs=self.evidence_needs, executors=self.executors,
             investigation_mode=self.investigation_mode, knowledge_mode=self.knowledge_mode,
             planning_only=self.planning_only, reworks=self.reworks,
-            additional_rework_authorized=self.additional_rework_authorized, pending=self.pending)
+            additional_rework_authorized=self.additional_rework_authorized, pending=self.pending,
+            selector_diagnostics=self.policy.review_driven)
         return validate_plan(selection, view, emit=self.event,
             can_collect=lambda count: self.rework_budget(
                 tool_calls=count, supervisor_completed=True)['can_collect'])
@@ -260,12 +262,20 @@ class Collaboration:
             prompt += REFERENCE_GUIDANCE
             self.event('diagnosis_reference_transport', role, policy=REFERENCE_POLICY,
                 scope='request_and_correction_only', mappings=list(transport.rows))
+        review_refs = ReviewerReferences(self.evidence, read_catalog(self.executors, self.ticket.scope)) if frame else None
+        if review_refs:
+            output_schema, model_input = review_refs.encode(output_schema), review_refs.encode(model_input)
+            prompt += REVIEW_REFERENCE_GUIDANCE
+            self.event('reviewer_reference_transport', role, mappings=review_refs.mappings(), verdicts_supplied=False)
+        if self.policy.review_driven and role == 'supervisor':
+            prompt += ('\nget_service_logs.category必须选择dependency/configuration/resource之一，不能为null或省略。'
+                '未过滤仅指省略level和error_code，不表示跨类别读取；按发出日志的边界选择类别，不能自动改写查询。')
         request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal,
             reject_truncated=frame is not None, validation_fields=frame.validation_fields if frame else ())
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
         return runner.run(request, self.models[role], emit=self.event,
-            parse=lambda content: parse_role_output(role, schema, frame.decode(content) if frame else transport.decode(content) if transport else content, view, emit=self.event), validate=validate,
+            parse=lambda content: parse_role_output(role, schema, frame.decode(review_refs.decode(content)) if frame else transport.decode(content) if transport else content, view, emit=self.event), validate=validate,
             follow_up=lambda result: self.role_follow_up(role, schema, result),
             exhausted=lambda exc, details, value: self.role_failure(role, schema, exc, details, value),
             correction=frame.correction if frame else transport.correction if transport else None)

@@ -26,6 +26,7 @@ class PlanningContext:
     reworks: int
     additional_rework_authorized: bool
     pending: Mapping[str, Any] | None
+    selector_diagnostics: bool = False
 
 
 def validate_plan(selection: SupervisorSelection, view: PlanningContext, *,
@@ -66,7 +67,9 @@ def validate_plan(selection: SupervisorSelection, view: PlanningContext, *,
                     'path': f'tasks.{task_index}.checks.{check_index}.args', 'tool': check.tool,
                     'role': task.role,
                     'allowed_tools': [s['function']['name'] for s in view.executors[task.role].schemas()],
-                    'instruction': '按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。'}]) from None
+                    'instruction': '按read_only_tools[role]选工具；start/end复制ticket.scope窗口或在其内缩小，不能为对照外扩。无法查询则保留缺口。',
+                    **({'argument_errors': view.executors[task.role].argument_errors(check.tool, check.args)}
+                       if view.selector_diagnostics else {})}]) from None
             key = (check.tool, args.model_dump_json())
             if key in seen:
                 raise ProtocolError('DUPLICATE_TASK_CHECK')

@@ -64,10 +64,12 @@ def field_value(evidence, field_path):
 
 
 def validate_semantic_scope(review, view):
-    for point in getattr(review, 'counterpoints', ()):
+    for index, point in enumerate(getattr(review, 'counterpoints', ())):
         target = view.targets.get(point.target_id)
         if target is None or point.claim_quote not in target.cause:
             raise ProtocolError('COUNTERPOINT_CLAIM_SCOPE', [{'target_id': point.target_id,
+                'path': f'counterpoints.{index}.claim_quote',
+                'current_cause': target.cause if target else None,
                 'instruction': 'claim_quote逐字引用当前H.cause的一部分；局部冲突不能排除整条原因。'}])
         for field in point.fields:
             source = view.evidence.get(field.evidence_id)

@@ -120,10 +120,19 @@ class ReviewerFrame:
         packet = ReviewerPacket.model_validate_json(content)
         data = packet.model_dump(mode='json',exclude_unset=True)
         verdicts = {a.target_id:a.verdict for a in packet.assessments}
-        for a in packet.assessments:
+        errors = []
+        for i, a in enumerate(packet.assessments):
             if a.target_id.startswith('H') and a.verdict=='not_supported':
-                raise ProtocolError('REVIEW_PACKET_H_VERDICT',[{'path':'assessments',
-                    'instruction':'自由文本H仅supported/uncertain；局部削弱放counterpoints，不能排除整条H。'}])
+                errors.append({'code':'REVIEW_PACKET_H_VERDICT','path':f'assessments.{i}.verdict',
+                    'instruction':'自由文本H仅supported/uncertain；局部削弱放counterpoints，不能排除整条H。'})
+        for i, point in enumerate(packet.counterpoints):
+            target = self.targets.get(point.target_id)
+            if target is None or point.claim_quote not in target.cause:
+                errors.append({'code':'COUNTERPOINT_CLAIM_SCOPE','path':f'counterpoints.{i}.claim_quote',
+                    'target_id':point.target_id,'current_cause':target.cause if target else None,
+                    'instruction':'从当前cause逐字截取连续片段，包括括号；不能删去中间文字后拼接成引用。'})
+        if errors:
+            raise ProtocolError(errors[0]['code'], errors[:5])
         for index, task in enumerate(data.get('manual_tasks',[])):
             target = self.targets.get(task['target_id'])
             if target is None or not task['target_id'].startswith('A') or target.kind!='manual_check':
