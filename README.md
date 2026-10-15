@@ -91,6 +91,8 @@ flowchart TD
 
 [Reviewer 契约与触发归属优化](examples/showcase/reviewer-contract-followup.md)进一步采用逐问题的互斥输出形态、范围提示与字段纠正，恢复隐式的非目标解释注释而不生成纠错提案；显式提案和真正的命题／证据修改仍独立裁决。新增 `--validation-session reviewer_contract_followup` 验证计划：从种子首稿新调用、不回放旧回复，错误机制优先；每场景最多 12 次真实请求，最后 2 次仅供末稿 Reviewer，跨实现继承已用计数，总上限 36 次。该额度只用于验证，不改变业务默认额度；标准流程仍默认。
 
+[无预置反馈的自主对照](examples/showcase/orchestration-autonomous-comparison.md)使用三个冻结合成场景，各运行两条流程一次，规划、草稿和复核均由真实模型生成。实际32次请求，标准18次、新编排14次；新编排未表现出稳定诊断优势，遗漏本地资源观测与来源失败后的交接行动仍需完善。标准流程继续默认。`scripts/compare_orchestration_live.py` 默认仅打印免费计划，显式 `--execute-live` 才开始新批次，每轮上限16次请求、整批96次，全部失败与token记录保留；不与此前种子探针混算。
+
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |
