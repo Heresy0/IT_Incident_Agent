@@ -62,7 +62,208 @@ def make_coordinator(models=None, **options):
         **options)
 
 
+def scope_models(*, disposition='revise', persistent=False, pending_need=False):
+    models = review_models()
+    def diagnosis(response, messages, calls):
+        data = json.loads(response.content)
+        data['hypotheses'][0].update(cause='Unproven quota reduction' if calls == 1 else 'Observed dependency unreachable',
+                                     level='mechanism')
+        return json_response(data)
+    def reviewer(response, messages, calls):
+        data = json.loads(response.content)
+        if calls == 2:
+            input_data = json.loads(messages[1].content)['input']
+            self_target = input_data['targets']['H1']['cause']
+            assert self_target == 'Unproven quota reduction', 'Proposed correction must not be committed before independent review'
+            evidence_ids = data['assessments'][0]['evidence_ids']
+            decision = {'target_id': 'H1', 'disposition': disposition,
+                        'reason': 'Independently checked raw observations', 'evidence_ids': evidence_ids}
+            data['scope_assessments'] = [decision]
+            if disposition != 'keep':
+                next(item for item in data['assessments'] if item['target_id'] == 'H1').update(
+                    verdict='uncertain', reason='Quota claim has no current evidence')
+            if disposition == 'revise':
+                data['revision_requests'] = [{'target_id': 'H1', 'issue_type': 'reasoning',
+                    'reason': 'Replace unproven attribution', 'required_change': 'Explain the observed dependency failure only'}]
+                if pending_need:
+                    next(item for item in data['need_assessments'] if item['need_id'] == 'N2').update(
+                        verdict='uncertain', gap_kind='revision', revision_targets=['H1'], blocker=None,
+                        evidence_ids=evidence_ids, reason='Evidence exists; draft mechanism requires correction')
+            if disposition == 'evidence':
+                data['request_evidence'] = {'need_id': 'N2', 'target_id': 'H1', 'missing_observation': 'Remote ownership records'}
+                next(item for item in data['need_assessments'] if item['need_id'] == 'N2').update(
+                    verdict='uncertain', blocker={'cause_level': 'mechanism', 'affected_targets': ['H1'],
+                        'missing_observation': 'Remote ownership records', 'decision_impact': 'Determine causal scope',
+                        'resolution': 'external_source'})
+        elif calls > 2 and persistent:
+            next(item for item in data['assessments'] if item['target_id'] == 'H1').update(verdict='uncertain')
+            data['revision_requests'] = [{'target_id': 'H1', 'issue_type': 'reasoning',
+                'reason': 'Still not satisfactory', 'required_change': 'Revise again'}]
+        return json_response(data)
+    models['diagnosis'] = AlterOutput(models['diagnosis'], diagnosis)
+    models['reviewer'] = AlterOutput(models['reviewer'], reviewer)
+    return models
+
+
 class ReviewDrivenTests(unittest.TestCase):
+    def test_uncertain_need_pending_revision_does_not_become_evidence_query(self):
+        report = make_coordinator(scope_models(pending_need=True)).run()
+        self.assertEqual(report['status'], 'completed')
+        self.assertEqual(report['scope_revision_rounds'], 1)
+        self.assertEqual(report['rework_rounds'], 0)
+        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        pending = next(row for row in report['reviews'][1]['review']['need_assessments'] if row['need_id'] == 'N2')
+        self.assertEqual(pending['verdict'], 'uncertain')
+        self.assertEqual(pending['gap_kind'], 'revision')
+        final = next(row for row in report['reviews'][2]['review']['need_assessments'] if row['need_id'] == 'N2')
+        self.assertEqual(final['verdict'], 'supported')
+
+    def test_revision_need_marker_cannot_hide_real_gap_or_missing_authorization(self):
+        from workflow.revision import validate_revision_needs
+        c = make_coordinator(scope_models(pending_need=True))
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        c.review_draft()
+        c.diagnose()
+        data = json.loads(c.models['reviewer'].invoke([SystemMessage(content='test'),
+            HumanMessage(content=json.dumps({'input': c.reviewer_input()}))]).content)
+        for kind in ('no_request', 'no_current_evidence', 'real_gap', 'wrong_target'):
+            value = deepcopy(data)
+            need = next(item for item in value['need_assessments'] if item['need_id'] == 'N2')
+            if kind == 'no_request':
+                value['revision_requests'] = []
+            elif kind == 'no_current_evidence':
+                need['evidence_ids'] = []
+            elif kind == 'wrong_target':
+                need['revision_targets'] = ['A1']
+            else:
+                value['request_evidence'] = {'need_id': 'N2', 'target_id': 'H1', 'missing_observation': 'New causal observation'}
+            with self.subTest(kind=kind), self.assertRaises(ProtocolError):
+                validate_revision_needs(RevisionReviewDecision.model_validate(value), c.evidence)
+
+    def test_legacy_review_schema_has_no_revision_gap_marker(self):
+        from agents.contracts import ReviewDecision
+        self.assertNotIn('gap_kind', ReviewDecision.model_json_schema()['$defs']['NeedAssessment']['properties'])
+
+    def test_non_target_hypothesis_correction_is_a_proposal_before_review(self):
+        c = self.prepare_revision()
+        from agents.contracts import RevisionDiagnosisSelection
+        value = c.revision_task.model_input(c.references)['output_template']
+        value['recommended_actions'][0]['action'] = 'Neutral check of actual records'
+        value['hypotheses'][0]['cause'] = 'Alternative proposed correction'
+        before = deepcopy(c.draft)
+        result = c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+        self.assertEqual(result.draft.hypotheses, before.hypotheses)
+        self.assertEqual(result.concerns[0]['candidate']['cause'], 'Alternative proposed correction')
+        self.assertEqual(result.concerns[0]['origin'], 'scope_projection')
+        self.assertEqual(c.draft, before)
+
+    def test_explicit_non_target_proposal_is_validated_without_committing_it(self):
+        c = self.prepare_revision()
+        from agents.contracts import RevisionDiagnosisSelection
+        value = c.revision_task.model_input(c.references)['output_template']
+        value['recommended_actions'][0]['action'] = 'Neutral check of actual records'
+        proposal = {**value['hypotheses'][0], 'cause': 'Proposed evidence-based correction'}
+        value['revision_concerns'] = [{'target_id': 'H1', 'reason': 'Original attribution unsupported', 'candidate': proposal}]
+        result = c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+        self.assertEqual(result.concerns[0]['origin'], 'explicit_proposal')
+        self.assertEqual(result.draft.hypotheses, c.draft.hypotheses)
+        value['revision_concerns'][0]['candidate']['support_refs'] = [{'reference_id': 'REF_' + '0' * 24}]
+        with self.assertRaises(ProtocolError):
+            c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+
+    def test_scope_projection_does_not_bypass_empty_edit_or_execution_guard(self):
+        from agents.contracts import RevisionDiagnosisSelection
+        c = self.prepare_revision()
+        original = c.revision_task.model_input(c.references)['output_template']
+        for mutation in ('noop', 'execution', 'count'):
+            value = deepcopy(original)
+            value['hypotheses'][0]['cause'] = 'New proposed mechanism'
+            if mutation != 'noop':
+                value['recommended_actions'][0]['action'] = 'Neutral actual check'
+            if mutation == 'execution':
+                value['recommended_actions'][0]['requires_approval'] = True
+            if mutation == 'count':
+                value['hypotheses'].append(deepcopy(value['hypotheses'][0]))
+            with self.subTest(mutation=mutation), self.assertRaises(ProtocolError):
+                c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+
+    def test_reviewer_authorizes_one_bound_scope_correction_then_full_review(self):
+        report = make_coordinator(scope_models()).run()
+        self.assertEqual(report['status'], 'completed')
+        self.assertEqual(report['pure_revision_rounds'], 1)
+        self.assertEqual(report['scope_revision_rounds'], 1)
+        self.assertEqual(report['rework_rounds'], 0)
+        self.assertEqual(report['run_summary']['model_calls'], 7)
+        self.assertEqual(report['run_summary']['tool_calls'], 2)
+        self.assertEqual([row['revision'] for row in report['reviews']], [1, 2, 3])
+        self.assertEqual(report['drafts'][1]['draft']['hypotheses'][0]['cause'], 'Unproven quota reduction')
+        self.assertEqual(report['output']['hypotheses'][0]['cause'], 'Observed dependency unreachable')
+        extension = next(e for e in report['events'] if e['type'] == 'revision_scope_extended')
+        self.assertEqual(extension['target_ids'], ['H1'])
+        self.assertFalse(extension['total_budget_changed'])
+
+    def test_rejected_proposal_cannot_broaden_scope(self):
+        report = make_coordinator(scope_models(disposition='keep')).run()
+        self.assertEqual(report['scope_revision_rounds'], 0)
+        self.assertEqual(report['drafts'][1]['draft']['hypotheses'][0]['cause'], 'Unproven quota reduction')
+        self.assertFalse(any(e['type'] == 'revision_scope_extended' for e in report['events']))
+
+    def test_real_new_evidence_gap_takes_priority_over_scope_extension(self):
+        report = make_coordinator(scope_models(disposition='evidence')).run()
+        self.assertEqual(report['status'], 'partial')
+        self.assertEqual(report['scope_revision_rounds'], 0)
+        self.assertEqual(report['handoff']['reason'], 'external_information_required')
+
+    def test_repeated_reasoning_revisions_cannot_loop(self):
+        report = make_coordinator(scope_models(persistent=True)).run()
+        self.assertEqual(report['status'], 'partial')
+        self.assertEqual(report['scope_revision_rounds'], 1)
+        self.assertEqual(len(report['drafts']), 3)
+        self.assertEqual(report['handoff']['reason'], 'revision_limit_or_budget')
+
+    def test_low_budget_denies_scope_extension(self):
+        report = make_coordinator(scope_models(), limits=Limits(model_calls=7, tool_calls=4, seconds=300)).run()
+        self.assertEqual(report['status'], 'partial')
+        self.assertEqual(report['pure_revision_rounds'], 1)
+        self.assertEqual(report['scope_revision_rounds'], 0)
+        self.assertEqual(report['run_summary']['model_calls'], 5)
+        self.assertEqual(report['handoff']['reason'], 'revision_limit_or_budget')
+
+    def test_stale_concern_cannot_start_an_independent_review(self):
+        c = make_coordinator(scope_models())
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        c.review_draft()
+        c.diagnose()
+        before = c.context.counts['model_calls']
+        c.executors['investigation'].check_results['stale'] = {'status': 'empty'}
+        with self.assertRaises(ProtocolError) as error:
+            c.review_draft()
+        self.assertEqual(error.exception.code, 'STALE_REVISION_CONCERNS')
+        self.assertEqual(c.context.counts['model_calls'], before)
+
+    def test_unresolved_or_contradictory_scope_decisions_are_rejected(self):
+        c = make_coordinator(scope_models())
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        c.review_draft()
+        c.diagnose()
+        value = json.loads(c.models['reviewer'].invoke([SystemMessage(content='test'),
+            HumanMessage(content=json.dumps({'input': c.reviewer_input()}))]).content)
+        for kind in ('missing', 'contradiction', 'unknown'):
+            candidate = deepcopy(value)
+            if kind == 'missing':
+                candidate['scope_assessments'] = []
+            elif kind == 'contradiction':
+                candidate['scope_assessments'][0]['disposition'] = 'keep'
+            else:
+                candidate['scope_assessments'][0]['evidence_ids'] = ['EV_unknown']
+            with self.subTest(kind=kind), self.assertRaises(ProtocolError):
+                c.validate_review(RevisionReviewDecision.model_validate(candidate))
     def test_direct_collection_saves_one_planning_call(self):
         baseline = collaborate(planned_models(), FixtureProvider('case_001', P), P)
         c = make_coordinator()

@@ -34,7 +34,8 @@ def review_disposition(view, *, reviewed_gaps, can_collect, can_revise,
         if decision.kind == 'plan':
             return ReviewDisposition('collect', 'critical_evidence_gap', decision.authorize_additional)
         return ReviewDisposition('handoff', 'rework_limit' if decision.kind == 'limit_stop' else 'collection_budget')
-    blocking = any(item.verdict == 'uncertain' and is_blocking(view.needs[item.need_id].model_copy(
+    blocking = any(item.verdict == 'uncertain' and getattr(item, 'gap_kind', 'evidence') != 'revision'
+        and is_blocking(view.needs[item.need_id].model_copy(
         update={} if item.blocking is None else {'blocking': item.blocking}))
         for item in view.review.need_assessments)
     if blocking or evidence_gaps:

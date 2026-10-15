@@ -28,6 +28,7 @@ class ControlState:
     protocol_fallback_used: bool = False
     last_supervisor_failure: str | None = None
     pure_revisions: int = 0
+    scope_revisions: int = 0
     initial_replans: int = 0
 
 
@@ -65,6 +66,7 @@ class DiagnosisState:
     team: str | None = None
     revision_task: Any = None
     pending_revision_requests: tuple = ()
+    revision_concerns: dict[str, Any] | None = None
     handoff_reason: str | None = None
 
 

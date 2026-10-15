@@ -16,7 +16,7 @@ from workflow.evidence_needs import check_ids, validate_assessments, is_blocking
 from workflow.review_outcome import readiness_gaps, nonblocking_trigger_request
 from workflow.review_protection import conservative, BOUNDED_POLICY
 from workflow.task_checks import adds_information
-from workflow.revision import validate_revision_requests
+from workflow.revision import validate_revision_requests, validate_scope_assessments, validate_revision_needs
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,7 @@ class ReviewContext:
     require_blockers: bool
     existing_gaps: Sequence[str]
     strict_need_scope: bool = False
+    revision_concerns: Sequence[dict] = ()
 
 
 @dataclass
@@ -170,9 +171,12 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
     validate_revision_requests(normalized, targets)
     if view.strict_need_scope:
         validate_need_scope(normalized, view.needs, targets)
+    revision_need_ids = validate_revision_needs(normalized, view.evidence) if view.strict_need_scope else ()
     normalized = validate_blockers(view.needs, normalized, view.executors,
         required=view.require_blockers, targets=targets,
-        conservative=conservative(view.protection), event=emit)
+        conservative=conservative(view.protection), event=emit, revision_need_ids=revision_need_ids)
+    if view.strict_need_scope:
+        validate_scope_assessments(normalized, view.revision_concerns, view.evidence)
     if conservative(view.protection):
         for assessment in normalized.need_assessments:
             if assessment.blocker and not is_blocking(view.needs[assessment.need_id].model_copy(

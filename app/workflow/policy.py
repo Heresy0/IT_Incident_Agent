@@ -55,9 +55,10 @@ class WorkflowPolicy:
     def review_driven(self):
         return self.orchestration == 'review_driven'
 
-    def can_revise(self, view: BudgetView, *, revisions):
+    def can_revise(self, view: BudgetView, *, revisions, scope_revisions=0, scope_authorized=False):
         judging = 2 + int(self.blind_review)
-        return (revisions < 1 and view.model_calls + judging + view.limits.reserve_model_calls
+        allowed = revisions < 1 or revisions == 1 and scope_revisions < 1 and scope_authorized
+        return (allowed and view.model_calls + judging + view.limits.reserve_model_calls
                 <= view.limits.model_calls
                 and view.elapsed < view.limits.seconds - 30 * judging - view.limits.reserve_seconds)
 

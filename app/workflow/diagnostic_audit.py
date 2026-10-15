@@ -12,7 +12,7 @@ from agents.contracts import EvidenceRequest
 VERSION = 'diagnostic_audit_v1'
 
 
-def validate_blockers(needs, review, executors, *, required=False, targets=None, conservative=False, event=None):
+def validate_blockers(needs, review, executors, *, required=False, targets=None, conservative=False, event=None, revision_need_ids=()):
     if conservative:
         review = normalize_blocker_scope(needs, review, executors, targets, event)
     verdicts = {a.target_id: a.verdict for a in review.assessments}
@@ -25,7 +25,7 @@ def validate_blockers(needs, review, executors, *, required=False, targets=None,
         blocker = assessment.blocker
         requested = review.request_evidence and review.request_evidence.need_id == need.need_id
         if blocker is None:
-            if required and not requested:
+            if required and not requested and need.need_id not in revision_need_ids:
                 raise ProtocolError('REVIEW_BLOCKER_REQUIRED', [{'need_id': need.need_id,
                     'path': 'need_assessments.blocker',
                     'instruction': '阻塞未知须给cause_level、affected_targets、missing_observation、decision_impact、resolution；不可为通过而编造支持。'}])

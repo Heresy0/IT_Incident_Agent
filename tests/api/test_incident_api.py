@@ -247,7 +247,8 @@ class IncidentAPITests(unittest.TestCase):
                      'orchestration': 'review_driven'}
         run_id = self.start(incident, 'review_driven', **allowance)
         report = self.result(run_id)
-        self.assertEqual(report['orchestration'], 'review_driven_v1')
+        self.assertEqual(report['orchestration'], 'review_driven_v2')
+        self.assertEqual(report['scope_revision_rounds'], 0)
         self.assertEqual(report['run_summary']['model_calls'], 3)
         self.assertEqual(self.start(incident, 'review_driven', **allowance), run_id)
         changed = self.req('POST', f'incidents/{incident["id"]}/diagnoses', json={

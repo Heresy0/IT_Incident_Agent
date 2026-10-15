@@ -93,6 +93,7 @@ def diagnosis_schema(schema, *, canonical_checks=False):
 
 def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refutation=False):
     schema = deepcopy(schema)
+    need_definition = 'RevisionNeedAssessment' if 'RevisionNeedAssessment' in schema['$defs'] else 'NeedAssessment'
     assessment = schema['$defs']['Assessment']
     if bounded_refutation:
         assessment.setdefault('allOf', []).append({
@@ -104,7 +105,7 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     else:
         assessment['properties'].pop('refutation_basis', None)
     core = [n.need_id for n in needs.values() if n.purpose in {'symptom', 'mechanism'}]
-    schema['$defs']['NeedAssessment']['allOf'] = [{
+    schema['$defs'][need_definition]['allOf'] = [{
         'if': {'properties': {'need_id': {'enum': core}}, 'required': ['need_id']},
         'then': {'properties': {'verdict': {'enum': ['supported', 'uncertain']},
                                 'blocking': {'enum': [None]}}}}]
@@ -116,13 +117,21 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
         eligible = [key for key, target in targets.items()
                     if not (key.startswith('H') and target.level == 'trigger')]
         if need_ids and (not conservative or strict_scope):
-            schema['$defs']['NeedAssessment']['allOf'].append({
+            schema['$defs'][need_definition]['allOf'].append({
                 'if': {'properties': {'need_id': {'enum': need_ids}}, 'required': ['need_id']},
                 'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'}, {
                     'type': 'object', 'properties': {'affected_targets': {
                         'contains': {'type': 'string', 'enum': eligible}, 'minContains': 1}}}]}}}})
     if 'RevisionRequest' in schema['$defs']:
         schema['$defs']['RevisionRequest']['properties']['target_id']['enum'] = [key for key in targets if key.startswith(('H', 'A'))]
+    if need_definition == 'RevisionNeedAssessment':
+        definition = schema['$defs'][need_definition]
+        definition['properties']['revision_targets']['items'] = {'enum': [key for key in targets if key.startswith(('H', 'A'))]}
+        definition['allOf'].append({
+            'if': {'properties': {'gap_kind': {'const': 'revision'}}, 'required': ['gap_kind']},
+            'then': {'properties': {'verdict': {'const': 'uncertain'}, 'blocker': {'type': 'null'},
+                'revision_targets': {'minItems': 1}, 'evidence_ids': {'minItems': 1}},
+                'required': ['revision_targets', 'evidence_ids']}})
     request = schema['$defs']['EvidenceRequest']['properties']
     request['need_id'] = {'enum': [*needs, None]}
     request['hypothesis_id'] = {'enum': [k for k in targets if k.startswith('H')] + [None]}
@@ -304,7 +313,8 @@ def role_output_schema(role, schema, view: RoleContractContext):
         required = list(view.targets)
         output_schema['$defs']['Assessment']['properties']['target_id']['enum'] = required
         output_schema['properties']['assessments'].update(minItems=len(required), maxItems=len(required))
-        output_schema['$defs']['NeedAssessment']['properties']['need_id']['enum'] = list(view.evidence_needs)
+        need_definition = 'RevisionNeedAssessment' if 'RevisionNeedAssessment' in output_schema['$defs'] else 'NeedAssessment'
+        output_schema['$defs'][need_definition]['properties']['need_id']['enum'] = list(view.evidence_needs)
         output_schema['properties']['need_assessments'].update(
             minItems=len(view.evidence_needs), maxItems=len(view.evidence_needs))
         output_schema = reviewer_schema(output_schema, view.evidence_needs, view.targets,

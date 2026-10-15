@@ -100,9 +100,11 @@ revision_task由程序生成，其requests是本次唯一修改范围。以outpu
 expression只修正文字，不改变行动kind/checks/repair/requires_approval或假设的证据归属。
 核查不能预设远端变更已发生，未知核查结果保留为分支，expected_result沿用程序固定说明。
 已有missing_information保留，可追加新发现的未知；负责人引用保持模板值。
-若发现非目标假设有证据问题，只在missing_information指出，留给随后独立Reviewer评估。
+若发现非目标假设有证据问题，保留该H原文，填写revision_concerns：target_id、reason、candidate
+（完整HypothesisSelection），可在candidate提出证据支持的替代表达及实际REF；它只是待独立裁决
+的提案，不能改入hypotheses或声称已支持。可以同时改好指定A并指出非目标H问题，不必牺牲其一。
 纠正时恢复非目标字段，同时保留并完成requests所要求的目标改写，不回退成完整旧稿。
-仅返回完整DiagnosisSelection JSON，不输出解释、目标编号或diff。
+仅返回完整RevisionDiagnosisSelection JSON，不输出解释或diff。
 """
 
 BOUNDED_DIAGNOSIS = """
@@ -176,6 +178,20 @@ revision_requests不能代替关键证据缺口；需要新增观测时仍用req
 supported目标不能同时请求修稿。核查expected_result是程序固定的中性说明：取得实际记录后
 判断候选是否得到支持或反证，未预设结果；不请求改写这个固定字段。具体问题评估action和condition。
 不能为修稿把缺证据的问题标supported。范围外信息明确external_source，保留具体人工待办。
+revision_concerns是Diagnosis对非目标H的未提交提案，不是证据，也未获得授权。出现时逐个在
+scope_assessments给target_id、disposition、reason、evidence_ids。必须独立判断当前targets中的
+原H，不能把提案当作已提交或已支持：keep只在原H有当前观测支持时保留；revise要求原H未支持，
+同时给该H的reasoning revision_request，说明如何用已有证据重写；需要新增观测则evidence，
+关联真实request_evidence或blocker。不得因为“发现错误”而自动采纳提案或扩大工具范围。
+区分错误因果陈述与证据本身不足：已有观测能直接解释近端机制、只需撤回不受支持的具体归因时，
+请求reasoning修稿，不为证明旧错误陈述去补查；N2评估原始观测是否足以形成机制，不继承旧H支持。
+确实缺少影响机制或下一步的观测则保留阻塞，不能为了修稿将其改判supported。
+need_assessments明确gap_kind：缺少新观测用evidence（默认），保留真实blocker及补查需求；
+已有当前观测、只是稿中机制论证待纠正用revision，verdict仍uncertain，revision_targets关联
+实际未支持H/A及revision_requests，evidence_ids引用可用于改稿的当前EV，blocker=null，
+不填相关request_evidence。“需要修正后的机制”是待修稿，不是missing_observation；
+不要为了进入修稿而提前把N2判supported。修稿完成后必须重新完整复核N2与所有目标。
+程序最多批准一次额外范围纠错，仍受原预算约束；任何改稿完成后都须完整独立复核。
 仅follow_up_reason不授权修稿，程序不会从自由文本猜测执行路线。你不选择路由或工具参数。
 """
 

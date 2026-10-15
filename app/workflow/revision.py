@@ -5,8 +5,8 @@ import hashlib
 import json
 from typing import Mapping, Sequence
 
-from agents.contracts import DiagnosisDraft, RevisionRequest, DiagnosisSelection
-from evidence.diagnosis import ProtocolError
+from agents.contracts import DiagnosisDraft, RevisionRequest, DiagnosisSelection, Hypothesis
+from evidence.diagnosis import ProtocolError, expand_refs
 
 
 def basis_id(evidence, executors):
@@ -20,11 +20,46 @@ def basis_id(evidence, executors):
 
 
 @dataclass(frozen=True)
+class RevisionCandidate:
+    draft: DiagnosisDraft
+    concerns: tuple[dict, ...]
+
+
+@dataclass(frozen=True)
 class RevisionTask:
     base_draft_revision: int
     basis_id: str
     draft: DiagnosisDraft
     requests: tuple[RevisionRequest, ...]
+
+    def project_candidate(self, candidate, concerns, registry):
+        """Separate non-target H proposals; never broaden the committed edit scope."""
+        requested = {item.target_id for item in self.requests}
+        available = {f'H{i + 1}' for i in range(len(self.draft.hypotheses))} - requested
+        proposals = {}
+        for item in concerns:
+            if item.target_id not in available or item.target_id in proposals:
+                raise ProtocolError('REVISION_CONCERN_TARGET', [{'target_id': item.target_id, 'allowed': sorted(available)}])
+            data = item.candidate.model_dump(exclude={'support_refs', 'counter_refs'})
+            hypothesis = Hypothesis(hypothesis_id=item.target_id, **data,
+                support_refs=expand_refs(item.candidate.support_refs, registry, 'revision_concerns.support_refs'),
+                counter_refs=expand_refs(item.candidate.counter_refs, registry, 'revision_concerns.counter_refs'))
+            proposals[item.target_id] = {'target_id': item.target_id, 'reason': item.reason,
+                'candidate': hypothesis.model_dump(mode='json', exclude={'status'}), 'origin': 'explicit_proposal'}
+        restored = list(candidate.hypotheses)
+        if len(restored) == len(self.draft.hypotheses):
+            for index, (before, after) in enumerate(zip(self.draft.hypotheses, restored)):
+                target = f'H{index + 1}'
+                if target in available and before != after:
+                    if target in proposals and proposals[target]['candidate'] != after.model_dump(mode='json', exclude={'status'}):
+                        raise ProtocolError('REVISION_CONCERN_CONFLICT', [{'target_id': target}])
+                    proposals.setdefault(target, {'target_id': target,
+                        'reason': '修稿候选同时改动非目标假设；此改动仅作待独立复核提案，不提交。',
+                        'candidate': after.model_dump(mode='json', exclude={'status'}), 'origin': 'scope_projection'})
+                    restored[index] = before.model_copy(deep=True)
+        projected = candidate.model_copy(update={'hypotheses': restored})
+        self.validate_candidate(projected)
+        return projected, tuple(proposals.values())
 
     def assert_current(self, revision, evidence, executors):
         if revision != self.base_draft_revision or basis_id(evidence, executors) != self.basis_id:
@@ -45,6 +80,8 @@ class RevisionTask:
                 'scope': 'requested_targets_only' if template else 'new_evidence_draft',
                 'editable_target_ids': [item.target_id for item in self.requests],
                 'requests': [item.model_dump(mode='json') for item in self.requests],
+                'concern_policy': '非目标H发现问题时保留原条目，使用revision_concerns提交target_id/reason/candidate；'
+                    '提案不是结论或授权，交由Reviewer独立判定。不得改非目标A、增删F/H/A或改变执行方式。',
                 'instruction': instruction}
 
     def validate_candidate(self, candidate):
@@ -106,7 +143,100 @@ class RevisionTask:
                 entries.append({'allOf': constraints})
             definition.update(minItems=len(entries), maxItems=len(entries), prefixItems=entries, items=False)
         schema['properties']['escalation_ref'] = {'const': template['escalation_ref']}
+        if 'RevisionConcern' in schema.get('$defs', {}):
+            ids = [f'H{i + 1}' for i in range(len(self.draft.hypotheses)) if f'H{i + 1}' not in requested]
+            schema['properties']['revision_concerns']['maxItems'] = len(ids)
+            schema['$defs']['RevisionConcern']['properties']['target_id']['enum'] = ids
         return schema
+
+
+def validate_scope_assessments(review, concerns, evidence):
+    expected = {item['target_id'] for item in concerns}
+    decisions = review.scope_assessments
+    ids = [item.target_id for item in decisions]
+    if len(ids) != len(set(ids)) or set(ids) != expected:
+        raise ProtocolError('REVISION_SCOPE_COVERAGE', [{'required_target_ids': sorted(expected), 'actual': ids}])
+    verdicts = {item.target_id: item.verdict for item in review.assessments}
+    requests = {item.target_id: item for item in review.revision_requests}
+    for scope_index, decision in enumerate(decisions):
+        if len(set(decision.evidence_ids)) != len(decision.evidence_ids) or any(key not in evidence for key in decision.evidence_ids):
+            raise ProtocolError('UNKNOWN_OR_DUPLICATE_EVIDENCE')
+        target = decision.target_id
+        request = requests.get(target)
+        evidence_request = review.request_evidence
+        linked_gap = (evidence_request and evidence_request.target_id == target) or any(
+            item.verdict == 'uncertain' and item.blocker and target in item.blocker.affected_targets
+            for item in review.need_assessments)
+        valid = (decision.disposition == 'keep' and verdicts[target] == 'supported' and request is None
+                    and any(evidence[key].kind == 'observation' for key in decision.evidence_ids)
+                 or decision.disposition == 'revise' and verdicts[target] != 'supported'
+                    and request is not None and request.issue_type == 'reasoning'
+                    and any(evidence[key].kind == 'observation' for key in decision.evidence_ids)
+                 or decision.disposition == 'evidence' and verdicts[target] != 'supported' and linked_gap)
+        if not valid:
+            index = next((i for i, item in enumerate(review.revision_requests) if item.target_id == target), None)
+            raise ProtocolError('REVISION_SCOPE_DECISION', [{'target_id': target, 'disposition': decision.disposition,
+                'path': f'revision_requests.{index}.issue_type' if index is not None
+                    and decision.disposition == 'revise' and request.issue_type != 'reasoning'
+                    else f'scope_assessments.{scope_index}.disposition',
+                'actual_issue_type': request.issue_type if request else None, 'actual_target_verdict': verdicts[target],
+                'instruction': '逐项独立裁决：keep须原H受当前观测支持且无修稿请求；revise须原H未支持且有reasoning修稿请求；'
+                               'evidence须原H未支持并关联真实证据缺口。撤回错误因果归因、改写论证属于reasoning，不是expression。'
+                               '独立重评N2：现有证据能说明近端机制时，不能仅因深层触发未知要求补查；'
+                               '确有关键观测缺口仍保留uncertain。提案本身不作为证据，不为完成改判。'}])
+
+
+def scope_review_schema(schema, concerns):
+    """Advertise the same cross-field authorization rules enforced at runtime."""
+    schema = deepcopy(schema)
+    ids = [item['target_id'] for item in concerns]
+    schema['properties']['scope_assessments'].update(minItems=len(ids), maxItems=len(ids))
+    if not ids:
+        return schema
+    schema['$defs']['RevisionScopeAssessment']['properties']['target_id']['enum'] = ids
+    schema.setdefault('required', []).append('scope_assessments')
+    schema['$defs']['RevisionRequest'].setdefault('allOf', []).append({
+        'if': {'properties': {'target_id': {'enum': ids}}, 'required': ['target_id']},
+        'then': {'properties': {'issue_type': {'const': 'reasoning'}}}})
+    for target in ids:
+        scope = {'properties': {'target_id': {'const': target}, 'disposition': {'const': 'revise'}},
+                 'required': ['target_id', 'disposition']}
+        request = {'properties': {'target_id': {'const': target}, 'issue_type': {'const': 'reasoning'}},
+                   'required': ['target_id', 'issue_type']}
+        schema.setdefault('allOf', []).append({
+            'if': {'properties': {'scope_assessments': {'contains': scope}}, 'required': ['scope_assessments']},
+            'then': {'properties': {'revision_requests': {'contains': request}}, 'required': ['revision_requests']}})
+    return schema
+
+
+def scope_revision_authorized(review, concerns):
+    approved = {item.target_id for item in review.scope_assessments if item.disposition == 'revise'}
+    return bool(review.revision_requests) and all(item.issue_type == 'reasoning' and item.target_id in approved
+        for item in review.revision_requests) and approved <= {item['target_id'] for item in concerns}
+
+
+def validate_revision_needs(review, evidence):
+    """An unresolved draft can require editing without declaring missing data."""
+    requests = {item.target_id for item in review.revision_requests}
+    verdicts = {item.target_id: item.verdict for item in review.assessments}
+    revision_needs = set()
+    for index, assessment in enumerate(review.need_assessments):
+        targets = getattr(assessment, 'revision_targets', [])
+        if getattr(assessment, 'gap_kind', 'evidence') != 'revision':
+            if targets:
+                raise ProtocolError('REVISION_NEED_CONFLICT', [{'path': f'need_assessments.{index}.revision_targets'}])
+            continue
+        query = review.request_evidence
+        conflict = query and (query.need_id == assessment.need_id or query.target_id in targets)
+        if (assessment.verdict != 'uncertain' or assessment.blocker is not None or conflict
+                or not targets or len(targets) != len(set(targets)) or not set(targets) <= requests
+                or any(verdicts.get(target) == 'supported' for target in targets)
+                or not any(evidence[key].kind == 'observation' for key in assessment.evidence_ids)):
+            raise ProtocolError('REVISION_NEED_CONFLICT', [{'path': f'need_assessments.{index}',
+                'instruction': 'revision表示已有当前证据、稿中论证待改；保持uncertain，关联未支持目标及修稿请求，'
+                               '引用当前观测，不填blocker或相关request_evidence。确需新证据则用evidence并保留真实缺口。'}])
+        revision_needs.add(assessment.need_id)
+    return revision_needs
 
 
 def selection_template(draft, references):

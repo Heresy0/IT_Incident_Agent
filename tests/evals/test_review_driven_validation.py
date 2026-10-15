@@ -13,6 +13,46 @@ from scripts.verify_review_driven import main, PAID_CAP, PaidBudget, RecordedMod
 
 
 class ReviewDrivenValidationTests(unittest.TestCase):
+    def test_final_review_metric_cannot_count_review_of_previous_draft(self):
+        from scripts.verify_revision_probe import control_checks
+        draft = {'findings': [], 'hypotheses': [], 'recommended_actions': [{'action': 'neutral check'}]}
+        report = {'drafts': [{'revision': index, 'draft': draft} for index in (1, 2, 3)],
+                  'reviews': [{'revision': index} for index in (1, 2)]}
+        self.assertFalse(control_checks(report)['final_review_completed'])
+        report['reviews'].append({'revision': 3})
+        self.assertTrue(control_checks(report)['final_review_completed'])
+
+    def test_paid_reply_replay_is_not_new_inference_and_later_turns_are_charged(self):
+        from scripts.verify_revision_probe import ReplayInitialRevision
+        from langchain_core.messages import AIMessage
+        class Live:
+            def invoke(self, messages):
+                return AIMessage(content='new live response')
+        budget = PaidBudget(maximum=8)
+        recorded = RecordedModel(Live(), budget)
+        replay = ReplayInitialRevision(recorded, 'retained exact paid response')
+        self.assertEqual(replay.invoke([]).content, 'retained exact paid response')
+        self.assertEqual(budget.used, 0)
+        self.assertEqual(recorded.replies, [])
+        self.assertEqual(replay.invoke([]).content, 'new live response')
+        self.assertEqual(budget.used, 1)
+        self.assertEqual(recorded.attempts, 1)
+
+    def test_new_scope_session_plan_stays_free_and_cannot_relabel_previous_session(self):
+        from scripts.verify_revision_probe import main as focused_main
+        out = io.StringIO()
+        with redirect_stdout(out), patch('scripts.verify_revision_probe.build_roles', side_effect=AssertionError('No models')):
+            focused_main(['--validation-session', 'scope_conflict_followup'])
+        plan = json.loads(out.getvalue())
+        self.assertEqual(plan['validation_session'], 'scope_conflict_followup')
+        self.assertEqual(plan['maximum_paid_attempts'], 24)
+        self.assertEqual(sum(plan['prior_case_paid_attempts'].values()), 0)
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'summary.json'
+            path.write_text(json.dumps({'plan': plan}), encoding='utf-8')
+            with self.assertRaises(ValueError):
+                focused_main(['--previous-summary', str(path)])
+
     def test_focused_probe_plan_has_independent_case_allowances_and_no_live_models(self):
         from scripts.verify_revision_probe import main as focused_main
         out = io.StringIO()

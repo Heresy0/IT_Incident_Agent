@@ -3,7 +3,7 @@ import hashlib
 import json
 import time
 from runtime.context import RunContext, ExecutionError, activate
-from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview, RevisionReviewDecision
+from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview, RevisionReviewDecision, RevisionDiagnosisSelection
 from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER, REVIEW_DRIVEN, REVISION_DIAGNOSIS
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
@@ -12,7 +12,7 @@ from agents.protocol import RoleContractContext, role_output_schema, role_model_
 from workflow.planning import PlanningContext, validate_plan
 from workflow.state import WorkflowState, state_property
 from workflow.policy import WorkflowPolicy, BudgetView, policy_property
-from workflow.revision import make_revision_task, collection_exit, basis_id
+from workflow.revision import make_revision_task, collection_exit, basis_id, RevisionCandidate, scope_revision_authorized, scope_review_schema
 from workflow.routing import review_disposition
 from workflow.handoff import build_handoff
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
@@ -92,9 +92,11 @@ class Collaboration:
     blind_review = policy_property('blind_review')
     orchestration = policy_property('orchestration')
     pure_revisions = state_property('control', 'pure_revisions')
+    scope_revisions = state_property('control', 'scope_revisions')
     initial_replans = state_property('control', 'initial_replans')
     revision_task = state_property('diagnosis', 'revision_task')
     pending_revision_requests = state_property('diagnosis', 'pending_revision_requests')
+    revision_concerns = state_property('diagnosis', 'revision_concerns')
     handoff_reason = state_property('diagnosis', 'handoff_reason')
 
     @property
@@ -214,6 +216,8 @@ class Collaboration:
         output_schema = role_output_schema(role, schema, view)
         if role == 'diagnosis' and self.revision_task:
             output_schema = self.revision_task.output_schema(output_schema, self.references)
+        if role == 'reviewer' and schema is RevisionReviewDecision:
+            output_schema = scope_review_schema(output_schema, self.current_revision_concerns())
         model_input = role_model_input(role, schema, payload, view)
         prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
         if self.review_protection == BOUNDED_POLICY:
@@ -300,6 +304,20 @@ class Collaboration:
             self.revision_task.validate_candidate(draft)
         return draft
 
+    def revision_candidate(self, selection):
+        draft = expand_diagnosis(selection, self)
+        draft = draft.model_copy(update={'rejected_actions': self.revision_task.draft.rejected_actions})
+        draft, concerns = self.revision_task.project_candidate(draft, selection.revision_concerns, self)
+        return RevisionCandidate(draft, concerns)
+
+    def current_revision_concerns(self):
+        if self.revision_concerns is None:
+            return ()
+        if (self.revision_concerns['draft_revision'] != len(self.drafts)
+                or self.revision_concerns['basis_id'] != basis_id(self.evidence, self.executors)):
+            raise ProtocolError('STALE_REVISION_CONCERNS')
+        return self.revision_concerns['items']
+
     def targets(self):
         return {f"{prefix}{n}": item for prefix, items in (("F", self.draft.findings),
             ("H", self.draft.hypotheses), ("A", self.draft.recommended_actions)) for n, item in enumerate(items, 1)}
@@ -382,6 +400,8 @@ class Collaboration:
                 "repair_capabilities": getattr(self.provider, 'repair_capabilities', []),
                 "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
                 "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
+                **({'revision_concerns': list(self.current_revision_concerns()),
+                    'concerns_are_untrusted_proposals': True} if self.policy.review_driven else {}),
                 "budget": {key: rework_budget[key] for key in
                            ('can_collect', 'remaining_model_calls', 'remaining_tools')}}
 
@@ -496,7 +516,8 @@ class Collaboration:
             executors=self.executors, targets=self.targets(), scope=self.ticket.scope,
             observation_gaps=self.observation_gaps(), protection=self.review_protection,
             require_blockers=self.blind_review or getattr(self.models['reviewer'], 'json_output', False),
-            existing_gaps=tuple(self.extra_gaps), strict_need_scope=self.policy.review_driven)
+            existing_gaps=tuple(self.extra_gaps), strict_need_scope=self.policy.review_driven,
+            revision_concerns=self.current_revision_concerns() if self.policy.review_driven else ())
 
     def review_routing_context(self, review=None):
         return ReviewRoutingContext(draft=self.draft, review=self.review if review is None else review,
@@ -539,15 +560,22 @@ class Collaboration:
         elif self.pending_revision_requests and self.draft:
             payload['revision_task'] = make_revision_task(len(self.drafts), self.draft,
                 self.pending_revision_requests, self.evidence, self.executors).model_input()
-        candidate = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis,
+        candidate = self.ask("diagnosis", RevisionDiagnosisSelection if revision_task else DiagnosisSelection,
+                             payload, terminal=True, validate=self.revision_candidate if revision_task else self.diagnosis,
                              system_prompt=REVISION_DIAGNOSIS if revision_task else None)
         if revision_task:
             revision_task.assert_current(len(self.drafts), self.evidence, self.executors)
-        self.draft = candidate
+        concerns = candidate.concerns if revision_task else ()
+        self.draft = candidate.draft if revision_task else candidate
         self.revision_task = None
         self.pending_revision_requests = ()
         revision = len(self.drafts) + 1
         self.drafts.append({"revision": revision, "draft": self.draft.model_dump(mode="json")})
+        self.revision_concerns = {'draft_revision': revision, 'basis_id': basis_id(self.evidence, self.executors),
+            'items': concerns} if concerns else None
+        if concerns:
+            self.event('revision_concerns_recorded', 'diagnosis', draft_revision=revision,
+                       basis_id=self.revision_concerns['basis_id'], concerns=list(concerns), committed_edits=False)
         for h in self.draft.hypotheses:
             self.note("revise" if revision > 1 else "propose_hypothesis", "diagnosis", "reviewer",
                       hypothesis_id=h.hypothesis_id, evidence_ids=[r.evidence_id for r in h.support_refs], reason=h.cause)
@@ -559,6 +587,8 @@ class Collaboration:
 
     def review_draft(self):
         revision = len(self.drafts)
+        if self.policy.review_driven:
+            self.current_revision_concerns()
         if self.blind_review and self.ticket.purpose == 'diagnosis':
             remaining = self.context.limits.model_calls - self.context.counts['model_calls']
             if remaining >= 2:
@@ -629,9 +659,12 @@ class Collaboration:
             self.note("accept" if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} else "escalate", "reviewer", "supervisor")
 
     def route_review(self, revision):
+        scope_extension = (self.pure_revisions == 1 and self.scope_revisions == 0
+            and scope_revision_authorized(self.review, self.current_revision_concerns()))
         disposition = review_disposition(self.review_routing_context(), reviewed_gaps=self.reviewed_gaps,
             can_collect=lambda additional: self.rework_budget(additional=additional)['can_collect'],
-            can_revise=lambda: self.policy.can_revise(self.budget_view(), revisions=self.pure_revisions),
+            can_revise=lambda: self.policy.can_revise(self.budget_view(),
+                revisions=self.pure_revisions, scope_revisions=self.scope_revisions, scope_authorized=scope_extension),
             evidence_gaps=[*self.observation_gaps(), *self.task_gaps()])
         self.reviews.append({'revision': revision, 'review': self.review.model_dump(mode='json')})
         self.event('evidence_needs_reviewed', 'reviewer', revision=revision, evidence_needs=self.need_input(),
@@ -639,10 +672,20 @@ class Collaboration:
         self.event('review_completed', 'reviewer', revision=revision,
                    follow_up_reason=self.review.follow_up_reason, status=disposition.route)
         self.event('review_routed', 'reviewer', revision=revision, route=disposition.route, reason=disposition.reason)
+        if self.current_revision_concerns():
+            self.event('revision_scope_reviewed', 'reviewer', revision=revision,
+                       assessments=[item.model_dump(mode='json') for item in self.review.scope_assessments],
+                       extension_eligible=scope_extension, execution_authorized=False)
         requests = tuple(self.review.revision_requests)
         if disposition.route == 'revise':
             self.revision_task = make_revision_task(revision, self.draft, requests, self.evidence, self.executors)
-            self.pure_revisions += 1
+            if scope_extension:
+                self.scope_revisions += 1
+                self.event('revision_scope_extended', 'reviewer', base_draft_revision=revision,
+                           basis_id=self.revision_task.basis_id, target_ids=[item.target_id for item in requests],
+                           total_budget_changed=False, maximum_scope_extensions=1)
+            else:
+                self.pure_revisions += 1
             self.event('draft_revision_requested', 'diagnosis', base_draft_revision=revision,
                        basis_id=self.revision_task.basis_id, target_ids=[item.target_id for item in requests])
             self.pending = None
@@ -650,6 +693,7 @@ class Collaboration:
         elif disposition.route == 'collect':
             request = self.review.request_evidence
             self.pending_revision_requests = requests
+            self.revision_concerns = None
             self.additional_rework_authorized |= disposition.authorize_additional
             if disposition.authorize_additional:
                 self.event('additional_rework_authorized', maximum_total_reworks=2, total_budget_changed=False)
@@ -1244,8 +1288,8 @@ class Collaboration:
             "prompt_version": self.prompt_version(),
         }
         if self.policy.review_driven:
-            metadata.update(orchestration='review_driven_v1', pure_revision_rounds=self.pure_revisions,
-                            initial_replans=self.initial_replans)
+            metadata.update(orchestration='review_driven_v2', pure_revision_rounds=self.pure_revisions,
+                            scope_revision_rounds=self.scope_revisions, initial_replans=self.initial_replans)
             if status != 'completed' or self.handoff_reason:
                 metadata['handoff'] = build_handoff(run_id=self.context.run_id, revision=len(self.drafts),
                     reason=self.handoff_reason or self.stop, publication=publication, needs=self.evidence_needs,
@@ -1262,7 +1306,7 @@ class Collaboration:
                    ObservationReview.model_json_schema() if self.blind_review else None,
                    *[ex.schemas() for ex in self.executors.values()]]
         if self.policy.review_driven:
-            payload.append(REVIEW_DRIVEN)
+            payload.extend([REVIEW_DRIVEN, REVISION_DIAGNOSIS, RevisionDiagnosisSelection.model_json_schema()])
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
 

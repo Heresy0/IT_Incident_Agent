@@ -169,6 +169,17 @@ class DiagnosisDraft(Contract):
     rejected_actions: list[dict[str, str]] = Field(default_factory=list)
 
 
+class RevisionConcern(Contract):
+    target_id: str = Field(pattern=r'^H[1-4]$')
+    reason: str = Field(min_length=1, max_length=300)
+    candidate: HypothesisSelection
+
+
+class RevisionDiagnosisSelection(DiagnosisSelection):
+    revision_concerns: list[RevisionConcern] = Field(default_factory=list, max_length=4,
+        description='Untrusted proposed corrections to non-target hypotheses; never edits to the committed draft.')
+
+
 class RefutationBasis(Contract):
     kind: Literal['direct_contradiction', 'weakens_explanation', 'absence_of_support']
     claim: str = Field(min_length=1, max_length=300,
@@ -217,10 +228,26 @@ class RevisionRequest(Contract):
         description='A correction possible from existing evidence; do not request new observations here.')
 
 
+class RevisionScopeAssessment(Contract):
+    target_id: str = Field(pattern=r'^H[1-4]$')
+    disposition: Literal['keep', 'revise', 'evidence']
+    reason: str = Field(min_length=1, max_length=300)
+    evidence_ids: list[str] = Field(default_factory=list, max_length=8)
+
+
+class RevisionNeedAssessment(NeedAssessment):
+    gap_kind: Literal['evidence', 'revision'] = 'evidence'
+    revision_targets: list[str] = Field(default_factory=list, max_length=4,
+        description='For gap_kind=revision only: existing H/A requiring an authorized edit, not a new observation.')
+
+
 class RevisionReviewDecision(ReviewDecision):
+    need_assessments: list[RevisionNeedAssessment] = Field(default_factory=list, max_length=6)
     revision_requests: list[RevisionRequest] = Field(default_factory=list, max_length=4,
         description='Only unsupported H/A wording or reasoning fixable with existing evidence. '
                     'Evidence gaps remain in request_evidence and need_assessments.')
+    scope_assessments: list[RevisionScopeAssessment] = Field(default_factory=list, max_length=4,
+        description='Independently resolve each untrusted non-target concern: keep original, authorize a reasoning edit, or seek evidence.')
 
 
 class ObservedClaim(Contract):

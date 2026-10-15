@@ -81,11 +81,13 @@ flowchart TD
 
 当前协作流程已将模型请求、计划校验、取证执行与并行汇总、复核校验与补查交接决策、报告发布提取为独立组件；WorkflowState 按职责保存运行状态，WorkflowPolicy 集中模式及预算准入判断，入口与诊断规则保持兼容。模块职责、状态归属及面试讲解见 [Agent 架构说明](examples/showcase/architecture.md)。
 
-新增 `review_driven` 编排试验：取证后直接诊断，程序按有效复核分流到已有证据修稿、新取证、人工交接或发布。纯修稿全运行最多一次，新稿重新复核；混合反馈先补查，再合并修稿要求。前端真实模型模式可显式选择“支持修稿与人工交接（试验）”，API 在诊断请求中传 `orchestration: "review_driven"`。标准流程与免费 Agent 演示仍保留，省略该参数沿用旧流程；既有启动请求幂等格式不变。控制测试证明分流和限次，真实模型收益仍需评测。
+新增 `review_driven` 编排试验：取证后直接诊断，程序按有效复核分流到已有证据修稿、新取证、人工交接或发布。常规纯修稿最多一次；非目标假设的纠错提案经 Reviewer 独立裁决，可另授权一次范围纠错，新稿仍完整复核且使用原预算。混合反馈先补查，再合并修稿要求。前端真实模型模式可显式选择“支持修稿与人工交接（试验）”，API 在诊断请求中传 `orchestration: "review_driven"`。标准流程与免费 Agent 演示仍保留，省略该参数沿用旧流程；既有启动请求幂等格式不变。控制测试证明分流和限次，真实模型收益仍需评测。
 
 `scripts/verify_review_driven.py` 默认只显示免费验证计划；显式 `--execute-live` 对冻结合成观测做新旧编排对照和标注的修稿探针。跨实现批次通过 `--previous-summary` 继承已用请求数，累计最多 50 次真实模型请求尝试，包含失败。所有批次与回复保留，不执行真实修复，不将种子反馈探针计入自主诊断质量。
 
 修稿定向优化采用目标范围门禁：程序生成完整输出模板，仅允许指定 H/A 修改，拒绝新增候选、改变未指定目标或原样返回目标；表达修改保留执行类型与核查参数。新路径复核拒绝仅用触发未知阻塞机制问题，仍由 Reviewer 独立重评。详见[修稿探针分析与复验](examples/showcase/revision-probe-followup.md)。`scripts/verify_revision_probe.py` 默认免费计划，显式 `--execute-live` 验证三个种子场景，每个最多 8 次真实请求；跨修复版本使用 `--previous-summary` 继承各场景已用计数，本次会话累计上限 24 次。
+
+后续[非目标假设纠错与范围冲突](examples/showcase/revision-scope-conflict.md)将范围外 H 的改动隔离为未提交提案，不直接写入实际稿。Reviewer 独立决定保留、授权 reasoning 纠错或补查；新路径用 `gap_kind` 区分缺观测与已有证据待修稿，后者保持 uncertain，不能据此提前发布。试验报告标记 `review_driven_v2`，标准请求和旧 ReviewDecision 契约保持兼容。
 
 | 路径 | 职责 |
 | --- | --- |
