@@ -64,6 +64,8 @@
 /evals/interview_consolidation/**/*.json -text
 /examples/showcase/interview-consolidation-validation.json -text
 /evals/interview_minimal_repairs/**/*.json -text
+/evals/interview_blocker_followup/**/*.json -text
+/examples/showcase/interview-blocker-followup-validation.json -text
 /examples/showcase/interview-minimal-repairs-validation.json -text
 /examples/showcase/interview-consolidation.md -text
 /evals/interview_consolidation/README.md -text

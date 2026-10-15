@@ -110,5 +110,19 @@ class MinimalReviewRepairTests(unittest.TestCase):
             self.assertIn('blocking_default',need)
             self.assertNotIn('status',need);self.assertNotIn('reason',need)
 
+    def test_missing_reference_downgrade_is_explained_in_blocker_error(self):
+        c=self.coordinator();c.run();c.models['reviewer'].json_output=True
+        data=c.review.model_dump(mode='json');data['request_evidence']=None
+        row=next(a for a in data['need_assessments'] if a['need_id']=='N1')
+        row.update(verdict='supported',evidence_ids=[],blocker=None)
+        value=ReviewDecision.model_validate(data)
+        with self.assertRaises(ProtocolError) as caught:c.validate_review(value)
+        detail=next(d for d in caught.exception.details if d['need_id']=='N1')
+        self.assertEqual(detail['support_gate']['submitted_verdict'],'supported')
+        self.assertEqual(detail['support_gate']['effective_verdict'],'uncertain')
+        self.assertEqual(detail['support_gate']['path'],'need_assessments.0.evidence_ids')
+        self.assertEqual(value.need_assessments[0].verdict,'supported')
+        self.assertEqual(value.need_assessments[0].evidence_ids,[])
+
 
 if __name__=='__main__':unittest.main()

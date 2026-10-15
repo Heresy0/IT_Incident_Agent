@@ -12,7 +12,7 @@ from evidence.diagnosis import ProtocolError, expand_refs
 from evidence.observations import gap_message, source_statement
 from runtime.context import ExecutionError
 from workflow.diagnostic_audit import validate_blockers, blocker_follow_up
-from workflow.evidence_needs import check_ids, validate_assessments, is_blocking
+from workflow.evidence_needs import check_ids, validate_assessments, is_blocking, current_support
 from workflow.review_outcome import readiness_gaps, nonblocking_trigger_request
 from workflow.review_protection import conservative, BOUNDED_POLICY
 from workflow.task_checks import adds_information
@@ -165,9 +165,21 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
         need_assessments = reopened
     normalized = review.model_copy(update={'assessments': checked, 'need_assessments': need_assessments,
                                            'request_evidence': request})
-    normalized = validate_blockers(view.needs, normalized, view.executors,
-        required=view.require_blockers, targets=targets,
-        conservative=conservative(view.protection), event=emit)
+    try:
+        normalized = validate_blockers(view.needs, normalized, view.executors,
+            required=view.require_blockers, targets=targets,
+            conservative=conservative(view.protection), event=emit)
+    except ProtocolError as exc:
+        if exc.code == 'REVIEW_BLOCKER_REQUIRED':
+            for detail in exc.details:
+                for index, original in enumerate(review.need_assessments):
+                    if (original.need_id == detail['need_id'] and original.verdict == 'supported'
+                            and not current_support(original.evidence_ids, view.evidence)):
+                        detail['support_gate'] = {'submitted_verdict': 'supported', 'effective_verdict': 'uncertain',
+                            'path': f'need_assessments.{index}.evidence_ids',
+                            'reason': 'NO_CURRENT_OBSERVATION_REFERENCE',
+                            'instruction': '原supported没有当前观测引用，已被降级uncertain。真有相关观测才补引用；否则保留未知并给blocker或同N请求，不机械补不相关EV。'}
+        raise
     if conservative(view.protection):
         for assessment in normalized.need_assessments:
             if assessment.blocker and not is_blocking(view.needs[assessment.need_id].model_copy(
