@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+最新[收敛版最小修复](examples/showcase/interview-minimal-repairs.md)：精确引用错误路径、按实际查询区分任务、解释阻塞及supported缺引用降级。终版701项回归中681通过、20项跳过；两批4次真实运行共24次请求，原失败全保留，流程仍为标准编排。
+
 当前面试展示分支为 `codex/interview-consolidation`，以 `fc01b2b` 恢复基础架构并保留少量通用修复。先读[架构与讲解材料](examples/showcase/interview-architecture.md)及[收敛交付记录](examples/showcase/interview-consolidation.md)。690项回归中670通过、20项数据库跳过；免费标准流程演示通过，三个真实检查仍保留失败与缺信息结果。
 
 免费排练：`python scripts/demo_interview_flow.py`。原实验分支 `codex/review-driven-orchestration`、全部历史失败和报告保留；当前分支不加载复杂Reviewer传输与多阶段修稿仲裁。

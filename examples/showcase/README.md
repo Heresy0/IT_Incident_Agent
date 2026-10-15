@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+[标准流程最小修复及全部失败](interview-minimal-repairs.md)：五个局部文件、无新增编排；首批三个案例与一次固定补充检查分别留档，引用合法不等于业务语义正确。
+
 当前展示入口：[面试架构与90秒讲解](interview-architecture.md)、[收敛交付与验证](interview-consolidation.md)、[完整真实检查记录](interview-consolidation-validation.json)。免费标准流程排练运行 `python scripts/demo_interview_flow.py`。
 
 原实验源码保留在 `codex/review-driven-orchestration`。本目录保留的Reviewer／修稿实验报告及对应冻结协议均为历史证据，不代表当前分支支持这些接口或已证明质量收益。
