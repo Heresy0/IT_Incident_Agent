@@ -136,6 +136,13 @@ def render_collaboration(result):
     lines.extend(["", "信息缺口：", *[f"- {gap}" for gap in output["missing_information"]]])
     if output["escalation_team"]:
         lines.append(f"建议升级团队：{output['escalation_team']}")
+    handoff = result.get('handoff')
+    if handoff:
+        lines.extend(['', '人工交接：', '- 自动处理停止原因：' + handoff['reason_label'],
+                      '- 接手团队：' + ('、'.join(item['team'] for item in handoff['owners'])
+                                      if handoff['owner_resolved'] else '尚未取得登记负责人，需人工确认接手方。')])
+        lines.extend('- 待核实：' + item for item in handoff['next_steps'])
+        lines.append('- 操作边界：' + handoff['operation_boundary'])
     summary = result["run_summary"]
     lines.append(f"\n模型 {summary['model_calls']} / 工具 {summary['tool_calls']}；返工 {result['rework_rounds']} 轮；结构修复 {result['repairs']} 次；{summary['termination_reason']}。未估算费用。")
     return "\n".join(lines) + "\n"

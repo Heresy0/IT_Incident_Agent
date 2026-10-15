@@ -155,6 +155,18 @@ directly_supported的每项refs必须选择当前观测的实际实质字段REF�
 
 ROLE_PROMPTS = {"supervisor": SUPERVISOR, "diagnosis": DIAGNOSIS, "reviewer": REVIEWER}
 
+REVIEW_DRIVEN = """
+已有证据足以修正的H/A表达或推理问题，使用revision_requests：target_id、issue_type
+（expression或reasoning）、reason、required_change；该目标保持uncertain或not_supported。
+例：将未证实的触发原因从机制陈述拆开；删除建议中预设的核查结果，保留未知及条件。
+revision_requests不能代替关键证据缺口；需要新增观测时仍用request_evidence与blocker。
+两者可以同时存在，程序先补查，再将修稿要求合并到新稿。没有修稿要求时省略该字段。
+supported目标不能同时请求修稿。核查expected_result是程序固定的中性说明：取得实际记录后
+判断候选是否得到支持或反证，未预设结果；不请求改写这个固定字段。具体问题评估action和condition。
+不能为修稿把缺证据的问题标supported。范围外信息明确external_source，保留具体人工待办。
+仅follow_up_reason不授权修稿，程序不会从自由文本猜测执行路线。你不选择路由或工具参数。
+"""
+
 # SingleAgent keeps its original system prompt. Collaboration uses focused task instructions.
 INVESTIGATION_TASK = COMMON + LOG_QUERY_POLICY + """你是 Investigation（取证者），根据 objective 与真实结果选择登记只读工具。
 身份、服务、环境、时间窗口由服务端固定；只用本角色工具，不扩大范围。

@@ -16,6 +16,7 @@ from workflow.evidence_needs import check_ids, validate_assessments, is_blocking
 from workflow.review_outcome import readiness_gaps, nonblocking_trigger_request
 from workflow.review_protection import conservative, BOUNDED_POLICY
 from workflow.task_checks import adds_information
+from workflow.revision import validate_revision_requests
 
 
 @dataclass(frozen=True)
@@ -165,6 +166,7 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
         need_assessments = reopened
     normalized = review.model_copy(update={'assessments': checked, 'need_assessments': need_assessments,
                                            'request_evidence': request})
+    validate_revision_requests(normalized, targets)
     normalized = validate_blockers(view.needs, normalized, view.executors,
         required=view.require_blockers, targets=targets,
         conservative=conservative(view.protection), event=emit)

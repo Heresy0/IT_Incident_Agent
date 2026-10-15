@@ -209,6 +209,20 @@ class ReviewDecision(Contract):
         description='When an H/A is uncertain and no evidence request is made, explain why no useful scoped read-only check is available or appropriate.')
 
 
+class RevisionRequest(Contract):
+    target_id: str = Field(pattern=r'^[HA][1-4]$')
+    issue_type: Literal['expression', 'reasoning']
+    reason: str = Field(min_length=1, max_length=300)
+    required_change: str = Field(min_length=1, max_length=300,
+        description='A correction possible from existing evidence; do not request new observations here.')
+
+
+class RevisionReviewDecision(ReviewDecision):
+    revision_requests: list[RevisionRequest] = Field(default_factory=list, max_length=4,
+        description='Only unsupported H/A wording or reasoning fixable with existing evidence. '
+                    'Evidence gaps remain in request_evidence and need_assessments.')
+
+
 class ObservedClaim(Contract):
     statement: str = Field(min_length=1, max_length=500)
     refs: list[ReferenceSelection] = Field(min_length=1, max_length=8)

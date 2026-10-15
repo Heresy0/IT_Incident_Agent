@@ -120,6 +120,8 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
                 'then': {'properties': {'blocker': {'anyOf': [{'type': 'null'}, {
                     'type': 'object', 'properties': {'affected_targets': {
                         'contains': {'type': 'string', 'enum': eligible}, 'minContains': 1}}}]}}}})
+    if 'RevisionRequest' in schema['$defs']:
+        schema['$defs']['RevisionRequest']['properties']['target_id']['enum'] = [key for key in targets if key.startswith(('H', 'A'))]
     request = schema['$defs']['EvidenceRequest']['properties']
     request['need_id'] = {'enum': [*needs, None]}
     request['hypothesis_id'] = {'enum': [k for k in targets if k.startswith('H')] + [None]}
@@ -153,7 +155,7 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     return review_contract_view(schema)
 
 
-def parse_review_selection(content, needs):
+def parse_review_selection(content, needs, schema=None):
     """Expand only omitted question metadata; never manufacture a verdict/ref."""
     from agents.contracts import ReviewDecision
     data = json.loads(content)
@@ -169,7 +171,7 @@ def parse_review_selection(content, needs):
             if isinstance(blocker, dict) and 'cause_level' not in blocker and need is not None:
                 blocker['cause_level'] = categories[need.purpose]
     # Explicit legacy categories still pass the original strict validators.
-    return ReviewDecision.model_validate(data)
+    return (schema or ReviewDecision).model_validate(data)
 
 
 def review_contract_view(schema):
@@ -297,7 +299,7 @@ def role_output_schema(role, schema, view: RoleContractContext):
                 output_schema['$defs']['TaskRequest'].setdefault('allOf', []).append({
                     'if': {'properties': {'role': {'const': task_role}}, 'required': ['role']},
                     'then': {'properties': {'checks': {'minItems': 1}}, 'required': ['checks']}})
-    if role == 'reviewer' and schema is ReviewDecision:
+    if role == 'reviewer' and issubclass(schema, ReviewDecision):
         required = list(view.targets)
         output_schema['$defs']['Assessment']['properties']['target_id']['enum'] = required
         output_schema['properties']['assessments'].update(minItems=len(required), maxItems=len(required))
@@ -317,7 +319,7 @@ def role_model_input(role, schema, payload, view: RoleContractContext):
     """Remove redundant schema prose without removing evidence or changing prompts."""
     from agents.contracts import ReviewDecision
     from evidence.ownership import owner_options
-    if role == 'supervisor' or role == 'reviewer' and schema is ReviewDecision:
+    if role == 'supervisor' or role == 'reviewer' and issubclass(schema, ReviewDecision):
         # These contracts use EV IDs and field paths, not REF selectors.
         # Owner selectors remain available for legacy scripted responses.
         payload = {**payload, 'evidence': [{k: v for k, v in row.items()
@@ -330,7 +332,7 @@ def role_model_input(role, schema, payload, view: RoleContractContext):
             {'name': item['function']['name'], 'description': item['function']['description'],
              'args_schema': 'output_schema.$defs.ReadOnlyCheck.oneOf (match tool)'}
             for item in executor.schemas()] for r, executor in view.executors.items()}}
-    model_input = payload if role == 'reviewer' and schema is ReviewDecision else {
+    model_input = payload if role == 'reviewer' and issubclass(schema, ReviewDecision) else {
         **payload, 'owner_options': owner_options(view)}
     return model_input
 
@@ -349,7 +351,7 @@ def parse_role_output(role, schema, content, view: RoleContractContext, *, emit)
                  ignored_count=len(data['tasks']) if isinstance(data['tasks'], list) else 1)
             content = json.dumps({**data, 'tasks': []})
     return (parse_owner_selection(schema, content, view) if issubclass(schema, EscalationSelection)
-            else parse_review_selection(content, view.evidence_needs) if schema is ReviewDecision
+            else parse_review_selection(content, view.evidence_needs, schema) if issubclass(schema, ReviewDecision)
             else schema.model_validate_json(content))
 
 

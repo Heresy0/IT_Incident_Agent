@@ -29,6 +29,7 @@ class WorkflowPolicy:
     review_protection: str = DEFAULT_REVIEW_PROTECTION
     parallel_collection: bool = True
     blind_review: bool = False
+    orchestration: str = 'legacy'
 
     # Existing workflow bounds, not extra budgets or new runtime switches.
     replan_supervisor_limit: ClassVar[int] = 3
@@ -45,6 +46,20 @@ class WorkflowPolicy:
             raise ValueError('unregistered knowledge mode')
         if self.reviewer_repair_mode not in {'shared', 'split'}:
             raise ValueError('unregistered reviewer repair mode')
+        if self.orchestration not in {'legacy', 'review_driven'}:
+            raise ValueError('unregistered orchestration mode')
+        if self.orchestration == 'review_driven' and not self.planning_only:
+            raise ValueError('review-driven orchestration requires programmatic collection')
+
+    @property
+    def review_driven(self):
+        return self.orchestration == 'review_driven'
+
+    def can_revise(self, view: BudgetView, *, revisions):
+        judging = 2 + int(self.blind_review)
+        return (revisions < 1 and view.model_calls + judging + view.limits.reserve_model_calls
+                <= view.limits.model_calls
+                and view.elapsed < view.limits.seconds - 30 * judging - view.limits.reserve_seconds)
 
     @property
     def planning_only(self):
@@ -67,13 +82,17 @@ class WorkflowPolicy:
         base = limits.reserve_model_calls
         if purpose != 'diagnosis':
             return base
+        if self.review_driven:
+            judging = 2 + int(self.blind_review)
+            required = 2 * judging + 1
+            return max(base, required) if limits.model_calls >= required + 1 else max(base, judging)
         required = 2 * (2 + int(self.blind_review)) + 2
         # Protect initial and revised judging stages plus planned collection;
         # tiny budgets retain the original allowance for initial finalization.
         return max(base, required) if limits.model_calls >= required + 3 else base
 
     def rework_budget(self, view: BudgetView, *, pending_model_calls=0,
-                      tool_calls=1, supervisor_completed=False, additional=False):
+                      tool_calls=1, supervisor_completed=False, additional=False, query_model_calls=0):
         limits = view.limits
         remaining = limits.model_calls - view.model_calls
         steps = {'pending_model_calls': pending_model_calls,
@@ -88,6 +107,13 @@ class WorkflowPolicy:
         model_turns = int(not supervisor_completed) + 3 + int(self.blind_review)
         # Retain the existing conservative time estimate for additional rework.
         time_required = 30 * model_turns + limits.reserve_seconds if extended else limits.reserve_seconds
+        if self.review_driven:
+            judging = 2 + int(self.blind_review)
+            steps = {'pending_model_calls': pending_model_calls, 'supervisor': int(not supervisor_completed),
+                     'query_models': query_model_calls, 'judging': judging,
+                     'correction_reserve': limits.reserve_model_calls}
+            needed = sum(steps.values())
+            time_required = 30 * (pending_model_calls + int(not supervisor_completed) + judging + query_model_calls) + limits.reserve_seconds
         affordable = (remaining >= needed and tools >= tool_calls
             and view.supervisor_calls < self.supervisor_limit(extended)
             and view.task_count < self.task_limit(extended)
@@ -101,10 +127,15 @@ class WorkflowPolicy:
         available = view.limits.model_calls - view.model_calls - int(pending_model_call)
         tools = view.limits.tool_calls - view.tool_calls
         if phase == 'rework':
+            if self.review_driven:
+                return int(tools >= pending_checks and available >= 2 + int(self.blind_review) + view.limits.reserve_model_calls)
             return int(tools >= pending_checks and available >= max(2, view.limits.reserve_model_calls) + 1)
         reserve = self.collection_reserve(view.limits, purpose)
         diagnosis = purpose == 'diagnosis'
         keep_tool = diagnosis and reserve > view.limits.reserve_model_calls and has_observations
+        if self.review_driven:
+            return max(0, min(self.max_parallel_roles, tools - int(keep_tool),
+                (5 if diagnosis else 6) - view.task_count)) if available >= reserve else 0
         return max(0, min(self.max_parallel_roles, tools - int(keep_tool),
                          (available - reserve) // 2, (5 if diagnosis else 6) - view.task_count))
 

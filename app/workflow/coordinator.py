@@ -3,8 +3,8 @@ import hashlib
 import json
 import time
 from runtime.context import RunContext, ExecutionError, activate
-from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview
-from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER
+from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview, RevisionReviewDecision
+from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER, REVIEW_DRIVEN
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
@@ -12,6 +12,9 @@ from agents.protocol import RoleContractContext, role_output_schema, role_model_
 from workflow.planning import PlanningContext, validate_plan
 from workflow.state import WorkflowState, state_property
 from workflow.policy import WorkflowPolicy, BudgetView, policy_property
+from workflow.revision import make_revision_task, collection_exit, basis_id
+from workflow.routing import review_disposition
+from workflow.handoff import build_handoff
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
     validate_observation_review, additional_rework_eligible, needs_review_follow_up,
     resolve_handoff, decide_rework, completion_reason)
@@ -87,6 +90,12 @@ class Collaboration:
     review_protection = policy_property('review_protection')
     parallel_collection = policy_property('parallel_collection')
     blind_review = policy_property('blind_review')
+    orchestration = policy_property('orchestration')
+    pure_revisions = state_property('control', 'pure_revisions')
+    initial_replans = state_property('control', 'initial_replans')
+    revision_task = state_property('diagnosis', 'revision_task')
+    pending_revision_requests = state_property('diagnosis', 'pending_revision_requests')
+    handoff_reason = state_property('diagnosis', 'handoff_reason')
 
     @property
     def planning_only(self):
@@ -97,13 +106,13 @@ class Collaboration:
         return self.policy.role_corrections
 
     def __init__(self, models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None,
-                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
+                 event_log=None, parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION, orchestration='legacy'):
         self.state = WorkflowState()
         self.policy = WorkflowPolicy(
             investigation_mode=investigation_mode,
             knowledge_mode=investigation_mode if knowledge_mode is None else knowledge_mode,
             reviewer_repair_mode=reviewer_repair_mode, review_protection=review_protection,
-            parallel_collection=parallel_collection,
+            parallel_collection=parallel_collection, orchestration=orchestration,
             blind_review=getattr(models.get('reviewer'), 'blind_review', False) if blind_review is None else blind_review)
         if set(models) != {"supervisor", "investigation", "knowledge", "diagnosis", "reviewer"}:
             raise ValueError("five registered models required")
@@ -198,7 +207,7 @@ class Collaboration:
         view = RoleContractContext(
             evidence=self.evidence, references=self.references, executors=self.executors,
             evidence_needs=self.evidence_needs,
-            targets=self.targets() if role == 'reviewer' and schema is ReviewDecision else {},
+            targets=self.targets() if role == 'reviewer' and issubclass(schema, ReviewDecision) else {},
             purpose=self.ticket.purpose, phase=self.phase, planning_only=self.planning_only,
             investigation_mode=self.investigation_mode, knowledge_mode=self.knowledge_mode,
             review_protection=self.review_protection)
@@ -209,8 +218,10 @@ class Collaboration:
             from agents.prompts import BOUNDED_DIAGNOSIS, BOUNDED_REVIEW
             if role == 'diagnosis':
                 prompt += BOUNDED_DIAGNOSIS
-            elif role == 'reviewer' and schema is ReviewDecision:
+            elif role == 'reviewer' and issubclass(schema, ReviewDecision):
                 prompt += BOUNDED_REVIEW
+        if self.policy.review_driven and role == 'reviewer' and issubclass(schema, ReviewDecision):
+            prompt += REVIEW_DRIVEN
         request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal)
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
@@ -235,7 +246,7 @@ class Collaboration:
                 '参考next_check及collection，已完整查空不能当作未查询或再次派相同检查。'
                 '无法查询、需要人工操作或没有有价值的新检查时，明确原因并保留缺口收尾。'
                 '不得为了通过而标supported，不必遍历所有渠道。此选择提醒全运行最多一次，仍返回完整JSON。')
-        if role == 'reviewer' and schema is ReviewDecision and self.needs_review_follow_up(result):
+        if role == 'reviewer' and issubclass(schema, ReviewDecision) and not getattr(result, 'revision_requests', ()) and self.needs_review_follow_up(result):
             self.review_follow_up_used = True
             self.event('review_follow_up_correction', role,
                 target_ids=[a.target_id for a in result.assessments
@@ -377,8 +388,10 @@ class Collaboration:
             self.reworks, self.additional_rework_authorized)
 
     def rework_budget(self, *, pending_model_calls=0, tool_calls=1, supervisor_completed=False, additional=False):
+        query_models = 2 * min(2, tool_calls) if self.policy.review_driven and self.has_runbook_embedding() else 0
         return self.policy.rework_budget(self.budget_view(), pending_model_calls=pending_model_calls,
-            tool_calls=tool_calls, supervisor_completed=supervisor_completed, additional=additional)
+            tool_calls=tool_calls, supervisor_completed=supervisor_completed, additional=additional,
+            query_model_calls=query_models)
 
     def additional_rework_eligible(self):
         return additional_rework_eligible(self.review_routing_context())
@@ -495,6 +508,9 @@ class Collaboration:
             self.extra_gaps.extend(audit.limitations)
 
     def diagnose(self):
+        revision_task = self.revision_task
+        if revision_task:
+            revision_task.assert_current(len(self.drafts), self.evidence, self.executors)
         if not self.prepare_diagnosis_entry():
             return
         self.review = None  # A previous revision's review never approves a new draft.
@@ -512,7 +528,17 @@ class Collaboration:
                    "read_only_capabilities": {r: ex.capabilities() for r, ex in self.executors.items()},
                    "read_only_tools": {r: ex.schemas() for r, ex in self.executors.items()},
                    "task_results": self.task_input(), "task_completion_gaps": self.task_gaps()}
-        self.draft = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
+        if revision_task:
+            payload['revision_task'] = revision_task.model_input()
+        elif self.pending_revision_requests and self.draft:
+            payload['revision_task'] = make_revision_task(len(self.drafts), self.draft,
+                self.pending_revision_requests, self.evidence, self.executors).model_input()
+        candidate = self.ask("diagnosis", DiagnosisSelection, payload, terminal=True, validate=self.diagnosis)
+        if revision_task:
+            revision_task.assert_current(len(self.drafts), self.evidence, self.executors)
+        self.draft = candidate
+        self.revision_task = None
+        self.pending_revision_requests = ()
         revision = len(self.drafts) + 1
         self.drafts.append({"revision": revision, "draft": self.draft.model_dump(mode="json")})
         for h in self.draft.hypotheses:
@@ -539,8 +565,12 @@ class Collaboration:
                 self.event('observation_review_completed', 'reviewer', revision=revision, draft_visible=False)
             else:
                 self.event('observation_review_skipped', 'reviewer', code='BUDGET_EXCEEDED', revision=revision)
-        self.review = self.ask("reviewer", ReviewDecision, self.reviewer_input(), terminal=True, validate=self.validate_review)
+        schema = RevisionReviewDecision if self.policy.review_driven else ReviewDecision
+        self.review = self.ask("reviewer", schema, self.reviewer_input(), terminal=True, validate=self.validate_review)
         self.evidence_needs = reviewed_needs(self.evidence_needs, self.review.need_assessments)
+        if self.policy.review_driven:
+            self.route_review(revision)
+            return
         handoff = resolve_handoff(self.review_routing_context(), reviewed_gaps=self.reviewed_gaps)
         request = handoff.request
         if handoff.deferred_request:
@@ -591,6 +621,64 @@ class Collaboration:
             self.finish_review()
             self.note("accept" if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} else "escalate", "reviewer", "supervisor")
 
+    def route_review(self, revision):
+        disposition = review_disposition(self.review_routing_context(), reviewed_gaps=self.reviewed_gaps,
+            can_collect=lambda additional: self.rework_budget(additional=additional)['can_collect'],
+            can_revise=lambda: self.policy.can_revise(self.budget_view(), revisions=self.pure_revisions),
+            evidence_gaps=[*self.observation_gaps(), *self.task_gaps()])
+        self.reviews.append({'revision': revision, 'review': self.review.model_dump(mode='json')})
+        self.event('evidence_needs_reviewed', 'reviewer', revision=revision, evidence_needs=self.need_input(),
+                   blocking_gaps=limitations(self.evidence_needs, blocking_only=True))
+        self.event('review_completed', 'reviewer', revision=revision,
+                   follow_up_reason=self.review.follow_up_reason, status=disposition.route)
+        self.event('review_routed', 'reviewer', revision=revision, route=disposition.route, reason=disposition.reason)
+        requests = tuple(self.review.revision_requests)
+        if disposition.route == 'revise':
+            self.revision_task = make_revision_task(revision, self.draft, requests, self.evidence, self.executors)
+            self.pure_revisions += 1
+            self.event('draft_revision_requested', 'diagnosis', base_draft_revision=revision,
+                       basis_id=self.revision_task.basis_id, target_ids=[item.target_id for item in requests])
+            self.pending = None
+            self.phase, self.next_node = 'revise', 'revise'
+        elif disposition.route == 'collect':
+            request = self.review.request_evidence
+            self.pending_revision_requests = requests
+            self.additional_rework_authorized |= disposition.authorize_additional
+            if disposition.authorize_additional:
+                self.event('additional_rework_authorized', maximum_total_reworks=2, total_budget_changed=False)
+            self.pending = {'challenge_id': f'C{self.reworks + 1}', **request.model_dump(),
+                'planning_required': True, 'hint_status': self.review_hint_status,
+                'base_draft_revision': revision, 'basis_id': basis_id(self.evidence, self.executors)}
+            self.phase, self.next_node = 'rework', 'supervisor'
+            self.note('request_evidence', 'reviewer', 'supervisor', hypothesis_id=request.hypothesis_id,
+                evidence_ids=request.evidence_ids, reason=request.missing_observation, check=request.proposed_check)
+        else:
+            self.handoff_reason = disposition.reason if disposition.route != 'publish' else None
+            if disposition.deferred_request:
+                self.deferred_review_requests.append({'revision': revision,
+                    'request': disposition.deferred_request.model_dump(mode='json'), 'reason': disposition.reason})
+                self.extra_gaps.append(disposition.limitation)
+                self.handoff_reason = 'nonblocking_unknown'
+                self.event('review_request_deferred', 'reviewer', revision=revision, verdicts_changed=False)
+            self.finish_review()
+            if disposition.route in {'handoff', 'stop'}:
+                self.stop = 'REVIEW_INCOMPLETE'
+                self.extra_gaps.append('自动处理停止：' + disposition.reason)
+            self.pending = None
+            self.note('accept' if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} else 'escalate',
+                      'reviewer', 'supervisor')
+
+    def route_collection(self):
+        outcome = collection_exit(self.evidence, self.executors, initial_replans=self.initial_replans,
+                                  can_replan=self.can_replan())
+        self.event('collection_exit_routed', route=outcome.route, reason=outcome.reason)
+        if outcome.route == 'supervisor':
+            self.initial_replans += 1
+        if outcome.route == 'handoff':
+            self.stop, self.handoff_reason = 'NEEDS_INFORMATION', outcome.reason
+        else:
+            self.next_node = outcome.route
+
     def diagnose_and_review(self):
         """Compatibility helper for direct callers; graph uses separate role nodes."""
         self.diagnose()
@@ -598,6 +686,7 @@ class Collaboration:
             self.review_draft()
 
     def prepare_dispatch(self, decision):
+        self.assert_pending_basis()
         if not decision.tasks or len(self.tasks) + len(decision.tasks) > self.policy.task_limit(self.additional_rework_authorized):
             raise ProtocolError("TASK_LIMIT")
         if self.phase == "rework" and len(decision.tasks) != 1:
@@ -641,6 +730,25 @@ class Collaboration:
             for task, _ in selected[capacity:]:
                 self.event("task_deferred", task.role, reason="insufficient_dispatch_budget")
             selected = selected[:capacity]
+        if self.policy.review_driven:
+            spare = self.context.limits.model_calls - self.context.counts['model_calls'] - self.collection_reserve()
+            spare_tools = self.context.limits.tool_calls - self.context.counts['tool_calls']
+            affordable = []
+            for task, key in selected:
+                cost = self.query_model_cost(task)
+                if cost <= spare and len(task.checks) <= spare_tools:
+                    affordable.append((task, key))
+                    spare -= cost
+                    spare_tools -= len(task.checks)
+                else:
+                    self.event('task_deferred', task.role, reason='planned_query_budget')
+            selected = affordable
+            if not selected:
+                if any(item.kind == 'observation' for item in self.evidence.values()):
+                    self.next_node = 'diagnosis'
+                else:
+                    self.stop, self.handoff_reason = 'NEEDS_INFORMATION', 'embedding_budget'
+                return
         self.seen_tasks.update(key for _, key in selected)
         follow_up = self.phase == "rework"
         if follow_up:
@@ -674,6 +782,9 @@ class Collaboration:
         return True
 
     def finish_collection(self, *, reused_only=False):
+        if self.policy.review_driven and not self.dispatch_queue and self.phase != 'rework':
+            self.route_collection()
+            return
         if self.dispatch_queue:
             self.next_node = self.dispatch_queue[0].role
         elif (reused_only and self.phase == 'collect' and self.ticket.purpose == 'diagnosis'
@@ -714,6 +825,20 @@ class Collaboration:
             "evidence": prior, "focused_evidence_ids": ids,
             "collection": self.collection()[-12:], "observation_gaps": self.observation_gaps(),
             "challenge": self.pending if follow_up else None}
+
+    def assert_pending_basis(self):
+        if self.policy.review_driven and self.phase == 'rework' and self.pending:
+            if (self.pending.get('base_draft_revision') != len(self.drafts)
+                    or self.pending.get('basis_id') != basis_id(self.evidence, self.executors)):
+                raise ProtocolError('STALE_REWORK_REQUEST')
+
+    def has_runbook_embedding(self):
+        binding = getattr(self.provider, 'binding', None)
+        return bool(getattr(binding, 'observations', {}).get('runbook_rag'))
+
+    def query_model_cost(self, task):
+        # The tool runner permits one retry; reserve both possible embedding attempts.
+        return 2 * sum(check.tool == 'search_runbooks' for check in task.checks) if self.has_runbook_embedding() else 0
 
     def collection_runner(self):
         return CollectionRunner(self.models, self.provider, self.principal, self.repairs,
@@ -792,6 +917,8 @@ class Collaboration:
         if not follow_up and self.dispatch_previous and not new_reads:
             self.event('collection_stalled', reason='no_new_evidence')
             self.next_node = 'diagnosis'
+        elif self.policy.review_driven and not follow_up:
+            self.route_collection()
         else:
             self.next_node = 'diagnosis' if follow_up else 'supervisor'
 
@@ -800,7 +927,8 @@ class Collaboration:
             raise ProtocolError('INVALID_TASK_ROUTE')
         batch = self.collection_runner().prepare_parallel(self.dispatch_queue, context=self.context,
             executors=self.executors, model_reserve=self.collection_reserve(),
-            objective_for=lambda task: self.task_objective(task, False))
+            objective_for=lambda task: self.task_objective(task, False),
+            model_cost_for=self.query_model_cost if self.policy.review_driven else None)
         self.parallel_batch, self.parallel_plans = batch.batch_id, batch.plans
         self.parallel_batches += 1
         self.event('parallel_collection_started', batch_id=self.parallel_batch,
@@ -835,6 +963,8 @@ class Collaboration:
                 self.next_node = 'diagnosis'
             else:
                 self.stop = joined.stop_codes[0] if joined.stop_codes else 'NEEDS_INFORMATION'
+        elif self.policy.review_driven:
+            self.route_collection()
         else:
             self.next_node = 'supervisor'
 
@@ -851,6 +981,7 @@ class Collaboration:
             pending_model_call=pending_model_call)
 
     def supervise(self):
+        self.assert_pending_basis()
         if (self.phase == 'collect' and self.ticket.purpose == 'diagnosis'
                 and any(e.kind == 'observation' for e in self.evidence.values())
                 and self.collection_reserve() > self.context.limits.reserve_model_calls
@@ -1105,22 +1236,32 @@ class Collaboration:
             **({'diagnostic_pack_exit': self.diagnostic_pack_exit} if self.diagnostic_pack_exit is not None else {}),
             "prompt_version": self.prompt_version(),
         }
+        if self.policy.review_driven:
+            metadata.update(orchestration='review_driven_v1', pure_revision_rounds=self.pure_revisions,
+                            initial_replans=self.initial_replans)
+            if status != 'completed' or self.handoff_reason:
+                metadata['handoff'] = build_handoff(run_id=self.context.run_id, revision=len(self.drafts),
+                    reason=self.handoff_reason or self.stop, publication=publication, needs=self.evidence_needs,
+                    evidence=self.evidence, executors=self.executors, review=self.review)
         return build_report(ReportSnapshot(metadata, publication))
 
     def prompt_version(self):
         from agents.prompts import KNOWLEDGE
         from agents.investigation_prompt import SYSTEM
-        schemas = [SupervisorSelection.model_json_schema(), DiagnosisSelection.model_json_schema(), ReviewDecision.model_json_schema()]
+        reviewer_schema = RevisionReviewDecision if self.policy.review_driven else ReviewDecision
+        schemas = [SupervisorSelection.model_json_schema(), DiagnosisSelection.model_json_schema(), reviewer_schema.model_json_schema()]
         payload = [ROLE_PROMPTS, PLANNER if self.planning_only else None, SYSTEM, INVESTIGATION_TASK, KNOWLEDGE,
                    OBSERVATION_REVIEW if self.blind_review else None, schemas,
                    ObservationReview.model_json_schema() if self.blind_review else None,
                    *[ex.schemas() for ex in self.executors.values()]]
+        if self.policy.review_driven:
+            payload.append(REVIEW_DRIVEN)
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
 
 def collaborate(models, provider, principal, *, limits=INCIDENT_LIMITS, emit=None, context=None, event_log=None,
-                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
+                parallel_collection=True, blind_review=None, investigation_mode='programmatic', reviewer_repair_mode='shared', knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION, orchestration='legacy'):
     return Collaboration(models, provider, principal, limits=limits, emit=emit, context=context,
                          event_log=event_log, parallel_collection=parallel_collection, blind_review=blind_review,
                          investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode,
-                         knowledge_mode=knowledge_mode, diagnostic_pack=diagnostic_pack, review_protection=review_protection).run()
+                         knowledge_mode=knowledge_mode, diagnostic_pack=diagnostic_pack, review_protection=review_protection, orchestration=orchestration).run()

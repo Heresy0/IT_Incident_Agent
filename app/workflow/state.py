@@ -27,6 +27,8 @@ class ControlState:
     collection_follow_up_used: bool = False
     protocol_fallback_used: bool = False
     last_supervisor_failure: str | None = None
+    pure_revisions: int = 0
+    initial_replans: int = 0
 
 
 @dataclass
@@ -61,6 +63,9 @@ class DiagnosisState:
     review_hint_status: list[dict[str, Any]] = field(default_factory=list)
     extra_gaps: list[str] = field(default_factory=list)
     team: str | None = None
+    revision_task: Any = None
+    pending_revision_requests: tuple = ()
+    handoff_reason: str | None = None
 
 
 @dataclass

@@ -29,7 +29,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider, investigation_mode='programmatic', reviewer_repair_mode='shared', blind_review=None, knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION):
+def capture(case_id, workflow, factory, principal, limits, *, provider_factory=FixtureProvider, investigation_mode='programmatic', reviewer_repair_mode='shared', blind_review=None, knowledge_mode=None, diagnostic_pack=None, review_protection=DEFAULT_REVIEW_PROTECTION, orchestration='legacy'):
     """Use one existing harness for both paths; retain accounting/evidence on unexpected failure."""
     provider = provider_factory(case_id, principal)
     events = []
@@ -45,7 +45,7 @@ def capture(case_id, workflow, factory, principal, limits, *, provider_factory=F
             result = single_agent(model, provider, principal, limits=limits, context=context, event_log=events, executor=executor)
         else:
             coordinator = Collaboration(model, provider, principal, limits=limits, context=context, event_log=events,
-                                        investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode, blind_review=blind_review, knowledge_mode=knowledge_mode, diagnostic_pack=diagnostic_pack, review_protection=review_protection)
+                                        investigation_mode=investigation_mode, reviewer_repair_mode=reviewer_repair_mode, blind_review=blind_review, knowledge_mode=knowledge_mode, diagnostic_pack=diagnostic_pack, review_protection=review_protection, orchestration=orchestration)
             evidence = coordinator.evidence
             result = coordinator.run()
     except Exception as exc:

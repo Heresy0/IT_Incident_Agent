@@ -238,6 +238,32 @@ class IncidentAPITests(unittest.TestCase):
         self.assertEqual(self.start(incident, 'live_injected', execution_mode='live', model_budget=6, tool_budget=4), run_id)
         self.assertEqual(calls, [True])
 
+    def test_review_driven_selection_is_saved_and_retry_cannot_change_policy(self):
+        from tests.workflow.test_planned_default import planned_models
+        self.service._base_config = TestConfig(api_key='injected-free')
+        self.service._incident.model_factory = lambda *args: planned_models()
+        incident = self.create()
+        allowance = {'execution_mode': 'live', 'model_budget': 6, 'tool_budget': 4,
+                     'orchestration': 'review_driven'}
+        run_id = self.start(incident, 'review_driven', **allowance)
+        report = self.result(run_id)
+        self.assertEqual(report['orchestration'], 'review_driven_v1')
+        self.assertEqual(report['run_summary']['model_calls'], 3)
+        self.assertEqual(self.start(incident, 'review_driven', **allowance), run_id)
+        changed = self.req('POST', f'incidents/{incident["id"]}/diagnoses', json={
+            'request_key': 'review_driven', **allowance, 'orchestration': 'legacy'})
+        self.assertEqual(changed.status_code, 409)
+
+    def test_legacy_allowance_keeps_old_shape_and_scripted_rejects_new_policy(self):
+        incident = self.create()
+        run_id = self.start(incident)
+        self.result(run_id)
+        self.assertNotIn('orchestration', self.store.get(run_id)['config']['execution'])
+        self.assertEqual(self.start(incident), run_id)
+        response = self.req('POST', f'incidents/{incident["id"]}/diagnoses', json={
+            'request_key': 'invalid_mode', 'orchestration': 'review_driven'})
+        self.assertEqual(response.status_code, 422)
+
     def test_storage_admission_failure_and_interrupted_incident_recovery(self):
         incident = self.create(); self.service.start()
         with patch.object(self.store, 'begin_diagnosis', side_effect=RuntimeError('db failed')):

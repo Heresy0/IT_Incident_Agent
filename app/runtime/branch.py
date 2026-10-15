@@ -4,10 +4,11 @@ from runtime.context import RunContext, ExecutionError
 
 
 class BranchContext(RunContext):
-    def __init__(self, parent, *, model_calls, tool_calls):
+    def __init__(self, parent, *, model_calls, tool_calls, tool_only=False):
         self.parent = parent
         self.events = []
         self.model_cap, self.tool_cap = model_calls, tool_calls
+        self.tool_only = tool_only
         super().__init__(run_id=parent.run_id, limits=parent.limits, scope=parent.scope)
         self.started, self.root_span = parent.started, parent.root_span
 
@@ -38,7 +39,7 @@ class BranchContext(RunContext):
 
     def can_research(self):
         with self.lock:
-            local = (not self.stop_reason and self.counts['model_calls'] < self.model_cap
+            local = (not self.stop_reason and (self.tool_only or self.counts['model_calls'] < self.model_cap)
                      and self.counts['tool_calls'] < self.tool_cap)
         with self.parent.lock:
             shared = (not self.parent.stop_reason

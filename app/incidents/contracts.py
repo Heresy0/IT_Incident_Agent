@@ -37,11 +37,14 @@ class DiagnosisRequest(BaseModel):
     execution_mode: Literal["scripted_control_only", "live"] = "scripted_control_only"
     model_budget: int | None = Field(default=None, ge=6, le=16)
     tool_budget: int | None = Field(default=None, ge=1, le=24)
+    orchestration: Literal['legacy', 'review_driven'] = 'legacy'
 
     @model_validator(mode="after")
     def explicit_allowance(self):
         if self.execution_mode == "live" and (self.model_budget is None or self.tool_budget is None):
             raise ValueError("live requires explicit model_budget and tool_budget")
+        if self.execution_mode != 'live' and self.orchestration != 'legacy':
+            raise ValueError('review-driven orchestration requires live programmatic execution')
         return self
 
 

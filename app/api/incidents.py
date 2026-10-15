@@ -66,7 +66,9 @@ async def patch(incident_id: UUID, payload: IncidentPatch, service: WorkflowServ
 @router.post("/incidents/{incident_id}/diagnoses", status_code=202)
 async def diagnose(incident_id: UUID, payload: DiagnosisRequest, service: WorkflowService = Depends(get_workflow_service),
                    principal: Principal = Depends(get_current_principal)):
-    run_id, replayed = await call(service.start_diagnosis, str(incident_id), payload.model_dump(), principal)
+    # Preserve the serialized allowance of old pending requests for idempotent replay.
+    execution = payload.model_dump(exclude={'orchestration'} if payload.orchestration == 'legacy' else set())
+    run_id, replayed = await call(service.start_diagnosis, str(incident_id), execution, principal)
     return {"run_id": run_id, "incident_id": str(incident_id), "replayed": replayed,
         "result_url": f"/api/v1/runs/{run_id}", "event_url": f"/api/v1/runs/{run_id}/events"}
 

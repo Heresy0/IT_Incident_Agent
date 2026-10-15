@@ -70,6 +70,8 @@ def build_graph(coordinator):
         lambda: c.merge_parallel(state.get('collection_results', {})))(state))
     graph.add_node('diagnosis', guarded('diagnosis', c.diagnose))
     graph.add_node('reviewer', guarded('reviewer', c.review_draft))
+    if c.policy.review_driven:
+        graph.add_node('revise', guarded('revise', c.diagnose))
     graph.add_node('finish', finish)
     if c.diagnostic_pack is None:
         graph.add_edge(START, 'supervisor')
@@ -82,7 +84,9 @@ def build_graph(coordinator):
             {'finish': 'finish', 'supervisor': 'supervisor'})
     routes = {n: n for n in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer',
                              'collect_parallel', 'collect_results', 'finish')}
-    for role in ('supervisor', 'diagnosis', 'reviewer', 'collect_results'):
+    if c.policy.review_driven:
+        routes['revise'] = 'revise'
+    for role in ('supervisor', 'diagnosis', 'reviewer', 'collect_results', *(['revise'] if c.policy.review_driven else [])):
         graph.add_conditional_edges(role, lambda state: state['next_node'], routes)
     graph.add_conditional_edges('collect_parallel',
         lambda state: 'finish' if c.stop else ['investigation', 'knowledge'], routes)

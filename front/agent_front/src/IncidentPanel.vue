@@ -26,6 +26,7 @@ const chosenDemo = ref(''), error = ref(''), notice = ref(''), busy = ref(false)
 const repairBusy = ref(false)
 const result = ref<Result | null>(null), runId = ref(''), runStatus = ref(''), events = ref<RunEvent[]>([])
 const offset = ref(0), mode = ref('scripted_control_only'), modelBudget = ref(12), toolBudget = ref(8)
+const orchestration = ref<'legacy' | 'review_driven'>('legacy')
 const cause = ref(''), resolution = ref(''), labels = ref(''), codes = ref('')
 const emptyFields = (): Fields => {
   const end = new Date()
@@ -35,7 +36,7 @@ const emptyFields = (): Fields => {
 }
 const form = ref<Fields>(emptyFields())
 const key = `incident.workspace.${props.tenantId}.${props.userId}`
-type Saved = { incidentId: string; runId?: string; seq?: number; pending?: { request_key: string; execution_mode: string; model_budget?: number; tool_budget?: number }; confirmationKey?: string }
+type Saved = { incidentId: string; runId?: string; seq?: number; pending?: { request_key: string; execution_mode: string; model_budget?: number; tool_budget?: number; orchestration?: 'legacy' | 'review_driven' }; confirmationKey?: string }
 const saved = ref<Saved | null>(null)
 let alive = true, generation = 0, streamController: AbortController | null = null
 const pageController = new AbortController()
@@ -147,6 +148,7 @@ const view = async (row: Incident) => {
   mode.value = saved.value.pending?.execution_mode || (row.demo_case_id ? 'scripted_control_only' : 'live')
   if (saved.value.pending?.model_budget) modelBudget.value = saved.value.pending.model_budget
   if (saved.value.pending?.tool_budget) toolBudget.value = saved.value.pending.tool_budget
+  orchestration.value = saved.value.pending?.orchestration || 'legacy'
   save()
   // Keep admission buttons usable while the subscription is open.
   void reconnect().catch(e => { if (alive && e.name !== 'AbortError') error.value = e.message })
@@ -184,7 +186,8 @@ const start = () => guarded(async () => {
   if (!saved.value || saved.value.incidentId !== selected.value.id) saved.value = { incidentId: selected.value.id }
   // Persist before POST. If the 202 response is lost, retry the same key and exact execution allowance.
   saved.value.pending ||= { request_key: crypto.randomUUID(), execution_mode: mode.value,
-    ...(mode.value === 'live' ? { model_budget: modelBudget.value, tool_budget: toolBudget.value } : {}) }
+    ...(mode.value === 'live' ? { model_budget: modelBudget.value, tool_budget: toolBudget.value,
+      ...(orchestration.value === 'review_driven' ? { orchestration: orchestration.value } : {}) } : {}) }
   save()
   const started = await (await api(`incidents/${selected.value.id}/diagnoses`, jsonOptions('POST', saved.value.pending))).json()
   saved.value.runId = started.run_id; saved.value.seq = 0; saved.value.pending = undefined; save()
@@ -265,7 +268,7 @@ onUnmounted(() => { alive = false; stopStream(); pageController.abort() })
         <p class="hint">已保存目的：{{ selected.purpose === 'status_check' ? '状态核查；完成仅表示所列观测已复核，不证明服务全面正常。' : '故障诊断；分析证据支持的原因及处理建议。' }}</p>
         <p v-if="!purposeSaved" class="notice">核查目的已修改，请先保存修订再启动。</p>
         <div class="actions"><label>执行模式<select v-model="mode" :disabled="busy || locked || !!saved?.pending" @change="paidAuthorized = false"><option value="scripted_control_only" :disabled="!selected.demo_case_id">免费流程演示（开发案例）</option><option value="live">真实模型（付费）</option></select></label>
-          <template v-if="mode === 'live'"><label>模型调用上限<input v-model.number="modelBudget" type="number" min="6" max="16" :disabled="busy || locked || !!saved?.pending" @input="paidAuthorized = false" /></label><label>工具调用上限<input v-model.number="toolBudget" type="number" min="1" max="24" :disabled="busy || locked || !!saved?.pending" @input="paidAuthorized = false" /></label></template>
+          <template v-if="mode === 'live'"><label>诊断流程<select v-model="orchestration" :disabled="busy || locked || !!saved?.pending" @change="paidAuthorized = false"><option value="legacy">标准流程</option><option value="review_driven">支持修稿与人工交接（试验）</option></select></label><label>模型调用上限<input v-model.number="modelBudget" type="number" min="6" max="16" :disabled="busy || locked || !!saved?.pending" @input="paidAuthorized = false" /></label><label>工具调用上限<input v-model.number="toolBudget" type="number" min="1" max="24" :disabled="busy || locked || !!saved?.pending" @input="paidAuthorized = false" /></label></template>
         </div>
         <label v-if="mode === 'live'" class="paid-consent"><input v-model="paidAuthorized" type="checkbox" :disabled="busy || locked" />我同意按上述预算执行本次付费诊断（模型最多 {{ modelBudget }} 次，工具最多 {{ toolBudget }} 次）。</label>
         <div class="actions"><button class="primary-action" :disabled="busy || locked || !permittedStart" @click="start">{{ saved?.pending ? '重试原启动请求' : mode === 'live' ? '启动付费诊断' : '启动免费演示' }}</button>

@@ -69,7 +69,8 @@ class IncidentAdapter:
             models = (self.model_factory(config.api_key, config.model) if self.model_factory else
                       build_roles(config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body))
         result = collaborate(models, provider, self.principal(request), context=context, event_log=events,
-                             investigation_mode='agent' if mode == 'scripted_control_only' else 'programmatic')
+                             investigation_mode='agent' if mode == 'scripted_control_only' else 'programmatic',
+                             orchestration=request['execution'].get('orchestration', 'legacy'))
         result.update(execution_mode=mode, model="scripted" if mode == "scripted_control_only" else self.service._base_config.model)
         result["final"] = render(result)
         result.update(task_type="incident", workflow="collaboration", incident_snapshot=snapshot, memory_enabled=False)

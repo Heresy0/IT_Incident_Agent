@@ -12,6 +12,7 @@ from agents.protocol import correction_instruction
 from evidence.diagnosis import ProtocolError
 from runtime.context import RunContext, ExecutionError, invoke_chat_model
 from workflow.model_input import input_sizes, rebuild_correction
+from agents.contracts import ReviewDecision
 
 
 @dataclass(frozen=True)
@@ -68,7 +69,8 @@ class RoleRunner:
                            model_call_index=self.context.counts['model_calls'],
                            repair_count=self.repairs['repairs'], schema_name=schema.__name__,
                            schema_version=schema_version)
-                review_stage = schema.__name__ if role == 'reviewer' and self.reviewer_repair_mode == 'split' else None
+                stage = 'ReviewDecision' if issubclass(schema, ReviewDecision) else schema.__name__
+                review_stage = stage if role == 'reviewer' and self.reviewer_repair_mode == 'split' else None
                 repair_role = role if self.role_corrections else None
                 if not self.context.claim_repair(self.repairs, reviewer=role == 'reviewer', review_stage=review_stage, repair_role=repair_role):
                     preserved = exhausted(exc, details, value) if exhausted else None

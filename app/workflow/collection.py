@@ -119,21 +119,24 @@ class CollectionRunner:
 
     def prepare_parallel(self, tasks: Sequence[TaskRequest], *, context: RunContext,
                          executors: Mapping[str, ToolExecutor], model_reserve: int,
-                         objective_for: Callable[[TaskRequest], dict]) -> ParallelBatch:
+                         objective_for: Callable[[TaskRequest], dict], model_cost_for=None) -> ParallelBatch:
         if len(tasks) != 2 or {task.role for task in tasks} != {'investigation', 'knowledge'}:
             raise ProtocolError('INVALID_TASK_ROUTE')
         with context.lock:
             available_models = context.limits.model_calls - model_reserve - context.counts['model_calls']
             available_tools = context.limits.tool_calls - context.counts['tool_calls']
-        if available_models < 4 or available_tools < 2 or not context.can_research():
+        required_models = sum(model_cost_for(task) for task in tasks) if model_cost_for else 4
+        required_tools = sum(len(task.checks) for task in tasks) if model_cost_for else 2
+        if available_models < required_models or available_tools < required_tools or not context.can_research():
             raise ExecutionError('BUDGET_EXCEEDED')
         batch_id, plans = str(uuid4()), {}
         # Stable allocations/publication order; unused slices remain available later.
         ordered = sorted(tasks, key=lambda task: task.role != 'investigation')
         for index, task in enumerate(ordered):
-            model_cap = min(4, available_models // 2 + (available_models % 2 if index == 0 else 0))
+            model_cap = model_cost_for(task) if model_cost_for else min(4, available_models // 2 + (available_models % 2 if index == 0 else 0))
             tool_cap = available_tools // 2 + (available_tools % 2 if index == 0 else 0)
-            child = BranchContext(context, model_calls=model_cap, tool_calls=tool_cap)
+            child = BranchContext(context, model_calls=model_cap, tool_calls=tool_cap,
+                                  tool_only=bool(model_cost_for and not model_cap))
             request = CollectionRequest(task, deepcopy(objective_for(task)), self.modes[task.role], model_cap)
             plans[task.role] = ParallelPlan(request, child, executors[task.role].fork(child))
         return ParallelBatch(batch_id, plans)
