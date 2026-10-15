@@ -1,5 +1,7 @@
 # IT Incident Agent
 
+[Reviewer 引用与修稿链路复验](examples/showcase/review-selector-recovery.md)：分开观测／查询标签，精确定位原文引用与工具参数错误。九次固定真实运行共35次请求，一个预置错误初稿的工程探针完整走通修稿与末稿复核；六次自主运行仅一次有效复核，仍未证明稳定收益。全部模型失败留档，标准流程继续默认。
+
 [输入上限提高到48000字符](examples/showcase/input-limit-recovery.md)：默认预算增加并支持 `INCIDENT_MAX_INPUT_CHARS` 配置。788项回归中768通过、20项数据库跳过；三次真实检查实际11次请求，无输入超限，但仍因其它契约失败停止。旧失败保留，标准流程仍默认。
 
 [Reviewer 输出容量与契约复验](examples/showcase/reviewer-packet-recovery.md)：精简输出、确定性字段绑定、范围关系和 schema 去重。三批共30次运行、130次真实请求，新流程截断为零；终版三例均曾有效复核、末稿两例有效，另一次修稿输入超限。全部失败与成本记录保留，仍未证明端到端稳定收益，标准流程继续默认。
