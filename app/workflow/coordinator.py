@@ -3,13 +3,16 @@ import hashlib
 import json
 import time
 from runtime.context import RunContext, ExecutionError, activate
-from agents.contracts import SupervisorSelection, DiagnosisSelection, Hypothesis, ReviewDecision, ObservationReview
+from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview
 from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
 from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output
 from workflow.planning import PlanningContext, validate_plan
+from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
+    validate_observation_review, additional_rework_eligible, needs_review_follow_up,
+    resolve_handoff, decide_rework, completion_reason)
 from workflow.collection import (CollectionRequest, CollectionOutcome, CollectionRunner,
                                  execute_planned_reads, task_record, join_parallel)
 from workflow.reporting import (PublicationInput, ReportSnapshot, publish_diagnosis, build_report,
@@ -17,15 +20,14 @@ from workflow.reporting import (PublicationInput, ReportSnapshot, publish_diagno
 
 
 from evidence.diagnosis import ProtocolError, expand_refs, expand_diagnosis, preserve_diagnosis
-from evidence.observations import FACT_RENDERING, pool_control_gaps, log_control_gaps, gap_message
+from evidence.observations import FACT_RENDERING, pool_control_gaps, log_control_gaps
 from evidence.model_view import MODEL_VIEW_VERSION, evidence_view
 from evidence.completion import diagnosis_gaps, required_sections
 from workflow.task_checks import completion, adds_information, log_query_feedback
-from workflow.evidence_needs import initial_needs, validate_assessments, reviewed_needs, limitations, is_blocking
-from workflow.diagnostic_audit import validate_blockers, diagnostic_audit, blocker_follow_up
-from workflow.review_outcome import review_policy, readiness_gaps, nonblocking_trigger_request
+from workflow.evidence_needs import initial_needs, reviewed_needs, limitations, is_blocking
+from workflow.diagnostic_audit import diagnostic_audit
+from workflow.review_outcome import review_policy, readiness_gaps
 from agents.protocol import REPAIR_POLICY, REVIEW_STAGE_POLICY, ROLE_REPAIR_POLICY
-from evidence.observations import source_statement
 from workflow.review_protection import conservative, BOUNDED_POLICY, DEFAULT_REVIEW_PROTECTION
 
 
@@ -265,15 +267,11 @@ class Collaboration:
     def finish_review(self):
         gaps = self.diagnosis_completion_gaps()
         self.extra_gaps.extend(gaps)
-        if gaps:
-            self.stop = 'DIAGNOSIS_INCOMPLETE'
+        self.stop = completion_reason(self.draft, self.review, self.ticket.purpose,
+            diagnosis_gaps=gaps, observation_gaps=self.observation_gaps(), task_gaps=self.task_gaps(),
+            blocking_gaps=limitations(self.evidence_needs, blocking_only=True))
+        if self.stop == 'DIAGNOSIS_INCOMPLETE':
             self.event('diagnosis_gate', 'diagnosis', code=self.stop, missing_information=gaps)
-        elif (readiness_gaps(self.draft, self.review, self.ticket.purpose)
-                or self.observation_gaps() or self.task_gaps()
-                or limitations(self.evidence_needs, blocking_only=True)):
-            self.stop = 'REVIEW_INCOMPLETE'
-        else:
-            self.stop = 'STATUS_CHECK_COMPLETED' if self.ticket.purpose == 'status_check' else 'FINISHED'
         self.check_diagnostic_pack_exit('review_completion')
 
     def check_diagnostic_pack_exit(self, stage):
@@ -364,23 +362,7 @@ class Collaboration:
                 'remaining_model_calls': remaining, 'required_tool_calls': tool_calls, 'remaining_tools': tools}
 
     def additional_rework_eligible(self):
-        if self.reworks != 1 or self.ticket.purpose != 'diagnosis' or self.protocol_fallback_used or not self.review:
-            return False
-        request = self.review.request_evidence
-        if not request or not request.need_id or not request.target_id:
-            return False
-        claim = self.targets().get(request.target_id)
-        if claim is None or (isinstance(claim, Hypothesis) and claim.level not in {'mechanism', 'alternative'}):
-            return False
-        target = next((a for a in self.review.assessments if a.target_id == request.target_id), None)
-        assessment = next((a for a in self.review.need_assessments if a.need_id == request.need_id), None)
-        if target is None or target.verdict != 'uncertain' or assessment is None or assessment.verdict != 'uncertain':
-            return False
-        blocker = assessment.blocker
-        return bool(blocker and request.target_id in blocker.affected_targets
-                    and blocker.cause_level in {'observation', 'mechanism', 'alternative', 'action_condition'}
-                    and blocker.resolution != 'external_source' and blocker.decision_impact.strip()
-                    and is_blocking(self.evidence_needs[request.need_id].model_copy(update={'blocking': assessment.blocking})))
+        return additional_rework_eligible(self.review_routing_context())
 
     def can_replan(self):
         return (self.supervisor_calls < 3 and len(self.tasks) < 6
@@ -464,138 +446,35 @@ class Collaboration:
         return True
 
     def needs_review_follow_up(self, review):
-        # One normal-budget clarification, with room for dispatch, interpretation,
-        # a revised diagnosis and its review. It never authorizes a tool by itself.
-        return (not self.protocol_fallback_used and self.ticket.purpose == 'diagnosis' and not self.review_follow_up_used
-            and not self.reworks and not review.request_evidence and not review.follow_up_reason
-            and ((any(a.verdict == 'uncertain' and a.target_id.startswith(('H', 'A')) for a in review.assessments)
-                  and readiness_gaps(self.draft, review, self.ticket.purpose))
-                 or any(a.verdict == 'uncertain' and is_blocking(self.evidence_needs[a.need_id].model_copy(
-                     update={} if a.blocking is None else {'blocking': a.blocking})) for a in review.need_assessments))
-            and self.rework_budget(pending_model_calls=1)['can_collect'])
+        return needs_review_follow_up(self.review_routing_context(review),
+            can_collect=lambda: self.rework_budget(pending_model_calls=1)['can_collect'])
 
     def collection(self):
         # Empty/truncated/error results remain visible to the tool-free judging roles.
         return [{k: event[k] for k in ("role", "name", "status", "query_profile", "truncated", "evidence_ids", "error")}
                 for event in self.events if event["type"] == "tool_result"]
 
+    def review_context(self):
+        return ReviewContext(needs=self.evidence_needs, evidence=self.evidence, references=self.references,
+            executors=self.executors, targets=self.targets(), scope=self.ticket.scope,
+            observation_gaps=self.observation_gaps(), protection=self.review_protection,
+            require_blockers=self.blind_review or getattr(self.models['reviewer'], 'json_output', False),
+            existing_gaps=tuple(self.extra_gaps))
+
+    def review_routing_context(self, review=None):
+        return ReviewRoutingContext(draft=self.draft, review=self.review if review is None else review,
+            needs=self.evidence_needs, targets=self.targets() if self.draft is not None else {},
+            purpose=self.ticket.purpose, protection=self.review_protection, reworks=self.reworks,
+            protocol_fallback_used=self.protocol_fallback_used, clarification_used=self.review_follow_up_used)
+
     def validate_review(self, review):
-        # Immutable core materiality is server-owned, independent of model wording.
-        core_flags = [a for a in review.need_assessments if a.need_id in self.evidence_needs
-                      and self.evidence_needs[a.need_id].purpose in {'symptom', 'mechanism'}
-                      and a.blocking is not None]
-        assessments = [a.model_copy(update={'blocking': None}) if a in core_flags else a
-                       for a in review.need_assessments]
-        need_assessments = validate_assessments(self.evidence_needs, assessments, self.evidence)
-        for assessment in core_flags:
-            self.event('reviewer_fields_ignored', 'reviewer', code='CORE_BLOCKING_RETAINED',
-                       need_id=assessment.need_id, path='blocking', actual=assessment.blocking)
-        targets = self.targets()
-        ids = [a.target_id for a in review.assessments]
-        if len(ids) != len(set(ids)) or set(ids) != set(targets):
-            raise ProtocolError("REVIEW_TARGET_COVERAGE", [{
-                'required_target_ids': list(targets),
-                'missing_target_ids': sorted(set(targets) - set(ids)),
-                'unexpected_target_ids': sorted(set(ids) - set(targets)),
-                'duplicate_target_ids': sorted({key for key in ids if ids.count(key) > 1}),
-            }])
-        checked = []
-        for assessment in review.assessments:
-            self.evidence_ids(assessment.evidence_ids)
-            target = targets[assessment.target_id]
-            if assessment.verdict == "supported" and assessment.target_id.startswith("H"):
-                if not any(self.evidence[r.evidence_id].kind == "observation" for r in target.support_refs):
-                    assessment = assessment.model_copy(update={"verdict": "uncertain",
-                        "reason": "Program gate: historical knowledge alone cannot establish a current cause."})
-                    self.event("review_gate", "reviewer", target_id=assessment.target_id, code="NO_CURRENT_SUPPORT")
-                elif self.observation_gaps():
-                    assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(self.observation_gaps())})
-                    self.event('review_gate', 'reviewer', target_id=assessment.target_id, code='MISSING_HEALTH_CONTROL')
-            checked.append(assessment)
-        if conservative(self.review_protection):
-            from workflow.review_protection import protect_refutations
-            checked = protect_refutations(review.model_copy(update={'assessments': checked}),
-                self.evidence, self.event, bounded=self.review_protection == BOUNDED_POLICY,
-                scope=self.ticket.scope).assessments
-        request = review.request_evidence
-        self.review_hint_status = []
-        if request:
-            self.evidence_ids(request.evidence_ids)
-            if request.need_id is not None and request.need_id not in self.evidence_needs:
-                raise ProtocolError('UNKNOWN_OR_DUPLICATE_NEED')
-            disputed = request.target_id or request.hypothesis_id
-            supported_check_request = (conservative(self.review_protection)
-                and disputed in targets and disputed.startswith('A')
-                and targets[disputed].kind in {'manual_check', 'read_only_check'})
-            if (request.hypothesis_id is not None and request.hypothesis_id not in targets
-                    or disputed is not None and (disputed not in targets
-                        or disputed.startswith('H') and request.hypothesis_id not in {None, disputed}
-                        or any(a.target_id == disputed and a.verdict == 'supported' for a in checked)
-                            and not supported_check_request)
-                    or disputed is None and request.need_id is None):
-                raise ProtocolError('INVALID_REWORK_TARGET')
-            if request.need_id and disputed and disputed.startswith('H'):
-                purpose = self.evidence_needs[request.need_id].purpose
-                level = targets[disputed].level
-                if (level == 'trigger' and purpose in {'symptom', 'mechanism', 'alternative'}
-                        or purpose == 'trigger' and level in {'mechanism', 'alternative'}):
-                    # The target and gap remain valid. Detach only the conflicting
-                    # edge; never promote a verdict or discard a missing observation.
-                    self.event('review_request_scope_detached', 'reviewer', code='REVIEW_REQUEST_SCOPE',
-                        need_id=request.need_id, target_id=disputed,
-                        need_purpose=purpose, target_level=level, verdicts_changed=False)
-                    request = request.model_copy(update={'need_id': None})
-            # Hints never authorize a call. Discard unsafe/redundant suggestions,
-            # but preserve the legitimate evidence gap for Supervisor to plan.
-            normalized, signatures = [], set()
-            executor = self.executors[request.target_role]
-            for check in request.checks:
-                code = None
-                try:
-                    args = executor.validate_args(check.tool, check.args)
-                    signature = (check.tool, args.model_dump_json())
-                    candidate = check.model_copy(update={'args': args.model_dump(mode='json')})
-                    if signature in signatures or not adds_information([candidate.model_dump(mode='json')], executor):
-                        code = 'DUPLICATE_TOOL'
-                    signatures.add(signature)
-                except ExecutionError as exc:
-                    code = exc.code
-                if code:
-                    self.review_hint_status.append({'tool': check.tool, 'code': code})
-                    self.event('review_hint_ignored', 'reviewer', code=code, name=check.tool)
-                else:
-                    normalized.append(candidate)
-            request = request.model_copy(update={'checks': normalized})
-            reopened = []
-            for assessment in need_assessments:
-                if assessment.need_id == request.need_id and assessment.verdict != 'uncertain':
-                    self.event('review_need_reopened', 'reviewer', need_id=assessment.need_id,
-                               target_id=disputed, previous_verdict=assessment.verdict,
-                               verdict='uncertain', code='EVIDENCE_GAP_PENDING')
-                    assessment = assessment.model_copy(update={'verdict': 'uncertain',
-                        'reason': ('复核提出证据缺口，此问题暂缓关闭：' + request.missing_observation)[:400]})
-                reopened.append(assessment)
-            need_assessments = reopened
-        normalized = review.model_copy(update={'assessments': checked, 'need_assessments': need_assessments,
-                                               'request_evidence': request})
-        normalized = validate_blockers(self.evidence_needs, normalized, self.executors,
-            required=self.blind_review or getattr(self.models['reviewer'], 'json_output', False), targets=targets,
-            conservative=conservative(self.review_protection), event=self.event)
-        if conservative(self.review_protection):
-            for assessment in normalized.need_assessments:
-                if assessment.blocker and not is_blocking(self.evidence_needs[assessment.need_id].model_copy(
-                        update={} if assessment.blocking is None else {'blocking': assessment.blocking})):
-                    gap = '复核保留范围限制：' + assessment.blocker.missing_observation
-                    if gap not in self.extra_gaps:
-                        self.extra_gaps.append(gap)
-        handoff = blocker_follow_up(self.evidence_needs, normalized, self.executors)
-        if handoff:
-            self.event('review_blocker_handoff', 'reviewer', need_id=handoff.need_id,
-                       target_id=handoff.target_id, planning_required=True)
-            normalized = normalized.model_copy(update={'request_evidence': handoff})
-            # A legacy blocker-derived request must pass the same ownership gate.
-            return self.validate_review(normalized)
-        return normalized
+        audit = ReviewAudit(hint_status=list(getattr(self, 'review_hint_status', [])))
+        try:
+            return validate_review(review, self.review_context(), audit=audit, emit=self.event)
+        finally:
+            # Diagnostic effects survive failed candidates; verdict/need state is not committed here.
+            self.review_hint_status = audit.hint_status
+            self.extra_gaps.extend(audit.limitations)
 
     def diagnose(self):
         if not self.prepare_diagnosis_entry():
@@ -632,38 +511,26 @@ class Collaboration:
         if self.blind_review and self.ticket.purpose == 'diagnosis':
             remaining = self.context.limits.model_calls - self.context.counts['model_calls']
             if remaining >= 2:
-                def validate_observations(value):
-                    claims = []
-                    for claim in value.directly_supported:
-                        refs = self.expand_refs(claim.refs)
-                        if any(self.evidence[ref.evidence_id].kind != 'observation' for ref in refs):
-                            raise ProtocolError('REVIEW_CURRENT_EVIDENCE_REQUIRED')
-                        claims.append(claim.model_copy(update={'statement': source_statement(refs, self.evidence)}))
-                    return value.model_copy(update={'directly_supported': claims})
                 self.event('observation_review_started', 'reviewer', revision=revision, draft_visible=False)
                 observed = self.ask('reviewer', ObservationReview, {
                     'ticket': self.ticket.model_dump(mode='json', exclude={'scope': {'tenant_id', 'user_id'}}),
                     'evidence': self.sources(), 'collection': self.collection()},
-                    terminal=True, validate=validate_observations, system_prompt=OBSERVATION_REVIEW)
+                    terminal=True, validate=lambda value: validate_observation_review(value, self.review_context()),
+                    system_prompt=OBSERVATION_REVIEW)
                 self.observation_reviews.append({'revision': revision, 'review': observed.model_dump(mode='json')})
                 self.event('observation_review_completed', 'reviewer', revision=revision, draft_visible=False)
             else:
                 self.event('observation_review_skipped', 'reviewer', code='BUDGET_EXCEEDED', revision=revision)
         self.review = self.ask("reviewer", ReviewDecision, self.reviewer_input(), terminal=True, validate=self.validate_review)
         self.evidence_needs = reviewed_needs(self.evidence_needs, self.review.need_assessments)
-        request = self.review.request_evidence
-        if (request and self.ticket.purpose == 'diagnosis' and not self.reviewed_gaps()
-                and nonblocking_trigger_request(self.draft, self.review, self.evidence_needs,
-                    conservative=conservative(self.review_protection))):
-            # Keep the actual request and unresolved verdict in the audit record.
-            # Only the automatic routing is deferred to human follow-up.
-            deferred = {'revision': revision, 'request': request.model_dump(mode='json'),
-                        'reason': '机制和有效下一步已复核；纯触发未知作为人工待核实限制保留。'}
+        handoff = resolve_handoff(self.review_routing_context(), reviewed_gaps=self.reviewed_gaps)
+        request = handoff.request
+        if handoff.deferred_request:
+            deferred = {'revision': revision, 'request': handoff.deferred_request.model_dump(mode='json'),
+                        'reason': handoff.reason}
             self.deferred_review_requests.append(deferred)
-            self.extra_gaps.append(('已支持核查待办的结果待人工取得：' if
-                (request.target_id or '').startswith('A') else '非关键触发原因待人工核实：') + request.missing_observation)
+            self.extra_gaps.append(handoff.limitation)
             self.event('review_request_deferred', 'reviewer', **deferred, verdicts_changed=False)
-            request = None
         self.event('evidence_needs_reviewed', 'reviewer', revision=revision,
                    evidence_needs=self.need_input(), blocking_gaps=limitations(self.evidence_needs, blocking_only=True))
         self.reviews.append({"revision": revision, "review": self.review.model_dump(mode="json")})
@@ -674,22 +541,24 @@ class Collaboration:
         if request:
             self.note("challenge", "reviewer", "diagnosis", hypothesis_id=request.hypothesis_id,
                       evidence_ids=request.evidence_ids, reason=request.missing_observation)
-            if self.protocol_fallback_used:
+            decision = decide_rework(self.review_routing_context(),
+                can_collect=lambda additional: self.rework_budget(additional=additional)['can_collect'])
+            if decision.kind == 'protocol_stop':
                 self.event('rework_denied', 'reviewer', code='PROTOCOL_FINALIZATION_ONLY')
                 self.extra_gaps.append('调度协议失败后仅收尾；复核提出的补查仍未执行：' + request.missing_observation)
                 self.finish_review()
                 # A pending executable check must not be disguised as completion.
                 self.stop = 'REVIEW_INCOMPLETE'
-            elif self.reworks >= 2 or (self.reworks == 1 and not self.additional_rework_eligible()):
+            elif decision.kind == 'limit_stop':
                 self.event("rework_denied", "supervisor", code="REWORK_LIMIT")
                 self.stop = "REWORK_LIMIT"
-            elif not self.rework_budget(additional=self.reworks == 1)['can_collect']:
+            elif decision.kind == 'budget_stop':
                 self.event('rework_denied', code='BUDGET_EXCEEDED')
                 self.extra_gaps.append('复核缺口未补查：预算或调度额度不足；' + request.missing_observation)
                 self.finish_review()
                 self.stop = 'REVIEW_INCOMPLETE'
             else:
-                if self.reworks == 1:
+                if decision.authorize_additional:
                     self.additional_rework_authorized = True
                     self.event('additional_rework_authorized', need_id=request.need_id,
                                target_id=request.target_id, maximum_total_reworks=2, total_budget_changed=False)
