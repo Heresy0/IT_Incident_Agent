@@ -10,7 +10,7 @@ def conservative(mode):
     return mode != 'strict_v1'
 
 
-def protect_refutations(review, evidence, event, *, bounded=False, scope=None):
+def protect_refutations(review, evidence, event, *, bounded=False, scope=None, claim_scoped=False):
     """A missing current citation cannot justify displaying a cause as refuted.
 
     IDs must already be validated by the caller. A cited observation still
@@ -25,6 +25,11 @@ def protect_refutations(review, evidence, event, *, bounded=False, scope=None):
             basis = assessment.refutation_basis
             if not observations:
                 code = 'NO_CURRENT_COUNTEREVIDENCE'
+            elif claim_scoped:
+                # Free-form causal hypotheses are not atomic logical predicates.
+                # Preserve claim-level counterpoints rather than turning a
+                # local sample or a model label into whole-cause exclusion.
+                code = 'CLAIM_COUNTERPOINT_NOT_WHOLE_REFUTATION'
             elif bounded:
                 if basis is None:
                     code = 'MISSING_REFUTATION_BASIS'

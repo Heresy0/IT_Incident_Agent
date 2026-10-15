@@ -247,7 +247,43 @@ class RequestedSource(Contract):
     category: Literal['dependency', 'configuration', 'resource'] | None = None
 
 
+class CounterpointField(Contract):
+    evidence_id: str
+    field_path: str = Field(min_length=1, max_length=120)
+
+
+class ClaimCounterpoint(Contract):
+    target_id: str = Field(pattern=r'^H[1-4]$')
+    claim_quote: str = Field(min_length=3, max_length=300,
+        description='An exact substring of the existing hypothesis cause, not a rewritten broader claim.')
+    effect: Literal['weakens', 'conflicts_with_quoted_claim', 'insufficient_to_exclude']
+    reason: str = Field(min_length=1, max_length=300)
+    fields: list[CounterpointField] = Field(min_length=1, max_length=4)
+    remaining_uncertainty: str = Field(min_length=1, max_length=300)
+
+
+class ReadStateAssertion(Contract):
+    read_id: str = Field(pattern=r'^RD_[0-9a-f]{16}$')
+    state: Literal['observed', 'empty', 'failed', 'not_queried', 'blocked_channel', 'truncated', 'missing_samples']
+
+
+class ManualHandoffTask(Contract):
+    target_id: str = Field(pattern=r'^A[1-4]$')
+    action_quote: str = Field(min_length=3, max_length=500)
+    subject: Literal['ticket_service', 'external_dependency']
+    record_scope: Literal['anchored_record', 'new_observation'] = 'new_observation'
+    question: str = Field(min_length=1, max_length=300)
+    requested_fields: list[str] = Field(min_length=1, max_length=6)
+    anchor_evidence_ids: list[str] = Field(default_factory=list, max_length=4)
+    related_reads: list[ReadStateAssertion] = Field(default_factory=list, max_length=3)
+    completion_criteria: str = Field(min_length=1, max_length=300)
+    decision_use: str = Field(min_length=1, max_length=300)
+
+
 class RevisionReviewDecision(ReviewDecision):
+    counterpoints: list[ClaimCounterpoint] = Field(default_factory=list, max_length=4)
+    ledger_assertions: list[ReadStateAssertion] = Field(default_factory=list, max_length=8)
+    manual_tasks: list[ManualHandoffTask] = Field(default_factory=list, max_length=4)
     request_source: RequestedSource | None = Field(default=None,
         description='For request_evidence seeking a ticket-service channel: identify its tool and log category if known. '
                     'This is a channel hint, not permission or query parameters. External-service information leaves this null.')

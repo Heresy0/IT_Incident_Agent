@@ -101,6 +101,18 @@ def render_collaboration(result):
                  'registered_repair': '登记修复候选', 'unspecified': '未分类（兼容旧输出）'}
         lines.append(f"- [{kinds[action.get('kind', 'unspecified')]}] {action['action']}；条件：{action['condition']}；验证：{action['expected_result']}；风险：{action['risk']}；需批准：{action['requires_approval']}")
         lines.extend('  - 提议只读检查：' + check['tool'] for check in action.get('checks', []))
+    if result.get('claim_counterpoints'):
+        lines.extend(['', '具体命题的反证或削弱（不等于整条因果假设已排除）：'])
+        for point in result['claim_counterpoints']:
+            lines.append(f"- {point['target_id']}：{point['claim_quote']}；{point['reason']}")
+            lines.extend(f"  - {fact['evidence_id']} / {fact['field_path']} = {fact['value']}" for fact in point['facts'])
+            lines.append('  - 仍未确定：' + point['remaining_uncertainty'])
+    if result.get('reviewed_manual_tasks'):
+        lines.extend(['', '人工核查任务（已复核细节，仍不授权操作）：'])
+        for task in result['reviewed_manual_tasks']:
+            lines.append(f"- {task['target_id']}：{task['question']}；所需字段：{'、'.join(task['requested_fields'])}")
+            lines.extend('  - ' + row['tool'] + '：' + row['state_label'] for row in task['query_states'])
+            lines.append('  - 完成条件：' + task['completion_criteria'] + '；判断用途：' + task['decision_use'])
     if result.get('pending_actions'):
         lines.extend(['', '待确认建议（未通过复核，不能据此审批或执行修复）：'])
         for action in result['pending_actions']:

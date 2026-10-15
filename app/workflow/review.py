@@ -102,11 +102,11 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
                 assessment = assessment.model_copy(update={'verdict': 'uncertain', 'reason': gap_message(view.observation_gaps)})
                 emit('review_gate', 'reviewer', target_id=assessment.target_id, code='MISSING_HEALTH_CONTROL')
         checked.append(assessment)
-    if conservative(view.protection):
+    if conservative(view.protection) or view.strict_need_scope:
         from workflow.review_protection import protect_refutations
         checked = protect_refutations(review.model_copy(update={'assessments': checked}),
             view.evidence, emit, bounded=view.protection == BOUNDED_POLICY,
-            scope=view.scope).assessments
+            scope=view.scope, claim_scoped=view.strict_need_scope).assessments
     request = review.request_evidence
     audit.hint_status = []
     if request:
@@ -203,6 +203,9 @@ def validate_review(review: ReviewDecision, view: ReviewContext, *,
                for a in normalized.need_assessments):
             raise ProtocolError('REVIEW_SOURCE_HINT_INVALID', [{'path': 'request_source',
                 'instruction': '范围外远端内部信息不是本服务登记渠道，request_source应为null。'}])
+    if view.strict_need_scope:
+        from workflow.semantic_scope import validate_semantic_scope
+        validate_semantic_scope(normalized, view)
     return normalized
 
 

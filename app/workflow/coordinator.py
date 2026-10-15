@@ -17,6 +17,8 @@ from workflow.routing import review_disposition, ReviewDisposition
 from workflow.collection_recovery import (channel_inventory, local_checks, failed_request_channel,
                                           boundary_task, RECOVERY_GUIDANCE, POLICY as RECOVERY_POLICY)
 from workflow.handoff import build_handoff
+from workflow.semantic_scope import (semantic_schema, counterpoint_view, manual_task_view, read_catalog,
+                                      SCOPED_REVIEWER, POLICY as SEMANTIC_POLICY)
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
     validate_observation_review, additional_rework_eligible, needs_review_follow_up,
     resolve_handoff, decide_rework, completion_reason)
@@ -222,6 +224,7 @@ class Collaboration:
         if role == 'reviewer' and schema is RevisionReviewDecision:
             output_schema = scope_review_schema(output_schema, self.current_revision_concerns())
             output_schema = revision_review_generation(output_schema, self.evidence_needs, self.targets(), self.evidence)
+            output_schema = semantic_schema(output_schema, self.targets(), self.evidence)
         model_input = role_model_input(role, schema, payload, view)
         prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
         if self.review_protection == BOUNDED_POLICY:
@@ -234,6 +237,8 @@ class Collaboration:
             prompt += REVIEW_DRIVEN
         if self.policy.review_driven:
             prompt += RECOVERY_GUIDANCE
+        if self.policy.review_driven and role == 'reviewer' and issubclass(schema, ReviewDecision):
+            prompt = SCOPED_REVIEWER
         request = RoleRequest(role, schema, output_schema, model_input, prompt, terminal)
         runner = RoleRunner(self.context, self.repairs, reviewer_repair_mode=self.reviewer_repair_mode,
                             role_corrections=self.role_corrections, purpose=self.ticket.purpose)
@@ -389,8 +394,18 @@ class Collaboration:
         tasks = [{k: row[k] for k in ('task_id', 'role', 'goal', 'need_ids', 'completion',
                                     'query_state_source', 'model_summary_verified')}
                  for row in self.task_input()]
+        collection = self.collection()
+        if self.policy.review_driven:
+            # Exact query profiles and per-read coverage live once in
+            # read_catalog; retain historical attempt outcomes separately.
+            tasks = [{**row, 'completion': {key: row['completion'][key]
+                for key in ('status', 'query_complete', 'goal_verified')}} for row in tasks]
+            collection = [{key: row[key] for key in ('role', 'name', 'status', 'truncated', 'error')}
+                          for row in collection]
         rework_budget = self.rework_budget(pending_model_calls=1, additional=self.reworks == 1)
         return {"targets": targets, "required_target_ids": list(targets),
+                **({'read_catalog': [{k: v for k, v in row.items() if k not in {'state_label', 'evidence_ids'}}
+                    for row in read_catalog(self.executors, self.ticket.scope).values()]} if self.policy.review_driven else {}),
                 **self.recovery_input(),
                 **self.diagnostic_pack_input(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
@@ -404,7 +419,7 @@ class Collaboration:
                 "task_results": tasks, "task_completion_gaps": self.task_gaps(),
                 "read_only_capabilities": {r: ex.capabilities() for r, ex in self.executors.items()},
                 "repair_capabilities": getattr(self.provider, 'repair_capabilities', []),
-                "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
+                "evidence": self.sources(), "collection": collection, "rework_used": self.reworks,
                 "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
                 **({'revision_concerns': list(self.current_revision_concerns()),
                     'concerns_are_untrusted_proposals': True,
@@ -1383,6 +1398,9 @@ class Collaboration:
             metadata.update(orchestration='review_driven_v2', pure_revision_rounds=self.pure_revisions,
                             scope_revision_rounds=self.scope_revisions, initial_replans=self.initial_replans,
                             collection_recovery_policy=RECOVERY_POLICY)
+            metadata.update(semantic_scope_policy=SEMANTIC_POLICY,
+                claim_counterpoints=counterpoint_view(self.review, self.evidence) if self.review else [],
+                reviewed_manual_tasks=manual_task_view(self.review, self.executors, self.ticket.scope, self.evidence))
             if status != 'completed' or self.handoff_reason:
                 metadata['handoff'] = build_handoff(run_id=self.context.run_id, revision=len(self.drafts),
                     reason=self.handoff_reason or self.stop, publication=publication, needs=self.evidence_needs,
@@ -1399,7 +1417,8 @@ class Collaboration:
                    ObservationReview.model_json_schema() if self.blind_review else None,
                    *[ex.schemas() for ex in self.executors.values()]]
         if self.policy.review_driven:
-            payload.extend([REVIEW_DRIVEN, REVISION_DIAGNOSIS, RevisionDiagnosisSelection.model_json_schema()])
+            payload.extend([REVIEW_DRIVEN, REVISION_DIAGNOSIS, RevisionDiagnosisSelection.model_json_schema(),
+                            SCOPED_REVIEWER, RECOVERY_GUIDANCE, SEMANTIC_POLICY])
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
 

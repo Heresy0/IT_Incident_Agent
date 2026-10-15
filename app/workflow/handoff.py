@@ -1,6 +1,7 @@
 """Deterministic human handoff from published results and actual read ledgers."""
 from runtime.context import MESSAGES
 from workflow.collection_recovery import CHANNEL_FAILURES, POLICY
+from workflow.semantic_scope import manual_task_view
 
 
 REASONS = {'external_information_required': '需要获取当前授权范围之外的信息',
@@ -66,7 +67,15 @@ def build_handoff(*, run_id, revision, reason, publication, needs, evidence, exe
               for role, executor in executors.items() for row in executor.check_results.values()]
     recovery = recovery_tasks(checks=checks, unresolved=unresolved, owners=owners,
         service=scope.service, environment=scope.environment, reviewed_actions=publication.actions)
-    steps = [*[task['action'] for task in recovery], *steps]
+    manual = manual_task_view(review, executors, scope, evidence)
+    for task in manual:
+        task['owner'] = owners[0]['team'] if owners and task['subject'] == 'ticket_service' else None
+        task['owner_resolved'] = task['owner'] is not None
+        statuses = '；'.join(row['tool'] + ':' + row['state_label'] for row in task['query_states'])
+        task['action'] = task['question'] + '；所需字段：' + '、'.join(task['requested_fields'])
+        task['condition'] = statuses or '基于所列当前锚定记录，人工核实仍未取得的字段；外部权限与负责人待确认。'
+    steps = [*[task['action'] + '；完成条件：' + task['completion_criteria'] for task in manual],
+             *[task['action'] for task in recovery], *steps]
     return {'run_id': run_id, 'draft_revision': revision, 'reason': reason,
             'reason_label': REASONS.get(reason, MESSAGES.get(reason, '本次自动诊断仍有未解决限制')),
             'blocking': publication.report_status == 'incomplete',
@@ -77,5 +86,6 @@ def build_handoff(*, run_id, revision, reason, publication, needs, evidence, exe
             'attempted_checks': checks, 'next_steps': list(dict.fromkeys(steps)),
             'owners': owners, 'owner_resolved': bool(owners),
             'recovery_policy': POLICY, 'recovery_tasks': recovery,
+            'reviewed_manual_tasks': manual,
             'recovery_tasks_meaning': '程序依据实际失败台账或未解问题生成的人工核查待办，未获得模型复核或变更授权，不改变诊断完成状态。',
             'operation_boundary': '核实未知信息；任何变更仍需独立审批与执行确认，不自动关闭工单。'}
