@@ -1,0 +1,676 @@
+{
+  "previous_summary": "output\\orchestration-autonomous\\a9dc9033-c8d4-4847-9ab0-c72d770619b7\\summary.json",
+  "previous_summary_sha256": "b09b2b296071205d157fca05dc80efe59780a32915bd1c7e268a6f91873181f0",
+  "scope": "Recorded failures only; similarity is for root-cause inspection and not a repair algorithm.",
+  "runs": [
+    {
+      "case_id": "closeout_001",
+      "repetition": 1,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "e27652b2-c58a-4f5f-a27b-d152805fec3d",
+          "trace_id": "e27652b2-c58a-4f5f-a27b-d152805fec3d",
+          "timestamp": 1792047540.2893577,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "e6c54eb9-a78e-4bb6-9602-1e9d9b35cdfa",
+          "parent_span_id": "debe775b-9ebd-4ad3-84fb-cd6cb600112f",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.3.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 56
+        },
+        {
+          "run_id": "e27652b2-c58a-4f5f-a27b-d152805fec3d",
+          "trace_id": "e27652b2-c58a-4f5f-a27b-d152805fec3d",
+          "timestamp": 1792047551.2312489,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "e6c54eb9-a78e-4bb6-9602-1e9d9b35cdfa",
+          "parent_span_id": "debe775b-9ebd-4ad3-84fb-cd6cb600112f",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.3.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 64
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 2,
+          "rejected": "REF_35d51e942f3e41b3ccda202a",
+          "hex_length": 24,
+          "format_valid": true,
+          "nearest_for_inspection_only": "REF_08093b192f3e41b3ccda202a"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_35d51e942f3e41b3ccda202a",
+          "hex_length": 24,
+          "format_valid": true,
+          "nearest_for_inspection_only": "REF_08093b192f3e41b3ccda202a"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_35d51e942f3e41b3ccda202a",
+          "hex_length": 24,
+          "format_valid": true,
+          "nearest_for_inspection_only": "REF_08093b192f3e41b3ccda202a"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_35d51e942f3e41b3ccda202a",
+          "hex_length": 24,
+          "format_valid": true,
+          "nearest_for_inspection_only": "REF_08093b192f3e41b3ccda202a"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_002",
+      "repetition": 1,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "e43b31cc-d3d8-4a17-b3da-8c8e556002d2",
+          "trace_id": "e43b31cc-d3d8-4a17-b3da-8c8e556002d2",
+          "timestamp": 1792047572.1974442,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "de32d6f5-358e-4ea6-b1ba-9428cf470165",
+          "parent_span_id": "031953b0-f715-42c6-b16f-281efa450931",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.3.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 56
+        },
+        {
+          "run_id": "e43b31cc-d3d8-4a17-b3da-8c8e556002d2",
+          "trace_id": "e43b31cc-d3d8-4a17-b3da-8c8e556002d2",
+          "timestamp": 1792047584.180488,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "de32d6f5-358e-4ea6-b1ba-9428cf470165",
+          "parent_span_id": "031953b0-f715-42c6-b16f-281efa450931",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.3.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 64
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 2,
+          "rejected": "REF_c28285db4e808ead45ec2d51afdb169093f7",
+          "hex_length": 36,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_c28285db4e808ead45ec2d51afdb169093f7",
+          "hex_length": 36,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_003",
+      "repetition": 1,
+      "review_calls": 2,
+      "validation_failures": [
+        {
+          "run_id": "7c826542-f43f-4a97-9736-373e50d57527",
+          "trace_id": "7c826542-f43f-4a97-9736-373e50d57527",
+          "timestamp": 1792047710.814975,
+          "type": "validation_failure",
+          "role": "reviewer",
+          "span_id": "e886cd97-d4c6-49f0-98c9-f98b07af0072",
+          "parent_span_id": "437e59b6-13ae-4772-858d-ba02fd8d26aa",
+          "reason": "REVIEW_SOURCE_HINT_INVALID",
+          "details": [
+            {
+              "path": "request_source",
+              "instruction": "范围外远端内部信息不是本服务登记渠道，request_source应为null。"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 3,
+          "repair_count": 0,
+          "schema_name": "RevisionReviewDecision",
+          "schema_version": "b54efeb3b489",
+          "seq": 55
+        },
+        {
+          "run_id": "7c826542-f43f-4a97-9736-373e50d57527",
+          "trace_id": "7c826542-f43f-4a97-9736-373e50d57527",
+          "timestamp": 1792047724.2405689,
+          "type": "validation_failure",
+          "role": "reviewer",
+          "span_id": "e886cd97-d4c6-49f0-98c9-f98b07af0072",
+          "parent_span_id": "437e59b6-13ae-4772-858d-ba02fd8d26aa",
+          "reason": "MANUAL_HANDOFF_UNREVIEWED",
+          "details": [],
+          "attempt": 2,
+          "model_call_index": 4,
+          "repair_count": 1,
+          "schema_name": "RevisionReviewDecision",
+          "schema_version": "b54efeb3b489",
+          "seq": 64
+        }
+      ],
+      "invalid_reference_copies": []
+    },
+    {
+      "case_id": "closeout_001",
+      "repetition": 2,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "911bd411-3637-4121-b1ee-edc6ca6a8b9e",
+          "trace_id": "911bd411-3637-4121-b1ee-edc6ca6a8b9e",
+          "timestamp": 1792047743.3721087,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "e6e05d46-6514-4927-ae0c-79b1cfea5d99",
+          "parent_span_id": "d5e433a2-f7bd-4392-aae2-79aebcfae073",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.2.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 60
+        },
+        {
+          "run_id": "911bd411-3637-4121-b1ee-edc6ca6a8b9e",
+          "trace_id": "911bd411-3637-4121-b1ee-edc6ca6a8b9e",
+          "timestamp": 1792047753.622445,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "e6e05d46-6514-4927-ae0c-79b1cfea5d99",
+          "parent_span_id": "d5e433a2-f7bd-4392-aae2-79aebcfae073",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.2.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 68
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 2,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_002",
+      "repetition": 2,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "f9afc727-341c-459b-9227-f87dbf32fdbf",
+          "trace_id": "f9afc727-341c-459b-9227-f87dbf32fdbf",
+          "timestamp": 1792047881.0934706,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "1187724c-92cc-4190-b1d9-876758c847ee",
+          "parent_span_id": "ff690cfa-b8c5-49eb-8eef-af5c1595324d",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "findings.1.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.2.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.3.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 52
+        },
+        {
+          "run_id": "f9afc727-341c-459b-9227-f87dbf32fdbf",
+          "trace_id": "f9afc727-341c-459b-9227-f87dbf32fdbf",
+          "timestamp": 1792047889.4707124,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "1187724c-92cc-4190-b1d9-876758c847ee",
+          "parent_span_id": "ff690cfa-b8c5-49eb-8eef-af5c1595324d",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs.0.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "findings.1.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.2.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.0.support_refs.3.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 60
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 2,
+          "rejected": "REF_cc6c045d2d51afdb1690937",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_cc6c045d2d51afdb169093f7"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_c28285db4e808ead452ec2",
+          "hex_length": 22,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_cc6c045d2d51afdb1690937",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_cc6c045d2d51afdb169093f7"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_c28285db4e808ead452ec2",
+          "hex_length": 22,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_cc6c045d2d51afdb1690937",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_cc6c045d2d51afdb169093f7"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_c28285db4e808ead452ec2",
+          "hex_length": 22,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_cc6c045d2d51afdb1690937",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_cc6c045d2d51afdb169093f7"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_c28285db4e808ead452ec2",
+          "hex_length": 22,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_003",
+      "repetition": 2,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "ee8a662f-44bd-440b-a85d-e0166c2b3011",
+          "trace_id": "ee8a662f-44bd-440b-a85d-e0166c2b3011",
+          "timestamp": 1792047906.2987094,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "0433ac18-de93-46da-9a26-09407e73c0d8",
+          "parent_span_id": "bd256f8e-b1db-4026-97a1-b72b05122688",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs",
+              "type": "too_short"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 46
+        },
+        {
+          "run_id": "ee8a662f-44bd-440b-a85d-e0166c2b3011",
+          "trace_id": "ee8a662f-44bd-440b-a85d-e0166c2b3011",
+          "timestamp": 1792047914.3709977,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "0433ac18-de93-46da-9a26-09407e73c0d8",
+          "parent_span_id": "bd256f8e-b1db-4026-97a1-b72b05122688",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs",
+              "type": "too_short"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 54
+        }
+      ],
+      "invalid_reference_copies": []
+    },
+    {
+      "case_id": "closeout_001",
+      "repetition": 3,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "trace_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "timestamp": 1792047997.4328744,
+          "type": "validation_failure",
+          "role": "supervisor",
+          "span_id": "f1a20650-b0a5-48c0-8761-ff6dd8d3ca52",
+          "parent_span_id": "d375a5a9-de3d-4fbd-9fe9-fd8852d3d707",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "tasks.0.checks",
+              "type": "too_long"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 1,
+          "repair_count": 0,
+          "schema_name": "SupervisorSelection",
+          "schema_version": "0a1a378a7150",
+          "seq": 8
+        },
+        {
+          "run_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "trace_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "timestamp": 1792048018.5531259,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "f1a20650-b0a5-48c0-8761-ff6dd8d3ca52",
+          "parent_span_id": "d375a5a9-de3d-4fbd-9fe9-fd8852d3d707",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.1.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 57
+        },
+        {
+          "run_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "trace_id": "b22adc5d-ff80-4fc0-a89d-6b064203e948",
+          "timestamp": 1792048030.1988094,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "f1a20650-b0a5-48c0-8761-ff6dd8d3ca52",
+          "parent_span_id": "d375a5a9-de3d-4fbd-9fe9-fd8852d3d707",
+          "reason": "UNKNOWN_REFERENCE",
+          "details": [
+            {
+              "path": "findings.1.refs.1.reference_id",
+              "type": "unknown_reference",
+              "instruction": "只能选择本次提供的 reference_options 中真实的 REF_ 编号，不能填写 EV_ 编号或自行构造。"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 4,
+          "repair_count": 2,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 65
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 3,
+          "rejected": "REF_1f3bc7952db3916131cd",
+          "hex_length": 20,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_7e517af352952db3916131cd"
+        },
+        {
+          "attempt": 4,
+          "rejected": "REF_1f3bc795c1cdae40947805c0",
+          "hex_length": 24,
+          "format_valid": true,
+          "nearest_for_inspection_only": "REF_1f3bc7952176a8b3f02a3a16"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_002",
+      "repetition": 3,
+      "review_calls": 0,
+      "validation_failures": [
+        {
+          "run_id": "0be9444d-9329-4bdd-90ad-88fc89727563",
+          "trace_id": "0be9444d-9329-4bdd-90ad-88fc89727563",
+          "timestamp": 1792048048.7966297,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "06f44866-5c40-468d-acc3-1d66307830db",
+          "parent_span_id": "8b492abc-a446-4170-81a7-a8911387f63a",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.2.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.1.support_refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 1,
+          "model_call_index": 2,
+          "repair_count": 0,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 52
+        },
+        {
+          "run_id": "0be9444d-9329-4bdd-90ad-88fc89727563",
+          "trace_id": "0be9444d-9329-4bdd-90ad-88fc89727563",
+          "timestamp": 1792048058.2316337,
+          "type": "validation_failure",
+          "role": "diagnosis",
+          "span_id": "06f44866-5c40-468d-acc3-1d66307830db",
+          "parent_span_id": "8b492abc-a446-4170-81a7-a8911387f63a",
+          "reason": "schema_mismatch",
+          "details": [
+            {
+              "path": "findings.2.refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            },
+            {
+              "path": "hypotheses.1.support_refs.1.reference_id",
+              "type": "string_pattern_mismatch"
+            }
+          ],
+          "attempt": 2,
+          "model_call_index": 3,
+          "repair_count": 1,
+          "schema_name": "DiagnosisSelection",
+          "schema_version": "2d24dd52f7ae",
+          "seq": 60
+        }
+      ],
+      "invalid_reference_copies": [
+        {
+          "attempt": 2,
+          "rejected": "REF_c28285db4e808ead452ec02",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 2,
+          "rejected": "REF_c28285db4e808ead452ec02",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_c28285db4e808ead452ec02",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        },
+        {
+          "attempt": 3,
+          "rejected": "REF_c28285db4e808ead452ec02",
+          "hex_length": 23,
+          "format_valid": false,
+          "nearest_for_inspection_only": "REF_c28285db4e808ead4524ec02"
+        }
+      ]
+    },
+    {
+      "case_id": "closeout_003",
+      "repetition": 3,
+      "review_calls": 1,
+      "validation_failures": [],
+      "invalid_reference_copies": []
+    }
+  ]
+}

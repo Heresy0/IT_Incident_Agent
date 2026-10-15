@@ -53,11 +53,14 @@ def provider_for(case):
 
 def execution_plan(config, suite='baseline'):
     unseen = suite == 'unseen_closeout'
-    lock_path = ROOT / ('evals/closeout_unseen/freeze.json' if unseen else 'evals/fresh_validation/freeze.json')
+    reference_recovery = suite == 'reference_recovery'
+    repeated = unseen or reference_recovery
+    lock_path = ROOT / ('evals/reference_recovery/freeze.json' if reference_recovery else
+                        'evals/closeout_unseen/freeze.json' if unseen else 'evals/fresh_validation/freeze.json')
     lock = json.loads(lock_path.read_text(encoding='utf-8'))
-    if unseen and implementation_version() != lock['source_version']:
+    if repeated and implementation_version() != lock['source_version']:
         raise ValueError('Application changed after unseen-case freeze')
-    if unseen and config.model != lock['model']:
+    if repeated and config.model != lock['model']:
         raise ValueError('Model changed after unseen-case freeze')
     files = dict(lock['files'])
     if suite == 'collection_recovery':
@@ -66,23 +69,27 @@ def execution_plan(config, suite='baseline'):
             path in {'evals/independent/manifest.json', 'evals/independent/rubric.json',
                      'fixtures/incident_independent/catalog.json'} or
             any(path.endswith(f'{case}.json') for case in RECOVERY_CASES if case.startswith('eval_'))})
-    elif suite not in ('baseline', 'unseen_closeout'):
+    elif suite not in ('baseline', 'unseen_closeout', 'reference_recovery'):
         raise ValueError('Unknown benchmark suite')
-    cases = UNSEEN_CASES if unseen else RECOVERY_CASES if suite == 'collection_recovery' else CASES
+    cases = UNSEEN_CASES if repeated else RECOVERY_CASES if suite == 'collection_recovery' else CASES
     for relative, expected in files.items():
         path = (ROOT / relative).resolve()
         if not path.is_relative_to(ROOT.resolve()) or digest(path) != expected:
             raise ValueError('Frozen benchmark input changed')
     scripts = ('scripts/compare_orchestration_live.py', 'scripts/compare_incident.py',
                'scripts/run_fresh_validation.py', 'evals/independent/provider.py')
-    repeats = 3 if unseen else 1
-    jobs = [{'case_id': case, 'orchestration': mode, **({'repetition': rep + 1} if unseen else {})}
+    repeats = 3 if repeated else 1
+    jobs = [{'case_id': case, 'orchestration': mode, **({'repetition': rep + 1} if repeated else {})}
             for rep in range(repeats) for index, case in enumerate(cases)
             for mode in (('legacy', 'review_driven') if (index + rep) % 2 == 0 else ('review_driven', 'legacy'))]
     return {'suite': suite, 'source_version': implementation_version(), 'script_hashes': {p: digest(ROOT / p) for p in scripts},
         'fixture_and_criteria_hashes': files, 'dataset_lock': digest(lock_path),
         **({'application_commit_before_new_cases': lock['application_commit']} if unseen else
            {'historical_dataset_lock': digest(lock_path)}),
+        **({'application_commit_before_reference_revalidation': lock['application_commit'],
+            'previous_failed_summary': lock['previous_summary'],
+            'previous_failed_summary_sha256': lock['previous_summary_sha256'],
+            'prior_dataset_lock': digest(ROOT/'evals/closeout_unseen/freeze.json')} if reference_recovery else {}),
         **({'additional_dataset_lock': digest(ROOT / 'evals/independent/freeze.json')} if suite == 'collection_recovery' else {}),
         'model': config.model, 'effective_settings_hash': hashlib.sha256(json.dumps(
             {'base_url': config.base_url, 'extra_body': config.extra_body}, sort_keys=True).encode()).hexdigest(),
@@ -90,7 +97,8 @@ def execution_plan(config, suite='baseline'):
         'limits': asdict(LIMITS), 'paid_cap_per_run': CAP_PER_RUN, 'maximum_paid_attempts': CAP_PER_RUN * len(jobs),
         'execution_order': jobs, 'attempts_per_case_arm': repeats, 'synthetic_observations': True,
         'seeded_turns': 0, 'replayed_turns': 0, 'independent_quality_score': False,
-        'benchmark_type': 'new_cases_after_application_freeze_author_assessed' if unseen else 'previously_seen_development_cases',
+        'benchmark_type': 'new_cases_after_application_freeze_author_assessed' if unseen else
+            'previously_seen_reference_regression_cases' if reference_recovery else 'previously_seen_development_cases',
         'independent_blind_holdout': False, 'estimated_cost': None,
         'workflow_settings': {'investigation_mode': 'programmatic', 'knowledge_mode': 'programmatic',
             'blind_review': False, 'reviewer_repair_mode': 'shared', 'review_protection': 'default'},
@@ -174,7 +182,7 @@ def summarize(report, ledger):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
-    parser.add_argument('--suite', choices=('baseline', 'collection_recovery', 'unseen_closeout'), default='baseline')
+    parser.add_argument('--suite', choices=('baseline', 'collection_recovery', 'unseen_closeout', 'reference_recovery'), default='baseline')
     args = parser.parse_args(argv)
     config = IncidentConfig.from_file()
     plan = execution_plan(config, args.suite)

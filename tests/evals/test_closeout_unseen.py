@@ -12,6 +12,15 @@ from scripts.compare_orchestration_live import CloseoutProvider, execution_plan,
 
 
 class CloseoutUnseenTests(unittest.TestCase):
+    def setUp(self):
+        # This suite tests a historical frozen application's preflight contract.
+        # Later authorized application changes must still fail without the mock.
+        from scripts.compare_orchestration_live import ROOT
+        version = json.loads((ROOT/'evals/closeout_unseen/freeze.json').read_text(encoding='utf-8'))['source_version']
+        patcher = patch('scripts.compare_orchestration_live.implementation_version',return_value=version)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_plan_only_has_eighteen_distinct_balanced_runs_without_models(self):
         with patch('scripts.compare_orchestration_live.IncidentConfig.from_file',
                    return_value=IncidentConfig(model='qwen3.7-flash')):

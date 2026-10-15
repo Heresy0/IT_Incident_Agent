@@ -34,7 +34,7 @@ class RoleRunner:
         self.purpose = purpose
 
     def run(self, request: RoleRequest, model, *, emit: Callable[..., None],
-            parse: Callable[[str], Any], validate=None, follow_up=None, exhausted=None):
+            parse: Callable[[str], Any], validate=None, follow_up=None, exhausted=None, correction=None):
         role, schema = request.role, request.schema
         output_schema, model_input = request.output_schema, request.model_input
         prompt, terminal = request.prompt, request.terminal
@@ -79,6 +79,8 @@ class RoleRunner:
                     raise ExecutionError("MODEL_OUTPUT_INVALID") from None
                 emit("validation_repair", role, review_stage=review_stage, repair_role=repair_role)
                 instruction = correction_instruction(role, schema, details, self.purpose)
+                if correction:
+                    instruction += correction(details)
                 messages, rebuilt = rebuild_correction(messages, response,
                     instruction + '。仅返回 JSON，不调用工具，不增加身份字段。',
                     details.get('details', []), self.context.limits.input_chars)
