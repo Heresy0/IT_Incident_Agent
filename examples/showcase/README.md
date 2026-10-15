@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+[48000字符输入上限及复验](input-limit-recovery.md)：可配置的请求容量、调用前门禁、历史行为对照与全部三次真实检查；保留旧失败和其它契约失败，未将容量恢复计为端到端质量通过。
+
 [Reviewer 输出容量与契约复验](reviewer-packet-recovery.md)：精简接口、字段归属、生成与运行时契约对齐、共享 schema，以及三十次真实运行的完整失败分流。标准流程仍默认；[三批总索引](reviewer-packet-recovery-summary.json)保留全部原始档案链接与哈希。
 
 [Diagnosis引用交付修复与回归](diagnosis-reference-recovery.md)：原始失败根因、短标签与原引用的精确映射、一次纠正和修稿边界，以及固定十八次自主回归对照。标准流程默认不变，全部旧失败继续留档。
