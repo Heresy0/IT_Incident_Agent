@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-10-15T08:26:40.267720+00:00",
+  "application_commit": "dc9c2785a4d0754e414620b1937ac1d1076d4bdb",
+  "source_version": "7f6b72c429c0697e",
+  "model": "qwen3.7-flash",
+  "files": {
+    "evals/closeout_unseen/criteria.json": "fb3ec89961c653378b638f4bab96dbbb0fd90f58f9f79e78adf3ea9dbdf6e716",
+    "fixtures/incident_closeout_unseen/catalog.json": "93c439241b725fe72d84999909546857fad0884cf15ead99f35e2b36eda104c7",
+    "fixtures/incident_closeout_unseen/closeout_001.json": "90f976d52b33c3666dcdb09a11fc0144be3958573686163af2a37850694484c8",
+    "fixtures/incident_closeout_unseen/closeout_002.json": "4cdc5b68a4feb83f2ef154a9057551ac2ab67b79468113e5bcd0c0923a00f4a6",
+    "fixtures/incident_closeout_unseen/closeout_003.json": "bfc902bdcc9a5d09daded77f3488cb15b70efb6fa9114b81cdfaa8bf84a7dcf5"
+  },
+  "driver_files": {
+    "scripts/compare_reviewer_recovery.py": "e5b896e13ceb2411ed44118641d26787b5100fdc23275fb107c940faa3614ce9",
+    "scripts/compare_orchestration_live.py": "1a57bb6671fbee8debc381b901f2519212e032391c8bdb6a52462c8d279723ae",
+    "scripts/compare_incident.py": "69216187e5b85fb980c3a6cfc5e74331d4525ec07a0a73522acf090abfddd311",
+    "scripts/run_fresh_validation.py": "5f25b3427596cb7fb96b1cfacca6bf7b709d56bb9443d5898768711b9ff26458",
+    "evals/independent/provider.py": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+    "evals/reference_recovery/freeze.json": "f2bff7156a9fc11a58eac6d4a261eb075f78c00eb1fbdeb892583397b9eab4a8",
+    "evals/closeout_unseen/freeze.json": "15fdf4dff9a21b1116292fd1383fe9f249c4fc2ab1f83fd80b8c73118a2de944"
+  },
+  "previous_summary": "output/orchestration-autonomous/a945c0b5-5bbd-4c67-9943-5bd701b53f16/summary.json",
+  "previous_summary_sha256": "7c946067a0c3de812debfeda649107ba11a2ae86b28faeeca252c37aaa050778",
+  "protocol": "18 paired primary jobs at Reviewer 4800 tokens plus 3 new-arm probes at 2200; Reviewer timeout60s in all jobs; other roles2200/30s; run16models/8tools/600s,reserve3models/90s; no seeded or replayed feedback; all failures retained.",
+  "application_frozen_during_batch": true,
+  "independent_blind_holdout": false,
+  "rubric_defect_preserved": "Case 2 records deployment completion, not start; do not claim temporal exclusion proves correctness."
+}
