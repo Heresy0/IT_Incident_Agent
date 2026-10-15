@@ -1,5 +1,7 @@
 # Agent 编排与 Harness 项目展示
 
+当前优先阅读[面试版本收尾与两个固定案例](interview-closeout.md)。限定提示试验未进入默认版本；完整记录和保守停止理由一并保留。
+
 [标准流程最小修复及全部失败](interview-minimal-repairs.md)：五个局部文件、无新增编排；首批三个案例与一次固定补充检查分别留档，引用合法不等于业务语义正确。
 
 当前展示入口：[面试架构与90秒讲解](interview-architecture.md)、[收敛交付与验证](interview-consolidation.md)、[完整真实检查记录](interview-consolidation-validation.json)。免费标准流程排练运行 `python scripts/demo_interview_flow.py`。

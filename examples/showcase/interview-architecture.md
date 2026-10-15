@@ -1,5 +1,7 @@
 # 面试展示版本：架构与执行流程
 
+[面试版本已收尾](interview-closeout.md)：两个固定案例、人工评估标准及提示试验停止理由；本轮没有运行时或编排修改。
+
 当前分支为 `codex/interview-consolidation`，基线为 `fc01b2b`。保留基础模块拆分、pgvector手册检索、审批执行和标准诊断流程；通用修复仅保留输入额度配置、参数错误定位及可选模型超时。实验代码和完整失败历史位于 `codex/review-driven-orchestration`，实验结论不能当作当前版本成绩。
 
 随后只追加[五个局部文件的最小修复](interview-minimal-repairs.md)：引用位置、查询任务标识和阻塞／支持降级反馈；不增加模型角色或编排层。
