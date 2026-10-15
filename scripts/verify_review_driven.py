@@ -30,16 +30,20 @@ CASES = ('fresh_001', 'fresh_003')
 
 
 class PaidBudget:
-    def __init__(self, maximum=PAID_CAP):
+    def __init__(self, maximum=PAID_CAP, final_review_reserve=0):
         if type(maximum) is not int or not 1 <= maximum <= PAID_CAP:
             raise ValueError('Invalid paid request cap')
+        if type(final_review_reserve) is not int or not 0 <= final_review_reserve < maximum:
+            raise ValueError('Invalid final review reserve')
         self.maximum = maximum
+        self.final_review_reserve = final_review_reserve
         self.used = 0
         self.lock = Lock()
 
-    def claim(self):
+    def claim(self, *, final_review=False):
         with self.lock:
-            if self.used >= self.maximum:
+            ceiling = self.maximum if final_review else self.maximum - self.final_review_reserve
+            if self.used >= ceiling:
                 raise ExecutionError('BUDGET_EXCEEDED')
             self.used += 1
 
@@ -48,13 +52,21 @@ class RecordedModel:
     json_output = True
     blind_review = False
 
-    def __init__(self, model, budget):
+    def __init__(self, model, budget, role=None):
         self.model, self.budget, self.replies = model, budget, []
         self.attempts = 0
+        self.role, self.final_review_attempts = role, 0
 
     def invoke(self, messages):
-        self.budget.claim()
+        final_review = False
+        if self.role == 'reviewer' and self.budget.final_review_reserve and len(messages) >= 2:
+            request = json.loads(messages[1].content).get('input', {})
+            round_info = request.get('review_round', {})
+            final_review = (round_info.get('draft_revision', 0) >= 2 and round_info.get('final_candidate') is True
+                            and not request.get('revision_concerns'))
+        self.budget.claim(final_review=final_review)
         self.attempts += 1
+        self.final_review_attempts += int(final_review)
         try:
             response = self.model.invoke(messages)
         except Exception as exc:

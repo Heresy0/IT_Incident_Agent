@@ -115,6 +115,10 @@ Reviewer 使用 `RevisionReviewDecision`，继承旧判定和证据缺口契约�
 
 新模式的 `RevisionNeedAssessment.gap_kind` 明确区分 `evidence`（默认，缺新观测）与 `revision`（已有观测、论证待修正）。revision 保持 uncertain，必须关联未支持的 revision_targets、已有修稿请求和当前 EV，不能同时声明 blocker 或相关补查。程序仅将这个有效待修稿问题送往编辑；问题台账仍未关闭，新稿需要完整复核，不能直接发布。真实证据、任务和观测缺口继续优先。标准模式的 NeedAssessment、ReviewBlocker 和原门禁不增加这类标记。详细流程与后续验证见[范围冲突优化](revision-scope-conflict.md)。
 
+新路径的模型输出 Schema 进一步按问题顺序绑定互斥形态：已评估、有现成证据待修稿、确缺新观测。核心问题不让模型输出 blocking，supported 和待修稿必须引用当前观测；症状／机制／竞争解释的证据 blocker 排除纯 trigger 目标。每个问题附带 need_focus，Reviewer 仍自行判定，不预填 verdict。缺 blocker 且只有 trigger 未确认时先报告 REVIEW_NEED_SCOPE；用已支持 H 填充触发 blocker 也被拒绝。纠正先重评问题归属，再选择形态，不机械补 blocker 或自动改判支持。
+
+隐式的非目标 H 改动若仅改变 evidence_explanation，程序恢复原值并记录 revision_annotations_restored，不生成范围纠错提案；该注释本来就不作为 Reviewer 的证据。cause、level、引用或 pending_checks 变化仍隔离成提案，显式 revision_concerns 也始终保留。实际稿、角色纠正限额和发布门禁不放宽。最终验证与末稿预算安排见[Reviewer 契约优化记录](reviewer-contract-followup.md)。
+
 普通补查及追加补查资格沿用原上限；已有合法未执行计划可复用，仍占用调度位置但不调用规划模型。补查之后直接重新诊断；失败、已执行或已覆盖查询不能伪装成新增信息。新预算按规划、可能的查询 Embedding、诊断、复核与纠正预留计算，移除旧取证解释阶段；并行纯程序分支允许零模型额度，真实模型调用仍受分支及总额度约束。Embedding 按工具允许的两次尝试保守预留，不能消耗受保护的收尾额度。
 
 交接材料保留已支持内容、待确认建议、未知问题、实际查询状态、停止原因和人工待办；只使用实际取得的 team 作为接手方，没有负责人时明确未解析。关键缺口保持 partial，非关键未知交接沿用带限制完成语义。生成交接不发送通知、不批准操作、不关闭工单。

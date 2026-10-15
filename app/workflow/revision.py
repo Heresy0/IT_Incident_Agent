@@ -23,6 +23,7 @@ def basis_id(evidence, executors):
 class RevisionCandidate:
     draft: DiagnosisDraft
     concerns: tuple[dict, ...]
+    annotation_drifts: tuple[dict, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -47,19 +48,26 @@ class RevisionTask:
             proposals[item.target_id] = {'target_id': item.target_id, 'reason': item.reason,
                 'candidate': hypothesis.model_dump(mode='json', exclude={'status'}), 'origin': 'explicit_proposal'}
         restored = list(candidate.hypotheses)
+        annotations = []
         if len(restored) == len(self.draft.hypotheses):
             for index, (before, after) in enumerate(zip(self.draft.hypotheses, restored)):
                 target = f'H{index + 1}'
                 if target in available and before != after:
                     if target in proposals and proposals[target]['candidate'] != after.model_dump(mode='json', exclude={'status'}):
                         raise ProtocolError('REVISION_CONCERN_CONFLICT', [{'target_id': target}])
-                    proposals.setdefault(target, {'target_id': target,
-                        'reason': '修稿候选同时改动非目标假设；此改动仅作待独立复核提案，不提交。',
-                        'candidate': after.model_dump(mode='json', exclude={'status'}), 'origin': 'scope_projection'})
+                    claim_fields = ('cause', 'level', 'support_refs', 'counter_refs', 'pending_checks')
+                    if target not in proposals and all(getattr(before, field) == getattr(after, field) for field in claim_fields):
+                        annotations.append({'target_id': target, 'field': 'evidence_explanation',
+                            'candidate_annotation': after.evidence_explanation,
+                            'reason': '隐式改动仅涉及非证据的解释注释；原稿保留，不构成范围纠错提案。'})
+                    else:
+                        proposals.setdefault(target, {'target_id': target,
+                            'reason': '修稿候选同时改动非目标假设；此改动仅作待独立复核提案，不提交。',
+                            'candidate': after.model_dump(mode='json', exclude={'status'}), 'origin': 'scope_projection'})
                     restored[index] = before.model_copy(deep=True)
         projected = candidate.model_copy(update={'hypotheses': restored})
         self.validate_candidate(projected)
-        return projected, tuple(proposals.values())
+        return RevisionCandidate(projected, tuple(proposals.values()), tuple(annotations))
 
     def assert_current(self, revision, evidence, executors):
         if revision != self.base_draft_revision or basis_id(evidence, executors) != self.basis_id:
@@ -228,11 +236,18 @@ def validate_revision_needs(review, evidence):
             continue
         query = review.request_evidence
         conflict = query and (query.need_id == assessment.need_id or query.target_id in targets)
-        if (assessment.verdict != 'uncertain' or assessment.blocker is not None or conflict
-                or not targets or len(targets) != len(set(targets)) or not set(targets) <= requests
-                or any(verdicts.get(target) == 'supported' for target in targets)
-                or not any(evidence[key].kind == 'observation' for key in assessment.evidence_ids)):
-            raise ProtocolError('REVISION_NEED_CONFLICT', [{'path': f'need_assessments.{index}',
+        conflicts = []
+        if assessment.verdict != 'uncertain': conflicts.append('verdict')
+        if assessment.blocker is not None: conflicts.append('blocker')
+        if conflict: conflicts.append('request_evidence')
+        if (not targets or len(targets) != len(set(targets)) or not set(targets) <= requests
+                or any(verdicts.get(target) == 'supported' for target in targets)): conflicts.append('revision_targets')
+        if not any(evidence[key].kind == 'observation' for key in assessment.evidence_ids): conflicts.append('evidence_ids')
+        if conflicts:
+            field = conflicts[0]
+            raise ProtocolError('REVISION_NEED_CONFLICT', [{'path': f'need_assessments.{index}.{field}' if field != 'request_evidence' else field,
+                'conflicting_fields': conflicts, 'need_id': assessment.need_id,
+                'actual_gap_kind': 'revision', 'revision_targets': targets,
                 'instruction': 'revision表示已有当前证据、稿中论证待改；保持uncertain，关联未支持目标及修稿请求，'
                                '引用当前观测，不填blocker或相关request_evidence。确需新证据则用evidence并保留真实缺口。'}])
         revision_needs.add(assessment.need_id)

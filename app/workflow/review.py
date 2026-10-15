@@ -199,17 +199,32 @@ def validate_need_scope(review, needs, targets):
     verdicts = {item.target_id: item.verdict for item in review.assessments}
     for assessment in review.need_assessments:
         blocker = assessment.blocker
-        if (assessment.verdict != 'uncertain' or blocker is None
+        if (assessment.verdict != 'uncertain'
                 or needs[assessment.need_id].purpose not in {'symptom', 'mechanism', 'alternative'}):
+            continue
+        unresolved = [key for key, target in targets.items() if verdicts.get(key) != 'supported'
+                      and not (key.startswith('H') and target.level == 'trigger')]
+        triggers = [key for key, target in targets.items() if key.startswith('H') and target.level == 'trigger'
+                    and verdicts.get(key) != 'supported']
+        if blocker is None:
+            if not unresolved and triggers:
+                raise ProtocolError('REVIEW_NEED_SCOPE', [{
+                    'path': f'need_assessments.{assessment.need_id}.verdict', 'need_id': assessment.need_id,
+                    'purpose': needs[assessment.need_id].purpose, 'unresolved_trigger_targets': triggers,
+                    'eligible_unresolved_targets': unresolved,
+                    'instruction': '先独立重评问题归属；当前仅trigger目标未确认，不能据此把症状/机制/竞争解释标成证据缺口。'
+                        '若确有影响当前判断的观测缺口，指出实际受影响的非trigger目标及原因；'
+                        '若仅触发来源未知，保留限制，不机械补blocker。不得为通过自动改判supported。'}])
             continue
         ids = blocker.affected_targets
         if ids and all(key in targets and (
             key.startswith('H') and targets[key].level == 'trigger'
-            or key.startswith('A') and verdicts.get(key) == 'supported') for key in ids):
+            or verdicts.get(key) == 'supported') for key in ids):
             raise ProtocolError('REVIEW_BLOCKER_SCOPE', [{
                 'path': f'need_assessments.{assessment.need_id}.blocker.affected_targets',
                 'need_id': assessment.need_id, 'purpose': needs[assessment.need_id].purpose,
                 'actual': ids, 'target_levels': {key: getattr(targets[key], 'level', None) for key in ids},
+                'target_verdicts': {key: verdicts.get(key) for key in ids}, 'eligible_unresolved_targets': unresolved,
                 'instruction': '此问题属于当前症状、机制或竞争解释，不能只用触发未知或已支持待办阻塞。'
                     '独立重评该问题：若确实缺关键机制证据，保持uncertain并关联实际受影响的机制/行动；'
                     '若仅触发来源未知，保留该未知与人工核查，不混入当前机制。不得为通过而改判supported。'}])

@@ -165,6 +165,58 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
     return review_contract_view(schema)
 
 
+def revision_review_generation(schema, needs, targets, evidence):
+    """Present mutually exclusive need rows; never supply semantic verdicts."""
+    schema = deepcopy(schema)
+    observation_ids = [key for key, item in evidence.items() if item.kind == 'observation']
+    source_rule = {'minItems': 1, 'uniqueItems': True,
+                   'contains': {'enum': observation_ids}, 'minContains': 1}
+    properties = deepcopy(schema['$defs']['RevisionNeedAssessment']['properties'])
+    rows = []
+    for need in needs.values():
+        eligible = [key for key, target in targets.items()
+                    if not (need.purpose in {'symptom', 'mechanism', 'alternative'}
+                             and key.startswith('H') and target.level == 'trigger')]
+        editable = [key for key in eligible if key.startswith(('H', 'A'))]
+        # The causal target boundary is owned by the registered question. This
+        # does not establish whether any eligible target is supported.
+        row_properties = {**properties, 'need_id': {'const': need.need_id}}
+        if need.purpose in {'symptom', 'mechanism'}:
+            row_properties.pop('blocking', None)
+        settled = {'properties': {'verdict': {'enum': ['supported', 'not_required']},
+            'gap_kind': {'const': 'evidence'}, 'blocker': {'type': 'null'},
+            'revision_targets': {'maxItems': 0}}}
+        if need.purpose in {'symptom', 'mechanism'}:
+            settled['properties']['verdict'] = {'const': 'supported'}
+        settled['allOf'] = [{'if': {'properties': {'verdict': {'const': 'supported'}}, 'required': ['verdict']},
+                            'then': {'properties': {'evidence_ids': source_rule}, 'required': ['evidence_ids']}}]
+        pending_edit = {'properties': {'verdict': {'const': 'uncertain'}, 'gap_kind': {'const': 'revision'},
+            'blocker': {'type': 'null'}, 'revision_targets': {'minItems': 1, 'uniqueItems': True, 'items': {'enum': editable}},
+            'evidence_ids': source_rule}, 'required': ['gap_kind', 'revision_targets', 'evidence_ids']}
+        pending_evidence = {'properties': {'verdict': {'const': 'uncertain'}, 'gap_kind': {'const': 'evidence'},
+            'revision_targets': {'maxItems': 0}, 'blocker': {'allOf': [{'$ref': '#/$defs/ReviewBlocker'},
+                {'properties': {'affected_targets': {'contains': {'enum': eligible}, 'minContains': 1}}}]}},
+            'required': ['blocker']}
+        rows.append({'type': 'object', 'properties': row_properties, 'required': ['need_id', 'verdict', 'reason'],
+                     'additionalProperties': False, 'oneOf': [settled, pending_edit, pending_evidence]})
+    schema['properties']['need_assessments'].update(prefixItems=rows, items=False,
+                                                    minItems=len(rows), maxItems=len(rows))
+    return review_contract_view(schema)
+
+
+def revision_review_focus(needs, targets):
+    """Expose ownership of uncertainty without classifying its materiality."""
+    trigger_ids = [key for key, target in targets.items() if key.startswith('H') and target.level == 'trigger']
+    return [{'need_id': need.need_id, 'purpose': need.purpose,
+             'excluded_trigger_targets': trigger_ids if need.purpose in {'symptom', 'mechanism', 'alternative'} else [],
+             'decision_test': '判断缺口是否会改变当前机制或下一步；仅解释为何开始的未知保留为限制。',
+             'output_forms': {'settled': '独立有支持或有理由不要求；无blocker、无revision_targets。',
+                 'revision': '已有当前EV、稿中论证待改：uncertain＋revision_targets，无blocker／相关补查。',
+                 'evidence': '确实缺影响判断的新观测：uncertain＋实际blocker，无revision_targets。'},
+             'core_blocking': '程序控制，省略blocking' if need.purpose in {'symptom', 'mechanism'} else '独立评估重要性'}
+            for need in needs.values()]
+
+
 def parse_review_selection(content, needs, schema=None):
     """Expand only omitted question metadata; never manufacture a verdict/ref."""
     from agents.contracts import ReviewDecision
@@ -374,6 +426,12 @@ def correction_instruction(role, schema, details, purpose):
         instruction += ('。refs只选实际观测字段REF，未确认原因保留在unverified_causes。'
             if schema is ObservationReview else
             '。必须完整覆盖 required_target_ids，每个编号恰好一次；证据不足时评估为 uncertain，不得省略条目')
+        if 'RevisionNeedAssessment' in schema.model_json_schema().get('$defs', {}):
+            if details['reason'] in {'REVIEW_BLOCKER_REQUIRED', 'REVIEW_BLOCKER_SCOPE', 'REVIEW_NEED_SCOPE', 'REVISION_NEED_CONFLICT'}:
+                instruction += ('。先重新独立判断错误问题的purpose及decision_test，再选择互斥形态；'
+                    '不要只给旧uncertain机械补blocker。机制问题评估当前如何发生，不要求证明触发来源；'
+                    '仅触发未知保留限制，不能关联触发H来阻塞机制。已有证据待修稿使用revision且blocker=null；'
+                    '确有缺观测仍用evidence并保留真实缺口。不得为通过自动改判supported。')
     elif role == 'diagnosis':
         if details['reason'] in {'UNKNOWN_REFERENCE', 'DUPLICATE_REFERENCE', 'reference_mismatch'}:
             instruction += ('。按 details.path 修正引用；REF_ 是字段引用编号，EV_ 是证据编号，不能混用。'

@@ -8,11 +8,11 @@ from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW,
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
 from agents.role_runner import RoleRequest, RoleRunner
-from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output
+from agents.protocol import RoleContractContext, role_output_schema, role_model_input, parse_role_output, revision_review_generation, revision_review_focus
 from workflow.planning import PlanningContext, validate_plan
 from workflow.state import WorkflowState, state_property
 from workflow.policy import WorkflowPolicy, BudgetView, policy_property
-from workflow.revision import make_revision_task, collection_exit, basis_id, RevisionCandidate, scope_revision_authorized, scope_review_schema
+from workflow.revision import make_revision_task, collection_exit, basis_id, scope_revision_authorized, scope_review_schema
 from workflow.routing import review_disposition
 from workflow.handoff import build_handoff
 from workflow.review import (ReviewContext, ReviewAudit, ReviewRoutingContext, validate_review,
@@ -218,6 +218,7 @@ class Collaboration:
             output_schema = self.revision_task.output_schema(output_schema, self.references)
         if role == 'reviewer' and schema is RevisionReviewDecision:
             output_schema = scope_review_schema(output_schema, self.current_revision_concerns())
+            output_schema = revision_review_generation(output_schema, self.evidence_needs, self.targets(), self.evidence)
         model_input = role_model_input(role, schema, payload, view)
         prompt = system_prompt or (PLANNER if role == 'supervisor' and self.planning_only else ROLE_PROMPTS[role])
         if self.review_protection == BOUNDED_POLICY:
@@ -307,8 +308,7 @@ class Collaboration:
     def revision_candidate(self, selection):
         draft = expand_diagnosis(selection, self)
         draft = draft.model_copy(update={'rejected_actions': self.revision_task.draft.rejected_actions})
-        draft, concerns = self.revision_task.project_candidate(draft, selection.revision_concerns, self)
-        return RevisionCandidate(draft, concerns)
+        return self.revision_task.project_candidate(draft, selection.revision_concerns, self)
 
     def current_revision_concerns(self):
         if self.revision_concerns is None:
@@ -401,7 +401,10 @@ class Collaboration:
                 "evidence": self.sources(), "collection": self.collection(), "rework_used": self.reworks,
                 "prior_challenge": self.pending, "observation_gaps": self.observation_gaps(),
                 **({'revision_concerns': list(self.current_revision_concerns()),
-                    'concerns_are_untrusted_proposals': True} if self.policy.review_driven else {}),
+                    'concerns_are_untrusted_proposals': True,
+                    'review_round': {'draft_revision': len(self.drafts), 'scope_revisions': self.scope_revisions,
+                        'final_candidate': len(self.drafts) >= 2 and not self.current_revision_concerns()},
+                    'need_focus': revision_review_focus(self.evidence_needs, self.targets())} if self.policy.review_driven else {}),
                 "budget": {key: rework_budget[key] for key in
                            ('can_collect', 'remaining_model_calls', 'remaining_tools')}}
 
@@ -576,6 +579,9 @@ class Collaboration:
         if concerns:
             self.event('revision_concerns_recorded', 'diagnosis', draft_revision=revision,
                        basis_id=self.revision_concerns['basis_id'], concerns=list(concerns), committed_edits=False)
+        if revision_task and candidate.annotation_drifts:
+            self.event('revision_annotations_restored', 'diagnosis', draft_revision=revision,
+                       annotations=list(candidate.annotation_drifts), semantic_verdicts_changed=False)
         for h in self.draft.hypotheses:
             self.note("revise" if revision > 1 else "propose_hypothesis", "diagnosis", "reviewer",
                       hypothesis_id=h.hypothesis_id, evidence_ids=[r.evidence_id for r in h.support_refs], reason=h.cause)

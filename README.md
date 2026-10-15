@@ -89,6 +89,8 @@ flowchart TD
 
 后续[非目标假设纠错与范围冲突](examples/showcase/revision-scope-conflict.md)将范围外 H 的改动隔离为未提交提案，不直接写入实际稿。Reviewer 独立决定保留、授权 reasoning 纠错或补查；新路径用 `gap_kind` 区分缺观测与已有证据待修稿，后者保持 uncertain，不能据此提前发布。试验报告标记 `review_driven_v2`，标准请求和旧 ReviewDecision 契约保持兼容。
 
+[Reviewer 契约与触发归属优化](examples/showcase/reviewer-contract-followup.md)进一步采用逐问题的互斥输出形态、范围提示与字段纠正，恢复隐式的非目标解释注释而不生成纠错提案；显式提案和真正的命题／证据修改仍独立裁决。新增 `--validation-session reviewer_contract_followup` 验证计划：从种子首稿新调用、不回放旧回复，错误机制优先；每场景最多 12 次真实请求，最后 2 次仅供末稿 Reviewer，跨实现继承已用计数，总上限 36 次。该额度只用于验证，不改变业务默认额度；标准流程仍默认。
+
 | 路径 | 职责 |
 | --- | --- |
 | `app/api/`、`app/app_main.py` | FastAPI 入口、认证、工单、运行回放及修复接口 |

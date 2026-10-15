@@ -106,6 +106,79 @@ def scope_models(*, disposition='revise', persistent=False, pending_need=False):
 
 
 class ReviewDrivenTests(unittest.TestCase):
+    def test_implicit_annotation_only_drift_is_restored_without_scope_proposal(self):
+        from agents.contracts import RevisionDiagnosisSelection
+        c = self.prepare_revision()
+        value = c.revision_task.model_input(c.references)['output_template']
+        value['recommended_actions'][0]['action'] = 'Neutral check of actual records'
+        value['hypotheses'][0]['evidence_explanation'] = 'Added public commentary; no claim or evidence change'
+        result = c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+        self.assertEqual(result.draft.hypotheses, c.draft.hypotheses)
+        self.assertEqual(result.concerns, ())
+        self.assertEqual(result.annotation_drifts[0]['target_id'], 'H1')
+
+    def test_explicit_annotation_proposal_is_not_silently_discarded(self):
+        from agents.contracts import RevisionDiagnosisSelection
+        c = self.prepare_revision()
+        value = c.revision_task.model_input(c.references)['output_template']
+        value['recommended_actions'][0]['action'] = 'Neutral check of actual records'
+        candidate = {**value['hypotheses'][0], 'evidence_explanation': 'Question original evidence sufficiency'}
+        value['revision_concerns'] = [{'target_id': 'H1', 'reason': 'Request independent evidence review', 'candidate': candidate}]
+        result = c.revision_candidate(RevisionDiagnosisSelection.model_validate(value))
+        self.assertEqual(result.concerns[0]['origin'], 'explicit_proposal')
+        self.assertEqual(result.annotation_drifts, ())
+
+    def test_trigger_only_uncertainty_gets_scope_diagnostic_before_missing_blocker(self):
+        from agents.contracts import Hypothesis
+        c = make_coordinator()
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        c.draft.hypotheses.append(Hypothesis(hypothesis_id='H2', cause='Unknown origin', level='trigger', support_refs=[], counter_refs=[], pending_checks=[]))
+        value = json.loads(c.models['reviewer'].invoke([SystemMessage(content='test'),
+            HumanMessage(content=json.dumps({'input': c.reviewer_input()}))]).content)
+        next(item for item in value['assessments'] if item['target_id'] == 'H2').update(verdict='uncertain', evidence_ids=[])
+        next(item for item in value['need_assessments'] if item['need_id'] == 'N2').update(verdict='uncertain', blocker=None)
+        with self.assertRaises(ProtocolError) as error:
+            c.validate_review(RevisionReviewDecision.model_validate(value))
+        self.assertEqual(error.exception.code, 'REVIEW_NEED_SCOPE')
+        self.assertEqual(error.exception.details[0]['eligible_unresolved_targets'], [])
+        self.assertEqual(c.evidence_needs['N2'].status, 'pending')
+
+    def test_supported_mechanism_cannot_pad_a_trigger_only_blocker(self):
+        from agents.contracts import Hypothesis
+        c = make_coordinator()
+        c.supervise()
+        c.execute_task('investigation')
+        c.diagnose()
+        c.draft.hypotheses.append(Hypothesis(hypothesis_id='H2', cause='Unknown origin', level='trigger', support_refs=[], counter_refs=[], pending_checks=[]))
+        value = json.loads(c.models['reviewer'].invoke([SystemMessage(content='test'),
+            HumanMessage(content=json.dumps({'input': c.reviewer_input()}))]).content)
+        next(item for item in value['assessments'] if item['target_id'] == 'H2').update(verdict='uncertain', evidence_ids=[])
+        need = next(item for item in value['need_assessments'] if item['need_id'] == 'N2')
+        need.update(verdict='uncertain', blocker={'cause_level': 'mechanism', 'affected_targets': ['H1', 'H2'],
+            'missing_observation': 'Remote origin', 'decision_impact': 'Why it started', 'resolution': 'external_source'})
+        with self.assertRaises(ProtocolError) as error:
+            c.validate_review(RevisionReviewDecision.model_validate(value))
+        self.assertEqual(error.exception.code, 'REVIEW_BLOCKER_SCOPE')
+        self.assertEqual(error.exception.details[0]['target_verdicts']['H1'], 'supported')
+
+    def test_revision_conflict_pinpoints_blocker_and_keeps_verdicts_unchanged(self):
+        from workflow.revision import validate_revision_needs
+        from agents.contracts import RevisionNeedAssessment
+        c = self.prepare_revision()
+        evidence = [key for key, item in c.evidence.items() if item.kind == 'observation']
+        review = RevisionReviewDecision(assessments=[{'target_id': 'H1', 'verdict': 'uncertain', 'reason': 'Needs edit'}],
+            need_assessments=[RevisionNeedAssessment(need_id='N2', verdict='uncertain', reason='Existing evidence, pending draft',
+                gap_kind='revision', revision_targets=['H1'], evidence_ids=evidence,
+                blocker={'cause_level': 'mechanism', 'affected_targets': ['H1'], 'missing_observation': 'Draft rewrite',
+                         'decision_impact': 'Correct draft', 'resolution': 'not_planned'})],
+            revision_requests=[{'target_id': 'H1', 'issue_type': 'reasoning', 'reason': 'Unsupported attribution', 'required_change': 'Rewrite'}])
+        with self.assertRaises(ProtocolError) as error:
+            validate_revision_needs(review, c.evidence)
+        self.assertEqual(error.exception.details[0]['path'], 'need_assessments.0.blocker')
+        self.assertEqual(review.need_assessments[0].verdict, 'uncertain')
+
     def test_uncertain_need_pending_revision_does_not_become_evidence_query(self):
         report = make_coordinator(scope_models(pending_need=True)).run()
         self.assertEqual(report['status'], 'completed')

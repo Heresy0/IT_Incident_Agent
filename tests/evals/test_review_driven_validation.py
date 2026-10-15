@@ -13,6 +13,41 @@ from scripts.verify_review_driven import main, PAID_CAP, PaidBudget, RecordedMod
 
 
 class ReviewDrivenValidationTests(unittest.TestCase):
+    def test_reviewer_followup_plan_is_fresh_prioritized_and_reserves_final_review(self):
+        from scripts.verify_revision_probe import main as focused_main
+        out = io.StringIO()
+        with redirect_stdout(out), patch('scripts.verify_revision_probe.build_roles', side_effect=AssertionError('No models')):
+            focused_main(['--validation-session', 'reviewer_contract_followup'])
+        plan = json.loads(out.getvalue())
+        self.assertEqual(plan['paid_cap_per_case'], 12)
+        self.assertEqual(plan['maximum_paid_attempts'], 36)
+        self.assertEqual(plan['final_review_reserve_per_case'], 2)
+        self.assertEqual(plan['execution_order'][0], 'unsupported_mechanism')
+        self.assertIsNone(plan['replayed_initial_revision'])
+        self.assertEqual(plan['limits']['model_calls'], 16)
+
+    def test_nonfinal_calls_cannot_consume_terminal_paid_allowance(self):
+        from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+        class Live:
+            def invoke(self, messages):
+                return AIMessage(content='reply')
+        budget = PaidBudget(maximum=12, final_review_reserve=2)
+        for _ in range(10): budget.claim()
+        reviewer = RecordedModel(Live(), budget, role='reviewer')
+        diagnosis = RecordedModel(Live(), budget, role='diagnosis')
+        def messages(final, concerns):
+            return [SystemMessage(content='test'), HumanMessage(content=json.dumps({'input': {
+                'review_round': {'draft_revision': 3, 'final_candidate': final}, 'revision_concerns': concerns}}))]
+        with self.assertRaises(ExecutionError): diagnosis.invoke(messages(True, []))
+        with self.assertRaises(ExecutionError): reviewer.invoke(messages(True, [{'target_id': 'H1'}]))
+        with self.assertRaises(ExecutionError): reviewer.invoke(messages(False, []))
+        self.assertEqual(budget.used, 10)
+        reviewer.invoke(messages(True, []))
+        reviewer.invoke(messages(True, []))
+        self.assertEqual(reviewer.final_review_attempts, 2)
+        self.assertEqual(budget.used, 12)
+        with self.assertRaises(ExecutionError): reviewer.invoke(messages(True, []))
+
     def test_final_review_metric_cannot_count_review_of_previous_draft(self):
         from scripts.verify_revision_probe import control_checks
         draft = {'findings': [], 'hypotheses': [], 'recommended_actions': [{'action': 'neutral check'}]}

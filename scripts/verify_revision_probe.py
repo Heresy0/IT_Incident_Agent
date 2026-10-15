@@ -24,6 +24,7 @@ from scripts.verify_review_driven import PaidBudget, RecordedModel, probe_models
 VARIANTS = ('wording', 'trigger_unknown', 'unsupported_mechanism')
 LIMITS = Limits(model_calls=12, tool_calls=6, seconds=240, reserve_model_calls=2, reserve_seconds=20)
 CASE_PAID_CAP = 8
+REVIEW_SESSION = 'reviewer_contract_followup'
 
 
 class ReplayInitialRevision:
@@ -60,7 +61,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--execute-live', action='store_true')
     parser.add_argument('--previous-summary', type=Path, help='Carry this focused session allowance across implementation fixes')
-    parser.add_argument('--validation-session', choices=['focused_revision_followup', 'scope_conflict_followup'],
+    parser.add_argument('--validation-session', choices=['focused_revision_followup', 'scope_conflict_followup', REVIEW_SESSION],
                         default='focused_revision_followup')
     parser.add_argument('--replay-initial-revision-from', type=Path,
         help='For unsupported_mechanism only: replay the retained paid initial edit, then independently rerun live review/correction')
@@ -68,6 +69,12 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if len(set(args.variants)) != len(args.variants):
         parser.error('Duplicate variants')
+    case_cap = 12 if args.validation_session == REVIEW_SESSION else CASE_PAID_CAP
+    final_review_reserve = 2 if args.validation_session == REVIEW_SESSION else 0
+    limits = Limits(model_calls=16, tool_calls=6, seconds=360, reserve_model_calls=2, reserve_seconds=20) if final_review_reserve else LIMITS
+    execution_order = sorted(args.variants, key=lambda item: item != 'unsupported_mechanism') if final_review_reserve else args.variants
+    if final_review_reserve and args.replay_initial_revision_from:
+        parser.error('Reviewer contract follow-up runs fresh; paid reply replay is not permitted')
     config = IncidentConfig.from_file()
     source = implementation_version()
     scripts = {name: hashlib.sha256((ROOT / 'scripts' / name).read_bytes()).hexdigest()
@@ -82,7 +89,8 @@ def main(argv=None):
         previous_plan = previous['plan']
         if (previous_plan['validation_session'] != args.validation_session
                 or previous_plan['model'] != config.model or previous_plan['variants'] != args.variants
-                or previous_plan['paid_cap_per_case'] != CASE_PAID_CAP
+                or previous_plan['paid_cap_per_case'] != case_cap
+                or previous_plan.get('final_review_reserve_per_case', 0) != final_review_reserve
                 or previous_plan['fixture_hashes'] != fixture_hashes):
             raise ValueError('Previous focused session model, variants, cap or fixtures differ')
         prior_counts.update(previous_plan.get('prior_case_paid_attempts', {}))
@@ -93,7 +101,7 @@ def main(argv=None):
                 raise ValueError('Invalid paid attempts')
             prior_counts[row['variant']] += row['paid_attempts']
         if (set(prior_counts) != set(args.variants)
-                or any(type(count) is not int or not 0 <= count <= CASE_PAID_CAP for count in prior_counts.values())
+                or any(type(count) is not int or not 0 <= count <= case_cap for count in prior_counts.values())
                 or sum(prior_counts.values()) != previous['paid_attempts']):
             raise ValueError('Previous focused paid counts are inconsistent')
         previous_ref = {'path': str(args.previous_summary.resolve()),
@@ -114,13 +122,14 @@ def main(argv=None):
             'content_sha256': hashlib.sha256(replay_content.encode()).hexdigest(),
             'source_version': previous['plan']['source_version'], 'new_inference': False}
     plan = {'source_version': source, 'script_hashes': scripts, 'fixture_hashes': fixture_hashes,
-            'model': config.model, 'variants': args.variants, 'limits': asdict(LIMITS),
-            'paid_cap_per_case': CASE_PAID_CAP, 'maximum_paid_attempts': CASE_PAID_CAP * len(args.variants),
+            'model': config.model, 'variants': args.variants, 'execution_order': execution_order, 'limits': asdict(limits),
+            'paid_cap_per_case': case_cap, 'maximum_paid_attempts': case_cap * len(args.variants),
+            'final_review_reserve_per_case': final_review_reserve,
             'seeded_feedback': True, 'attempts_per_variant': 1, 'independent_quality_score': False,
             'synthetic_observations': True, 'live_repairs': 0,
             'validation_session': args.validation_session, 'estimated_cost': None,
             'prior_case_paid_attempts': prior_counts, 'remaining_case_paid_attempts': {
-                variant: CASE_PAID_CAP - count for variant, count in prior_counts.items()},
+                variant: case_cap - count for variant, count in prior_counts.items()},
             'previous_summary': previous_ref,
             'replayed_initial_revision': replay_ref,
             'boundary_control': 'unsupported_mechanism is deliberately false preliminary seed judgment; final review must be independent'}
@@ -132,7 +141,7 @@ def main(argv=None):
     directory = ROOT / 'output/revision-probe' / str(uuid4())
     write_json(directory / 'plan.json', plan)
     rows = []
-    for variant in args.variants:
+    for variant in execution_order:
         assert implementation_version() == source, 'Application changed during validation'
         assert all(hashlib.sha256((ROOT / 'scripts' / name).read_bytes()).hexdigest() == expected
                    for name, expected in scripts.items())
@@ -141,16 +150,16 @@ def main(argv=None):
         if replay_ref:
             assert hashlib.sha256((ROOT / replay_ref['reply_file']).read_bytes()).hexdigest() == replay_ref['reply_sha256']
         print(json.dumps({'starting': variant, 'directory': str(directory)}, ensure_ascii=False), flush=True)
-        budget = PaidBudget(maximum=CASE_PAID_CAP)
+        budget = PaidBudget(maximum=case_cap, final_review_reserve=final_review_reserve)
         budget.used = prior_counts[variant]
         paid_before = budget.used
-        live = {role: RecordedModel(model, budget) for role, model in build_roles(
+        live = {role: RecordedModel(model, budget, role=role) for role, model in build_roles(
             config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body).items()}
         delegated = dict(live)
         if replay_ref and variant == 'unsupported_mechanism':
             delegated['diagnosis'] = ReplayInitialRevision(live['diagnosis'], replay_content)
         models = probe_models(delegated, variant)
-        report = capture('case_001', 'multi', lambda flow: models, Principal('synthetic_demo', 'cli_reader'), LIMITS,
+        report = capture('case_001', 'multi', lambda flow: models, Principal('synthetic_demo', 'cli_reader'), limits,
             provider_factory=FixtureProvider, investigation_mode='programmatic', knowledge_mode='programmatic',
             blind_review=False, orchestration='review_driven')
         report.update(source_version=source, model=config.model, execution_mode='live_seeded_probe',
@@ -166,6 +175,7 @@ def main(argv=None):
             'model_calls': report['run_summary']['model_calls'], 'tool_calls': report['run_summary']['tool_calls'],
             'pure_revisions': report.get('pure_revision_rounds', 0), 'reworks': report.get('rework_rounds', 0),
             'scope_revisions': report.get('scope_revision_rounds', 0),
+            'final_review_paid_attempts': live['reviewer'].final_review_attempts,
             'replayed_revision_turns': report['replayed_revision_turns'],
             'handoff_reason': report.get('handoff', {}).get('reason'), 'controls': control_checks(report),
             'validation_failures': [e.get('reason') for e in report.get('events', []) if e['type'] == 'validation_failure'],

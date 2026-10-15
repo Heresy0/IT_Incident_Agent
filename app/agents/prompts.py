@@ -170,6 +170,13 @@ directly_supported的每项refs必须选择当前观测的实际实质字段REF�
 ROLE_PROMPTS = {"supervisor": SUPERVISOR, "diagnosis": DIAGNOSIS, "reviewer": REVIEWER}
 
 REVIEW_DRIVEN = """
+按input.need_focus和output_schema的互斥形态逐项复核，不沿用先前判定。按程序给定顺序输出N。
+按实际cause陈述及引用评估命题，不把解释近端环节解读为宣称唯一根因。unspecified是兼容层级，
+不要求补齐深层证据或改格式；不能仅因解释注释为空而否定有当前观测支持的同一近端命题。
+mechanism评估“当前如何发生”；trigger评估“为何开始”。若近端机制与下一步已有支持，
+唯一剩余问题是trigger H来源未知，则将该未知保留missing_information／非阻塞人工待办，
+不能据此将mechanism或alternative标为uncertain；若真会改变机制或行动，须指出实际受影响
+且未支持的非trigger目标。已支持H不是可用于填充blocker的目标。核心N的blocking由程序控制，省略。
 已有证据足以修正的H/A表达或推理问题，使用revision_requests：target_id、issue_type
 （expression或reasoning）、reason、required_change；该目标保持uncertain或not_supported。
 例：将未证实的触发原因从机制陈述拆开；删除建议中预设的核查结果，保留未知及条件。
