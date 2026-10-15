@@ -54,7 +54,7 @@ class Limits:
     seconds: float = 180
     reserve_model_calls: int = 2
     reserve_seconds: float = 15
-    input_chars: int = 28000
+    input_chars: int = 48000
     snippet_chars: int = 1800
     max_sources: int = 10
 
@@ -63,7 +63,10 @@ class Limits:
         return cls(model_calls=max(3, min(64, int(os.getenv("INCIDENT_MAX_MODEL_CALLS", 16)))),
                    web_calls=max(1, min(48, int(os.getenv("INCIDENT_MAX_WEB_CALLS", 12)))),
                    tool_calls=max(1, min(96, int(os.getenv("INCIDENT_MAX_TOOL_CALLS", 24)))),
-                   seconds=max(20, min(300, float(os.getenv("INCIDENT_MAX_SECONDS", 180)))))
+                   seconds=max(20, min(300, float(os.getenv("INCIDENT_MAX_SECONDS", 180)))),
+                   # Complete request characters, including schema and history;
+                   # this is separate from provider input/output token limits.
+                   input_chars=max(4000, min(128000, int(os.getenv("INCIDENT_MAX_INPUT_CHARS") or cls.input_chars))))
 
 
 _CURRENT = ContextVar("incident_runtime", default=None)
