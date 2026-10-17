@@ -1,0 +1,118 @@
+{
+  "verification_kind": "multi_review_feedback_boundaries_minimal_fix_v1",
+  "application_version_before": "edb82e107285c069",
+  "application_version_after": "021a29451b985148",
+  "existing_changes_checkpoint_commit": "5dbab67",
+  "before_snapshot_sha256": "de820034c6847efb6e923108120d0eea545b1bcc19b8bb2e7455d277ef24417c",
+  "changed_application_files": [
+    "app/agents/prompts.py",
+    "app/agents/protocol.py"
+  ],
+  "unchanged_application_files": 85,
+  "changed_protocol_functions": [
+    "reviewer_schema",
+    "correction_instruction"
+  ],
+  "changed_prompt_constants": [
+    "DIAGNOSIS",
+    "REVIEWER"
+  ],
+  "other_protocol_and_prompt_ast_unchanged": true,
+  "static_contract_schema_versions_unchanged": {
+    "DiagnosisSelection": "2d24dd52f7ae",
+    "ReviewDecision": "7ad6cb86b214"
+  },
+  "runtime_guards_publishers_model_configuration_budgets_unchanged": true,
+  "new_test_file": "tests/workflow/test_review_feedback_boundaries.py",
+  "new_test_methods": 11,
+  "free_regression_families": 6,
+  "new_regressions": {
+    "tests": 11,
+    "passed": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 6.438,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3406
+  },
+  "focused": {
+    "tests": 109,
+    "passed": 109,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 19.172,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3406
+  },
+  "full": {
+    "tests": 789,
+    "passed": 769,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 20,
+    "seconds": 133.688,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3406
+  },
+  "saved_record_replay": {
+    "tests": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 4.797,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3406
+  },
+  "single_behavior": {
+    "before_tests": 14,
+    "after_tests": 14,
+    "probe_runs_before": 14,
+    "probe_runs_after": 14,
+    "before_sha256": "6f77d777a4639da957099ed9259c7d8a457811665979a284c1075278c1da36a2",
+    "after_sha256": "6f77d777a4639da957099ed9259c7d8a457811665979a284c1075278c1da36a2",
+    "identical": true
+  },
+  "existing_files_unchanged": 3406,
+  "existing_output_files_unchanged": 3095,
+  "existing_fixture_evaluation_script_test_files_unchanged": 311,
+  "new_and_old_raw_reports_unchanged": 6,
+  "frozen_dataset_verified": true,
+  "paid_model_calls": 0,
+  "new_real_runs": 0,
+  "real_pair_reruns": 0,
+  "new_assistant_scores": 0,
+  "formal_human_reviews_added": 0,
+  "historical_replay_files": [
+    "saved-review-feedback.json",
+    "saved-h1-controls.json"
+  ],
+  "retained_debug_run": "new-before is the pre-change red control. Three subcase errors also revealed a new metric fixture omitted granularity; only the test argument was completed. Final new/related/full results are green.",
+  "limitations": [
+    "The dynamic schema now matches the existing manual-check business guard; real models may still emit the forbidden tuple or disguise the same objection under a different label.",
+    "A supported decision is always model-supplied, never manufactured by the correction or publisher.",
+    "Free semantic judgments are scripted; false full declarations can still pass, as an explicit negative control demonstrates.",
+    "The H1 narrow control is labeled synthetic. The real record actually contains baseline samples, but its original H1 did not select them.",
+    "Rejected reviewer bodies were not saved. The replay reconstructs deterministic feedback from saved errors, not the missing responses.",
+    "Real model correction success, wording/citation quality, token overhead, latency and diagnostic effect remain unmeasured.",
+    "Database integration tests without isolated test DSNs are skipped, not counted as passing."
+  ]
+}

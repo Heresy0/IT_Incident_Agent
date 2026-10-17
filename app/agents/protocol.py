@@ -108,7 +108,7 @@ def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refut
             'if': {'properties': {'target_id': {'enum': manual_checks}, 'verdict': {'const': 'uncertain'}},
                    'required': ['target_id', 'verdict']},
             'then': {'properties': {'uncertainty_basis': {'enum': [
-                'relevance_gap', 'scope_or_safety_gap', 'assumed_outcome', 'future_result_only']}},
+                'relevance_gap', 'scope_or_safety_gap', 'assumed_outcome']}},
                      'required': ['uncertainty_basis']}})
     if bounded_refutation:
         assessment.setdefault('allOf', []).append({
@@ -371,15 +371,25 @@ def parse_role_output(role, schema, content, view: RoleContractContext, *, emit)
 
 def correction_instruction(role, schema, details, purpose):
     """Keep role-specific correction text together with its output contract."""
-    from agents.contracts import DiagnosisSelection, ObservationReview
+    from agents.contracts import DiagnosisSelection, ObservationReview, ReviewDecision
     instruction = '按提供的契约和已观测编号纠正一次。' + json.dumps(details, ensure_ascii=False)
     if role == 'reviewer':
-        instruction += ('。refs只选实际观测字段REF，未确认原因保留在unverified_causes。'
-            if schema is ObservationReview else
-            '。必须完整覆盖 required_target_ids，每个编号恰好一次；证据不足时评估为 uncertain，不得省略条目')
-        if schema is not ObservationReview:
-            instruction += ('。纠正引用时同时核对全部uncertain问题：实际阻塞的N必须有自己的blocker，'
-                '或request_evidence.need_id指向该N。按input.uncertain_need_rule填写，不为通过自动改判supported。')
+        if schema is ReviewDecision and details['reason'] == 'MANUAL_CHECK_FUTURE_RESULT_ONLY':
+            instruction += ('。人工核查纠正：重新审查 details 中 target_id 对应的完整action、condition和expected_result。'
+                'A的待办价值与业务证据需求N是否解决分别判断；尚未执行或结果未知不能单独否定取得未知信息的核查。'
+                '核查相关、具体、范围安全且不预设结果时可以supported，不表示已执行或恢复；'
+                '有真实异议时保留uncertain，uncertainty_basis选择relevance_gap、scope_or_safety_gap或assumed_outcome，'
+                'reason指出建议原文的具体缺陷。不得仅更换理由标签或改为not_supported绕过门禁，也不自动supported。'
+                'F/H仍按观测核对，未解决的N按input.uncertain_need_rule保留未知；受限交接可保留N为uncertain及partial，'
+                '不能因A通过而关闭业务缺口。此次只纠正审阅，不新增查询、不扩大范围或增加纠正次数。'
+                '完整覆盖required_target_ids和required_need_ids，每个编号恰好一次，返回完整JSON。')
+        else:
+            instruction += ('。refs只选实际观测字段REF，未确认原因保留在unverified_causes。'
+                if schema is ObservationReview else
+                '。必须完整覆盖 required_target_ids，每个编号恰好一次；证据不足时评估为 uncertain，不得省略条目')
+            if schema is not ObservationReview:
+                instruction += ('。纠正引用时同时核对全部uncertain问题：实际阻塞的N必须有自己的blocker，'
+                    '或request_evidence.need_id指向该N。按input.uncertain_need_rule填写，不为通过自动改判supported。')
     elif role == 'diagnosis':
         if schema is DiagnosisSelection and details['reason'] == 'schema_mismatch':
             errors = details.get('details', [])
