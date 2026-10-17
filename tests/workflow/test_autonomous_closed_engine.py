@@ -88,7 +88,7 @@ class ClosedEngineTests(unittest.TestCase):
     def test_duplicate_rework_read_is_not_executed_and_does_not_loop(self):
         result, model = self.run_case(ClosedModel(duplicate=True))
         self.assertEqual(result['run_summary']['tool_calls'], 1)
-        self.assertLessEqual(model.rework_steps, 2)
+        self.assertLessEqual(model.rework_steps, 3)
         self.assertEqual(result['rework_rounds'], 1)
 
     def test_bad_revision_preserves_previous_items_and_new_sources(self):

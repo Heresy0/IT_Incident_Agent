@@ -17,7 +17,8 @@ from runtime.context import ExecutionError, Limits, RunContext, activate, invoke
 from tools.executor import ToolExecutor
 from tools.query_coverage import complete_read, covers
 from workflow.task_checks import completion
-from workflow.v2.policy import remaining, can_explore, can_finalize
+from workflow.v2.policy import (remaining, can_explore, can_finalize, can_collect,
+                               collection_reservation, collect_stop_reason)
 from workflow.v2.contracts import (draft_schema, parse_draft, draft_input, source_facts,
                                    draft_correction_targets, merge_drafts)
 from workflow.v2.review import review_draft
@@ -112,13 +113,11 @@ def collection_view(executor):
 def _can_collect(context, repairs, reserve_models=None):
     if reserve_models is None:
         return can_explore(context, correction_available=repairs['repairs'] == 0)
-    view = remaining(context)
-    return (view.models > reserve_models and view.tools > 0
-            and view.seconds > context.limits.reserve_seconds)
+    return can_collect(context, reserve_models=reserve_models)
 
 
 def collect(model, executor, context, failures, repairs, *, review_feedback=None,
-            reserve_models=None, max_decisions=None, phase='collect'):
+            reserve_models=None, max_decisions=None, max_new_reads=None, phase='collect'):
     ticket = executor.provider.ticket()
     stop, feedback, decisions, read_attempts, invalid_streak = 'FINISHED', None, 0, 0, 0
     tools = deepcopy(executor.schemas(generic=True))
@@ -126,7 +125,9 @@ def collect(model, executor, context, failures, repairs, *, review_feedback=None
         params = definition['function']['parameters']
         params['required'] = [key for key in params.get('required', []) if key not in {'start', 'end'}]
     context.emit({'type': 'phase', 'role': 'investigation', 'engine_id': ENGINE_ID, 'phase': phase})
-    while _can_collect(context, repairs, reserve_models) and (max_decisions is None or decisions < max_decisions):
+    while (_can_collect(context, repairs, reserve_models)
+            and (max_decisions is None or decisions < max_decisions)
+            and (max_new_reads is None or read_attempts < max_new_reads)):
         state = draft_input(executor)
         payload = {'ticket': ticket.model_dump(mode='json', exclude={'scope': {'tenant_id', 'user_id'}}),
                    'capabilities': executor.capabilities(generic=True), 'tools': tools,
@@ -190,7 +191,8 @@ def collect(model, executor, context, failures, repairs, *, review_feedback=None
             invalid_streak += 1
             feedback = {'code': 'QUERY_ALREADY_ATTEMPTED' if signature in executor.check_results else 'QUERY_COVERED',
                         'query_state': covered, 'instruction': '复用已有结果；换新增范围/渠道或finish。失败与截断的新缩窗可执行。'}
-            context.emit({'type': 'query_reused', 'role': 'investigation', 'name': step.tool, 'reason': feedback['code']})
+            context.emit({'type': 'query_reused', 'role': 'investigation', 'name': step.tool,
+                          'query_profile': args, 'reason': feedback['code']})
             if invalid_streak >= 3:
                 stop = 'NO_NEW_QUERIES'
                 break
@@ -214,7 +216,9 @@ def collect(model, executor, context, failures, repairs, *, review_feedback=None
             stop = code
             break
     else:
-        stop = 'REWORK_COLLECTION_STOPPED' if review_feedback else 'COLLECTION_BUDGET_EXHAUSTED'
+        reserve = reserve_models if reserve_models is not None else 2 + int(repairs['repairs'] == 0)
+        stop = collect_stop_reason(context, reserve_models=reserve, new_reads=read_attempts,
+            max_new_reads=max_new_reads, no_progress=invalid_streak) or 'COLLECTION_DECISION_LIMIT_REACHED'
     context.emit({'type': 'collection_completed', 'role': 'investigation', 'decisions': decisions,
                   'read_attempts': read_attempts, 'reason': stop, 'phase': phase})
     return stop, decisions, read_attempts
@@ -294,7 +298,7 @@ def execute_review_rework(model, draft, reviews, executor, context, *, repairs=N
     if not feedback['allowed_target_ids']:
         audit['reason'] = 'NO_CURRENT_REVIEW_OBJECTION'
         return draft, reviews, audit
-    final_reserve = 3 if enable_challenge else 2
+    final_reserve = collection_reservation(context, phase='rework', enable_challenge=enable_challenge)
     if remaining(context).models < final_reserve or not claim_rework(context, repairs):
         audit['reason'] = 'REWORK_BUDGET_UNAVAILABLE'
         context.emit({'type': 'rework_skipped', 'role': 'investigation', 'reason': audit['reason']})
@@ -302,8 +306,9 @@ def execute_review_rework(model, draft, reviews, executor, context, *, repairs=N
     audit['performed'] = True
     context.emit({'type': 'semantic_rework_started', 'role': 'investigation', 'round': 1,
                   'target_ids': feedback['allowed_target_ids']})
-    _, audit['decisions'], _ = collect(model, executor, context, audit['failures'], repairs,
-        review_feedback=feedback, reserve_models=final_reserve, max_decisions=2, phase='review_rework')
+    audit['collection_stop'], audit['decisions'], audit['read_attempts'] = collect(
+        model, executor, context, audit['failures'], repairs, review_feedback=feedback,
+        reserve_models=final_reserve, max_new_reads=2, phase='review_rework')
     audit['queries_after'] = len(executor.check_results)
     before_versions = {target.id: target.version for target in [*draft.claims, *draft.next_steps]}
     try:
@@ -361,9 +366,9 @@ def investigate(model, provider, principal, *, context=None, limits=None, event_
     executor = ToolExecutor(provider, principal, ticket.scope, context, role='single')
     repairs = {'repairs': 0, 'reviewer_repairs': 0}
     failures = []
-    # Reserve consistently across budget sizes: even a small run may make one
-    # decision, and increasing its cap never reduces the same collection path.
-    reserve = min(7 if enable_challenge else 5, max(0, context.limits.model_calls - 1)) if enable_rework else None
+    # Quote only pending finalization. Rework is optional until a real objection
+    # exists; no speculative seven-call allocation is withheld from this read loop.
+    reserve = collection_reservation(context, enable_challenge=enable_challenge) if enable_rework else None
     stop, decisions, _ = collect(model, executor, context, failures, repairs, reserve_models=reserve)
     draft = make_draft(model, executor, context, failures, repairs, stop)
     reviews = review_draft(model_for(model, 'reviewer'), draft, executor, context,
@@ -377,7 +382,7 @@ def investigate(model, provider, principal, *, context=None, limits=None, event_
     reworks, challenges = [], []
     if enable_rework and ticket.purpose != 'status_check':
         if enable_challenge:
-            reviews, audit = run_challenge(model, draft, reviews, executor, context, reserve_after=2)
+            reviews, audit = run_challenge(model, draft, reviews, executor, context)
             challenges.append(audit)
             first_pass['challenged_review'] = reviews.model_dump(mode='json')
         draft, reviews, audit = execute_review_rework(model, draft, reviews, executor, context,
