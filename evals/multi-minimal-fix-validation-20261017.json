@@ -1,0 +1,70 @@
+{
+  "verification_version": "multi-minimal-fix-v1",
+  "source_version_before": "32439aead4164543",
+  "source_version_after": "9e71d638837aa780",
+  "single_implementation_and_shared_runtime_unchanged": true,
+  "changed_existing_application_files": [
+    "app/agents/prompts.py",
+    "app/workflow/coordinator.py",
+    "app/workflow/state.py"
+  ],
+  "added_application_files": [
+    "app/workflow/handoff.py"
+  ],
+  "single_behavior_snapshot": {
+    "tests": 14,
+    "runs": 14,
+    "before_sha256": "6f77d777a4639da957099ed9259c7d8a457811665979a284c1075278c1da36a2",
+    "after_sha256": "6f77d777a4639da957099ed9259c7d8a457811665979a284c1075278c1da36a2",
+    "identical": true
+  },
+  "new_tests": 19,
+  "focused_regression": {
+    "tests": 111,
+    "passed": 111,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 29.891,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 113
+  },
+  "full_regression": {
+    "tests": 758,
+    "passed": 738,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 20,
+    "seconds": 123.454,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 113
+  },
+  "frozen_artifacts_unchanged": 113,
+  "evaluation_source_hashes_match_previous_freeze": true,
+  "dataset_freeze_verified": true,
+  "paid_model_calls": 0,
+  "real_pair_runs": 0,
+  "formal_human_reviews_added": 0,
+  "free_example": {
+    "execution_mode": "scripted_control_only",
+    "local_model_steps": 4,
+    "synthetic_tool_attempts": 3,
+    "status": "partial",
+    "actions": 1,
+    "team": "Checkout on-call"
+  },
+  "limitations": [
+    "Free substitutes verify routing and boundaries, not real-model semantic accuracy.",
+    "The new closure requires a programmatic diagnostic collection exit via request_info/escalate with no current business observation.",
+    "No model/budget change; old frozen experiments retain their original source fingerprints.",
+    "The initial full run blocked five temporary configuration-file tests; the guard was corrected and a fresh full run completed."
+  ]
+}

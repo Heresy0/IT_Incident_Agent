@@ -19,6 +19,8 @@ SINGLE_SYSTEM = SINGLE_SYSTEM.replace("tentative_hypotheses", "hypotheses") + ""
 预期结果、风险以及是否需要人工审批。不得执行修复操作。
 所有假设在独立核查前都保持待验证，不得声称故障已解决或根因已确认。
 根据实际现象和结果选择工具。只返回 JSON，使用简短的公开决策说明。
+collection 与 query_execution 的实际状态由服务端账本确定；未执行查询不等于空结果，
+查询失败不等于空结果。没有实际查询或可复用观测时，不得编造检查经历、原因或修复建议。
 """
 
 

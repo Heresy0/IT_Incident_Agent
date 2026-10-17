@@ -292,7 +292,8 @@ class IncidentInvestigationTests(unittest.TestCase):
         model = Responses([selected(), AIMessage(content=json.dumps(invalid)), AIMessage(content="{}")])
         result = self.run_model(model)
         self.assertEqual(result["validation_failures"], [{"step": 2, "reason": "reference_mismatch", "details": [
-            {"path": "findings.0.refs.0.value", "type": "value_mismatch"}]}])
+            {"path": "findings.0.refs.0.value", "type": "value_mismatch"}],
+            "stage": "output_resolution", "content_type": "str", "tool_call_count": 0}])
         self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
         self.assertEqual(result["repairs"], 1)
         self.assertEqual(result["run_summary"]["model_calls"], 3)
@@ -401,7 +402,8 @@ class IncidentInvestigationTests(unittest.TestCase):
 
     def test_invalid_json_failure_is_safe_and_repair_counted(self):
         result = self.run_model(Responses([AIMessage(content="TEST_SECRET_CANARY"), AIMessage(content="{}")]))
-        self.assertEqual(result["validation_failures"], [{"step": 1, "reason": "invalid_json", "details": []}])
+        self.assertEqual(result["validation_failures"], [{"step": 1, "reason": "invalid_json", "details": [],
+            "stage": "output_resolution", "content_type": "str", "tool_call_count": 0}])
         self.assertNotIn("TEST_SECRET_CANARY", json.dumps(result))
         self.assertEqual(result["run_summary"]["model_calls"], 2)
 

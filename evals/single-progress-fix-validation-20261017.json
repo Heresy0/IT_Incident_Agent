@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-17",
+  "scope": "single-agent-minimal-progress-fix",
+  "changes": {
+    "app/agents/investigation.py": [
+      "保留可信ProtocolError码和路径，补充校验阶段/内容类型/工具调用数量。",
+      "首次取证前的格式纠错保留工具，合法提前结束时最多1次进度提示。",
+      "无取证候选不进入发布输出；服务端账本区分未执行、失败及为空，保留查询范围。"
+    ],
+    "app/agents/single.py": [
+      "明确提示未执行、空结果和查询失败的区别。"
+    ],
+    "tests": [
+      "新增14个测试方法覆盖六组场景，更新3个已有测试文件的诊断元数据、停止原因及提示词指纹断言。"
+    ]
+  },
+  "new_regression_test_methods": 14,
+  "six_scenarios": [
+    {
+      "case": 1,
+      "name": "协议错误分类与脱敏",
+      "tests": [
+        "test_distinct_protocol_errors_keep_codes_and_paths",
+        "test_generic_errors_do_not_echo_exception_text",
+        "test_non_string_content_records_type_without_rejected_body"
+      ],
+      "verified": "保留UNKNOWN_REFERENCE/CHANGE_APPROVAL_REQUIRED/READ_ONLY_ACTION_INVALID，记录阶段与内容类型，不保存被拒绝正文。",
+      "passed": true
+    },
+    {
+      "case": 2,
+      "name": "首次输出失败后继续取证",
+      "tests": [
+        "test_first_invalid_output_keeps_tools_then_can_read_and_finish"
+      ],
+      "verified": "JSON错误和未知引用两种首轮失败后，下一轮仍绑定工具；3次本地替身调用、1次夹具查询完成，格式修正1次。",
+      "passed": true
+    },
+    {
+      "case": 3,
+      "name": "合法但提前结束的输出",
+      "tests": [
+        "test_legal_premature_answer_gets_one_read_prompt_and_recovers"
+      ],
+      "verified": "只发1次取证进度提示，允许随后实际读取并完成，不占用格式修正额度。",
+      "passed": true
+    },
+    {
+      "case": 4,
+      "name": "持续无取证安全退出",
+      "tests": [
+        "test_persistent_no_read_safely_stops_without_publishing_prose_or_advice",
+        "test_format_repair_and_progress_prompt_are_both_bounded",
+        "test_repeated_invalid_output_still_stops_after_one_format_repair"
+      ],
+      "verified": "无取证时不发布原因、修复建议及虚构查询经历；合法但无进展返回NO_TOOL_PROGRESS；反复非法输出保留MODEL_OUTPUT_INVALID，格式修正及进度提示各不超过1次。",
+      "passed": true
+    },
+    {
+      "case": 5,
+      "name": "失败与空结果明确区分",
+      "tests": [
+        "test_failed_and_empty_queries_keep_distinct_server_status_and_scope"
+      ],
+      "verified": "实际夹具查询失败保留SOURCE_UNAVAILABLE；实际空查询保留过滤条件、起止窗口；不将它们误判为未执行，不触发同查询的进度重试。",
+      "passed": true
+    },
+    {
+      "case": 6,
+      "name": "既有纠错、预算和复用边界",
+      "tests": [
+        "test_format_correction_after_read_uses_json_without_tools",
+        "test_insufficient_remaining_steps_do_not_add_calls",
+        "test_tool_budget_exit_uses_reserve_without_executing_tools",
+        "test_late_model_response_is_discarded_without_more_calls",
+        "test_existing_observations_can_be_reused_without_new_read_prompt"
+      ],
+      "verified": "已有观测后的格式修正关闭工具；步数不足不额外调用；工具额度耗尽保留预算退出；超时响应丢弃；已有观测无需重新查询。",
+      "passed": true
+    }
+  ],
+  "focused_regression": {
+    "tests": 76,
+    "passed": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 8.515,
+    "successful": true,
+    "blocked_external_network_attempts": 0,
+    "blocked_real_credential_read_attempts": 0,
+    "paid_model_requests": 0,
+    "real_pair_runs": 0,
+    "log": "output\\single-minimal-fix-20261017\\focused-final.log"
+  },
+  "full_regression": {
+    "tests": 737,
+    "passed": 717,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 20,
+    "duration_seconds": 118.735,
+    "successful": true,
+    "blocked_external_network_attempts": 0,
+    "blocked_real_credential_read_attempts": 0,
+    "paid_model_requests": 0,
+    "real_pair_runs": 0,
+    "log": "output\\single-minimal-fix-20261017\\full-final.log"
+  },
+  "preservation": {
+    "protected_files": 48,
+    "changed_protected_files": [],
+    "original_saved_metrics_recomputed_identically": true,
+    "previous_application_fingerprint": "fa6e3b3b76224064",
+    "current_application_fingerprint": "32439aead4164543",
+    "old_frozen_experiment_rejects_new_application": true,
+    "model_request_fingerprint_stubbed_for_drift_guard_only": true,
+    "manifest_canonical_sha256": "6d172cf09e783a259ed69a9b7307d12d3766973fd5267c22db03a868310dda48",
+    "paid_requests_sent": 0,
+    "real_pair_runs": 0
+  },
+  "changed_file_sha256": {
+    "app/agents/investigation.py": "3fe6d36f9b57dac06413cfdd633187e01edbd7f15b8616960abf55861005f090",
+    "app/agents/single.py": "f7b5e91f0b6bb690df83fddc4f410d920c83604a0995efa17e211abcbc1becbb",
+    "tests/agents/test_single_progress.py": "116a5f47cf3bc9961e259572b14e839ea462b42d1c4c078dd27d4eee0380199a",
+    "tests/agents/test_incident_investigation.py": "65e5a53dc5346321cf4dfc974ee4ddad68624afa3f2a505a68baba0cac3fb47c",
+    "tests/workflow/test_live_protocol_regressions.py": "25c6ff4281d8a4855b6ccc33bedfd86a42664c05617f369d0007b9075610d45b",
+    "tests/workflow/test_information_gain.py": "c28de71bb79edcee84123dd9d516be971feee5e5d9bbe448c260f98b349ab24b"
+  },
+  "evidence_sha256": {
+    "focused-final.log": "080bf5fe6c375b32d2adf5b51dcf1f1d5690c0e09e1806bcfc20404f80c8eea4",
+    "full-final.log": "1c0589313f3629b67090899289f24771c3b6375c6761e50cf5a330b5295dd6b4",
+    "preservation-before.json": "7e16bd35913c1334e2c7f6e8a28778469ec1269fe4276a6623eb0db9e84187fc",
+    "preservation-after.json": "d52e7965772d168893765f4af82f215dd6cc8298fca7e360c8bec0ab83e85f1d"
+  },
+  "execution_controls": [
+    "仅本地替身及夹具，未执行真实配对；外部DNS/连接由测试进程审计钩子拒绝。",
+    "项目真实凭据文件禁止读取；普通配置入口指向临时测试目录。",
+    "原冻结实验及历史文件在测试进程内设为只读，并完成前后哈希核对。"
+  ],
+  "paid_model_requests": 0,
+  "real_pair_runs": 0,
+  "limitations": [
+    "20项PostgreSQL/pgvector集成测试未运行；本次无数据库改动。",
+    "未验证真实模型的行为、诊断准确率或性能提升。",
+    "首次被拒绝的历史响应未保存，无法恢复其具体字段错误；新日志只补充可信错误信息，不默认保存正文。",
+    "本次阻止无取证输出发布；实际取证后的自由文本语义仍须外部人工复核。",
+    "新应用指纹与原冻结实验不同；未创建新实验，也未改写原实验或其成绩。"
+  ],
+  "initial_validation_notes": [
+    "专项首轮两处旧测试未包含新增诊断字段，已更新断言。",
+    "全量首轮真实.env读取被测试审计钩子阻止；改用临时AppSettings环境文件，同时更新已改变的单角色提示词指纹断言。初轮日志保留。"
+  ]
+}

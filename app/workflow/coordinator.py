@@ -3,7 +3,7 @@ import hashlib
 import json
 import time
 from runtime.context import RunContext, ExecutionError, activate
-from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview
+from agents.contracts import SupervisorSelection, DiagnosisSelection, ReviewDecision, ObservationReview, TaskRequest
 from agents.prompts import ROLE_PROMPTS, INVESTIGATION_TASK, OBSERVATION_REVIEW, PLANNER
 from agents.investigation import INCIDENT_LIMITS
 from tools.executor import ToolExecutor
@@ -30,6 +30,8 @@ from workflow.evidence_needs import initial_needs, reviewed_needs, limitations, 
 from workflow.diagnostic_audit import diagnostic_audit
 from workflow.review_outcome import review_policy, readiness_gaps
 from agents.protocol import REPAIR_POLICY, REVIEW_STAGE_POLICY, ROLE_REPAIR_POLICY
+from workflow.handoff import (owner_choice, has_business_observation, fatal_collection_code,
+                              can_finalize, handoff_notes, SingleAttemptOwnerProvider, FATAL_CODES)
 from workflow.review_protection import conservative, BOUNDED_POLICY, DEFAULT_REVIEW_PROTECTION
 
 
@@ -46,6 +48,7 @@ class Collaboration:
     collection_follow_up_used = state_property('control', 'collection_follow_up_used')
     protocol_fallback_used = state_property('control', 'protocol_fallback_used')
     last_supervisor_failure = state_property('control', 'last_supervisor_failure')
+    limited_handoff = state_property('control', 'limited_handoff')
 
     tasks = state_property('collection', 'tasks')
     reused_requests = state_property('collection', 'reused_requests')
@@ -281,7 +284,19 @@ class Collaboration:
         if self.ticket.purpose == 'status_check' and (selection.hypotheses or selection.recommended_actions):
             raise ProtocolError('STATUS_CHECK_SCOPE', [{'purpose': 'status_check',
                 'instruction': '状态核查只输出观测和信息缺口，hypotheses、recommended_actions 均使用空列表。'}])
-        return expand_diagnosis(selection, self)
+        if self.limited_handoff and selection.hypotheses:
+            raise ProtocolError('HANDOFF_CAUSE_NOT_OBSERVED', [{
+                'path': 'hypotheses', 'instruction': '受限交接没有当前业务观测，hypotheses必须为空；只整理观测缺口、人工只读核查和真实接手人。'}])
+        if self.limited_handoff and any(a.kind != 'manual_check' for a in selection.recommended_actions):
+            raise ProtocolError('HANDOFF_READ_ONLY_REQUIRED', [{
+                'path': 'recommended_actions', 'instruction': '受限交接只允许manual_check、checks=[]、repair=null；不得提出变更或重复已失败的程序查询。'}])
+        draft = expand_diagnosis(selection, self)
+        if (self.limited_handoff and draft.escalation_team is not None
+                and draft.escalation_team != owner_choice(self.evidence, self.ticket.scope.service,
+                    self.executors['investigation'].check_results.values()).team):
+            raise ProtocolError('HANDOFF_OWNER_UNCERTAIN', [{
+                'instruction': '负责人查询有冲突或截断，escalation_ref必须为null；保留人工确认接手人的缺口。'}])
+        return draft
 
     def targets(self):
         return {f"{prefix}{n}": item for prefix, items in (("F", self.draft.findings),
@@ -328,7 +343,9 @@ class Collaboration:
             # A previous model's verdict/explanation is not evidence. The claim,
             # selected fields and its stated unknowns remain available.
             value.pop('status', None)
-            value.pop('evidence_explanation', None)
+            explanation = value.pop('evidence_explanation', None)
+            if explanation is not None:
+                value['claim_explanation_to_audit'] = explanation
             for field in ("refs", "support_refs", "counter_refs"):
                 if field in value:
                     value[field] = [{"evidence_id": r["evidence_id"], "field_path": r["field_path"]} for r in value[field]]
@@ -352,18 +369,21 @@ class Collaboration:
                  for row in self.task_input()]
         rework_budget = self.rework_budget(pending_model_calls=1, additional=self.reworks == 1)
         return {"targets": targets, "required_target_ids": list(targets),
+                'claim_explanation_policy': 'claim_explanation_to_audit是待核验的原始陈述，不是来源或既有通过结论；连同cause中的因果、排除范围和查询叙述逐项复核。',
                 **self.diagnostic_pack_input(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
-                'uncertain_need_rule': 'supported必须引用与此问题相关的当前观测；缺引用或仅历史线索会被原门禁降级uncertain，不能只凭窗口覆盖或查询完成宣告支持。'
+                'uncertain_need_rule': ('受限交接中核心symptom/mechanism没有业务观测，只能uncertain，不能用owner支持；保留原因，不要求给已支持的人工待办附加冲突blocker，不再规划补查。'
+                    if self.limited_handoff else 'supported必须引用与此问题相关的当前观测；缺引用或仅历史线索会被原门禁降级uncertain，不能只凭窗口覆盖或查询完成宣告支持。'
                     '每个uncertain且阻塞的问题须给自己的blocker，或由request_evidence.need_id明确指向同一个N。'
                     '核心symptom/mechanism始终阻塞；其它问题blocking省略/null使用blocking_default，false须有非阻塞理由。'
                     'blocker填写affected_targets、missing_observation、decision_impact、resolution；reason不能替代这些字段。'
-                    'cause_level由程序绑定，不输出；不得为满足格式改判supported。',
+                    'cause_level由程序绑定，不输出；不得为满足格式改判supported。'),
                 'core_need_ids': [n.need_id for n in self.evidence_needs.values()
                                   if n.purpose in {'symptom', 'mechanism'}],
                 'independent_observation_review': self.observation_reviews[-1]['review']
                     if self.observation_reviews and self.observation_reviews[-1]['revision'] == len(self.drafts) else None,
                 "purpose": self.ticket.purpose,
+                'limited_handoff': self.limited_handoff,
                 "diagnosis_completion_gaps": self.diagnosis_completion_gaps(),
                 "ticket": self.ticket.model_dump(mode='json', exclude={'scope': {'tenant_id', 'user_id'}}),
                 "task_results": tasks, "task_completion_gaps": self.task_gaps(),
@@ -470,6 +490,8 @@ class Collaboration:
         return True
 
     def needs_review_follow_up(self, review):
+        if self.limited_handoff:
+            return False
         return needs_review_follow_up(self.review_routing_context(review),
             can_collect=lambda: self.rework_budget(pending_model_calls=1)['can_collect'])
 
@@ -482,7 +504,7 @@ class Collaboration:
         return ReviewContext(needs=self.evidence_needs, evidence=self.evidence, references=self.references,
             executors=self.executors, targets=self.targets(), scope=self.ticket.scope,
             observation_gaps=self.observation_gaps(), protection=self.review_protection,
-            require_blockers=self.blind_review or getattr(self.models['reviewer'], 'json_output', False),
+            require_blockers=not self.limited_handoff and (self.blind_review or getattr(self.models['reviewer'], 'json_output', False)),
             existing_gaps=tuple(self.extra_gaps))
 
     def review_routing_context(self, review=None):
@@ -492,6 +514,11 @@ class Collaboration:
             protocol_fallback_used=self.protocol_fallback_used, clarification_used=self.review_follow_up_used)
 
     def validate_review(self, review):
+        if self.limited_handoff and any(a.need_id in self.evidence_needs
+                and self.evidence_needs[a.need_id].purpose in {'symptom', 'mechanism'}
+                and a.verdict != 'uncertain' for a in review.need_assessments):
+            raise ProtocolError('HANDOFF_CORE_UNRESOLVED', [{
+                'instruction': '受限交接没有当前业务观测，核心symptom/mechanism只能uncertain，不能用负责人、查询错误或人工待办关闭。'}])
         audit = ReviewAudit(hint_status=list(getattr(self, 'review_hint_status', [])))
         try:
             return validate_review(review, self.review_context(), audit=audit, emit=self.event)
@@ -509,6 +536,7 @@ class Collaboration:
                    'diagnosis_policy': review_policy(),
                    'evidence_needs': self.need_input(),
                    "purpose": self.ticket.purpose,
+                   'limited_handoff': self.limited_handoff,
                    "completion_requirements": {'required_sections': required_sections(self.ticket.purpose),
                        'insufficient_evidence': '保留缺失项并说明具体信息缺口，不编造原因或不适用的操作；故障诊断会以 partial 结束。',
                        'read_only_checks': '只提出未被collection完整覆盖的新检查；同参数失败重试不是新信息。'},
@@ -532,7 +560,7 @@ class Collaboration:
 
     def review_draft(self):
         revision = len(self.drafts)
-        if self.blind_review and self.ticket.purpose == 'diagnosis':
+        if self.blind_review and self.ticket.purpose == 'diagnosis' and not self.limited_handoff:
             remaining = self.context.limits.model_calls - self.context.counts['model_calls']
             if remaining >= 2:
                 self.event('observation_review_started', 'reviewer', revision=revision, draft_visible=False)
@@ -563,6 +591,11 @@ class Collaboration:
                    status="needs_rework" if request else
                    "passed" if not self.reviewed_gaps() else "needs_information")
         if request:
+            if self.limited_handoff:
+                self.extra_gaps.append('受限交接未进行额外补查：' + request.missing_observation)
+                self.finish_review()
+                self.stop = 'NEEDS_INFORMATION'
+                return
             self.note("challenge", "reviewer", "diagnosis", hypothesis_id=request.hypothesis_id,
                       evidence_ids=request.evidence_ids, reason=request.missing_observation)
             decision = decide_rework(self.review_routing_context(),
@@ -595,6 +628,8 @@ class Collaboration:
         else:
             self.pending = None
             self.finish_review()
+            if self.limited_handoff:
+                self.stop = 'NEEDS_INFORMATION'
             self.note("accept" if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} else "escalate", "reviewer", "supervisor")
 
     def diagnose_and_review(self):
@@ -859,6 +894,51 @@ class Collaboration:
             has_observations=any(e.kind == 'observation' for e in self.evidence.values()),
             pending_model_call=pending_model_call)
 
+    def prepare_limited_handoff(self):
+        """One bounded closure after actual unavailable/empty business reads."""
+        collection = self.collection()
+        if (self.limited_handoff or not self.planning_only or self.phase != 'collect'
+                or self.ticket.purpose != 'diagnosis' or self.draft is not None
+                or has_business_observation(self.evidence)
+                or not any(c['name'] in {'get_service_metrics', 'get_service_logs'} for c in collection)
+                or fatal_collection_code(collection)):
+            return False
+        self.limited_handoff = True
+        alias = self.ticket.scope.service
+        choice = owner_choice(self.evidence, alias, self.executors['investigation'].check_results.values())
+        executor = self.executors['investigation']
+        check = {'tool': 'get_service_owner', 'args': {'alias': alias}}
+        # Never spend the last judging turns on owner lookup, or retry an attempted read.
+        if (choice.status == 'missing' and can_finalize(self.context)
+                and completion([check], executor)['checks'][0]['status'] == 'not_executed'
+                and self.context.can_research()):
+            task = TaskRequest(role='investigation', goal='取得本工单登记负责人以交接观测缺口',
+                checks=[check], expected_value='只确认接手团队，不支持业务故障原因')
+            objective = {**self.task_objective(task, False), 'execution_source': 'limited_handoff_policy'}
+            child = executor.fork(self.context)
+            child.provider = SingleAttemptOwnerProvider(executor.provider)
+            try:
+                outcome = self.collection_runner().collect(CollectionRequest(task, objective, 'programmatic', 0),
+                    executor=child, context=self.context, event_log=self.events)
+            finally:
+                child.provider = executor.provider
+            self.executors['investigation'] = child
+            self.record_collection(outcome)
+            choice = owner_choice(self.evidence, alias, self.executors['investigation'].check_results.values())
+        self.team = choice.team  # Exact current-service observation, or explicitly unknown.
+        self.extra_gaps.extend(handoff_notes(self.ticket, choice))
+        self.event('limited_handoff_prepared', owner_status=choice.status, team_observed=bool(choice.team),
+                   can_finalize=can_finalize(self.context), cause_confirmation='not_performed')
+        fatal = fatal_collection_code(self.collection())
+        if fatal:
+            self.stop = fatal
+        elif can_finalize(self.context):
+            self.next_node = 'diagnosis'
+        else:
+            self.extra_gaps.append('收尾预算不足，人工待办未经过模型复核，不作为已支持建议。')
+            self.stop = 'NEEDS_INFORMATION'
+        return True
+
     def supervise(self):
         if (self.phase == 'collect' and self.ticket.purpose == 'diagnosis'
                 and any(e.kind == 'observation' for e in self.evidence.values())
@@ -930,6 +1010,8 @@ class Collaboration:
             self.team = decision.escalation_team
             self.extra_gaps.extend(decision.missing_information or [decision.reason])
             self.note("escalate", "supervisor", "human", reason=decision.reason)
+            if self.prepare_limited_handoff():
+                return
             self.stop = "ESCALATED" if decision.action == "escalate" else "NEEDS_INFORMATION"
 
     def pending_rework_selection(self):
@@ -1018,6 +1100,8 @@ class Collaboration:
         return self.result()
 
     def status(self):
+        if self.limited_handoff and self.stop not in FATAL_CODES:
+            return 'partial'
         if self.stop in {'FINISHED', 'STATUS_CHECK_COMPLETED'} and self.review is not None:
             if self.diagnostic_pack is not None and self.ticket.purpose == 'diagnosis':
                 from workflow.diagnostic_pack import refresh
@@ -1038,6 +1122,14 @@ class Collaboration:
         if self.diagnostic_pack is not None:
             self.context.stop_reason = self.stop
         status = self.status()
+        needs_handoff = status != 'completed' or bool(self.draft and any(
+            a.kind == 'manual_check' for a in self.draft.recommended_actions))
+        if needs_handoff and not (self.team or self.draft and self.draft.escalation_team):
+            choice = owner_choice(self.evidence, self.ticket.scope.service,
+                                  self.executors['investigation'].check_results.values())
+            self.team = choice.team
+            if choice.status == 'ambiguous':
+                self.extra_gaps.append('负责人信息存在冲突，未选择任何登记团队，需人工确认接手人。')
         publication = publish_diagnosis(PublicationInput(
             draft=self.draft, review=self.review, purpose=self.ticket.purpose, status=status, stop=self.stop,
             missing_information=[*self.extra_gaps, *self.task_gaps(), *limitations(self.evidence_needs)],

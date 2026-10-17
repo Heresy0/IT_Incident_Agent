@@ -54,6 +54,10 @@ def literal_options(schema, location):
 
 
 def validation_details(exc, schema=None):
+    # Local import: diagnosis expansion imports this module's reference validators.
+    from evidence.diagnosis import ProtocolError
+    if isinstance(exc, ProtocolError):
+        return {'reason': exc.code, 'details': exc.details}
     if isinstance(exc, json.JSONDecodeError):
         return {"reason": "invalid_json", "details": []}
     if isinstance(exc, ValidationError):
@@ -83,7 +87,7 @@ def validation_details(exc, schema=None):
                 "details": details}
     if isinstance(exc, (ReferenceValidationError, OwnerSelectionError)):
         return {"reason": "reference_mismatch", "details": [{"path": exc.path, "type": exc.reason}]}
-    return {"reason": "invalid_output_type", "details": []}
+    return {"reason": "invalid_output_type" if isinstance(exc, TypeError) else "output_validation_error", "details": []}
 
 
 def validate_output(output, evidence, allowed_kinds=("observation",)):
@@ -205,6 +209,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
     output_model = model
     native_json = getattr(model, 'json_output', False)
     model = model.bind_tools(executor.schemas())
+    def single_needs_first_read():
+        # Reusable registered evidence and actual failed/empty reads count as work.
+        # Model prose and an objective's claimed collection are not a read ledger.
+        return role == 'single' and not executor.check_results and not executor.evidence
     task_id = str(uuid4())
     def event(kind, **fields):
         context.emit({"type": kind, "role": role, "task_id": task_id,
@@ -302,6 +310,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                 can_read_pending = bool(unexecuted_checks and step < max_steps - 1
                     and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
                     and context.can_research())
+                can_read_pending = can_read_pending or bool(single_needs_first_read()
+                    and step < max_steps - 1
+                    and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
+                    and context.can_research())
                 final_json = native_json and (terminal or step == max_steps - 1 or (output_correction and not can_read_pending)
                     or (checks_complete and not gap_feedback_sent))
                 if final_json:
@@ -319,7 +331,9 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     break
                 finish = getattr(response, "response_metadata", {}).get("finish_reason")
                 event("model_output", step=step + 1, output_chars=len(str(response.content)),
-                      finish_reason=finish if finish in {"stop", "length", "tool_calls"} else "unknown")
+                      finish_reason=finish if finish in {"stop", "length", "tool_calls"} else "unknown",
+                      content_type=type(response.content).__name__ if type(response.content) in (str, list, dict, type(None)) else 'other',
+                      tool_call_count=len(response.tool_calls))
                 messages.append(response)
                 calls = response.tool_calls
                 if getattr(response, "invalid_tool_calls", None) or len(calls) > 6:
@@ -396,8 +410,24 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                             'and unnecessary error_code, or retain that explicit gap. Do not repeat the ERROR query. '
                             + json.dumps(list(executor.log_gaps.values()))))
                     continue
+                validation_stage = 'output_resolution'
                 try:
                     candidate, output_protocol = output_resolver(response.content, executor, allowed_kinds)
+                    validation_stage = 'completion_checks'
+                    if single_needs_first_read():
+                        event('single_output_withheld', code='NO_TOOL_PROGRESS',
+                              hypotheses=len(candidate.hypotheses), actions=len(candidate.recommended_actions))
+                        remaining_calls = limits.model_calls - limits.reserve_model_calls - context.counts['model_calls']
+                        if (not task_feedback_sent and not terminal and step < max_steps - 2
+                                and remaining_calls >= 2 and context.can_research()):
+                            task_feedback_sent = True
+                            event('task_execution_correction', step=step + 1, code='NO_TOOL_PROGRESS')
+                            messages.append(HumanMessage(content='服务端查询账本为空：尚未执行查询，不表示查询返回空结果或渠道不可用。'
+                                '请根据当前工单选择有价值且已登记的只读工具，实际取得结果后再解释；'
+                                '不要编造检查经历，不执行修复，不扩大权限或预算。'))
+                            continue
+                        stop = context.stop_reason or 'NO_TOOL_PROGRESS'
+                        break
                     if required_checks:
                         from workflow.task_checks import completion
                         task_coverage = completion(required_checks, executor)
@@ -445,7 +475,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     stop = "FINISHED"
                     break
                 except (ValidationError, ValueError, TypeError) as exc:
-                    failure = {"step": step + 1, **validation_details(exc)}
+                    failure = {"step": step + 1, **validation_details(exc, output_schema),
+                               'stage': validation_stage,
+                               'content_type': type(response.content).__name__ if type(response.content) in (str, list, dict, type(None)) else 'other',
+                               'tool_call_count': len(response.tool_calls)}
                     failures.append(failure)
                     event("validation_failure", node=role, **failure)
                     if step < max_steps - 1 and context.claim_repair(repair_state):
@@ -466,6 +499,10 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                                if unexecuted_checks and step < max_steps - 2
                                and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
                                and context.can_research()
+                               else 'No queries have been executed. Select a useful registered read-only tool before reporting results; do not invent empty or failed queries.'
+                               if single_needs_first_read() and step < max_steps - 2
+                               and limits.model_calls - limits.reserve_model_calls - context.counts['model_calls'] >= 2
+                               and context.can_research()
                                else 'Correct only the recorded observations; preserve missing checks as gaps.')))
                     else:
                         stop = "MODEL_OUTPUT_INVALID"
@@ -483,6 +520,27 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
                     missing_information=[f"SingleAgent stopped: {stop}; evidence requires human review."], escalation_team=None)
             else:
                 output = InvestigationOutput(missing_information=[f"Investigation stopped: {stop}; evidence requires human review."])
+        query_execution = None
+        if role == 'single':
+            queries = [{'tool': row['tool'], 'status': row['status'],
+                        'query_profile': {k: v for k, v in row['args'].items()
+                            if k in {'start', 'end', 'metrics', 'granularity', 'category', 'level', 'error_code'}},
+                        'truncated': row['truncated'], 'error_code': row['error'],
+                        'evidence_ids': list(row['evidence_ids'])}
+                       for row in executor.check_results.values()]
+            query_execution = {'source': 'server_read_ledger',
+                'state': 'attempted' if queries else 'reused_evidence' if executor.evidence else 'not_executed',
+                'queries': queries}
+            gaps = []
+            if single_needs_first_read():
+                gaps.append('本轮尚未执行工具查询，也无可复用观测；不能声称查询为空、渠道不可用或原因已确认。需补充当前观测并由人工复核。')
+            for query in queries:
+                scope = json.dumps(query['query_profile'], ensure_ascii=False, sort_keys=True)
+                if query['status'] == 'error':
+                    gaps.append(f"{query['tool']}：查询失败（{query['error_code']}）；范围={scope}。不能作为空结果或服务正常的证据。")
+                elif query['status'] == 'empty':
+                    gaps.append(f"{query['tool']}：查询已执行，当前过滤条件未匹配记录；范围={scope}。不能推断服务整体正常。")
+            output = output.model_copy(update={'missing_information': list(dict.fromkeys([*output.missing_information, *gaps]))})
         # Conservative M2 boundary: a truncated source remains explicitly partial, even
         # when selected fields are valid. M3 can assess whether later checks close that gap.
         incomplete = model_omitted or any(e["type"] == "tool_result" and e["truncated"] for e in events[event_start:])
@@ -517,4 +575,5 @@ def investigate(model, provider, principal, *, limits=INCIDENT_LIMITS, max_steps
             "observation_coverage": "limited_by_truncation" if incomplete else "not_truncated",
             "evidence": [e.model_dump(mode="json") for e in executor.evidence.values()],
             "events": list(events[event_start:]), "run_summary": {**context.summary(), "termination_reason": stop}, "repairs": repairs,
-            "validation_failures": failures}
+            "validation_failures": failures,
+            **({'query_execution': query_execution} if query_execution is not None else {})}

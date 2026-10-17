@@ -1,0 +1,39 @@
+{
+  "version": "paired-diagnosis-metrics-v1",
+  "dataset_version": "independent-synthetic-v1",
+  "split": "validation",
+  "cases": ["eval_001", "eval_002", "eval_003", "eval_004", "eval_005", "eval_006"],
+  "batches": [["eval_001", "eval_005"], ["eval_002", "eval_003"], ["eval_004", "eval_006"]],
+  "model_budget": 16,
+  "tool_budget": 8,
+  "critical_checks": {
+    "eval_001": [
+      {"check_id": "current_failure", "requirement": "取得本次请求失败的当前观测；不能仅依赖用户描述或历史案例。", "availability": "available"},
+      {"check_id": "failure_boundary", "requirement": "取得能区分连接建立前失败与远端业务处理慢的当前观测。", "availability": "available"}
+    ],
+    "eval_002": [
+      {"check_id": "authentication_rejection", "requirement": "取得当前认证拒绝的具体原因及请求配置与依赖要求的对应关系。", "availability": "available"},
+      {"check_id": "configuration_context", "requirement": "取得与当前拒绝相关的配置或变更证据；时间接近本身不算因果证据。", "availability": "available"}
+    ],
+    "eval_003": [
+      {"check_id": "current_write_failure", "requirement": "取得本次写入失败的直接错误观测。", "availability": "available"},
+      {"check_id": "resource_discrimination", "requirement": "取得区分当前资源问题与历史CPU解释的当前对照观测。", "availability": "available"}
+    ],
+    "eval_004": [
+      {"check_id": "business_failure", "requirement": "取得失败业务链路的具体依赖错误，而不只查询健康接口。", "availability": "available"},
+      {"check_id": "health_control_scope", "requirement": "取得健康通道与业务失败通道的对照，限定整体健康判断。", "availability": "available"}
+    ],
+    "eval_005": [
+      {"check_id": "current_metrics", "requirement": "本次业务指标观测；数据集已固定该渠道不可用，单列而不算查询选择遗漏。", "availability": "unavailable"},
+      {"check_id": "current_logs", "requirement": "本次业务日志观测；数据集已固定该渠道不可用，单列而不算查询选择遗漏。", "availability": "unavailable"},
+      {"check_id": "handoff_owner", "requirement": "取得可用的登记负责人，为信息缺口交接提供真实接手线索。", "availability": "available"}
+    ],
+    "eval_006": [
+      {"check_id": "current_pause", "requirement": "取得当前暂停或积压的观测，限定时间窗口。", "availability": "available"},
+      {"check_id": "maintenance_context", "requirement": "取得对应维护计划，区分计划暂停与非计划故障。", "availability": "available"}
+    ]
+  },
+  "quality_rule": "机械通过且现有语义规则通过且status不是failed；合理partial允许合格。人工评价未齐或计划运行未齐时，主质量指标为null。",
+  "check_rule": "available项只能observed/missed；observed须列本次真实evidence_ids。unavailable项固定单列。两臂共用清单，不限制工具顺序。",
+  "limitations": ["内部已见合成评测集，不是外部盲测。", "同预算指相同调用及时间上限，不要求实际消耗相同。", "系统耗时不是人工工时或MTTR；Token不是货币费用。", "所有失败、partial及预算退出保留，不挑最好一次。"]
+}

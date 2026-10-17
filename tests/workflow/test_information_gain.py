@@ -77,9 +77,9 @@ class QueryReuseTests(unittest.TestCase):
 
     def test_single_version_tracks_shared_diagnosis_contract_and_tools_remain_unchanged(self):
         result = single_agent(ScriptedSingle(), self.provider, P)
-        # Clarifying action outcomes changes the shared schema, not SINGLE_SYSTEM.
-        # The shared repair contract now advertises the registered maintenance actions.
-        self.assertEqual(result['prompt_version'], '9fb3a5def3ff')
+        # The single prompt now explicitly distinguishes unexecuted, empty and
+        # failed queries. Its new fingerprint must not reuse historical results.
+        self.assertEqual(result['prompt_version'], '484dddf62694')
         ex = ToolExecutor(self.provider, P, self.scope, RunContext(scope=self.scope), role='single')
         ex.execute('get_service_logs', {**self.window, 'category': 'dependency'})
         ex.execute('get_service_logs', {**self.window, 'category': 'dependency', 'level': 'ERROR'})

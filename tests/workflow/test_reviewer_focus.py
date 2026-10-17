@@ -27,6 +27,8 @@ class ReviewerFocusTests(unittest.TestCase):
         self.assertNotIn('read_only_tools', view)
         self.assertNotIn('owner_options', view)
         self.assertTrue(all('status' not in row and 'evidence_explanation' not in row for row in view['targets'].values()))
+        for index, hypothesis in enumerate(report['drafts'][0]['draft']['hypotheses'],1):
+            self.assertEqual(view['targets'][f'H{index}']['claim_explanation_to_audit'],hypothesis['evidence_explanation'])
         self.assertEqual(report['status'], 'completed')
 
     def test_schema_keeps_coverage_and_core_rules_without_executable_plans(self):

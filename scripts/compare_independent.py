@@ -1,6 +1,6 @@
 """Independent pairs: free planning by default; explicit bounded live execution only."""
 import argparse
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import json
 import os
 from pathlib import Path
@@ -36,10 +36,18 @@ def parse_args(argv=None, *, suite=None):
     parser.add_argument('--model-budget', type=int)
     parser.add_argument('--tool-budget', type=int)
     parser.add_argument('--model', help='Override MODEL from the shared project configuration')
+    parser.add_argument('--experiment-file', type=Path, help='Optional frozen paired-metrics experiment manifest')
+    parser.add_argument('--repeat-id', type=int, choices=(1, 2), default=1)
+    parser.add_argument('--order-offset', type=int, choices=(0, 1), default=0)
+    parser.add_argument('--plan-output', type=Path, help='Save a free plan to a new file; never executes a run')
     parser.add_argument('--output', type=Path, default=ROOT / 'output/independent-comparison')
     args = parser.parse_args(argv)
     if args.execute_live and not args.live:
         parser.error('--execute-live requires --live; no request sent')
+    if args.plan_output and (args.live or args.fake or args.check):
+        parser.error('--plan-output is only allowed for free planning')
+    if not args.experiment_file and (args.repeat_id != 1 or args.order_offset != 0):
+        parser.error('Repeat/order metadata requires --experiment-file')
     if args.live and (not args.execute_live or not args.cases or args.model_budget is None or args.tool_budget is None):
         parser.error('Live requires explicit cases, both budgets and --execute-live; no request sent')
     try:
@@ -66,6 +74,7 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
         return 0
     runtime_config = IncidentConfig.from_file()
     args.model = args.model or runtime_config.model
+    runtime_config = replace(runtime_config, model=args.model)
     limits = Limits(model_calls=args.model_budget, tool_calls=args.tool_budget,
                     reserve_model_calls=3, reserve_seconds=20)
     config = {'cases': args.cases, 'split': args.split, 'release_holdout': args.release_holdout,
@@ -73,12 +82,33 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
               'execution_mode': 'live' if args.live else 'scripted_control_only' if args.fake else 'plan_only',
               'model_settings': {'temperature': 0, 'max_tokens': 2200, 'max_retries': 0, 'request_timeout': 30, 'transport': 'openai_chat_completions',
                   'response_format': {'type': 'json_object'}}}
+    from evals.paired_metrics import request_fingerprint, arm_order
+    config['request_config_sha256'] = request_fingerprint(runtime_config, args.model)
+    metrics_meta, frozen_batch, manifest = None, None, None
+    if args.experiment_file:
+        from evals.paired_metrics import fingerprint, validate_batch
+        try:
+            manifest = suite.read_json(args.experiment_file)
+            frozen_batch = validate_batch(manifest, runtime_config, args.cases, asdict(limits),
+                repeat_id=args.repeat_id, order_offset=args.order_offset)
+            metrics_meta = {'experiment_id': manifest['experiment_id'], 'manifest_sha256': fingerprint(manifest),
+                            'repeat_id': args.repeat_id, 'order_offset': args.order_offset}
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            parser.error('Frozen experiment preflight failed; no request sent: ' + str(exc))
     plan = {'plan_only': not (args.live or args.fake), 'dataset_version': lock['dataset_version'],
             'configuration': config, 'paired_runs': 2 * len(args.cases),
             'maximum_model_calls': 2 * len(args.cases) * limits.model_calls,
             'maximum_tool_calls': 2 * len(args.cases) * limits.tool_calls, 'estimated_cost': None,
             'note': '默认免费计划。真实批次最多两个案例；需用户显式授权。合成观测，不访问真实IT服务。'}
+    if metrics_meta:
+        plan.update(metrics_experiment=metrics_meta, frozen_batch=frozen_batch,
+                    application_version=manifest['application_version'],
+                    evaluation_code_sha256=manifest['evaluation_code_sha256'])
     if not args.live and not args.fake:
+        if args.plan_output:
+            if args.plan_output.exists():
+                parser.error('Plan output already exists; preserved')
+            write_json(args.plan_output, plan)
         print(json.dumps(plan, ensure_ascii=False, indent=2))
         return 0
     if args.live:
@@ -97,7 +127,9 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
         except (HTTPException, ProviderError):
             parser.error('Identity/scope unavailable; no request sent')
         from agents.models import build_model, build_roles
-        factory = lambda flow: (build_model if flow == 'single' else build_roles)(key, args.model)
+        factory = lambda flow: (build_model if flow == 'single' else build_roles)(
+            key, args.model, base_url=runtime_config.base_url, extra_body=runtime_config.extra_body,
+            max_output_tokens=2200)
     else:
         principal = Principal('synthetic_demo', 'cli_reader')
     directory = args.output / str(uuid4())
@@ -113,14 +145,24 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
             'evals/independent/control.py', 'evals/independent/suite.py', 'evals/independent/scoring.py',
             'evals/incident/comparison.py', 'evals/incident/acceptance.py'),
             *getattr(suite, 'EVALUATION_FILES', ()))}}
+    if metrics_meta:
+        provenance.update(metrics_experiment=metrics_meta,
+                          evaluation_code_sha256=manifest['evaluation_code_sha256'])
     write_json(directory / 'execution-plan.json', {**plan, 'provenance': provenance})
+    attempt = None
+    if args.live and metrics_meta:
+        from evals.paired_metrics import claim_attempt
+        try:
+            attempt = claim_attempt(args.experiment_file, frozen_batch, directory)
+        except ValueError as exc:
+            parser.error(str(exc))
     bundle = {'configuration': config, 'provenance': provenance, 'runs': []}
     # Alternate arm order by neutral case number; report all runs including partial/failure.
     for cid in args.cases:
         if args.fake:
             from evals.independent.control import smoke_factory
             factory = smoke_factory(provider_factory(cid, principal))
-        order = ('single', 'multi') if int(cid.rsplit('_', 1)[1]) % 2 else ('multi', 'single')
+        order = arm_order(cid, args.order_offset)
         for flow in order:
             report = {**capture(cid, flow, factory, principal, limits, provider_factory=provider_factory,
                                 investigation_mode='agent' if args.fake else 'programmatic'),
@@ -131,10 +173,17 @@ def main(argv=None, *, suite=None, provider_factory=IndependentProvider, scoring
                                   'report_sha256': digest(path)})
             # Retain completed attempts even if a later process is interrupted.
             write_json(directory / 'run-index.json', bundle)
+            if attempt:
+                receipt_path, receipt = attempt
+                write_json(receipt_path, {**receipt, 'status': 'in_progress', 'saved_runs': len(bundle['runs'])})
     # Reference answers are hashed and opened only AFTER both arms of all selected cases finish.
     for entry in bundle['runs']:
         entry['answer_sha256'] = digest(suite_root / 'answers' / f"{entry['case_id']}.json")
     write_json(directory / 'bundle.json', bundle)
+    if attempt:
+        receipt_path, receipt = attempt
+        write_json(receipt_path, {**receipt, 'status': 'reports_saved', 'saved_runs': len(bundle['runs']),
+                                 'bundle_file': str((directory / 'bundle.json').resolve())})
     if scoring is None:
         from evals.independent import scoring
     summary, reports = scoring.evaluate(bundle, directory)

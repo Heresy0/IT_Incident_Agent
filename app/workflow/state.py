@@ -27,6 +27,7 @@ class ControlState:
     collection_follow_up_used: bool = False
     protocol_fallback_used: bool = False
     last_supervisor_failure: str | None = None
+    limited_handoff: bool = False
 
 
 @dataclass

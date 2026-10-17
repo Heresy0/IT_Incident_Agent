@@ -175,9 +175,11 @@ class LiveProtocolRegressions(unittest.TestCase):
     def test_single_without_current_fact_cannot_complete(self):
         result = single_agent(SingleReportModel(no_facts=True), FixtureProvider('case_001', P), P)
         self.assertEqual(result['status'], 'partial')
-        self.assertEqual(result['run_summary']['termination_reason'], 'DIAGNOSIS_INCOMPLETE')
+        self.assertEqual(result['run_summary']['termination_reason'], 'NO_TOOL_PROGRESS')
         self.assertEqual(result['run_summary']['tool_calls'], 0)
-        self.assertIn('故障诊断缺少可复核的当前观测。', result['output']['missing_information'])
+        self.assertFalse(result['output']['hypotheses'])
+        self.assertFalse(result['output']['recommended_actions'])
+        self.assertEqual(result['query_execution']['state'], 'not_executed')
 
     def test_complete_single_is_still_unreviewed_and_status_check_does_not_require_cause(self):
         for purpose, business in [('diagnosis', 'diagnosis_available'), ('status_check', 'status_checked')]:

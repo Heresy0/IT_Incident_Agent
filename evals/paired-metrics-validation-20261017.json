@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-17",
+  "scope": "evaluation_only",
+  "business_application_fingerprint": "fa6e3b3b76224064",
+  "business_code_changed": false,
+  "paid_model_requests": 0,
+  "real_repairs_executed": 0,
+  "new_metric_tests": {
+    "passed": 22,
+    "log": "output/paired-metrics-new-tests.log"
+  },
+  "full_regression": {
+    "tests": 723,
+    "passed": 703,
+    "skipped_isolated_database": 20,
+    "seconds": 89.987,
+    "log": "output/paired-metrics-full-tests-final.log"
+  },
+  "free_control": {
+    "unique_cases": 6,
+    "runs": 12,
+    "scripted_model_steps": 51,
+    "tool_attempts": 12,
+    "mechanical_passes": 12,
+    "quality_status": "excluded_scripted",
+    "formal_quality_rates": null,
+    "report": "output/paired-metrics-20261017/control-summary/metrics.md"
+  },
+  "history_reuse": {
+    "bundles": 2,
+    "runs": 8,
+    "version_cohorts": 2,
+    "original_report_hashes_match": true,
+    "mechanical_passes_under_current_checker": 2,
+    "human_approved_reviews": 0,
+    "quality_status": "historical_review_only",
+    "report": "output/paired-metrics-20261017/history/metrics.md",
+    "worksheet": "output/paired-metrics-20261017/history/human-reviews.template.json"
+  },
+  "first_live_batch": {
+    "status": "not_started",
+    "cases": [
+      "eval_001",
+      "eval_005"
+    ],
+    "model": "qwen3.7-flash",
+    "runs": 4,
+    "maximum_model_calls": 64,
+    "maximum_tool_calls": 32,
+    "seconds_per_run": 180,
+    "temperature": 0,
+    "max_tokens": 2200,
+    "max_retries": 0,
+    "request_timeout": 30,
+    "cost": null,
+    "plan_file": "output/paired-metrics-20261017/first-live-plan.json"
+  },
+  "protocol_sha256": "9aa65e78e865b6acc34873b4c230cba912003e8cc39bc5377b0da8e87c5c4258",
+  "evidence_sha256": {
+    "output\\paired-metrics-20261017\\experiment.json": "1bbe3e7a6fe59cec0e2f139190ffc0a75467f8eee6ec37ec05553259691e1df4",
+    "output\\paired-metrics-20261017\\first-live-plan.json": "a4ef64992f51845b0f7271a16dfa1bdc45b6df33e4c976ec8d1a7a211639f082",
+    "output\\paired-metrics-20261017\\control-summary\\metrics.json": "2a9ea24419306e2dc7920c50555aa8ff600492b38813cf07fb0cebef71c42105",
+    "output\\paired-metrics-20261017\\history\\metrics.json": "b3d497b4682adba748b0ff8b3a878c6bfc51a58a18d57258f4a6342334c5a6f0",
+    "output\\paired-metrics-20261017\\history-source-audit.json": "aad4734a05c35b40d0bcc0beb2c21b51d22a454fd604ce1c508bfc3c85d8059e",
+    "output\\paired-metrics-new-tests.log": "a6c69bd97e08482b98924a8add6ed76866309bb8d0e9c75a4a096384a3f81747",
+    "output\\paired-metrics-full-tests-final.log": "498d96e9515f97d24fa860dba2018ca419d5ba558bd55511affe8042062bc8ab"
+  },
+  "limitations": [
+    "脚本与助手评价不计业务质量；本轮没有人工正式评分。",
+    "历史版本不计当前版本成绩；当前检查器不通过项保留，不能直接解释为旧运行时成绩。",
+    "数据库检查本轮跳过；未验证真实模型Key、Bearer身份、供应商连通性或额度。"
+  ]
+}
