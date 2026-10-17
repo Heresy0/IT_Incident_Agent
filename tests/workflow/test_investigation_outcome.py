@@ -53,6 +53,14 @@ class InvestigationOutcomeTests(unittest.TestCase):
         self.assertEqual(result['run_outcome']['investigation']['known_unknowns'], ['为何开始仍未知'])
         self.assertEqual(result['diagnosis_readiness']['report_status'], 'reviewed_with_limitations')
 
+    def test_source_ledger_error_code_is_preserved_in_handoff(self):
+        self.ex.check_results['missing-source'] = {'tool': 'get_recent_changes', 'status': 'error',
+            'args': {}, 'truncated': False, 'error': 'SOURCE_NOT_CONFIGURED', 'evidence_ids': []}
+        result = self.outcome()
+        self.assertEqual(result['status'], 'partial')
+        self.assertEqual(result['run_outcome']['investigation']['source_limitations'][0]['error_code'],
+                         'SOURCE_NOT_CONFIGURED')
+
     def test_facts_and_appropriate_advice_do_not_substitute_for_mechanism(self):
         draft = self.draft(claims=False, action=True)
         result = self.outcome(draft)

@@ -22,6 +22,27 @@ class RecoveringReadModel(ClosedModel):
 
 
 class ReworkQueryRecoveryTests(unittest.TestCase):
+    def test_corrected_argument_error_is_retained_as_history_without_false_interruption(self):
+        class BadThenValid(ClosedModel):
+            def invoke(self, messages):
+                request = json.loads(messages[-1].content)
+                if request.get('stage') == 'investigate' and request['input'].get('review_feedback'):
+                    self.rework_steps += 1
+                    value = ({'kind': 'query', 'tool': 'get_service_logs',
+                              'args': {'category': 'resource', 'unexpected': True}}
+                             if self.rework_steps == 1 else
+                             {'kind': 'query', 'tool': 'get_service_logs', 'args': {'category': 'resource'}}
+                             if self.rework_steps == 2 else {'kind': 'finish'})
+                    return AIMessage(content=json.dumps(value))
+                return super().invoke(messages)
+        report = investigate(BadThenValid(), FixtureProvider('case_001', P), P,
+            limits=Limits(model_calls=12, tool_calls=8), enable_rework=True, enable_challenge=False)
+        failure = next(row for row in report['protocol_failures'] if row.get('code') == 'INVALID_ARGUMENTS')
+        self.assertTrue(failure['recovered'])
+        self.assertEqual(report['run_outcome']['execution']['failure_codes'], [])
+        self.assertEqual(report['status'], 'completed')
+        self.assertEqual(report['run_summary']['tool_calls'], 2)
+
     def test_duplicate_feedback_can_be_followed_by_a_third_new_scope_choice(self):
         model = RecoveringReadModel()
         report = investigate(model, FixtureProvider('case_001', P), P,

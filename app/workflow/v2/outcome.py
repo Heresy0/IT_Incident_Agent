@@ -18,6 +18,8 @@ _HARD_STOPS = {
 
 
 def _error_code(error):
+    if isinstance(error, str):
+        return error
     if isinstance(error, dict):
         return error.get('code')
     return getattr(error, 'code', None)
