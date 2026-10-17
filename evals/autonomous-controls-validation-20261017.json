@@ -1,0 +1,2693 @@
+{
+  "schema_version": "autonomous-controls-validation-v1",
+  "validation_date": "2026-10-17",
+  "branch": "codex/autonomous-investigation-v2",
+  "baseline_commit": "221aeaefa0558089a41b5ed23ad6b9c2dab4c419",
+  "implementation_commits": [
+    "8fe092e",
+    "bf052b0",
+    "4bc643f"
+  ],
+  "source_version": "6314e5e1a65e932c",
+  "engine_version": "autonomous_v2.4",
+  "prompt_version": "autonomous_step_v2",
+  "scope": "依次修复完成契约/停止原因、预算分配、最小调查问题状态；没有新增项目Agent或模型规划阶段。",
+  "engineering_status": "implemented_and_verified",
+  "synthetic_comparison_status": "passed",
+  "production_acceptance": "hold",
+  "human_semantic_gate": "pending",
+  "production_rollout": false,
+  "original_uncommitted_changes": {
+    "sha256": {
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "evals/multi-prompt-simplification-validation-20261017.json": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "tests/workflow/test_prompt_query_boundaries.py": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    },
+    "byte_identical_after": {
+      "app/agents/prompts.py": true,
+      "evals/multi-prompt-simplification-validation-20261017.json": true,
+      "tests/workflow/test_prompt_query_boundaries.py": true
+    },
+    "included_in_commits": false
+  },
+  "implementation": [
+    {
+      "order": 1,
+      "commit": "8fe092e",
+      "change": "允许受审阅支持的有限机制不附加人工建议；独立报告执行、条目审阅、有限调查结论和真实阻碍。完成不代表唯一根因或已修复。"
+    },
+    {
+      "order": 2,
+      "commit": "bf052b0",
+      "change": "只预留实际待执行的草稿/修订、审阅和可选挑战额度；每次重复调用仍计入总预算。返工最多两次新范围读取，连续三次无进展停止，允许读取去重反馈后恢复。"
+    },
+    {
+      "order": 3,
+      "commit": "4bc643f",
+      "change": "最多三条服务端问题记录进入既有模型调用；保留原调查问题、当前异议、读取结果与登记候选。观测增加、文字收窄、撤回分别审计，不接受模型自报已解决。"
+    }
+  ],
+  "invariants": {
+    "new_project_agents": 0,
+    "additional_planner_model_calls": 0,
+    "new_model_output_schemas": 0,
+    "semantic_rework_rounds_max": 1,
+    "rework_novel_scoped_reads_max": 2,
+    "consecutive_no_progress_limit": 3,
+    "per_run_model_calls": 12,
+    "per_run_tool_calls": 8,
+    "seconds": 180,
+    "input_chars": 48000,
+    "source_authorization_unchanged": true,
+    "same_executor_and_run_context": true,
+    "repair_eligible": false,
+    "unassessed_review_or_challenge_cannot_approve": true,
+    "provider_writes_executed": false
+  },
+  "controlled_comparison": {
+    "schema_version": "autonomous-controls-comparison-v1",
+    "paid_requests_sent": 0,
+    "comparison_plan_sha256": "7972bc42c6a3455c2d1ef6c9b402b710f9256173c5dab73c35117981d2d4968d",
+    "comparability": "passed",
+    "stages": {
+      "e2e": {
+        "stage": "e2e",
+        "comparability": "passed",
+        "normalization_notes": [],
+        "baseline_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\bundle.json",
+          "sha256": "969b0e507b244a8a9d4bc09bf0ff5d06b85b6390d640d9924e518b84868f8d9f",
+          "application": {
+            "source_version": "30a0185e998a69ea",
+            "engine_version": "autonomous_v2.3",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "eee17020b555d3e92d084a5232c4077afe44fa7c68d0975a1f4530262d7ff2ae",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "candidate_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\bundle.json",
+          "sha256": "231eb8327bf5eb96f212f83236f923f357ec7c162f166f873b6ee8c6e9ebb60d",
+          "application": {
+            "source_version": "6314e5e1a65e932c",
+            "engine_version": "autonomous_v2.4",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180.0,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "baseline": {
+          "runs": 6,
+          "completed": 2,
+          "key_observations_required": 6,
+          "key_observations_acquired": 4,
+          "key_observations_omitted": 2,
+          "key_observations_acquired_after_review": 0,
+          "resources": {
+            "model_calls": {
+              "known_runs": 6,
+              "sum": 56,
+              "mean": 9.333333333333334
+            },
+            "tool_calls": {
+              "known_runs": 6,
+              "sum": 17,
+              "mean": 2.8333333333333335
+            },
+            "duration_ms": {
+              "known_runs": 6,
+              "sum": 137951,
+              "mean": 22991.833333333332
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 0,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 0,
+          "reference_items": 0,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 0,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 3,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "candidate": {
+          "runs": 6,
+          "completed": 4,
+          "key_observations_required": 6,
+          "key_observations_acquired": 5,
+          "key_observations_omitted": 1,
+          "key_observations_acquired_after_review": 0,
+          "resources": {
+            "model_calls": {
+              "known_runs": 6,
+              "sum": 67,
+              "mean": 11.166666666666666
+            },
+            "tool_calls": {
+              "known_runs": 6,
+              "sum": 17,
+              "mean": 2.8333333333333335
+            },
+            "duration_ms": {
+              "known_runs": 6,
+              "sum": 157626,
+              "mean": 26271.0
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 0,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 0,
+          "reference_items": 0,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 0,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 2,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "pairs": [
+          {
+            "case_id": "followup_available",
+            "arm": "closed_loop",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\followup_available-closed_loop-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\followup_available-closed_loop-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 2,
+              "duration_ms": 31328,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 3,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 11,
+              "tool_calls": 2,
+              "duration_ms": 33766,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 3,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": -1,
+              "tool_calls": 0,
+              "duration_ms": 2438
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "partial",
+              "projected_status": "partial",
+              "projected_reason": "string_too_short",
+              "status_changed": false,
+              "empty_advice_gate_completion_gain": false,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "interrupted",
+                  "collection_stop": "NO_NEW_QUERIES",
+                  "failure_codes": [
+                    "string_too_short",
+                    "CHALLENGE_BUDGET_UNAVAILABLE"
+                  ]
+                },
+                "review": {
+                  "status": "needs_information",
+                  "target_count": 3,
+                  "valid_target_count": 1,
+                  "unresolved_target_ids": [
+                    "C1",
+                    "C2"
+                  ]
+                },
+                "investigation": {
+                  "status": "handoff",
+                  "supported_mechanism_ids": [],
+                  "known_unknowns": [
+                    "缺乏对peer_0f8be79d（允许依赖）的具体错误原因或状态观测。",
+                    "无法确定是临时网络抖动、下游服务崩溃还是配置不匹配导致的502。",
+                    "未新增观测，仅修订或撤回表述；原审阅异议仍需交接：C1：独立来源范围挑战提出模型异议，未经人工判定：下游依赖组件返回HTTP 502错误导致当前请求失败。；缺少观测：需要观测到具体的HTTP 502状态码响应数据，以证实'HTTP 502'这一具体错误类型及因果链条。；原句断言了具体的错误代码（HTTP 502）及其导致的因果关系。来源EV仅提供了error_code为'GATEWAY_FAILURE'和message文本中包含'HTTP 502'字符串。根据规则，引用有效只证明可溯源，不证明含义或因果；且field_path 'error_code'的值是'GATEWAY_FAILURE'而非'502'，无法直接覆盖'HTTP 502'这一特定技术事实的观测，属于未覆盖的具体断言。"
+                  ],
+                  "source_limitations": [],
+                  "blockers": [
+                    "EXECUTION_FAILURE",
+                    "REVIEW_INCOMPLETE",
+                    "NO_SUPPORTED_MECHANISM"
+                  ]
+                },
+                "completion_basis": null,
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          },
+          {
+            "case_id": "followup_available",
+            "arm": "closed_loop",
+            "repeat": 2,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\followup_available-closed_loop-r2.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\followup_available-closed_loop-r2.json",
+            "baseline": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 2,
+              "duration_ms": 33062,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 1,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 4,
+              "duration_ms": 25468,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 2,
+              "duration_ms": -7594
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "completed",
+              "projected_status": "completed",
+              "projected_reason": "FINISHED",
+              "status_changed": false,
+              "empty_advice_gate_completion_gain": false,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "completed",
+                  "collection_stop": "NO_NEW_QUERIES",
+                  "failure_codes": []
+                },
+                "review": {
+                  "status": "passed",
+                  "target_count": 3,
+                  "valid_target_count": 3,
+                  "unresolved_target_ids": []
+                },
+                "investigation": {
+                  "status": "limited",
+                  "supported_mechanism_ids": [
+                    "C1"
+                  ],
+                  "known_unknowns": [
+                    "缺乏对peer_0f8be79d服务内部状态的直接观测证据。",
+                    "无法确定502是源于目标服务过载、连接拒绝还是路由配置错误。",
+                    "未新增观测，仅修订或撤回表述；原审阅异议仍需交接：C1：观测证实下游依赖返回了HTTP 502错误（支持前半部分），但日志明确记录‘downstream response was not recorded by this channel’，表明当前渠道未成功接收或记录该响应数据。命题声称‘导致当前请求失败’隐含了完整的请求-响应链路中断或特定因果路径，而观测仅显示网关层报错且响应未被本渠道记录，未能直接证明该502是导致最终用户请求失败的唯一或直接原因（可能存在重试、缓存或其他上游处理逻辑）。因此，仅部分表述得到支持。"
+                  ],
+                  "source_limitations": [],
+                  "blockers": []
+                },
+                "completion_basis": "model_reviewed_bounded_mechanism",
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          },
+          {
+            "case_id": "followup_unavailable",
+            "arm": "closed_loop",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\followup_unavailable-closed_loop-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\followup_unavailable-closed_loop-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 0,
+                "acquired_count": 0,
+                "omitted_ids": [],
+                "available": false,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 8,
+              "tool_calls": 3,
+              "duration_ms": 17015,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 2,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 0,
+                "acquired_count": 0,
+                "omitted_ids": [],
+                "available": false,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 8,
+              "tool_calls": 1,
+              "duration_ms": 15922,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": -2,
+              "duration_ms": -1093
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "partial",
+              "projected_status": "partial",
+              "projected_reason": "SOURCE_NOT_CONFIGURED",
+              "status_changed": false,
+              "empty_advice_gate_completion_gain": false,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "interrupted",
+                  "collection_stop": "COLLECTION_BUDGET_EXHAUSTED",
+                  "failure_codes": [
+                    "SOURCE_NOT_CONFIGURED"
+                  ]
+                },
+                "review": {
+                  "status": "passed",
+                  "target_count": 2,
+                  "valid_target_count": 2,
+                  "unresolved_target_ids": []
+                },
+                "investigation": {
+                  "status": "handoff",
+                  "supported_mechanism_ids": [
+                    "C1"
+                  ],
+                  "known_unknowns": [
+                    "Recent configuration changes are unavailable due to SOURCE_NOT_CONFIGURED.",
+                    "Peer service health logs are not accessible through this service."
+                  ],
+                  "source_limitations": [
+                    {
+                      "tool": "get_recent_changes",
+                      "status": "error",
+                      "truncated": false,
+                      "error_code": "SOURCE_NOT_CONFIGURED"
+                    },
+                    {
+                      "tool": "get_recent_changes",
+                      "status": "error",
+                      "truncated": false,
+                      "error_code": "SOURCE_NOT_CONFIGURED"
+                    }
+                  ],
+                  "blockers": [
+                    "EXECUTION_FAILURE",
+                    "SOURCE_LIMITED"
+                  ]
+                },
+                "completion_basis": null,
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          },
+          {
+            "case_id": "followup_unavailable",
+            "arm": "closed_loop",
+            "repeat": 2,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\followup_unavailable-closed_loop-r2.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\followup_unavailable-closed_loop-r2.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 0,
+                "acquired_count": 0,
+                "omitted_ids": [],
+                "available": false,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 8,
+              "tool_calls": 3,
+              "duration_ms": 18000,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 2,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 0,
+                "acquired_count": 0,
+                "omitted_ids": [],
+                "available": false,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 4,
+              "duration_ms": 24485,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 1,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 4,
+              "tool_calls": 1,
+              "duration_ms": 6485
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "partial",
+              "projected_status": "partial",
+              "projected_reason": "SOURCE_NOT_CONFIGURED",
+              "status_changed": false,
+              "empty_advice_gate_completion_gain": false,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "interrupted",
+                  "collection_stop": "COLLECTION_BUDGET_EXHAUSTED",
+                  "failure_codes": [
+                    "SOURCE_NOT_CONFIGURED"
+                  ]
+                },
+                "review": {
+                  "status": "passed",
+                  "target_count": 3,
+                  "valid_target_count": 3,
+                  "unresolved_target_ids": []
+                },
+                "investigation": {
+                  "status": "handoff",
+                  "supported_mechanism_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "known_unknowns": [
+                    "get_recent_changes query failed with SOURCE_NOT_CONFIGURED, preventing verification of recent configuration or state changes.",
+                    "Cannot distinguish between local timeout due to remote unavailability versus internal processing delay without successful change history."
+                  ],
+                  "source_limitations": [
+                    {
+                      "tool": "get_recent_changes",
+                      "status": "error",
+                      "truncated": false,
+                      "error_code": "SOURCE_NOT_CONFIGURED"
+                    },
+                    {
+                      "tool": "get_recent_changes",
+                      "status": "error",
+                      "truncated": false,
+                      "error_code": "SOURCE_NOT_CONFIGURED"
+                    }
+                  ],
+                  "blockers": [
+                    "EXECUTION_FAILURE",
+                    "SOURCE_LIMITED"
+                  ]
+                },
+                "completion_basis": null,
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "arm": "closed_loop",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\temporal_counterevidence-closed_loop-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\temporal_counterevidence-closed_loop-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 2,
+                "acquired_count": 2,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 8,
+              "tool_calls": 4,
+              "duration_ms": 18843,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 2,
+                "acquired_count": 2,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 3,
+              "duration_ms": 31797,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 4,
+              "tool_calls": -1,
+              "duration_ms": 12954
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "partial",
+              "projected_status": "completed",
+              "projected_reason": "FINISHED",
+              "status_changed": true,
+              "empty_advice_gate_completion_gain": true,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "completed",
+                  "collection_stop": "COLLECTION_BUDGET_EXHAUSTED",
+                  "failure_codes": []
+                },
+                "review": {
+                  "status": "passed",
+                  "target_count": 2,
+                  "valid_target_count": 2,
+                  "unresolved_target_ids": []
+                },
+                "investigation": {
+                  "status": "limited",
+                  "supported_mechanism_ids": [
+                    "C1"
+                  ],
+                  "known_unknowns": [
+                    "无法确定06:04之前的故障是否由相同的受众配置问题引起，因为缺乏更早的日志证据。",
+                    "无法确认06:08的配置更新是否解决了根本原因或引入了新的状态。"
+                  ],
+                  "source_limitations": [],
+                  "blockers": []
+                },
+                "completion_basis": "model_reviewed_bounded_mechanism",
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "arm": "closed_loop",
+            "repeat": 2,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-e2e\\9d335006-b5e8-470a-a75c-0761db76fce6\\temporal_counterevidence-closed_loop-r2.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-e2e\\2652ed0b-da12-4475-b2a4-501d06daef88\\temporal_counterevidence-closed_loop-r2.json",
+            "baseline": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 2,
+                "acquired_count": 2,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 8,
+              "tool_calls": 3,
+              "duration_ms": 19703,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 2,
+                "acquired_count": 2,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 12,
+              "tool_calls": 3,
+              "duration_ms": 26188,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 4,
+              "tool_calls": 0,
+              "duration_ms": 6485
+            },
+            "baseline_contract_reprojection": {
+              "status": "available",
+              "original_status": "completed",
+              "projected_status": "completed",
+              "projected_reason": "FINISHED",
+              "status_changed": false,
+              "empty_advice_gate_completion_gain": false,
+              "new_observations": 0,
+              "paid_requests": 0,
+              "causal_accuracy_gain": null,
+              "run_outcome": {
+                "execution": {
+                  "status": "completed",
+                  "collection_stop": "COLLECTION_BUDGET_EXHAUSTED",
+                  "failure_codes": []
+                },
+                "review": {
+                  "status": "passed",
+                  "target_count": 3,
+                  "valid_target_count": 3,
+                  "unresolved_target_ids": []
+                },
+                "investigation": {
+                  "status": "limited",
+                  "supported_mechanism_ids": [
+                    "C1"
+                  ],
+                  "known_unknowns": [
+                    "缺乏故障发生瞬间（06:04）的确切配置快照，无法直接证明当时的配置值与请求不匹配。",
+                    "未提供peer_7747622b在故障期间的详细日志或健康状态，排除依赖方自身问题。"
+                  ],
+                  "source_limitations": [],
+                  "blockers": []
+                },
+                "completion_basis": "model_reviewed_bounded_mechanism",
+                "human_verified": false,
+                "causality_verified_by_program": false
+              },
+              "note": "Same recorded trajectory; contract-only reprojection is not new investigation or semantic acceptance."
+            }
+          }
+        ],
+        "contract_reprojection": {
+          "requested": true,
+          "available_runs": 6,
+          "not_available_runs": 0,
+          "original_completed_among_available": 2,
+          "projected_completed_among_available": 3,
+          "empty_advice_gate_completion_gains": 1,
+          "new_observations": 0,
+          "paid_requests": 0,
+          "causal_accuracy_gain": null
+        },
+        "human_semantic_gate": "pending",
+        "rollout_recommendation": "hold",
+        "acquisition_is_not_causal_success": true
+      },
+      "fixed_rework": {
+        "stage": "fixed_rework",
+        "comparability": "passed",
+        "normalization_notes": [],
+        "baseline_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-fixed\\c0ced833-0dec-450b-a21d-b8b4b121d6ad\\bundle.json",
+          "sha256": "f1bf4221c9cd28a8e537d1ffaaeba02b374502e0f05a9db4e09cc8c43ad463e1",
+          "application": {
+            "source_version": "30a0185e998a69ea",
+            "engine_version": "autonomous_v2.3",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "eee17020b555d3e92d084a5232c4077afe44fa7c68d0975a1f4530262d7ff2ae",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "candidate_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-fixed\\a8f15243-40d8-4bbe-82f8-10497d9c2b75\\bundle.json",
+          "sha256": "c8102061801561e5eb76b19905ff75befb375b17d80bc3e45a97682e691b309b",
+          "application": {
+            "source_version": "6314e5e1a65e932c",
+            "engine_version": "autonomous_v2.4",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180.0,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "baseline": {
+          "runs": 2,
+          "completed": 0,
+          "key_observations_required": 2,
+          "key_observations_acquired": 0,
+          "key_observations_omitted": 2,
+          "key_observations_acquired_after_review": 0,
+          "resources": {
+            "model_calls": {
+              "known_runs": 2,
+              "sum": 13,
+              "mean": 6.5
+            },
+            "tool_calls": {
+              "known_runs": 2,
+              "sum": 4,
+              "mean": 2.0
+            },
+            "duration_ms": {
+              "known_runs": 2,
+              "sum": 25016,
+              "mean": 12508.0
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 0,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 0,
+          "reference_items": 0,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 0,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 0,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "candidate": {
+          "runs": 2,
+          "completed": 1,
+          "key_observations_required": 2,
+          "key_observations_acquired": 1,
+          "key_observations_omitted": 1,
+          "key_observations_acquired_after_review": 1,
+          "resources": {
+            "model_calls": {
+              "known_runs": 2,
+              "sum": 12,
+              "mean": 6.0
+            },
+            "tool_calls": {
+              "known_runs": 2,
+              "sum": 4,
+              "mean": 2.0
+            },
+            "duration_ms": {
+              "known_runs": 2,
+              "sum": 26015,
+              "mean": 13007.5
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 0,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 0,
+          "reference_items": 0,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 0,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 0,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "pairs": [
+          {
+            "case_id": "followup_available",
+            "arm": "closed_loop",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-fixed\\c0ced833-0dec-450b-a21d-b8b4b121d6ad\\followup_available-closed_loop-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-fixed\\a8f15243-40d8-4bbe-82f8-10497d9c2b75\\followup_available-closed_loop-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 6,
+              "tool_calls": 2,
+              "duration_ms": 12141,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": true,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 1,
+                "omitted_ids": [],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [
+                "local-detail"
+              ],
+              "model_calls": 7,
+              "tool_calls": 3,
+              "duration_ms": 15468,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 1,
+              "duration_ms": 3327
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "followup_available",
+            "arm": "closed_loop",
+            "repeat": 2,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-fixed\\c0ced833-0dec-450b-a21d-b8b4b121d6ad\\followup_available-closed_loop-r2.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-fixed\\a8f15243-40d8-4bbe-82f8-10497d9c2b75\\followup_available-closed_loop-r2.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 7,
+              "tool_calls": 2,
+              "duration_ms": 12875,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": {
+                "reference_kind": "synthetic_key_observation_ids",
+                "required_count": 1,
+                "acquired_count": 0,
+                "omitted_ids": [
+                  "local-detail"
+                ],
+                "available": true,
+                "human_verified": false
+              },
+              "key_observations_acquired_after_review": [],
+              "model_calls": 5,
+              "tool_calls": 1,
+              "duration_ms": 10547,
+              "review_controls": [],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": -2,
+              "tool_calls": -1,
+              "duration_ms": -2328
+            },
+            "baseline_contract_reprojection": null
+          }
+        ],
+        "contract_reprojection": {
+          "requested": false,
+          "available_runs": 0,
+          "not_available_runs": 0,
+          "original_completed_among_available": 0,
+          "projected_completed_among_available": 0,
+          "empty_advice_gate_completion_gains": 0,
+          "new_observations": 0,
+          "paid_requests": 0,
+          "causal_accuracy_gain": null
+        },
+        "human_semantic_gate": "pending",
+        "rollout_recommendation": "hold",
+        "acquisition_is_not_causal_success": true
+      },
+      "review": {
+        "stage": "review",
+        "comparability": "passed",
+        "normalization_notes": [],
+        "baseline_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\bundle.json",
+          "sha256": "1c5bc4cb437316c82c6c1b7bb3257fd4915ada55510508b5f02b5d8d56823d19",
+          "application": {
+            "source_version": "30a0185e998a69ea",
+            "engine_version": "autonomous_v2.3",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "eee17020b555d3e92d084a5232c4077afe44fa7c68d0975a1f4530262d7ff2ae",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "candidate_bundle": {
+          "path": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\bundle.json",
+          "sha256": "a272b728c923d4293b103c0ecd13f78fd47d55ad22141289b6348039ab1a148b",
+          "application": {
+            "source_version": "6314e5e1a65e932c",
+            "engine_version": "autonomous_v2.4",
+            "review_policy_version": "atomic_review_v2",
+            "contract_version": "atomic_draft_v1",
+            "challenge_policy_version": "blind_scope_challenge_v1",
+            "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+            "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+            "engine_source_sha256": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+            "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+            "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+          }
+        },
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180.0,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "baseline": {
+          "runs": 8,
+          "completed": 0,
+          "key_observations_required": 0,
+          "key_observations_acquired": 0,
+          "key_observations_omitted": 0,
+          "key_observations_acquired_after_review": 0,
+          "resources": {
+            "model_calls": {
+              "known_runs": 8,
+              "sum": 15,
+              "mean": 1.875
+            },
+            "tool_calls": {
+              "known_runs": 8,
+              "sum": 14,
+              "mean": 1.75
+            },
+            "duration_ms": {
+              "known_runs": 8,
+              "sum": 45296,
+              "mean": 5662.0
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 10,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 6,
+          "reference_items": 16,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 10,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 0,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "candidate": {
+          "runs": 8,
+          "completed": 0,
+          "key_observations_required": 0,
+          "key_observations_acquired": 0,
+          "key_observations_omitted": 0,
+          "key_observations_acquired_after_review": 0,
+          "resources": {
+            "model_calls": {
+              "known_runs": 8,
+              "sum": 15,
+              "mean": 1.875
+            },
+            "tool_calls": {
+              "known_runs": 8,
+              "sum": 14,
+              "mean": 1.75
+            },
+            "duration_ms": {
+              "known_runs": 8,
+              "sum": 45516,
+              "mean": 5689.5
+            }
+          },
+          "provisional_false_accepts": 0,
+          "negative_reference_items": 10,
+          "provisional_false_rejects": 0,
+          "positive_reference_items": 6,
+          "reference_items": 16,
+          "unassessed_reference_items": 0,
+          "provisional_exact_agreement": 10,
+          "execution_error_runs": 0,
+          "unrecovered_failure_runs": 0,
+          "hard_limit_violation_runs": 0,
+          "budget_rejections": 0
+        },
+        "pairs": [
+          {
+            "case_id": "compound_assertion",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\compound_assertion-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\compound_assertion-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 6547,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C3",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 5531,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C3",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -1016
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "contribution_and_uniqueness",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\contribution_and_uniqueness-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\contribution_and_uniqueness-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 3,
+              "tool_calls": 2,
+              "duration_ms": 6625,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 3,
+              "tool_calls": 2,
+              "duration_ms": 6516,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -109
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "followup_available",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\followup_available-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\followup_available-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 1,
+              "tool_calls": 1,
+              "duration_ms": 2188,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 1,
+              "tool_calls": 1,
+              "duration_ms": 1906,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -282
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\followup_unavailable-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\followup_unavailable-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 1,
+              "tool_calls": 1,
+              "duration_ms": 1656,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "insufficient",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 1,
+              "tool_calls": 1,
+              "duration_ms": 1828,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "insufficient",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 172
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "future_manual_check",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\future_manual_check-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\future_manual_check-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 6000,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "partial",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "A1",
+                  "kind": "check_appropriateness",
+                  "expected": "appropriate",
+                  "observed": "appropriate",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 6313,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "partial",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "A1",
+                  "kind": "check_appropriateness",
+                  "expected": "appropriate",
+                  "observed": "appropriate",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 313
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "pool_probe_ambiguity",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\pool_probe_ambiguity-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\pool_probe_ambiguity-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 5,
+              "duration_ms": 8906,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C3",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 5,
+              "duration_ms": 9766,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C3",
+                  "kind": "factual_relation",
+                  "expected": "insufficient",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 860
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "probe_scope",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\probe_scope-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\probe_scope-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 6234,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 6609,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "partial",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": false,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 375
+            },
+            "baseline_contract_reprojection": null
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "arm": "challenged_review",
+            "repeat": 1,
+            "baseline_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\baseline-review\\a8e5c3e9-3343-4fb1-b5f8-723323f09860\\temporal_counterevidence-challenged_review-r1.json",
+            "candidate_report": "D:\\code\\it_incident_agent\\output\\autonomy-controls\\candidate-review\\b95d6a99-4241-44d8-90e1-a72b2427f6bb\\temporal_counterevidence-challenged_review-r1.json",
+            "baseline": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 2,
+              "duration_ms": 7140,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "candidate": {
+              "completed": false,
+              "key_observations": null,
+              "key_observations_acquired_after_review": [],
+              "model_calls": 2,
+              "tool_calls": 2,
+              "duration_ms": 7047,
+              "review_controls": [
+                {
+                  "target_id": "C1",
+                  "kind": "factual_relation",
+                  "expected": "contradicted",
+                  "observed": "contradicted",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                },
+                {
+                  "target_id": "C2",
+                  "kind": "factual_relation",
+                  "expected": "supported",
+                  "observed": "supported",
+                  "protocol_status": "valid",
+                  "false_accept": false,
+                  "false_reject": false,
+                  "exact_agreement": true,
+                  "reference_kind": "synthetic_source_constructed_provisional",
+                  "human_verified": false
+                }
+              ],
+              "execution_error": false,
+              "unrecovered_failures": 0,
+              "hard_limit_violations": [],
+              "budget_rejections": 0
+            },
+            "resource_delta_candidate_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -93
+            },
+            "baseline_contract_reprojection": null
+          }
+        ],
+        "contract_reprojection": {
+          "requested": false,
+          "available_runs": 0,
+          "not_available_runs": 0,
+          "original_completed_among_available": 0,
+          "projected_completed_among_available": 0,
+          "empty_advice_gate_completion_gains": 0,
+          "new_observations": 0,
+          "paid_requests": 0,
+          "causal_accuracy_gain": null
+        },
+        "human_semantic_gate": "pending",
+        "rollout_recommendation": "hold",
+        "acquisition_is_not_causal_success": true
+      }
+    },
+    "cross_stage_errors": [],
+    "synthetic_acceptance": {
+      "status": "passed",
+      "conditions": {
+        "e2e_no_hard_cap_violation": true,
+        "e2e_no_execution_error": true,
+        "fixed_rework_no_hard_cap_violation": true,
+        "fixed_rework_no_execution_error": true,
+        "review_no_hard_cap_violation": true,
+        "review_no_execution_error": true,
+        "fixed_acquisition_improved": true,
+        "e2e_no_additional_omissions": true,
+        "e2e_no_fewer_completed": true,
+        "e2e_no_fewer_completed_same_contract": true,
+        "review_false_accept_no_increase": true,
+        "review_all_controls_assessed": true
+      }
+    },
+    "human_semantic_gate": "pending",
+    "production_accuracy": "not_established",
+    "rollout_recommendation": "hold",
+    "limitations": [
+      "Source-constructed controls and small repeated samples are not independent human gold.",
+      "Collected records, model-reviewed claims and contract completion are separate outcomes.",
+      "Contract-only reprojection neither changes the trajectory nor demonstrates causal improvement."
+    ]
+  },
+  "completion_interpretation": {
+    "baseline_original_completed": 2,
+    "baseline_same_reports_new_contract_completed": 3,
+    "candidate_completed": 4,
+    "runs_per_version": 6,
+    "contract_reprojection_paid_calls": 0,
+    "contract_reprojection_new_observations": 0,
+    "meaning": "旧报告仅重投影2/6→3/6，新实际轨迹4/6。完成契约变化与实际运行变化分开列示，不能将全部完成增幅当作取证或因果准确率提升，也不是严格可加的因果分解。",
+    "same_contract_extra_completed_run": {
+      "case_id": "followup_unavailable",
+      "repeat": 1,
+      "explanation": "候选未查询不可用changes来源，形成有范围限制的超时报告并保留未知；没有取得额外关键观测。"
+    },
+    "key_acquisition_gain_is_a_separate_run": {
+      "case_id": "followup_available",
+      "repeat": 2,
+      "explanation": "候选实际新增local-detail；旧版此轮虽漏该记录也已completed，因此不能用完成数代表取证准确率。"
+    }
+  },
+  "key_observation_interpretation": {
+    "e2e_baseline_acquired": 4,
+    "e2e_candidate_acquired": 5,
+    "e2e_required_records_per_version": 6,
+    "denominator": "三案例各重复两次；temporal每次两条、available每次一条、unavailable无可得关键条目。6是记录数，不是6种故障。",
+    "fixed_baseline_acquired": 0,
+    "fixed_candidate_acquired": 1,
+    "fixed_required": 2,
+    "fixed_boundary": "同一作者构造可补证案例两次重复；固定初始查询和错误初稿，独立于自然端到端实验。"
+  },
+  "resource_tradeoff": {
+    "e2e_baseline_mean_model_calls": 9.333333333333334,
+    "e2e_candidate_mean_model_calls": 11.166666666666666,
+    "e2e_model_call_increase_percent": 19.64,
+    "e2e_baseline_mean_seconds": 22.991833333333332,
+    "e2e_candidate_mean_seconds": 26.271,
+    "fixed_baseline_mean_model_calls": 6.5,
+    "fixed_candidate_mean_model_calls": 6.0,
+    "limits_identical": true,
+    "currency_cost": null
+  },
+  "regression": {
+    "full_suite_discovered": 1020,
+    "full_suite_passed": 1000,
+    "skipped": 20,
+    "duration_seconds": 131.969,
+    "full_suite_status": "passed",
+    "skip_reason": "没有隔离PostgreSQL/pgvector测试配置；未连接生产数据库。",
+    "subsequent_comparison_tool_tests": {
+      "tests": 16,
+      "status": "passed",
+      "reason": "在完整回归之后增加同契约完成不退化门槛，仅修改离线比较器，重新通过该工具全部16项测试。"
+    },
+    "application_source_unchanged_after_full_suite": true
+  },
+  "e2e_run_details": [
+    {
+      "arm": "baseline",
+      "case_id": "temporal_counterevidence",
+      "repeat": 1,
+      "status": "partial",
+      "model_calls": 8,
+      "tool_calls": 4,
+      "termination_reason": "COLLECTION_BUDGET_EXHAUSTED",
+      "rework_rounds": 0,
+      "run_outcome": null,
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "baseline",
+      "case_id": "followup_available",
+      "repeat": 1,
+      "status": "partial",
+      "model_calls": 12,
+      "tool_calls": 2,
+      "termination_reason": "NO_NEW_QUERIES",
+      "rework_rounds": 1,
+      "run_outcome": null,
+      "unrecovered_failures": [
+        {
+          "stage": "review",
+          "category": "shape",
+          "code": "string_too_short",
+          "path": "items.0.issue",
+          "target_id": "C1",
+          "recovered": false
+        },
+        {
+          "stage": "review",
+          "category": "shape",
+          "code": "string_too_short",
+          "path": "items.1.issue",
+          "target_id": "C2",
+          "recovered": false
+        },
+        {
+          "stage": "review",
+          "category": "policy",
+          "code": "CHALLENGE_BUDGET_UNAVAILABLE",
+          "path": "$",
+          "recovered": false
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case_id": "followup_unavailable",
+      "repeat": 1,
+      "status": "partial",
+      "model_calls": 8,
+      "tool_calls": 3,
+      "termination_reason": "COLLECTION_BUDGET_EXHAUSTED",
+      "rework_rounds": 0,
+      "run_outcome": null,
+      "unrecovered_failures": [
+        {
+          "stage": "query",
+          "category": "transport",
+          "code": "SOURCE_NOT_CONFIGURED"
+        },
+        {
+          "stage": "query",
+          "category": "transport",
+          "code": "SOURCE_NOT_CONFIGURED"
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case_id": "temporal_counterevidence",
+      "repeat": 2,
+      "status": "completed",
+      "model_calls": 8,
+      "tool_calls": 3,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 0,
+      "run_outcome": null,
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "baseline",
+      "case_id": "followup_available",
+      "repeat": 2,
+      "status": "completed",
+      "model_calls": 12,
+      "tool_calls": 2,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 1,
+      "run_outcome": null,
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "baseline",
+      "case_id": "followup_unavailable",
+      "repeat": 2,
+      "status": "partial",
+      "model_calls": 8,
+      "tool_calls": 3,
+      "termination_reason": "COLLECTION_BUDGET_EXHAUSTED",
+      "rework_rounds": 0,
+      "run_outcome": null,
+      "unrecovered_failures": [
+        {
+          "stage": "query",
+          "category": "transport",
+          "code": "SOURCE_NOT_CONFIGURED"
+        },
+        {
+          "stage": "query",
+          "category": "transport",
+          "code": "SOURCE_NOT_CONFIGURED"
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case_id": "temporal_counterevidence",
+      "repeat": 1,
+      "status": "completed",
+      "model_calls": 12,
+      "tool_calls": 3,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 1,
+      "run_outcome": {
+        "execution": {
+          "status": "completed",
+          "collection_stop": "NO_NEW_QUERIES",
+          "failure_codes": []
+        },
+        "review": {
+          "status": "passed",
+          "target_count": 2,
+          "valid_target_count": 2,
+          "unresolved_target_ids": []
+        },
+        "investigation": {
+          "status": "limited",
+          "supported_mechanism_ids": [
+            "C1"
+          ],
+          "known_unknowns": [
+            "无法确认06:04故障时的具体配置值与当前scope-b是否不兼容，仅知故障发生在配置变更前。",
+            "缺乏对peer_7747622b在06:04时刻状态或日志的观测，无法排除依赖方自身问题。",
+            "已撤回关于错误由特定逻辑触发的推断，该机制归属仍未知。",
+            "未新增观测，仅修订或撤回表述；原审阅异议仍需交接：C1：观测支持业务请求在06:04因AUTH_REJECTED失败，但无法从证据中确认该错误是由‘依赖项验证逻辑’触发的。证据仅记录了错误代码和消息，未提供触发机制或组件归属的因果信息，属于部分支持。"
+          ],
+          "source_limitations": [],
+          "blockers": []
+        },
+        "completion_basis": "model_reviewed_bounded_mechanism",
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "candidate",
+      "case_id": "followup_available",
+      "repeat": 1,
+      "status": "partial",
+      "model_calls": 11,
+      "tool_calls": 2,
+      "termination_reason": "string_too_short",
+      "rework_rounds": 1,
+      "run_outcome": {
+        "execution": {
+          "status": "interrupted",
+          "collection_stop": "NO_NEW_QUERIES",
+          "failure_codes": [
+            "string_too_short"
+          ]
+        },
+        "review": {
+          "status": "not_performed",
+          "target_count": 3,
+          "valid_target_count": 0,
+          "unresolved_target_ids": [
+            "A1",
+            "C1",
+            "C2"
+          ]
+        },
+        "investigation": {
+          "status": "handoff",
+          "supported_mechanism_ids": [],
+          "known_unknowns": [
+            "缺乏对依赖项peer_0f8be79d的直接观测证据，无法确定502的具体成因。",
+            "本地验证记录存在于其他通道，但未提供该通道与失败通道之间的数据一致性或路由差异的证据。",
+            "无法排除网关配置或限流策略导致502的可能性，因为缺少网关层的详细错误码细分。",
+            "未新增观测，仅修订或撤回表述；原审阅异议仍需交接：C1：独立来源范围挑战提出模型异议，未经人工判定：下游服务返回了HTTP 502错误；缺少观测：需要直接观测到下游服务发出的HTTP 502状态码，或网关明确记录从下游接收到的502响应。当前证据仅显示网关侧报错GATEWAY_FAILURE及消息提及502，未提供下游实际响应的原始数据或确认机制。；原句断言'下游服务...返回了HTTP 502'是因果归因。证据EV中的message字段虽包含文本'returned HTTP 502'，但这属于日志记录的字符串内容，而非对下游网络层实际返回状态的独立观测验证。在严格核对中，日志文本引用不等于对下游行为的事实覆盖，存在网关自行构造错误码的可能性，故该具体事实未被充分覆盖。"
+          ],
+          "source_limitations": [],
+          "blockers": [
+            "EXECUTION_FAILURE",
+            "REVIEW_INCOMPLETE",
+            "NO_SUPPORTED_MECHANISM"
+          ]
+        },
+        "completion_basis": null,
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": [
+        {
+          "stage": "review",
+          "category": "shape",
+          "code": "string_too_short",
+          "path": "items.0.issue",
+          "target_id": "C1",
+          "recovered": false
+        },
+        {
+          "stage": "review",
+          "category": "shape",
+          "code": "string_too_short",
+          "path": "items.1.issue",
+          "target_id": "C2",
+          "recovered": false
+        },
+        {
+          "stage": "review",
+          "category": "shape",
+          "code": "string_too_short",
+          "path": "items.2.issue",
+          "target_id": "A1",
+          "recovered": false
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case_id": "followup_unavailable",
+      "repeat": 1,
+      "status": "completed",
+      "model_calls": 8,
+      "tool_calls": 1,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 0,
+      "run_outcome": {
+        "execution": {
+          "status": "completed",
+          "collection_stop": "NO_NEW_QUERIES",
+          "failure_codes": []
+        },
+        "review": {
+          "status": "passed",
+          "target_count": 1,
+          "valid_target_count": 1,
+          "unresolved_target_ids": []
+        },
+        "investigation": {
+          "status": "limited",
+          "supported_mechanism_ids": [
+            "C1"
+          ],
+          "known_unknowns": [
+            "无法区分是依赖服务(peer_3d745da3)无响应、网络延迟还是本地配置导致的超时，因为缺少对依赖端日志或连接状态的观测。",
+            "无法确认该超时是偶发性问题还是系统性故障，缺乏历史数据对比。"
+          ],
+          "source_limitations": [],
+          "blockers": []
+        },
+        "completion_basis": "model_reviewed_bounded_mechanism",
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "candidate",
+      "case_id": "temporal_counterevidence",
+      "repeat": 2,
+      "status": "completed",
+      "model_calls": 12,
+      "tool_calls": 3,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 1,
+      "run_outcome": {
+        "execution": {
+          "status": "completed",
+          "collection_stop": "NO_NEW_QUERIES",
+          "failure_codes": []
+        },
+        "review": {
+          "status": "passed",
+          "target_count": 1,
+          "valid_target_count": 1,
+          "unresolved_target_ids": []
+        },
+        "investigation": {
+          "status": "limited",
+          "supported_mechanism_ids": [
+            "C1"
+          ],
+          "known_unknowns": [
+            "无法确定早期失败是否由配置变更前的状态引起，还是其他未观测到的依赖问题。",
+            "配置变更的具体生效机制和传播延迟未被观测证实。",
+            "未能区分导致 AUTH_REJECTED 的具体技术原因（如受众不匹配、密钥过期或其他认证逻辑错误）。",
+            "未新增观测，仅修订或撤回表述；原审阅异议仍需交接：C1：观测证实了服务失败及错误码 AUTH_REJECTED（支持‘导致服务失败’），但命题中‘因身份验证受众不匹配’这一具体因果归因在证据中未得到直接支持。证据 R2 显示配置变更发生在故障之后，且无其他证据直接证明当前故障是由受众不匹配引起的，存在其他原因导致认证被拒的可能性。"
+          ],
+          "source_limitations": [],
+          "blockers": []
+        },
+        "completion_basis": "model_reviewed_bounded_mechanism",
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "candidate",
+      "case_id": "followup_available",
+      "repeat": 2,
+      "status": "completed",
+      "model_calls": 12,
+      "tool_calls": 4,
+      "termination_reason": "FINISHED",
+      "rework_rounds": 0,
+      "run_outcome": {
+        "execution": {
+          "status": "completed",
+          "collection_stop": "FINISHED",
+          "failure_codes": []
+        },
+        "review": {
+          "status": "passed",
+          "target_count": 1,
+          "valid_target_count": 1,
+          "unresolved_target_ids": []
+        },
+        "investigation": {
+          "status": "limited",
+          "supported_mechanism_ids": [
+            "C1"
+          ],
+          "known_unknowns": [
+            "工单描述的现象为返回502，但当前证据仅显示本地拒绝且无出站连接，无法解释502的来源或确认是否存在其他并行失败路径。"
+          ],
+          "source_limitations": [],
+          "blockers": []
+        },
+        "completion_basis": "model_reviewed_bounded_mechanism",
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": []
+    },
+    {
+      "arm": "candidate",
+      "case_id": "followup_unavailable",
+      "repeat": 2,
+      "status": "partial",
+      "model_calls": 12,
+      "tool_calls": 4,
+      "termination_reason": "SOURCE_NOT_CONFIGURED",
+      "rework_rounds": 0,
+      "run_outcome": {
+        "execution": {
+          "status": "interrupted",
+          "collection_stop": "FINISHED",
+          "failure_codes": [
+            "SOURCE_NOT_CONFIGURED"
+          ]
+        },
+        "review": {
+          "status": "passed",
+          "target_count": 1,
+          "valid_target_count": 1,
+          "unresolved_target_ids": []
+        },
+        "investigation": {
+          "status": "handoff",
+          "supported_mechanism_ids": [
+            "C1"
+          ],
+          "known_unknowns": [
+            "无法确认peer_3d745da3的实际可用性，因为get_recent_changes查询因SOURCE_NOT_CONFIGURED而失败。",
+            "资源层和配置层日志为空，无法排除本地资源瓶颈或配置变更导致的超时。",
+            "仅凭本地超时记录无法区分是依赖方无响应、网络中断还是本地连接池耗尽。"
+          ],
+          "source_limitations": [
+            {
+              "tool": "get_recent_changes",
+              "status": "error",
+              "truncated": false,
+              "error_code": "SOURCE_NOT_CONFIGURED"
+            }
+          ],
+          "blockers": [
+            "EXECUTION_FAILURE",
+            "SOURCE_LIMITED"
+          ]
+        },
+        "completion_basis": null,
+        "human_verified": false,
+        "causality_verified_by_program": false
+      },
+      "unrecovered_failures": [
+        {
+          "stage": "query",
+          "category": "transport",
+          "code": "SOURCE_NOT_CONFIGURED"
+        }
+      ]
+    }
+  ],
+  "paid_budget": {
+    "max_requests": 240,
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 200000,
+    "max_model_seconds": 3600,
+    "requests": 178,
+    "input_tokens": 399280,
+    "output_tokens": 31087,
+    "model_seconds": 432.01599999994505,
+    "unknown_usage_calls": 0
+  },
+  "paid_calls_this_task": 178,
+  "paid_call_boundary": "本任务178次真实调用；独立于此前阶段的调用。根进程独占预算账本，无隐式重试或未知usage。",
+  "known_limitations": [
+    "Flash固定补证仍遗漏1/2；失败运行连续重复同一渠道三次后安全停止，仍有预算，不能说选择能力稳定。",
+    "AI只读复核确认候选取得关键记录的一次确实用于有限机制命题，但未充分利用未出站边界，部分未知仍过宽。AI复核不是人工金标。",
+    "候选端到端一次复审issue空字符串导致三条目标结构校验失败，保留事实但不放行；另一次来源SOURCE_NOT_CONFIGURED保留交接。",
+    "同一模型的审阅与范围挑战仍可能共享语义盲点；固定审阅精确四分类一致为10/16，两版相同，不能等同100%语义正确。",
+    "审阅控制每项仅一次重复，本次未验收审阅翻转稳定性。端到端只有三个人工构造案例各两次，不是外部盲测或生产准确率。",
+    "更多可用调查额度提高了实际调用数，端到端平均9.33→11.17次；没有证明总体成本效率提升。",
+    "所有对照使用同一模型、预算、案例、review/challenge策略与提示；比较三项修复的组合，没有进一步单独因果分离预算与问题状态的贡献。",
+    "数据库集成、独立人工语义验收和外部真实故障盲测未完成，正式灰度仍关闭。"
+  ],
+  "deployment_configuration_changed": false,
+  "project_documents_modified": false,
+  "evaluation_evidence_hash": "8140f04686101cc0bcc2b1bd599cebcc11d051291e68fc826654064d143571bb",
+  "evaluation_evidence_hash_kind": "canonical_artifact_manifest_sha256",
+  "artifacts": [
+    {
+      "path": "output/autonomy-controls/freeze.json",
+      "sha256": "da4316f5ff057e23761d36f348c8fb0bf0e1170be3fb4db5a8c51b7f9e0984a1"
+    },
+    {
+      "path": "output/autonomy-controls/comparison-plan.json",
+      "sha256": "7972bc42c6a3455c2d1ef6c9b402b710f9256173c5dab73c35117981d2d4968d"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-freeze.json",
+      "sha256": "d0af8333af9f5a30e184492f8ea31ce1549e4110091db6a7c9119d0a3af80c67"
+    },
+    {
+      "path": "output/autonomy-controls/comparison.json",
+      "sha256": "b17d115bdbf446273db28ecb9bb292102ac9e34fcfab139471ddc8f158f65d73"
+    },
+    {
+      "path": "output/autonomy-controls/budget-ledger.json",
+      "sha256": "b899883011fa1767ed2fa989840b1d25294214b2816aa43d38b47605b769c3b7"
+    },
+    {
+      "path": "output/autonomy-controls/final-verified-tests.log",
+      "sha256": "5607cfc83cde6e52ef1fc6f092f0646af2da55b3171b6a697ec91be69115b062"
+    },
+    {
+      "path": "output/autonomy-controls/comparison-tests.log",
+      "sha256": "31e59b0a637e8c4f2affaa91968cda7b5062756bca56bb6efaf62c53b1811dc9"
+    },
+    {
+      "path": "output/autonomy-controls/ai-fixed-review.json",
+      "sha256": "93784a3957654f3a9084495ccfbfe92ecb1723c52cdb9b977edf70d27f5bfbc6"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/bundle.json",
+      "sha256": "969b0e507b244a8a9d4bc09bf0ff5d06b85b6390d640d9924e518b84868f8d9f"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/followup_available-closed_loop-r1.json",
+      "sha256": "55717c9e44231cb47c863e466b706427e3bd85cda90af1efbad0ecccd71b3825"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/followup_available-closed_loop-r2.json",
+      "sha256": "d5ad35cba9659e5fe8208cc5952962031a36b594dbf8fb75daa68a22265334e7"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/followup_unavailable-closed_loop-r1.json",
+      "sha256": "74c109a91126bd527bd88b06afa2aa4191ab1bf0514128b3c64e197337c8f11e"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/followup_unavailable-closed_loop-r2.json",
+      "sha256": "ebd3b8332ffa047ea80d0548e3d1cc5ac92561081c56c01500fe9e2fb5d88cee"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/human-review.pending.json",
+      "sha256": "7fa249d47fc48591773264986c02322c44101be7133bb1d06cded3b95a9e473f"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/plan.json",
+      "sha256": "180c9c2a89ad2e4746fc8ae03113460950bce469096f0cc4b8654bf61b3b74e5"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/temporal_counterevidence-closed_loop-r1.json",
+      "sha256": "27d1bc3dca85728c7d2ecac2c91936cf589ba1277bfd5d900b80092e5d998ba6"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-e2e/9d335006-b5e8-470a-a75c-0761db76fce6/temporal_counterevidence-closed_loop-r2.json",
+      "sha256": "cc938a37dcab55af660e92aa6db6efc8bb7aed71ca4f18502addeb9515b82f4e"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-fixed/c0ced833-0dec-450b-a21d-b8b4b121d6ad/bundle.json",
+      "sha256": "f1bf4221c9cd28a8e537d1ffaaeba02b374502e0f05a9db4e09cc8c43ad463e1"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-fixed/c0ced833-0dec-450b-a21d-b8b4b121d6ad/followup_available-closed_loop-r1.json",
+      "sha256": "57f0cc224b902ea54060ab8b04b281f3e3f49fecf06966881f9c798b964f70a7"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-fixed/c0ced833-0dec-450b-a21d-b8b4b121d6ad/followup_available-closed_loop-r2.json",
+      "sha256": "526497097061678fb834111600751b88d611b16acf3b1971e6bc698e154f4eb1"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-fixed/c0ced833-0dec-450b-a21d-b8b4b121d6ad/human-review.pending.json",
+      "sha256": "c4ee39f4c996c0eeb4bcde0c1c716c80f2acd232081c9ddeb099f46b6c30bf08"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-fixed/c0ced833-0dec-450b-a21d-b8b4b121d6ad/plan.json",
+      "sha256": "9398409eda120038384c6367e01a2824326998c135460aa6c306c91ef21f1ed1"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/bundle.json",
+      "sha256": "1c5bc4cb437316c82c6c1b7bb3257fd4915ada55510508b5f02b5d8d56823d19"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/compound_assertion-challenged_review-r1.json",
+      "sha256": "e962ccf4910bf2f832072e210d94f038c60c6bd30c785f572a0c89fa522bda83"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/contribution_and_uniqueness-challenged_review-r1.json",
+      "sha256": "67732cdd0382faa19a976091e9cd7b1f6227b1673fbf13525f2421af35cd5b51"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/followup_available-challenged_review-r1.json",
+      "sha256": "f1b5a02892d585cbc6fefe8490a0dda8b4032655afe4dcb9c86ededde85042d8"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/followup_unavailable-challenged_review-r1.json",
+      "sha256": "38b1bf674df65f7748e2c8db5d95f864508b09458763858b2961888165e5b526"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/future_manual_check-challenged_review-r1.json",
+      "sha256": "23c2c58564c5f64df9597df08d96cad61bce7b41601e6e7e0edefb7b75e71230"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/human-review.pending.json",
+      "sha256": "11cb1f28fea8bba2793316498d0cf22fec13b05aa2f9c352cfade50ba04f2221"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/plan.json",
+      "sha256": "e56322d9d26afc31dd933aacef5aae3e7b45a6fce3ce71b6abba3e65c31cc73a"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/pool_probe_ambiguity-challenged_review-r1.json",
+      "sha256": "b2141539a62413215205a2d8ed216838ba6731179b6f5db1edeaedbc7720b727"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/probe_scope-challenged_review-r1.json",
+      "sha256": "86122fc056924f81b6ec5b741ef875e5de7b97e9278b00000625b7c6d15359cb"
+    },
+    {
+      "path": "output/autonomy-controls/baseline-review/a8e5c3e9-3343-4fb1-b5f8-723323f09860/temporal_counterevidence-challenged_review-r1.json",
+      "sha256": "de280b7ea1d73d99850f7ada08670e4e443d7c0b9ba7d652de866a83ff8a53c4"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/bundle.json",
+      "sha256": "231eb8327bf5eb96f212f83236f923f357ec7c162f166f873b6ee8c6e9ebb60d"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/followup_available-closed_loop-r1.json",
+      "sha256": "d76b6bc76e13658d8586a8430b1956775ce5819573bb1955b7a6c6214e6ecf32"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/followup_available-closed_loop-r2.json",
+      "sha256": "d38522e0cef2098775fdf9d256a8030d01710610502dd9099fe871169b6d322d"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/followup_unavailable-closed_loop-r1.json",
+      "sha256": "2754ef0a4b7127d0cd98e7eec3fe2b61fbcfc662876c8edb0da16f7b4ab5b1b4"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/followup_unavailable-closed_loop-r2.json",
+      "sha256": "1129d31eded9293b5cdd6ff36dda6cdd31057b377743011f355e62db09eab2f1"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/human-review.pending.json",
+      "sha256": "41cca9da7b39a9af51dccf33d93f252e9bcd759b516ee29631851283ee5dfe4b"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/plan.json",
+      "sha256": "1485677c87282547c256dd414b25e8fe02927e8750b8593d36528b4c78dd89f9"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/temporal_counterevidence-closed_loop-r1.json",
+      "sha256": "5a5cddf458816532496aa5cea2517282bf8fa574eca95b42589a7a056343210c"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-e2e/2652ed0b-da12-4475-b2a4-501d06daef88/temporal_counterevidence-closed_loop-r2.json",
+      "sha256": "189f94b2aa19758de8b39a3648d0b65ac95e391b40b7b37ca5a4f98c3f729620"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-fixed/a8f15243-40d8-4bbe-82f8-10497d9c2b75/bundle.json",
+      "sha256": "c8102061801561e5eb76b19905ff75befb375b17d80bc3e45a97682e691b309b"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-fixed/a8f15243-40d8-4bbe-82f8-10497d9c2b75/followup_available-closed_loop-r1.json",
+      "sha256": "4f844bf8083954300b14ae289646fe4cfb385ad6e86e658e3227363e2f105122"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-fixed/a8f15243-40d8-4bbe-82f8-10497d9c2b75/followup_available-closed_loop-r2.json",
+      "sha256": "b9ef086663fafeeca91a884da509e85a97658ad977bc6df0d0dca6dda12a78f1"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-fixed/a8f15243-40d8-4bbe-82f8-10497d9c2b75/human-review.pending.json",
+      "sha256": "964a686eb1cf7cc229c47ddbab19d02a22cf8acb3b6418189fe55b56a365ec67"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-fixed/a8f15243-40d8-4bbe-82f8-10497d9c2b75/plan.json",
+      "sha256": "d081f98572de1d040a05babcf72edbc824800122ba0159a75de647531ff04148"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/bundle.json",
+      "sha256": "a272b728c923d4293b103c0ecd13f78fd47d55ad22141289b6348039ab1a148b"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/compound_assertion-challenged_review-r1.json",
+      "sha256": "f208b46d3a4a23e219feb43344c3dcc1c8abb469c5352a0dc4764ad38e6f48ff"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/contribution_and_uniqueness-challenged_review-r1.json",
+      "sha256": "12e77ad087539717fb778bb9c9e5adeb95a1fd086fa31cc8537a8e998a40d513"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/followup_available-challenged_review-r1.json",
+      "sha256": "f215fa746efa2c80394e53e72133413fe5c5e348c62bc91e5dd0f73425611304"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/followup_unavailable-challenged_review-r1.json",
+      "sha256": "7c5580fd98eb27f213cc8f24fce49a11581240e3b5796acbe17c9230922b9c12"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/future_manual_check-challenged_review-r1.json",
+      "sha256": "44af83334b4e5a0e4f1f3573f75dac3533d9ea82728575ee2c8bca4d0a5d2b87"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/human-review.pending.json",
+      "sha256": "2023cdead9074c9d1af4d01052e84af218d46cb97f8a947c4c1981f6b4a964e3"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/plan.json",
+      "sha256": "4cbca218cd8f886ce67176109a0f23faa1a55bc789416cc10be69cac0deb7327"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/pool_probe_ambiguity-challenged_review-r1.json",
+      "sha256": "05a3cd21ce6b2cc37b1846318c26b9128d8e7e7baf00f4bef94176b95ec258ae"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/probe_scope-challenged_review-r1.json",
+      "sha256": "d6a5c75ddf320fdb874398cc1de1e5b799dc746df383a7330a94f21939d1ca0f"
+    },
+    {
+      "path": "output/autonomy-controls/candidate-review/b95d6a99-4241-44d8-90e1-a72b2427f6bb/temporal_counterevidence-challenged_review-r1.json",
+      "sha256": "32c47d04b2787927872a121990455ff334a9c928f36ec5d0a6451bec4b2578bd"
+    }
+  ]
+}
