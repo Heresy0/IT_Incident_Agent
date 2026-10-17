@@ -21,7 +21,7 @@ class CapacityExceeded(RuntimeError):
 
 class WorkflowService:
     def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None,
-                 service_registry=None, repair_executors=None, incident_engine=None):
+                 service_registry=None, repair_executors=None, incident_engine=None, incident_rollout=None):
         self.incident_engine = incident_engine or os.getenv('INCIDENT_ENGINE', 'legacy')
         if self.incident_engine not in {'legacy', 'autonomous_v2'}:
             raise ValueError('Unsupported INCIDENT_ENGINE')
@@ -31,6 +31,9 @@ class WorkflowService:
         self._store = store
         self._store_started = False
         self._admission_lock = Lock()
+        from workflow.rollout import RolloutPolicy
+        self.incident_rollout = (RolloutPolicy.parse(incident_rollout) if incident_rollout is not None
+                                 else RolloutPolicy.from_environment())
         self._closed = False
         from providers.registry import ServiceRegistry
         self.services = service_registry if service_registry is not None else ServiceRegistry.from_environment()
@@ -41,6 +44,13 @@ class WorkflowService:
         self._executor = ThreadPoolExecutor(max_workers=capacity, thread_name_prefix="workflow")
         from workflow.execution import IncidentAdapter
         self._incident = IncidentAdapter(self, incident_model_factory)
+
+    def configure_incident_rollout(self, policy):
+        """Operator-side replacement; already accepted requests keep their frozen spec."""
+        from workflow.rollout import RolloutPolicy
+        selected = RolloutPolicy.parse(policy)
+        with self._admission_lock:
+            self.incident_rollout = selected
 
     def start(self):
         with self._store_lock:

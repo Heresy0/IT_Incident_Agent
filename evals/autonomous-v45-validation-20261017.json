@@ -1,0 +1,2150 @@
+{
+  "schema_version": "autonomous-v45-validation-v1",
+  "validation_date": "2026-10-17",
+  "branch": "codex/autonomous-investigation-v2",
+  "baseline_commit": "c6003859b05169a55709850b2798e36db8f2dd13",
+  "source_version": "a9d571433a418bab",
+  "engine_version": "autonomous_v2.3",
+  "review_policy_version": "atomic_review_v2",
+  "challenge_policy_version": "blind_scope_challenge_v1",
+  "scope": "阶段4审阅返工闭环；阶段5冻结评测、灰度接纳、回滚及旧路径隔离。未修改项目文档。",
+  "overall_acceptance": "partially_passed",
+  "deployment_acceptance": "hold",
+  "human_semantic_acceptance": "pending",
+  "production_rollout": false,
+  "production_accuracy": "not_established",
+  "original_worktree_changes": {
+    "hashes_before": {
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "evals/multi-prompt-simplification-validation-20261017.json": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "tests/workflow/test_prompt_query_boundaries.py": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    },
+    "byte_identical_after": {
+      "app/agents/prompts.py": true,
+      "evals/multi-prompt-simplification-validation-20261017.json": true,
+      "tests/workflow/test_prompt_query_boundaries.py": true
+    },
+    "excluded_from_implementation_commit": [
+      "app/agents/prompts.py",
+      "evals/multi-prompt-simplification-validation-20261017.json",
+      "tests/workflow/test_prompt_query_boundaries.py"
+    ],
+    "baseline_includes_original_uncommitted_changes": true
+  },
+  "stage4": {
+    "engineering_status": "implemented_and_regression_tested",
+    "mechanism": [
+      "当前版本异议返回同一Investigator和同一Executor，允许自主新查询、收窄、替换或撤回，再统一复审。",
+      "不按服务写取证规则；只暴露当前授权范围内的通用能力、已查记录和原始观测。",
+      "最多一轮语义返工；模型、工具、时间预算共享；结构修复全局最多一次。",
+      "主审通过项接受独立来源覆盖挑战；挑战只能保留或降级，不是金标或自动批准。",
+      "稳定target ID与版本、当前证据包校验、无进展禁止重抽审阅、无新增观测保留原异议交接。"
+    ],
+    "effect_status": "partially_passed"
+  },
+  "stage5": {
+    "engineering_status": "implemented_and_api_validated",
+    "mechanism": [
+      "off/canary/full与稳定分桶；授权检查先于灰度范围；接纳时冻结引擎、模型配置和预算。",
+      "验收门禁绑定完整应用指纹、审阅策略、模型与预算配置及评测摘要；任一不匹配回退legacy。",
+      "回滚仅影响新接纳；在途任务继续使用原冻结规格。",
+      "shadow使用离线冻结可查询世界；生产不执行双读、不增加写权限。",
+      "新引擎路径隔离旧coordinator/graph/render导入；旧引擎仍保留作为回滚路径。"
+    ],
+    "migration_status": "rollout_held_legacy_rollback_retained",
+    "full_legacy_retirement": "not_performed_because_quality_gate_not_met",
+    "effect_status": "partially_passed"
+  },
+  "acceptance_matrix": [
+    {
+      "metric": "固定来源审阅误放",
+      "baseline": "2/20",
+      "challenged": "0/20",
+      "status": "passed_synthetic_controls"
+    },
+    {
+      "metric": "固定来源审阅误拒",
+      "baseline": "0/12",
+      "challenged": "0/12",
+      "status": "passed_synthetic_controls"
+    },
+    {
+      "metric": "重复审阅翻转率不超过20%",
+      "baseline": "1/16 (6.25%)",
+      "challenged": "2/16 (12.5%)",
+      "status": "passed_threshold_but_stability_did_not_improve"
+    },
+    {
+      "metric": "四分类与临时标签一致",
+      "baseline": "21/32",
+      "challenged": "22/32",
+      "status": "limited",
+      "remaining_error": "两臂各6次将部分支持误判为反证，不能等同于全面语义准确。"
+    },
+    {
+      "metric": "Flash可用补证案例取得关键记录",
+      "baseline": "0/2",
+      "closed_loop": "0/2",
+      "status": "not_passed"
+    },
+    {
+      "metric": "Plus可用补证案例取得关键记录",
+      "baseline": "0/3",
+      "closed_loop": "3/3",
+      "final_source_only": "closed_loop 2/2; baseline 0/2",
+      "status": "passed_small_supplement_only",
+      "boundary": "同一个作者构造案例跨两源码版本的重复，不能推广为一般准确率或归因于单个代码改动。"
+    },
+    {
+      "metric": "自然端到端关键观测取得",
+      "baseline": "3/3",
+      "closed_loop": "3/3",
+      "status": "passed_small_sample",
+      "boundary": "分母为3条关键来源记录：temporal_counterevidence两条、followup_available一条；followup_unavailable没有可得关键记录。"
+    },
+    {
+      "metric": "自然端到端实际触发返工",
+      "closed_loop": "0/3",
+      "status": "not_covered"
+    },
+    {
+      "metric": "相同预算端到端完成数不退化",
+      "baseline": "2/3",
+      "closed_loop": "1/3",
+      "status": "not_passed",
+      "boundary": "闭环预留预算使followup_available以COLLECTION_BUDGET_EXHAUSTED结束；关键观测已取得仍保留partial。"
+    },
+    {
+      "metric": "真实模型API接纳/规格冻结/回滚/幂等/SSE/隔离",
+      "status": "passed_local_asgi",
+      "boundary": "真实模型API+内存存储+公开合成demo；并非生产数据库或线上灰度。"
+    },
+    {
+      "metric": "独立人工语义验收与外部盲测",
+      "status": "pending",
+      "deployment_decision": "hold"
+    }
+  ],
+  "resource_tradeoff": {
+    "review_only_mean_calls": 1.1875,
+    "challenged_review_mean_calls": 1.9375,
+    "review_only_mean_seconds": 3.5839375,
+    "challenged_review_mean_seconds": 6.43475,
+    "flash_fixed_rework_mean_calls": 6.25,
+    "flash_no_rework_mean_calls": 1,
+    "final_source_plus_available_mean_calls": 6,
+    "final_source_plus_baseline_mean_calls": 1,
+    "final_source_plus_available_mean_seconds": 22.211,
+    "final_source_plus_baseline_mean_seconds": 2.6875,
+    "currency_cost": null,
+    "reason": "供应商返回token与模型耗时已记录；未取得计费账单，不估算金额。"
+  },
+  "regression_tests": {
+    "discovered": 968,
+    "passed": 948,
+    "skipped": 20,
+    "duration_seconds": 127.396,
+    "status": "passed",
+    "log": {
+      "path": "output/autonomy-v45/final-verified-tests.log",
+      "sha256": "98c72e018b9491888c57e230baf9d5b10648641b65cf482958e121109f70b615"
+    },
+    "skip_reason": "未配置隔离PostgreSQL/pgvector测试DSN；未连接生产数据库。",
+    "command": "$env:PYTHONPATH='app'; .\\.venv\\Scripts\\python.exe -m unittest discover -s tests -t . -p 'test_*.py'"
+  },
+  "live_api_validation": {
+    "status": "passed",
+    "checks": {
+      "first_frozen_closed_loop": true,
+      "exact_configuration": true,
+      "exact_limits": true,
+      "second_frozen_legacy": true,
+      "replay_same_run": true,
+      "only_two_admitted": true,
+      "both_pending_before_release": true,
+      "first_single_final": true,
+      "first_sse_sequence": true,
+      "first_sse_resume": true,
+      "first_terminal_persisted": true,
+      "first_no_budget_failure": true,
+      "second_single_final": true,
+      "second_sse_sequence": true,
+      "second_sse_resume": true,
+      "second_terminal_persisted": true,
+      "second_no_budget_failure": true,
+      "first_kept_frozen_spec": true,
+      "first_repair_ineligible": true,
+      "rollback_second_engine": true,
+      "other_owner_isolated": true,
+      "other_tenant_isolated": true,
+      "within_shared_paid_cap": true
+    },
+    "sse": {
+      "first": {
+        "events": 62,
+        "final_events": 1,
+        "last_event_id": 62,
+        "resume_final_events": 1
+      },
+      "second": {
+        "events": 102,
+        "final_events": 1,
+        "last_event_id": 102,
+        "resume_final_events": 1
+      }
+    },
+    "runs": {
+      "first": {
+        "engine_id": "autonomous_v2",
+        "status": "completed",
+        "rework_rounds": 0,
+        "execution_mode": "live",
+        "repair_eligible": false
+      },
+      "second": {
+        "engine_id": "legacy",
+        "status": "partial",
+        "rework_rounds": 1,
+        "execution_mode": "live",
+        "repair_eligible": null
+      }
+    },
+    "paid_budget": {
+      "session_requests": 16,
+      "charged_delta": {
+        "requests": 16,
+        "input_tokens": 78946,
+        "output_tokens": 8655,
+        "model_seconds": 96.76599999999598
+      },
+      "unknown_usage_calls_delta": 0,
+      "remaining": {
+        "requests": 14,
+        "input_tokens": 819706,
+        "output_tokens": 126131,
+        "model_seconds": 2210.491000000002
+      },
+      "token_accounting": "known_or_conservative_upper_bound",
+      "single_process_ledger": true,
+      "admission_closed": false
+    },
+    "plan": {
+      "schema_version": "rollout-asgi-validation-v1",
+      "case": "case_001",
+      "execution_mode": "live",
+      "source_version": "a9d571433a418bab",
+      "review_policy_version": "atomic_review_v2",
+      "world": {
+        "kind": "queryable_synthetic_world",
+        "catalog_sha256": "e0a637eba427b6eb1de5a6607daa387a2e19fc4b2738b728b4067fb560d63b2d",
+        "fixture_sha256": {
+          "case_001": "dcb61d9bad7d0c220c53fa0fd53448edecf0cb77b96ca05fc204f093b25f23e1"
+        },
+        "services": {
+          "case_001": "checkout-api"
+        },
+        "anonymization": {
+          "enabled": false
+        },
+        "runtime_world_sha256": {
+          "case_001": "c00976521e2c9a516d633b7ed7074335d64a0261c2728ed9a937e99ad9d96a59"
+        },
+        "profile_required": false,
+        "external_blind_evaluation": false
+      },
+      "model_settings": {
+        "model": "qwen3.7-flash",
+        "temperature": 0,
+        "max_output_tokens": 2200,
+        "request_timeout": 30,
+        "max_retries": 0,
+        "response_format": "json_object"
+      },
+      "model_settings_sha256": "8fa451b0f14404350db9784b7982759599a742b46cf9a159d1ba876f7772c97c",
+      "configuration_sha256": "98190f21a7a0231870c86609dab66c55b1dfd1ee164ca586098feece4d019425",
+      "limits_per_run": {
+        "model_calls": 12,
+        "web_calls": 12,
+        "tool_calls": 8,
+        "seconds": 180.0,
+        "reserve_model_calls": 3,
+        "reserve_seconds": 20,
+        "input_chars": 48000,
+        "snippet_chars": 1800,
+        "max_sources": 10
+      },
+      "planned_runs": 2,
+      "planned_arms": [
+        "closed_loop",
+        "legacy_after_rollback"
+      ],
+      "max_model_calls": 20,
+      "gate_fixture": "local_ephemeral_gate_fixture_not_deployment_approval",
+      "gate_is_deployment_approval": false,
+      "production_rollout": false,
+      "human_evaluation": "pending",
+      "semantic_quality_status": "not_established",
+      "data_source": "public_synthetic_demo",
+      "storage": "MemoryRunStore",
+      "provider_production_reads": false,
+      "production_dual_reads": false,
+      "transport": "in_process_ASGI",
+      "read_only": true
+    },
+    "report": {
+      "path": "output/autonomy-v45/api-rollout/19a27b4d-77b5-459d-b5a7-c2aac65eba2a/report.json",
+      "sha256": "e584b4da907f85e66c58eb9f5b6ee87e300091f4d109cf888205d2b31541a9b5"
+    },
+    "gate_fixture": "local_ephemeral_gate_fixture_not_deployment_approval",
+    "gate_is_deployment_approval": false
+  },
+  "e2e_statuses": {
+    "closed_loop": [
+      {
+        "case_id": "followup_available",
+        "status": "partial",
+        "termination_reason": "COLLECTION_BUDGET_EXHAUSTED",
+        "rework_rounds": 0
+      },
+      {
+        "case_id": "followup_unavailable",
+        "status": "partial",
+        "termination_reason": "NEEDS_INFORMATION",
+        "rework_rounds": 0
+      },
+      {
+        "case_id": "temporal_counterevidence",
+        "status": "completed",
+        "termination_reason": "FINISHED",
+        "rework_rounds": 0
+      }
+    ],
+    "no_rework": [
+      {
+        "case_id": "followup_available",
+        "status": "completed",
+        "termination_reason": "FINISHED",
+        "rework_rounds": 0
+      },
+      {
+        "case_id": "followup_unavailable",
+        "status": "partial",
+        "termination_reason": "NEEDS_INFORMATION",
+        "rework_rounds": 0
+      },
+      {
+        "case_id": "temporal_counterevidence",
+        "status": "completed",
+        "termination_reason": "FINISHED",
+        "rework_rounds": 0
+      }
+    ]
+  },
+  "paid_budget_total": {
+    "max_requests": 180,
+    "max_input_tokens": 1200000,
+    "max_output_tokens": 160000,
+    "max_model_seconds": 2700,
+    "requests": 166,
+    "input_tokens": 380294,
+    "output_tokens": 33869,
+    "model_seconds": 489.5089999999982,
+    "unknown_usage_calls": 0
+  },
+  "paid_calls_this_task": 166,
+  "paid_call_boundary": "本任务166次；不包含之前阶段0到3的118次调用；所有新调用由单一根进程记账，无未知usage。",
+  "experiments": {
+    "review-comparison": {
+      "plan": {
+        "version": "closed-loop-evaluation-v1",
+        "stage": "review",
+        "execution_mode": "live",
+        "comparison": "primary versus primary_plus_blind_scope_challenge",
+        "not_original_v22_comparison": true,
+        "cases": [
+          "probe_scope",
+          "compound_assertion",
+          "temporal_counterevidence",
+          "contribution_and_uniqueness",
+          "future_manual_check",
+          "followup_available",
+          "followup_unavailable",
+          "pool_probe_ambiguity"
+        ],
+        "arms": [
+          "review",
+          "challenged_review"
+        ],
+        "repeats": 2,
+        "planned_runs": 32,
+        "limits": {
+          "model_calls": 4,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "maximum_model_calls": 64,
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "application": {
+          "source_version": "d4c5a173726dd7c1",
+          "engine_version": "autonomous_v2.3",
+          "review_policy_version": "atomic_review_v2",
+          "contract_version": "atomic_draft_v1",
+          "challenge_policy_version": "blind_scope_challenge_v1",
+          "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+          "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+          "engine_source_sha256": "13c32ab355067125f2a1589d93526d4f9ed8aba45a7ff022c68d11ae2da0f795",
+          "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+          "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+        },
+        "dataset_version": "closed-loop-source-controls-v1",
+        "case_freezes": [
+          {
+            "case_id": "probe_scope",
+            "world_sha256": "3604b791d8ef58c8aeca78d620aa09d3c046bf118bb12af4aca544b00f1a8fe9",
+            "reference_sha256": "7d4e9744f61a4d96c42aa2f885dccd89bc5e6ff76d8486223500b58cf47c40e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "compound_assertion",
+            "world_sha256": "a1650a566d8b748ad7d0b80d077b6433a6547f6434c9f5dce29ca5d6fdb9dd88",
+            "reference_sha256": "fb7b4c2d06a0cb7c4cf8e5aabd9c0fff85b51a758db21b6b39be0158ce98d031",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "world_sha256": "73a827f91787e3fde532822f2d9bef4f6beb194e997baa2ba3b1eec8b32f5cc2",
+            "reference_sha256": "3d24e66156a77c94db4eb993c0ea71d03958c05520507c11626534f295918bd8",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "contribution_and_uniqueness",
+            "world_sha256": "bb98f612063f10b0a72c0dec592dcfcd351e48a51303475861412a861c6c2d82",
+            "reference_sha256": "1f7351b4375027fe71568c0fbe4a49edace2248002e03321c102ebb3a5119666",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "future_manual_check",
+            "world_sha256": "a6ff0bae0344f510b8e8b91cd3d8e131d7ee1e3ef9b261bd0546c04465600eaf",
+            "reference_sha256": "f0c388285008a678d5f2fa6a73d52ba8d5b737a00555509d405f3ea9b143012a",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_available",
+            "world_sha256": "9be840b18d8de56c29661ae9764464b1ebd1252214e5dfab6afcb717c881f62a",
+            "reference_sha256": "89a9bc217722d86d666638341302ee81544928ecb22d470e7ef01780613040e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_unavailable",
+            "world_sha256": "fec803720982e23ea0c873b374521b3c3e65167a1dc2ce0057db512f4b69f57a",
+            "reference_sha256": "a68fb7c10c21b43fb7a7b5ca6961be27a051d77f50799fed9a7bfba31b842885",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "pool_probe_ambiguity",
+            "world_sha256": "88f5713cac40952d26c665391c163abad58411771571eb909198ca5e43a38319",
+            "reference_sha256": "a7f976018ede8aedc44442c7d08fff0576ed7ba99a5e21e90a17868f2904297b",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "known_regression_from_v22_failure",
+            "external_blind_test": false
+          }
+        ],
+        "evaluation_source_sha256": {
+          "scripts/evaluate_autonomous_closed_loop.py": "120c4cb4e889c06934c7e1d0f21a8fd87ca037628b4ebd589e9a45e2d8d04569",
+          "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688"
+        },
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "authoring": "Developer-authored new synthetic worlds plus explicitly tagged known regressions; not independent external blind testing.",
+        "read_only": true,
+        "estimated_cost": null
+      },
+      "summary": {
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "runs": 32,
+        "expected_runs": 32,
+        "reference_items": 64,
+        "assessed_items": 64,
+        "provisional_false_accepts": 2,
+        "negative_reference_items": 40,
+        "provisional_false_rejects": 0,
+        "positive_reference_items": 24,
+        "provisional_exact_agreement": 43,
+        "repeated_groups": 32,
+        "groups_with_relation_changes": 3,
+        "by_arm": {
+          "challenged_review": {
+            "runs": 16,
+            "reference_items": 32,
+            "assessed_items": 32,
+            "negative_reference_items": 20,
+            "positive_reference_items": 12,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": 0.0,
+            "provisional_false_reject_rate": 0.0,
+            "repeated_groups": 16,
+            "groups_with_relation_changes": 2,
+            "resources": {
+              "model_calls": {
+                "known_runs": 16,
+                "sum": 31,
+                "mean": 1.9375
+              },
+              "tool_calls": {
+                "known_runs": 16,
+                "sum": 28,
+                "mean": 1.75
+              },
+              "duration_ms": {
+                "known_runs": 16,
+                "sum": 102956,
+                "mean": 6434.75
+              }
+            },
+            "key_observations_required": 0,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          },
+          "review": {
+            "runs": 16,
+            "reference_items": 32,
+            "assessed_items": 32,
+            "negative_reference_items": 20,
+            "positive_reference_items": 12,
+            "provisional_false_accepts": 2,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": 0.1,
+            "provisional_false_reject_rate": 0.0,
+            "repeated_groups": 16,
+            "groups_with_relation_changes": 1,
+            "resources": {
+              "model_calls": {
+                "known_runs": 16,
+                "sum": 19,
+                "mean": 1.1875
+              },
+              "tool_calls": {
+                "known_runs": 16,
+                "sum": 28,
+                "mean": 1.75
+              },
+              "duration_ms": {
+                "known_runs": 16,
+                "sum": 57343,
+                "mean": 3583.9375
+              }
+            },
+            "key_observations_required": 0,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          }
+        },
+        "paired_deltas": [
+          {
+            "case_id": "probe_scope",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 2719
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "compound_assertion",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 2250
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 3984
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "contribution_and_uniqueness",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 3359
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "future_manual_check",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 5688
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_available",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -109
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 750
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "pool_probe_ambiguity",
+            "repeat": 1,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 2,
+              "tool_calls": 0,
+              "duration_ms": 4750
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "probe_scope",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 4344
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "compound_assertion",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 1219
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "temporal_counterevidence",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 4001
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "contribution_and_uniqueness",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 2423
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "future_manual_check",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 3484
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_available",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": -78
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 360
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "pool_probe_ambiguity",
+            "repeat": 2,
+            "baseline_arm": "review",
+            "final_arm": "challenged_review",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 1,
+              "tool_calls": 0,
+              "duration_ms": 6469
+            },
+            "semantic_accuracy_delta": null
+          }
+        ],
+        "synthetic_gate": {
+          "status": "passed",
+          "evaluated_arm": "challenged_review",
+          "conditions": {
+            "complete_execution": true,
+            "all_reference_items_assessed": true,
+            "zero_provisional_false_accepts": true,
+            "provisional_false_reject_rate_at_most_20_percent": true,
+            "repeated_relation_flip_rate_at_most_20_percent": true
+          }
+        },
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "rollout_recommendation": "hold",
+        "rollout_reason": "Human semantic acceptance remains pending; synthetic controls do not authorize production rollout."
+      },
+      "paid_budget": {
+        "session_requests": 50,
+        "charged_delta": {
+          "requests": 50,
+          "input_tokens": 102568,
+          "output_tokens": 11443,
+          "model_seconds": 159.00099999997474
+        },
+        "unknown_usage_calls_delta": 0,
+        "remaining": {
+          "requests": 130,
+          "input_tokens": 1097432,
+          "output_tokens": 148557,
+          "model_seconds": 2540.9990000000253
+        },
+        "token_accounting": "known_or_conservative_upper_bound",
+        "single_process_ledger": true,
+        "admission_closed": false
+      },
+      "final_source_version_matches": false
+    },
+    "fixed-rework": {
+      "plan": {
+        "version": "closed-loop-evaluation-v1",
+        "stage": "fixed_rework",
+        "execution_mode": "live",
+        "comparison": "same_fixed_prefix_primary_and_challenge_then_rework_on_or_off",
+        "not_original_v22_comparison": true,
+        "cases": [
+          "followup_available",
+          "followup_unavailable"
+        ],
+        "arms": [
+          "no_rework",
+          "closed_loop"
+        ],
+        "repeats": 2,
+        "planned_runs": 8,
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "maximum_model_calls": 40,
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "application": {
+          "source_version": "4dc83e109f28eefd",
+          "engine_version": "autonomous_v2.3",
+          "review_policy_version": "atomic_review_v2",
+          "contract_version": "atomic_draft_v1",
+          "challenge_policy_version": "blind_scope_challenge_v1",
+          "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+          "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+          "engine_source_sha256": "3dad9f05b2c3ede158cfbc8492d2e27e979283b1cc782e90bab65aa17e3094ea",
+          "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+          "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+        },
+        "dataset_version": "closed-loop-source-controls-v1",
+        "case_freezes": [
+          {
+            "case_id": "followup_available",
+            "world_sha256": "9be840b18d8de56c29661ae9764464b1ebd1252214e5dfab6afcb717c881f62a",
+            "reference_sha256": "89a9bc217722d86d666638341302ee81544928ecb22d470e7ef01780613040e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_unavailable",
+            "world_sha256": "fec803720982e23ea0c873b374521b3c3e65167a1dc2ce0057db512f4b69f57a",
+            "reference_sha256": "a68fb7c10c21b43fb7a7b5ca6961be27a051d77f50799fed9a7bfba31b842885",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          }
+        ],
+        "evaluation_source_sha256": {
+          "scripts/evaluate_autonomous_closed_loop.py": "120c4cb4e889c06934c7e1d0f21a8fd87ca037628b4ebd589e9a45e2d8d04569",
+          "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688"
+        },
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "authoring": "Developer-authored new synthetic worlds plus explicitly tagged known regressions; not independent external blind testing.",
+        "read_only": true,
+        "estimated_cost": null
+      },
+      "summary": {
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "runs": 8,
+        "expected_runs": 8,
+        "reference_items": 0,
+        "assessed_items": 0,
+        "provisional_false_accepts": 0,
+        "negative_reference_items": 0,
+        "provisional_false_rejects": 0,
+        "positive_reference_items": 0,
+        "provisional_exact_agreement": 0,
+        "repeated_groups": 0,
+        "groups_with_relation_changes": 0,
+        "by_arm": {
+          "closed_loop": {
+            "runs": 4,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 4,
+                "sum": 25,
+                "mean": 6.25
+              },
+              "tool_calls": {
+                "known_runs": 4,
+                "sum": 9,
+                "mean": 2.25
+              },
+              "duration_ms": {
+                "known_runs": 4,
+                "sum": 48766,
+                "mean": 12191.5
+              }
+            },
+            "key_observations_required": 2,
+            "key_observations_omitted": 2,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 4,
+            "changed_targets": 4,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          },
+          "no_rework": {
+            "runs": 4,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 4,
+                "sum": 4,
+                "mean": 1.0
+              },
+              "tool_calls": {
+                "known_runs": 4,
+                "sum": 4,
+                "mean": 1.0
+              },
+              "duration_ms": {
+                "known_runs": 4,
+                "sum": 6546,
+                "mean": 1636.5
+              }
+            },
+            "key_observations_required": 2,
+            "key_observations_omitted": 2,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          }
+        },
+        "paired_deltas": [
+          {
+            "case_id": "followup_available",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 1,
+              "duration_ms": 10234
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 2,
+              "duration_ms": 9046
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_available",
+            "repeat": 2,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 1,
+              "duration_ms": 10220
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 2,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 6,
+              "tool_calls": 1,
+              "duration_ms": 12720
+            },
+            "semantic_accuracy_delta": null
+          }
+        ],
+        "synthetic_gate": {
+          "status": "not_evaluated",
+          "evaluated_arm": null,
+          "conditions": {
+            "complete_execution": true,
+            "all_reference_items_assessed": false,
+            "zero_provisional_false_accepts": false,
+            "provisional_false_reject_rate_at_most_20_percent": false,
+            "repeated_relation_flip_rate_at_most_20_percent": false
+          }
+        },
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "rollout_recommendation": "hold",
+        "rollout_reason": "Human semantic acceptance remains pending; synthetic controls do not authorize production rollout."
+      },
+      "paid_budget": {
+        "session_requests": 29,
+        "charged_delta": {
+          "requests": 29,
+          "input_tokens": 53192,
+          "output_tokens": 3437,
+          "model_seconds": 54.53400000000693
+        },
+        "unknown_usage_calls_delta": 0,
+        "remaining": {
+          "requests": 101,
+          "input_tokens": 1044240,
+          "output_tokens": 145120,
+          "model_seconds": 2486.4650000000183
+        },
+        "token_accounting": "known_or_conservative_upper_bound",
+        "single_process_ledger": true,
+        "admission_closed": false
+      },
+      "final_source_version_matches": false
+    },
+    "fixed-rework-plus": {
+      "plan": {
+        "version": "closed-loop-evaluation-v1",
+        "stage": "fixed_rework",
+        "execution_mode": "live",
+        "comparison": "same_fixed_prefix_primary_and_challenge_then_rework_on_or_off",
+        "not_original_v22_comparison": true,
+        "cases": [
+          "followup_available",
+          "followup_unavailable"
+        ],
+        "arms": [
+          "no_rework",
+          "closed_loop"
+        ],
+        "repeats": 1,
+        "planned_runs": 4,
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "maximum_model_calls": 20,
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-plus"
+        },
+        "configuration_sha256": "923aebfe3c6a978296e200ed6bf9f99d28dc573b5a0dfa11f24a989f6f0f7f6a",
+        "application": {
+          "source_version": "4dc83e109f28eefd",
+          "engine_version": "autonomous_v2.3",
+          "review_policy_version": "atomic_review_v2",
+          "contract_version": "atomic_draft_v1",
+          "challenge_policy_version": "blind_scope_challenge_v1",
+          "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+          "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+          "engine_source_sha256": "3dad9f05b2c3ede158cfbc8492d2e27e979283b1cc782e90bab65aa17e3094ea",
+          "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+          "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+        },
+        "dataset_version": "closed-loop-source-controls-v1",
+        "case_freezes": [
+          {
+            "case_id": "followup_available",
+            "world_sha256": "9be840b18d8de56c29661ae9764464b1ebd1252214e5dfab6afcb717c881f62a",
+            "reference_sha256": "89a9bc217722d86d666638341302ee81544928ecb22d470e7ef01780613040e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_unavailable",
+            "world_sha256": "fec803720982e23ea0c873b374521b3c3e65167a1dc2ce0057db512f4b69f57a",
+            "reference_sha256": "a68fb7c10c21b43fb7a7b5ca6961be27a051d77f50799fed9a7bfba31b842885",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          }
+        ],
+        "evaluation_source_sha256": {
+          "scripts/evaluate_autonomous_closed_loop.py": "120c4cb4e889c06934c7e1d0f21a8fd87ca037628b4ebd589e9a45e2d8d04569",
+          "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688"
+        },
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "authoring": "Developer-authored new synthetic worlds plus explicitly tagged known regressions; not independent external blind testing.",
+        "read_only": true,
+        "estimated_cost": null
+      },
+      "summary": {
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "runs": 4,
+        "expected_runs": 4,
+        "reference_items": 0,
+        "assessed_items": 0,
+        "provisional_false_accepts": 0,
+        "negative_reference_items": 0,
+        "provisional_false_rejects": 0,
+        "positive_reference_items": 0,
+        "provisional_exact_agreement": 0,
+        "repeated_groups": 0,
+        "groups_with_relation_changes": 0,
+        "by_arm": {
+          "closed_loop": {
+            "runs": 2,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 2,
+                "sum": 7,
+                "mean": 3.5
+              },
+              "tool_calls": {
+                "known_runs": 2,
+                "sum": 4,
+                "mean": 2.0
+              },
+              "duration_ms": {
+                "known_runs": 2,
+                "sum": 22281,
+                "mean": 11140.5
+              }
+            },
+            "key_observations_required": 1,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 1,
+            "rework_rounds": 1,
+            "changed_targets": 1,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          },
+          "no_rework": {
+            "runs": 2,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 2,
+                "sum": 2,
+                "mean": 1.0
+              },
+              "tool_calls": {
+                "known_runs": 2,
+                "sum": 2,
+                "mean": 1.0
+              },
+              "duration_ms": {
+                "known_runs": 2,
+                "sum": 5812,
+                "mean": 2906.0
+              }
+            },
+            "key_observations_required": 1,
+            "key_observations_omitted": 1,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          }
+        },
+        "paired_deltas": [
+          {
+            "case_id": "followup_available",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 2,
+              "duration_ms": 16094
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 375
+            },
+            "semantic_accuracy_delta": null
+          }
+        ],
+        "synthetic_gate": {
+          "status": "not_evaluated",
+          "evaluated_arm": null,
+          "conditions": {
+            "complete_execution": true,
+            "all_reference_items_assessed": false,
+            "zero_provisional_false_accepts": false,
+            "provisional_false_reject_rate_at_most_20_percent": false,
+            "repeated_relation_flip_rate_at_most_20_percent": false
+          }
+        },
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "rollout_recommendation": "hold",
+        "rollout_reason": "Human semantic acceptance remains pending; synthetic controls do not authorize production rollout."
+      },
+      "paid_budget": {
+        "session_requests": 9,
+        "charged_delta": {
+          "requests": 9,
+          "input_tokens": 17090,
+          "output_tokens": 1046,
+          "model_seconds": 27.81199999999808
+        },
+        "unknown_usage_calls_delta": 0,
+        "remaining": {
+          "requests": 92,
+          "input_tokens": 1027150,
+          "output_tokens": 144074,
+          "model_seconds": 2458.6530000000203
+        },
+        "token_accounting": "known_or_conservative_upper_bound",
+        "single_process_ledger": true,
+        "admission_closed": false
+      },
+      "final_source_version_matches": false
+    },
+    "plus-repeat": {
+      "plan": {
+        "version": "closed-loop-evaluation-v1",
+        "stage": "fixed_rework",
+        "execution_mode": "live",
+        "comparison": "same_fixed_prefix_primary_and_challenge_then_rework_on_or_off",
+        "not_original_v22_comparison": true,
+        "cases": [
+          "followup_available"
+        ],
+        "arms": [
+          "no_rework",
+          "closed_loop"
+        ],
+        "repeats": 2,
+        "planned_runs": 4,
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "maximum_model_calls": 18,
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-plus"
+        },
+        "configuration_sha256": "923aebfe3c6a978296e200ed6bf9f99d28dc573b5a0dfa11f24a989f6f0f7f6a",
+        "application": {
+          "source_version": "a9d571433a418bab",
+          "engine_version": "autonomous_v2.3",
+          "review_policy_version": "atomic_review_v2",
+          "contract_version": "atomic_draft_v1",
+          "challenge_policy_version": "blind_scope_challenge_v1",
+          "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+          "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+          "engine_source_sha256": "d70c43b840f3d86ebca3b8bd8a5192fc28baa6b52cf3f55653004da13beb0475",
+          "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+          "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+        },
+        "dataset_version": "closed-loop-source-controls-v1",
+        "case_freezes": [
+          {
+            "case_id": "followup_available",
+            "world_sha256": "9be840b18d8de56c29661ae9764464b1ebd1252214e5dfab6afcb717c881f62a",
+            "reference_sha256": "89a9bc217722d86d666638341302ee81544928ecb22d470e7ef01780613040e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          }
+        ],
+        "evaluation_source_sha256": {
+          "scripts/evaluate_autonomous_closed_loop.py": "120c4cb4e889c06934c7e1d0f21a8fd87ca037628b4ebd589e9a45e2d8d04569",
+          "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688"
+        },
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "authoring": "Developer-authored new synthetic worlds plus explicitly tagged known regressions; not independent external blind testing.",
+        "read_only": true,
+        "estimated_cost": null
+      },
+      "summary": {
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "runs": 4,
+        "expected_runs": 4,
+        "reference_items": 0,
+        "assessed_items": 0,
+        "provisional_false_accepts": 0,
+        "negative_reference_items": 0,
+        "provisional_false_rejects": 0,
+        "positive_reference_items": 0,
+        "provisional_exact_agreement": 0,
+        "repeated_groups": 0,
+        "groups_with_relation_changes": 0,
+        "by_arm": {
+          "closed_loop": {
+            "runs": 2,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 2,
+                "sum": 12,
+                "mean": 6.0
+              },
+              "tool_calls": {
+                "known_runs": 2,
+                "sum": 6,
+                "mean": 3.0
+              },
+              "duration_ms": {
+                "known_runs": 2,
+                "sum": 44422,
+                "mean": 22211.0
+              }
+            },
+            "key_observations_required": 2,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 2,
+            "rework_rounds": 2,
+            "changed_targets": 2,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          },
+          "no_rework": {
+            "runs": 2,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 2,
+                "sum": 2,
+                "mean": 1.0
+              },
+              "tool_calls": {
+                "known_runs": 2,
+                "sum": 2,
+                "mean": 1.0
+              },
+              "duration_ms": {
+                "known_runs": 2,
+                "sum": 5375,
+                "mean": 2687.5
+              }
+            },
+            "key_observations_required": 2,
+            "key_observations_omitted": 2,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          }
+        },
+        "paired_deltas": [
+          {
+            "case_id": "followup_available",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 2,
+              "duration_ms": 23407
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_available",
+            "repeat": 2,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 5,
+              "tool_calls": 2,
+              "duration_ms": 15640
+            },
+            "semantic_accuracy_delta": null
+          }
+        ],
+        "synthetic_gate": {
+          "status": "not_evaluated",
+          "evaluated_arm": null,
+          "conditions": {
+            "complete_execution": true,
+            "all_reference_items_assessed": false,
+            "zero_provisional_false_accepts": false,
+            "provisional_false_reject_rate_at_most_20_percent": false,
+            "repeated_relation_flip_rate_at_most_20_percent": false
+          }
+        },
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "rollout_recommendation": "hold",
+        "rollout_reason": "Human semantic acceptance remains pending; synthetic controls do not authorize production rollout."
+      },
+      "paid_budget": {
+        "session_requests": 14,
+        "charged_delta": {
+          "requests": 14,
+          "input_tokens": 28412,
+          "output_tokens": 2127,
+          "model_seconds": 49.35700000000361
+        },
+        "unknown_usage_calls_delta": 0,
+        "remaining": {
+          "requests": 78,
+          "input_tokens": 998738,
+          "output_tokens": 141947,
+          "model_seconds": 2409.2960000000166
+        },
+        "token_accounting": "known_or_conservative_upper_bound",
+        "single_process_ledger": true,
+        "admission_closed": false
+      },
+      "final_source_version_matches": true
+    },
+    "e2e": {
+      "plan": {
+        "version": "closed-loop-evaluation-v1",
+        "stage": "e2e",
+        "execution_mode": "live",
+        "comparison": "single_pass versus combined_challenge_and_rework",
+        "not_original_v22_comparison": true,
+        "cases": [
+          "temporal_counterevidence",
+          "followup_available",
+          "followup_unavailable"
+        ],
+        "arms": [
+          "no_rework",
+          "closed_loop"
+        ],
+        "repeats": 1,
+        "planned_runs": 6,
+        "limits": {
+          "model_calls": 12,
+          "web_calls": 12,
+          "tool_calls": 8,
+          "seconds": 180,
+          "reserve_model_calls": 2,
+          "reserve_seconds": 15,
+          "input_chars": 48000,
+          "snippet_chars": 1800,
+          "max_sources": 10
+        },
+        "maximum_model_calls": 60,
+        "model_settings": {
+          "temperature": 0,
+          "max_output_tokens": 2200,
+          "request_timeout": 30,
+          "max_retries": 0,
+          "response_format": "json_object",
+          "model": "qwen3.7-flash"
+        },
+        "configuration_sha256": "3399f73aa1bb1d73acec2dc36d8c10e93f0b65babffc35819c61c7ff685781eb",
+        "application": {
+          "source_version": "a9d571433a418bab",
+          "engine_version": "autonomous_v2.3",
+          "review_policy_version": "atomic_review_v2",
+          "contract_version": "atomic_draft_v1",
+          "challenge_policy_version": "blind_scope_challenge_v1",
+          "challenge_prompt_sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660",
+          "review_prompt_sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6",
+          "engine_source_sha256": "d70c43b840f3d86ebca3b8bd8a5192fc28baa6b52cf3f55653004da13beb0475",
+          "review_source_sha256": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+          "challenge_source_sha256": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114"
+        },
+        "dataset_version": "closed-loop-source-controls-v1",
+        "case_freezes": [
+          {
+            "case_id": "temporal_counterevidence",
+            "world_sha256": "73a827f91787e3fde532822f2d9bef4f6beb194e997baa2ba3b1eec8b32f5cc2",
+            "reference_sha256": "3d24e66156a77c94db4eb993c0ea71d03958c05520507c11626534f295918bd8",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_available",
+            "world_sha256": "9be840b18d8de56c29661ae9764464b1ebd1252214e5dfab6afcb717c881f62a",
+            "reference_sha256": "89a9bc217722d86d666638341302ee81544928ecb22d470e7ef01780613040e9",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          },
+          {
+            "case_id": "followup_unavailable",
+            "world_sha256": "fec803720982e23ea0c873b374521b3c3e65167a1dc2ce0057db512f4b69f57a",
+            "reference_sha256": "a68fb7c10c21b43fb7a7b5ca6961be27a051d77f50799fed9a7bfba31b842885",
+            "reference_kind": "synthetic_source_constructed_provisional",
+            "human_review": "pending",
+            "scenario_origin": "new_author_constructed_world",
+            "external_blind_test": false
+          }
+        ],
+        "evaluation_source_sha256": {
+          "scripts/evaluate_autonomous_closed_loop.py": "120c4cb4e889c06934c7e1d0f21a8fd87ca037628b4ebd589e9a45e2d8d04569",
+          "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688"
+        },
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "authoring": "Developer-authored new synthetic worlds plus explicitly tagged known regressions; not independent external blind testing.",
+        "read_only": true,
+        "estimated_cost": null
+      },
+      "summary": {
+        "reference_kind": "synthetic_source_constructed_provisional",
+        "runs": 6,
+        "expected_runs": 6,
+        "reference_items": 0,
+        "assessed_items": 0,
+        "provisional_false_accepts": 0,
+        "negative_reference_items": 0,
+        "provisional_false_rejects": 0,
+        "positive_reference_items": 0,
+        "provisional_exact_agreement": 0,
+        "repeated_groups": 0,
+        "groups_with_relation_changes": 0,
+        "by_arm": {
+          "closed_loop": {
+            "runs": 3,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 3,
+                "sum": 24,
+                "mean": 8.0
+              },
+              "tool_calls": {
+                "known_runs": 3,
+                "sum": 9,
+                "mean": 3.0
+              },
+              "duration_ms": {
+                "known_runs": 3,
+                "sum": 53266,
+                "mean": 17755.333333333332
+              }
+            },
+            "key_observations_required": 3,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          },
+          "no_rework": {
+            "runs": 3,
+            "reference_items": 0,
+            "assessed_items": 0,
+            "negative_reference_items": 0,
+            "positive_reference_items": 0,
+            "provisional_false_accepts": 0,
+            "provisional_false_rejects": 0,
+            "provisional_false_accept_rate": null,
+            "provisional_false_reject_rate": null,
+            "repeated_groups": 0,
+            "groups_with_relation_changes": 0,
+            "resources": {
+              "model_calls": {
+                "known_runs": 3,
+                "sum": 24,
+                "mean": 8.0
+              },
+              "tool_calls": {
+                "known_runs": 3,
+                "sum": 9,
+                "mean": 3.0
+              },
+              "duration_ms": {
+                "known_runs": 3,
+                "sum": 50218,
+                "mean": 16739.333333333332
+              }
+            },
+            "key_observations_required": 3,
+            "key_observations_omitted": 0,
+            "key_observations_acquired_after_review": 0,
+            "rework_rounds": 0,
+            "changed_targets": 0,
+            "withdrawn_targets": 0,
+            "effective_narrowing_human_judgment": null
+          }
+        },
+        "paired_deltas": [
+          {
+            "case_id": "temporal_counterevidence",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 0,
+              "tool_calls": 0,
+              "duration_ms": 2047
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_available",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": -2,
+              "tool_calls": -1,
+              "duration_ms": -4374
+            },
+            "semantic_accuracy_delta": null
+          },
+          {
+            "case_id": "followup_unavailable",
+            "repeat": 1,
+            "baseline_arm": "no_rework",
+            "final_arm": "closed_loop",
+            "resource_delta_final_minus_baseline": {
+              "model_calls": 2,
+              "tool_calls": 1,
+              "duration_ms": 5375
+            },
+            "semantic_accuracy_delta": null
+          }
+        ],
+        "synthetic_gate": {
+          "status": "not_evaluated",
+          "evaluated_arm": null,
+          "conditions": {
+            "complete_execution": true,
+            "all_reference_items_assessed": false,
+            "zero_provisional_false_accepts": false,
+            "provisional_false_reject_rate_at_most_20_percent": false,
+            "repeated_relation_flip_rate_at_most_20_percent": false
+          }
+        },
+        "human_semantic_gate": "pending",
+        "production_accuracy": "not_established",
+        "rollout_recommendation": "hold",
+        "rollout_reason": "Human semantic acceptance remains pending; synthetic controls do not authorize production rollout."
+      },
+      "paid_budget": {
+        "session_requests": 48,
+        "charged_delta": {
+          "requests": 48,
+          "input_tokens": 100086,
+          "output_tokens": 7161,
+          "model_seconds": 102.03900000001886
+        },
+        "unknown_usage_calls_delta": 0,
+        "remaining": {
+          "requests": 30,
+          "input_tokens": 898652,
+          "output_tokens": 134786,
+          "model_seconds": 2307.256999999998
+        },
+        "token_accounting": "known_or_conservative_upper_bound",
+        "single_process_ledger": true,
+        "admission_closed": false
+      },
+      "final_source_version_matches": true
+    }
+  },
+  "provenance": {
+    "review_control_code_and_prompts_unchanged_since_comparison": {
+      "review_source_sha256": true,
+      "challenge_source_sha256": true,
+      "review_prompt_sha256": true,
+      "challenge_prompt_sha256": true
+    },
+    "earlier_runs_are_not_final_source_acceptance": true,
+    "earlier_engine_fixes": [
+      "阻止无进展重抽审阅",
+      "过期证据包拒绝发布",
+      "共享协议修复额度",
+      "无新增观测保留交接异议"
+    ],
+    "final_source_experiments": [
+      "plus-repeat",
+      "e2e",
+      "api-rollout"
+    ],
+    "comparison_is_same_code_ablation_not_original_v22": true,
+    "baseline_v22_frozen_copy": "output/autonomy-v45/baseline-v2.2",
+    "reference_kind": "synthetic_source_constructed_provisional",
+    "new_author_constructed_worlds": 7,
+    "known_v22_regression_worlds": 1,
+    "external_blind_test": false,
+    "ai_reviews": [
+      {
+        "path": "output/autonomy-v45/ai-rework-review.json",
+        "sha256": "89e1019cf6dc11fa29c9b29a860a1d8075fd959518159aa8bb6ccc3ccdff5edf"
+      }
+    ],
+    "ai_reviews_are_human_gold": false
+  },
+  "remaining_limits": [
+    "Flash返工仍会选错渠道；共享同一模型的主审和挑战可能共同漏掉语义范围错误。",
+    "独立AI复核发现将未记录远端响应误读为远端未响应的残留风险；不能把引用存在视为结论正确。",
+    "改写和收窄的有效性未经过人工金标验证；reference_items为0时不解释为零语义错误。",
+    "有限预算下为返工预留模型调用可能降低首轮完成率；端到端不退化指标未通过。",
+    "更强模型的小样本补证成功不足以决定默认模型切换；未修改原模型配置。",
+    "生产持久化集成、独立人工评审与真实故障盲测仍未建立，正式灰度继续关闭。"
+  ],
+  "deployment_configuration_changed": false,
+  "deployment_gate": {
+    "source_version": "a9d571433a418bab",
+    "review_policy_version": "atomic_review_v2",
+    "configuration_sha256": "98190f21a7a0231870c86609dab66c55b1dfd1ee164ca586098feece4d019425",
+    "evaluation_hash": "48acc1ff292e3c72e56aa6ff406bb0d8894048c0193780d0afa60d3102a2011b",
+    "evaluation_hash_kind": "canonical_artifact_manifest_sha256",
+    "verdict": "hold",
+    "reason": "默认模型补证与端到端不退化指标未达；人工语义验收pending。"
+  },
+  "remediation_writes_executed": false,
+  "artifacts": [
+    {
+      "path": "output/autonomy-v45/freeze.json",
+      "sha256": "7373b4a21a3588878fed4e6b496dcfa87e5a7caf33f8d95998ab46c3c1eda6d3"
+    },
+    {
+      "path": "output/autonomy-v45/final-verified-tests.log",
+      "sha256": "98c72e018b9491888c57e230baf9d5b10648641b65cf482958e121109f70b615"
+    },
+    {
+      "path": "output/autonomy-v45/budget-ledger.json",
+      "sha256": "034976f7543dfff8634291f11b6a646f4036106b319ade08f43bdb0f8ded7038"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/bundle.json",
+      "sha256": "576ed221587991530b17dbcc60e05446ea7800368d68cf17be0defbc20223d74"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/compound_assertion-challenged_review-r1.json",
+      "sha256": "9da7911a2f9f72d4f4dca53be5c7bf30298ede88866d5f0c5cf90d5c81d519d0"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/compound_assertion-challenged_review-r2.json",
+      "sha256": "a6468da22615a465a49486ad61d1602f0c010f799f0b4b1d7c3e4602ae92b21c"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/compound_assertion-review-r1.json",
+      "sha256": "6dbe5fe2eef6f433b19987c3721b526c30738074036e02860f5fe27462252a57"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/compound_assertion-review-r2.json",
+      "sha256": "b440d33ca690fb0445dd555b05ae73b9e183c4a266431ed790ac70c31f3e1479"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/contribution_and_uniqueness-challenged_review-r1.json",
+      "sha256": "197a3082baca579a454e369c1128901dc029a728337614f65178b36c4f56d97c"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/contribution_and_uniqueness-challenged_review-r2.json",
+      "sha256": "2de436ec8ffccc3fcb580d631d80bc6f56e624b4c52887532143a5933759560f"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/contribution_and_uniqueness-review-r1.json",
+      "sha256": "5aea5d8a855aee9d32b19384fb371cfdcb9c13118d1196b49abc9695d4128027"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/contribution_and_uniqueness-review-r2.json",
+      "sha256": "2a3e9da857de062f92b20b1d724598b133d8421671064760a6aee2dcc7a50667"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_available-challenged_review-r1.json",
+      "sha256": "ddb4d09c6b47e4c59243955c2150407859f07476dde3bf5b36f66948bb69e949"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_available-challenged_review-r2.json",
+      "sha256": "214edaf076e926e4deb5ccc2a4702d3ec00642642af7e8bfad1eed26ba6527c4"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_available-review-r1.json",
+      "sha256": "9cc9c4cd9d1d4bd3ef7b0b93fc4f033f9cf7cb884f2925c9c76944cb0ca6fa6a"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_available-review-r2.json",
+      "sha256": "28e00061ab619a8357b0446f9b2fc038ac55f0169123095048a9ba58156062d0"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_unavailable-challenged_review-r1.json",
+      "sha256": "482791ce4f608e3a6e69d9b3fff1edb24509e6ba02a04cdf0ce0121c60a72d7f"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_unavailable-challenged_review-r2.json",
+      "sha256": "de75febcbceb217da4d6c06c3eca91514252bcb24cb5d6d4dc654375f6a0a93a"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_unavailable-review-r1.json",
+      "sha256": "95dfeb9db8f1413b34b64e59b7a754161c7c62be190077bed778047431c0fb7d"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/followup_unavailable-review-r2.json",
+      "sha256": "ce5322fcde6778e8a08a28afa24b3824e87d263ccfbc8a2a650e19bb6593cdd4"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/future_manual_check-challenged_review-r1.json",
+      "sha256": "d22f079fa7e2e14ce4705c8f22049a3e380095866e6acfde9a0c0537f09fddeb"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/future_manual_check-challenged_review-r2.json",
+      "sha256": "7003ff2ea123c0233207561f52edc31d18b4e7923c0e4226969aa4bfa1738de1"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/future_manual_check-review-r1.json",
+      "sha256": "c0b24f9362335a1891f0d977ec64e9a62fa6906670bf90f3c1d3cbd2f4339268"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/future_manual_check-review-r2.json",
+      "sha256": "5bd40f9e35f4149e69535d08e4720f1a7009f0ec86de9a5ad7cc43f0fcdb6640"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/human-review.pending.json",
+      "sha256": "cf48a8ca565e53adaa441de110b5603288f523fe67188d97dca05889301c9273"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/plan.json",
+      "sha256": "270798c7225cf807e8bb58c37c40b5b566edc8b0735b56e244f69151d05790ca"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/pool_probe_ambiguity-challenged_review-r1.json",
+      "sha256": "1917634c7ed3fa35a65f49c42cf4d83680382306612bb5acc9f4300a53d8a5d3"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/pool_probe_ambiguity-challenged_review-r2.json",
+      "sha256": "93ce79486837e026c620696b29eaebd6668c160be65b09cc3737a6c8652475b5"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/pool_probe_ambiguity-review-r1.json",
+      "sha256": "e23f398a1aab709d4d8226f7cb04ede3d0ed38be03da74caba06264e0a784e26"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/pool_probe_ambiguity-review-r2.json",
+      "sha256": "7aeff162ac733534b9b2d5a1e4fb522c003453a733e0e0e196b71eab3f6d6e8a"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/probe_scope-challenged_review-r1.json",
+      "sha256": "c2412dd082f3831751a0d3f99e62e680bd45142b6694fca630adff80aeb39a1e"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/probe_scope-challenged_review-r2.json",
+      "sha256": "406287bdaff1471cc5c777441b93e270f2e184d09dd319d12e40c327485ce7e4"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/probe_scope-review-r1.json",
+      "sha256": "4ed0419a1bf5587821f210fcfc748dfaeb870b2b4a468baaa7a5704568dc8811"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/probe_scope-review-r2.json",
+      "sha256": "a9001efc499636bb1df44fdc8c7ef7a7d4a79cd8a7b3569e47bd4a398ee2dbb1"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/temporal_counterevidence-challenged_review-r1.json",
+      "sha256": "1a5a14e1a2debafa0e5daed909bcc0f362857ae6109d709765d06a8ee068bfbf"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/temporal_counterevidence-challenged_review-r2.json",
+      "sha256": "5f709bba073e03a70587d3bca0637b5c7e199e0ac741c1ec7e6823b91b451023"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/temporal_counterevidence-review-r1.json",
+      "sha256": "d697977da2bf0163e757a89835579501d1aea8ac6ea3078845594d5dde4ccfa5"
+    },
+    {
+      "path": "output/autonomy-v45/review-comparison/1f90cd9c-e221-4826-a0e1-23ef516f68c4/temporal_counterevidence-review-r2.json",
+      "sha256": "6f457dccc7366ce67ca6b2661625a8492704c1027826af4f738ff5839f5a37e6"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/bundle.json",
+      "sha256": "161b3f24130577363aee070b97ca1a53013ea3a58921a113d4d35aa4a7da4827"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_available-closed_loop-r1.json",
+      "sha256": "75bbe431d60463f48cd6b97c1394374916c2b38b781b30efde41f26f0515f5bb"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_available-closed_loop-r2.json",
+      "sha256": "86445a73877c73f50576df98b4947d43e71393040f7c91c5d777b7429121abe2"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_available-no_rework-r1.json",
+      "sha256": "aba6b05f9a6c9b3d0cc55a0855b2282808cee2b8ffb63bd7f0f2bfe1ca5d24bb"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_available-no_rework-r2.json",
+      "sha256": "c7d72319c5c9a32fdac81940769697a0691a65eb62b3a93757dd5fba51bf47e2"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_unavailable-closed_loop-r1.json",
+      "sha256": "e9bb72311832422ec3478a31fb7a47e5c219be1bd553835d3673e36db7dd96ed"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_unavailable-closed_loop-r2.json",
+      "sha256": "a8fb18c04fa44bc6837ec3c4e619002de440a8d32ac0e7480c469c13acfcbdf9"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_unavailable-no_rework-r1.json",
+      "sha256": "7152e2d0ca0ff43fbf8faf1b0c61f9a53312593f24e46bfc33206efbd4911c57"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/followup_unavailable-no_rework-r2.json",
+      "sha256": "fda1061f40a44248f82951a2469a1ac1e746b19cc133170cc9522a947d66eae0"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/human-review.pending.json",
+      "sha256": "1b0d31274779c22f34d0dfeb9c1c0fb74388c5e84e15d2b8099afeeea206070c"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework/a62cbac8-6249-48d3-a57c-787844c6c6bf/plan.json",
+      "sha256": "e7eaee93e2b825294cc01a7e8502dfd1732a6f9106b1b2c484dbdc779cb6ea2f"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/bundle.json",
+      "sha256": "d433d04a83a1b7d90d4be184d91512b8c227c7012fa0033d6fc5201006f582f9"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/followup_available-closed_loop-r1.json",
+      "sha256": "23a0caa4d8138cc2b7f6c75cd859a69b392052e93665a2e752416d6570e83d37"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/followup_available-no_rework-r1.json",
+      "sha256": "2403669022f0372206333869afd2ee212905173b2c89f9f6baf16a699d5d4bf5"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/followup_unavailable-closed_loop-r1.json",
+      "sha256": "7b74fcffd4ca91d7fc251e2506a29dff0ee418aedeac0be912569f60b5250179"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/followup_unavailable-no_rework-r1.json",
+      "sha256": "9a781550945a9db3eef9515859925cc794c35ff8ec8e0bf278dcc26a5c7632c6"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/human-review.pending.json",
+      "sha256": "eee12f7eb5ed6e1da6bc1f34c858b94114b7fcf62874d37417b8549f4befbe45"
+    },
+    {
+      "path": "output/autonomy-v45/fixed-rework-plus/972c9754-9961-4b0a-bee3-efc2ff47fc49/plan.json",
+      "sha256": "229f944e75371be7e9c88240cc5a2735e21f8dba9c34d21d25fecb920de18f1a"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/bundle.json",
+      "sha256": "0bd1011d22c8c2c331382224ebd058c52aeed5b25be7d7c7b9ed3ff8c124e8bf"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/followup_available-closed_loop-r1.json",
+      "sha256": "3b5ade50f39b524d6dbf776d6ab3699feb437baf48a4f23e3b968d4a609e33fe"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/followup_available-closed_loop-r2.json",
+      "sha256": "6edc451282480b1252d43e7aca64b169f871bdba9db483f4d6fd3f033680caf0"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/followup_available-no_rework-r1.json",
+      "sha256": "be705609fd87894cfa49e8ade6ffa48454e4cb511be7287248853ddd2da9a2d5"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/followup_available-no_rework-r2.json",
+      "sha256": "8a3759ea2833b006119357b7941fe75c71180509d03c7774d7c45840f0c78a27"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/human-review.pending.json",
+      "sha256": "4e33c19b63595f085dbbe137f5de9a1ecbc338317f3a9b4e044de6027f137288"
+    },
+    {
+      "path": "output/autonomy-v45/plus-repeat/faa96443-8d7b-4107-861b-d8ac127069db/plan.json",
+      "sha256": "6d1b857cfee1c0314bb454c429d3e3afbbc82d1a8b3c900ddd49e0bba236492c"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/bundle.json",
+      "sha256": "b49519066b7411725254c9cd8a5e750033a7fc93d9edd618543923ec5320779f"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/followup_available-closed_loop-r1.json",
+      "sha256": "e4d83b1aac912c1f5e5e370da61eb92f34c14b97dfd09dd012284ec63dcb7194"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/followup_available-no_rework-r1.json",
+      "sha256": "08121ee8193fa6dcddebe8c237e3b20ec5b78c2b837143d8ff07915ae817e2a2"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/followup_unavailable-closed_loop-r1.json",
+      "sha256": "100fccd376f30fdded782a17c0abe6b173a3d3d9212d7223788520fab6ec17c8"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/followup_unavailable-no_rework-r1.json",
+      "sha256": "2d31d0231c40829acb7f6f65f16d44bb1130e79f83fdc21a7fadfd13769d67d9"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/human-review.pending.json",
+      "sha256": "7338a09abcf92d6985d2e85b5b66178f074bc3dbae73d8a6cd6794ec61faf7d3"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/plan.json",
+      "sha256": "86fb722073fdf35eded75e628e26428b4e9c8b203aad94f7449c7be541ca0b20"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/temporal_counterevidence-closed_loop-r1.json",
+      "sha256": "d96f7c22d0394545f621fe900a5b8379659ddf0f51f11d76fd7f992ee750ed8b"
+    },
+    {
+      "path": "output/autonomy-v45/e2e/71f74086-3755-4e8f-acd5-f814e41382d2/temporal_counterevidence-no_rework-r1.json",
+      "sha256": "6863d99fac897ca65ae315f8b7e7eff8ebb2083dd89fe0d219a25d2568182c4a"
+    },
+    {
+      "path": "output/autonomy-v45/api-rollout/19a27b4d-77b5-459d-b5a7-c2aac65eba2a/human-review.pending.json",
+      "sha256": "328a7945f33fbe00944112fe1c0ba9e4e9cea811b5d03410d59ef5fa2c3c5f71"
+    },
+    {
+      "path": "output/autonomy-v45/api-rollout/19a27b4d-77b5-459d-b5a7-c2aac65eba2a/plan.json",
+      "sha256": "b6ad5a74b282fe092fdffc2b222bc3474a234f589283c39ab7550b2a1e7ceb31"
+    },
+    {
+      "path": "output/autonomy-v45/api-rollout/19a27b4d-77b5-459d-b5a7-c2aac65eba2a/report.json",
+      "sha256": "e584b4da907f85e66c58eb9f5b6ee87e300091f4d109cf888205d2b31541a9b5"
+    },
+    {
+      "path": "output/autonomy-v45/ai-rework-review.json",
+      "sha256": "89e1019cf6dc11fa29c9b29a860a1d8075fd959518159aa8bb6ccc3ccdff5edf"
+    }
+  ]
+}

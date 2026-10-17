@@ -13,7 +13,16 @@ class ScriptedModel:
     def invoke(self, messages):
         request = json.loads(messages[-1].content)
         stage, payload = request.get('stage'), request.get('input', request)
-        if stage == 'investigate':
+        if payload.get('challenge_policy_version'):
+            value = {'items': [{'target_id': target['id'], 'coverage': 'covered',
+                'refs': [next((o['reference_id'] for o in payload.get('reference_options', [])
+                    if any(o['evidence_id'] == r['evidence_id'] and o['field_path'] == r['field_path']
+                           for r in target.get('refs', []))), 'R1')],
+                'reason': '脚本接线控制，不代表来源覆盖或因果判断正确。'}
+                for target in payload.get('targets', [])]}
+        elif stage == 'revise':
+            value = {'items': [], 'withdraw': [], 'gaps': ['脚本不产生语义修订能力。']}
+        elif stage == 'investigate':
             capabilities = payload.get('capabilities', {})
             metrics = list(capabilities.get('registered_metrics', {}))
             categories = capabilities.get('registered_log_categories', [])

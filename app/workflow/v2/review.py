@@ -95,6 +95,17 @@ def _digest(value):
     return hashlib.sha256(_json(value).encode()).hexdigest()[:24]
 
 
+def evidence_pack_version(executor, *, collection=None):
+    """Fingerprint all sources and read quality, including empty/error reads.
+
+    A new observation or changed query ledger invalidates the entire prior
+    batch, including verdicts for targets whose wording did not change.
+    """
+    pack = draft_input(executor, collection=collection)
+    return _digest({'sources': [{**row, 'hash': executor.evidence[row['evidence_id']].hash}
+                                 for row in pack['evidence']], 'collection': pack['collection']})
+
+
 def _targets(draft):
     return {target.id: target for target in [*draft.claims, *draft.next_steps]}
 
@@ -204,8 +215,7 @@ def review_draft(model, draft, executor, context, *, repairs=None, collection=No
     repairs.setdefault('reviewer_repairs', 0)
     targets = _targets(draft)
     pack = draft_input(executor, collection=collection)
-    pack_version = _digest({'sources': [{**row, 'hash': executor.evidence[row['evidence_id']].hash}
-                                        for row in pack['evidence']], 'collection': pack['collection']})
+    pack_version = evidence_pack_version(executor, collection=collection)
     items = {key: _item(target, pack_version, 'not_run', 'REVIEW_NOT_RUN') for key, target in targets.items()}
     if not targets:
         return ReviewBatch(evidence_pack_version=pack_version)
