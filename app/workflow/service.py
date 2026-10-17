@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 from threading import BoundedSemaphore, Lock
 from typing import AsyncIterator
@@ -20,7 +21,10 @@ class CapacityExceeded(RuntimeError):
 
 class WorkflowService:
     def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None,
-                 service_registry=None, repair_executors=None):
+                 service_registry=None, repair_executors=None, incident_engine=None):
+        self.incident_engine = incident_engine or os.getenv('INCIDENT_ENGINE', 'legacy')
+        if self.incident_engine not in {'legacy', 'autonomous_v2'}:
+            raise ValueError('Unsupported INCIDENT_ENGINE')
         self._config_path = config_path
         self._store_lock = Lock()
         self._base_config = config
@@ -134,14 +138,20 @@ class WorkflowService:
                 raise CapacityExceeded("执行池已满，请稍后重试。")
             run_id, created, active = str(uuid4()), False, False
             try:
+                model_config = deepcopy(self._base_config)
+                provider_registry = deepcopy(self.services)
                 run_id, created, config = self._store.begin_diagnosis(iid, run_id, execution, principal,
-                    self._incident.metadata(execution))
+                    self._incident.metadata(execution, incident=incident, principal=principal,
+                                            registry=provider_registry, config=model_config))
                 if not created:
                     self._capacity.release()
                     return run_id, True
                 request = {"task_type": "incident", "execution": config["execution"], "incident_snapshot": config["incident_snapshot"],
                     "query": config["incident_snapshot"]["symptoms"], "thread_id": iid,
-                    "tenant_id": principal.tenant_id, "user_id": principal.user_id}
+                    "tenant_id": principal.tenant_id, "user_id": principal.user_id,
+                    "run_spec": config.get('run_spec', {}),
+                    # Credentials stay in process memory, never in the persisted/public run config.
+                    "_model_config": model_config, "_provider_registry": provider_registry}
                 with METRICS.lock:
                     METRICS.active += 1
                     active = True

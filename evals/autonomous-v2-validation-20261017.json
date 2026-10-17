@@ -1,0 +1,651 @@
+{
+  "schema_version": "autonomous-v2-validation-v1",
+  "date": "2026-10-17",
+  "branch": "codex/autonomous-investigation-v2",
+  "git_base": "5cb7833c0d5789b67d57775a5926c45eb241d495",
+  "source_version": "15c8b64c46024377",
+  "engine_version": "autonomous_v2.2",
+  "working_tree_contains_preserved_user_changes": true,
+  "scope": {
+    "stages": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "stage_2_full": true,
+    "generic_autonomy": true,
+    "mandatory_fault_profiles": false,
+    "production_writes_performed": false,
+    "stage_4_implemented": false,
+    "project_docs_modified": false
+  },
+  "stages": {
+    "0": "Frozen original source, user work, free tests, live baseline and shared paid ledger.",
+    "1": "Public semantic capabilities, canonical query ledger, incomplete-read boundaries and explicit budget reserve.",
+    "2": "Server-rendered source facts, small versioned draft, item salvage, typed atomic review, one shared correction.",
+    "3": "Engine switch, frozen admission specification, API/SSE/idempotency compatibility, repair gate and repeatable evaluation."
+  },
+  "preserved_user_work": [
+    {
+      "path": "app/agents/prompts.py",
+      "sha256": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "byte_identical": true
+    },
+    {
+      "path": "evals/multi-prompt-simplification-validation-20261017.json",
+      "sha256": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "byte_identical": true
+    },
+    {
+      "path": "tests/workflow/test_prompt_query_boundaries.py",
+      "sha256": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90",
+      "byte_identical": true
+    }
+  ],
+  "verification": {
+    "tests_discovered": 889,
+    "tests_passed": 869,
+    "tests_skipped": 20,
+    "skip_reason": "No isolated PostgreSQL/pgvector *_test database configured.",
+    "frontend_typecheck": "passed",
+    "frontend_build": "passed",
+    "diff_whitespace_check": "passed",
+    "test_log": "output/autonomy-v2/final-tests-v2.2.log"
+  },
+  "live": {
+    "model": "qwen3.7-flash",
+    "paid_ledger": {
+      "max_requests": 180,
+      "max_input_tokens": 600000,
+      "max_output_tokens": 120000,
+      "max_model_seconds": 2700,
+      "requests": 118,
+      "input_tokens": 553711,
+      "output_tokens": 43629,
+      "model_seconds": 538.5029999999388,
+      "unknown_usage_calls": 0
+    },
+    "original_baseline": [
+      {
+        "file": "output/autonomy-v2/baseline-case_001.json",
+        "sha256": "acbc230ee6f3f20206519876ba31693008b99e432d772f8546c79df962b25e36",
+        "source_version": null,
+        "engine_version": "incident_graph_v17_programmatic_source_handoff",
+        "status": "partial",
+        "review_status": "not_performed",
+        "model_calls": 5,
+        "tool_calls": 2,
+        "input_tokens": 31305,
+        "output_tokens": 3673,
+        "duration_ms": 41266,
+        "stop_reason": "MODEL_OUTPUT_INVALID",
+        "evidence_count": 8,
+        "protocol_failure_count": 0
+      },
+      {
+        "file": "output/autonomy-v2/baseline-case_003.json",
+        "sha256": "d74f579082239dbd8a778a8e5e73b246a3702005900f448e3600c0a5ca6dae25",
+        "source_version": null,
+        "engine_version": "incident_graph_v17_programmatic_source_handoff",
+        "status": "partial",
+        "review_status": "not_performed",
+        "model_calls": 5,
+        "tool_calls": 4,
+        "input_tokens": 37957,
+        "output_tokens": 5392,
+        "duration_ms": 48938,
+        "stop_reason": "MODEL_OUTPUT_INVALID",
+        "evidence_count": 9,
+        "protocol_failure_count": 0
+      },
+      {
+        "file": "output/autonomy-v2/baseline-case_004.json",
+        "sha256": "71cad5f550bd94a6ecdfeed8d11beadc6fea1e150fc1a3a87263cf0e243dc982",
+        "source_version": null,
+        "engine_version": "incident_graph_v17_programmatic_source_handoff",
+        "status": "partial",
+        "review_status": "not_performed",
+        "model_calls": 5,
+        "tool_calls": 2,
+        "input_tokens": 34496,
+        "output_tokens": 3194,
+        "duration_ms": 34141,
+        "stop_reason": "MODEL_OUTPUT_INVALID",
+        "evidence_count": 8,
+        "protocol_failure_count": 0
+      },
+      {
+        "file": "output/autonomy-v2/baseline-case_006.json",
+        "sha256": "3101ceda9044b6d955303a0a008f211275b0d34d297ec235a086a3979d321278",
+        "source_version": null,
+        "engine_version": "incident_graph_v17_programmatic_source_handoff",
+        "status": "partial",
+        "review_status": "needs_information",
+        "model_calls": 5,
+        "tool_calls": 3,
+        "input_tokens": 35784,
+        "output_tokens": 3524,
+        "duration_ms": 42984,
+        "stop_reason": "REVIEW_INCOMPLETE",
+        "evidence_count": 11,
+        "protocol_failure_count": 0
+      }
+    ],
+    "paired_pre_typed_review": {
+      "note": "Historical v2.1 comparison, not final-version accuracy.",
+      "rows": {
+        "legacy": [
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_001-legacy-r1.json",
+            "sha256": "bcd68750f05b5f531d24474d99d164e021186aec63b4c292032e187207de8d4f",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "incident_graph_v17_programmatic_source_handoff",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 4,
+            "tool_calls": 4,
+            "input_tokens": 27564,
+            "output_tokens": 3510,
+            "duration_ms": 37610,
+            "stop_reason": "REVIEW_INCOMPLETE",
+            "evidence_count": 9,
+            "protocol_failure_count": 0
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_003-legacy-r1.json",
+            "sha256": "7e60f9c44fe5ee1b53e7f8c772ae24f8c7b99cdea232d717a08b979d2cab801a",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "incident_graph_v17_programmatic_source_handoff",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 7,
+            "tool_calls": 4,
+            "input_tokens": 54844,
+            "output_tokens": 5190,
+            "duration_ms": 59203,
+            "stop_reason": "REVIEW_INCOMPLETE",
+            "evidence_count": 11,
+            "protocol_failure_count": 0
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_004-legacy-r1.json",
+            "sha256": "6ed9a0726b700397a2d97edb7cc8862d2c30ced03ca7aec0997bacfd3bd18429",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "incident_graph_v17_programmatic_source_handoff",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 6,
+            "tool_calls": 5,
+            "input_tokens": 50161,
+            "output_tokens": 3790,
+            "duration_ms": 46032,
+            "stop_reason": "REVIEW_INCOMPLETE",
+            "evidence_count": 13,
+            "protocol_failure_count": 0
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_006-legacy-r1.json",
+            "sha256": "5de1ed865b62c3936d7c55ffbde641b03476fee8a4546a01902e03524a817813",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "incident_graph_v17_programmatic_source_handoff",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 5,
+            "tool_calls": 3,
+            "input_tokens": 35538,
+            "output_tokens": 3715,
+            "duration_ms": 44688,
+            "stop_reason": "REVIEW_INCOMPLETE",
+            "evidence_count": 12,
+            "protocol_failure_count": 0
+          }
+        ],
+        "v2": [
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_001-v2-r1.json",
+            "sha256": "f29f0d2e2185d56b43d18a091c83dee7391a3bf5e09bc1b30fce2a8e96df8185",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "autonomous_v2.1",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 8,
+            "tool_calls": 5,
+            "input_tokens": 26169,
+            "output_tokens": 1127,
+            "duration_ms": 18312,
+            "stop_reason": "COLLECTION_BUDGET_EXHAUSTED",
+            "evidence_count": 8,
+            "protocol_failure_count": 3
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_003-v2-r1.json",
+            "sha256": "f9f5678b96902d14c35813de2a5576c29de6bfc8173459f6476c139430b85186",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "autonomous_v2.1",
+            "status": "completed",
+            "review_status": "passed",
+            "model_calls": 8,
+            "tool_calls": 5,
+            "input_tokens": 27362,
+            "output_tokens": 1292,
+            "duration_ms": 21015,
+            "stop_reason": "FINISHED",
+            "evidence_count": 9,
+            "protocol_failure_count": 1
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_004-v2-r1.json",
+            "sha256": "dc12ef67a8a6dfcf04f069e9c79122ae61ec8117263ed4e0b97789fe9d590378",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "autonomous_v2.1",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 8,
+            "tool_calls": 4,
+            "input_tokens": 28850,
+            "output_tokens": 1427,
+            "duration_ms": 23109,
+            "stop_reason": "COLLECTION_BUDGET_EXHAUSTED",
+            "evidence_count": 10,
+            "protocol_failure_count": 3
+          },
+          {
+            "file": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_006-v2-r1.json",
+            "sha256": "eeea90087855ff9b22286b5fa3eb4faac45bbf3a9575619737a697d0187e5176",
+            "source_version": "0acce68381f2c18c",
+            "engine_version": "autonomous_v2.1",
+            "status": "partial",
+            "review_status": "needs_information",
+            "model_calls": 8,
+            "tool_calls": 5,
+            "input_tokens": 29771,
+            "output_tokens": 1315,
+            "duration_ms": 24234,
+            "stop_reason": "COLLECTION_BUDGET_EXHAUSTED",
+            "evidence_count": 10,
+            "protocol_failure_count": 1
+          }
+        ]
+      },
+      "aggregate": {
+        "legacy": {
+          "runs": 4,
+          "completed": 0,
+          "partial": 4,
+          "model_calls": 22,
+          "tool_calls": 16,
+          "input_tokens": 168107,
+          "output_tokens": 16205,
+          "duration_ms": 187533
+        },
+        "v2": {
+          "runs": 4,
+          "completed": 1,
+          "partial": 3,
+          "model_calls": 32,
+          "tool_calls": 19,
+          "input_tokens": 112152,
+          "output_tokens": 5161,
+          "duration_ms": 86670
+        }
+      }
+    },
+    "final_version_e2e": [
+      {
+        "file": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/case_003-v2-r1.json",
+        "sha256": "4aae699bf144cd345e4be39238a50735d366732b889a3c7c12209581e88e230c",
+        "source_version": "15c8b64c46024377",
+        "engine_version": "autonomous_v2.2",
+        "status": "partial",
+        "review_status": "needs_information",
+        "model_calls": 7,
+        "tool_calls": 5,
+        "input_tokens": 25669,
+        "output_tokens": 1378,
+        "duration_ms": 20359,
+        "stop_reason": "COLLECTION_BUDGET_EXHAUSTED",
+        "evidence_count": 11,
+        "protocol_failure_count": 0
+      },
+      {
+        "file": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/case_004-v2-r1.json",
+        "sha256": "f7c913c8908de33c5386d9fbc461e71808fd845a8523b48d096852e10c134ef9",
+        "source_version": "15c8b64c46024377",
+        "engine_version": "autonomous_v2.2",
+        "status": "completed",
+        "review_status": "passed",
+        "model_calls": 7,
+        "tool_calls": 5,
+        "input_tokens": 25992,
+        "output_tokens": 1179,
+        "duration_ms": 17672,
+        "stop_reason": "FINISHED",
+        "evidence_count": 10,
+        "protocol_failure_count": 0
+      }
+    ],
+    "renamed_with_semantic_metadata": [
+      {
+        "file": "output/autonomy-v2/renamed-live/c1da8f32-e19c-4ca6-b6ea-cfa7248f926a/case_001-v2-r1.json",
+        "sha256": "5fd8912d919d68ced53693e300477d89a24917ee9bc521f2cb08fa37cb213ccf",
+        "source_version": "15c8b64c46024377",
+        "engine_version": "autonomous_v2.2",
+        "status": "partial",
+        "review_status": "needs_information",
+        "model_calls": 7,
+        "tool_calls": 5,
+        "input_tokens": 31197,
+        "output_tokens": 1207,
+        "duration_ms": 16968,
+        "stop_reason": "COLLECTION_BUDGET_EXHAUSTED",
+        "evidence_count": 12,
+        "protocol_failure_count": 0
+      }
+    ],
+    "isolated_review_controls": {
+      "reference_kind": "provisional_source_entailment_controls_not_diagnostic_accuracy",
+      "controls": 15,
+      "agreement_count": 15,
+      "repeated_groups": 5,
+      "groups_with_relation_changes": 0,
+      "human_verified": false
+    }
+  },
+  "acceptance": {
+    "engineering_checks": "passed",
+    "semantic_accuracy": null,
+    "human_review": "pending",
+    "diagnostic_accuracy_claimed": false,
+    "interpretation": "Stages 0-3 engineering implementation complete; finite interview demo is available. Complex causal judgment remains fallible; no semantic sign-off or production readiness claim.",
+    "observed_limits": [
+      "A database ping can still be wrongly generalized into overall database health.",
+      "Load/configuration correlation can still be over-attributed as a capacity root cause.",
+      "Proposal suitability improved in two observed runs after typed review, without a general accuracy guarantee."
+    ],
+    "ai_review_is_human_gold": false,
+    "ai_review_files": [
+      "output/autonomy-v2/ai-review.json",
+      "output/autonomy-v2/ai-review-final.json"
+    ]
+  },
+  "activation": {
+    "default_engine": "legacy",
+    "enable": "$env:INCIDENT_ENGINE='autonomous_v2'",
+    "rollback": "$env:INCIDENT_ENGINE='legacy'",
+    "restart_backend_required": true,
+    "v2_repair_eligible": false
+  },
+  "reproduce": [
+    "$env:PYTHONPATH='app'; .\\.venv\\Scripts\\python.exe -m unittest discover -s tests -t . -p 'test_*.py'",
+    ".\\.venv\\Scripts\\python.exe scripts/evaluate_autonomous.py --plan --arms legacy v2",
+    ".\\.venv\\Scripts\\python.exe scripts/evaluate_autonomous.py --scripted --anonymize --arms v2 --cases case_001",
+    "Live runs additionally require --live --max-model-calls N --budget-ledger PATH; planning never pays."
+  ],
+  "artifacts": [
+    {
+      "path": "output/autonomy-v2/ai-review-final.json",
+      "sha256": "f0066cf756bbbe95c0fe8f69cd02b67a0dcfdcad3a88eae5b27aa3a82ee8a018"
+    },
+    {
+      "path": "output/autonomy-v2/ai-review.json",
+      "sha256": "b86e4dd9a336091e6527c0f4d3b779d92fed2d281a188920ab361d61ed37a4bd"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-case_001.json",
+      "sha256": "acbc230ee6f3f20206519876ba31693008b99e432d772f8546c79df962b25e36"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-case_003.json",
+      "sha256": "d74f579082239dbd8a778a8e5e73b246a3702005900f448e3600c0a5ca6dae25"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-case_004.json",
+      "sha256": "71cad5f550bd94a6ecdfeed8d11beadc6fea1e150fc1a3a87263cf0e243dc982"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-case_006.json",
+      "sha256": "3101ceda9044b6d955303a0a008f211275b0d34d297ec235a086a3979d321278"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-console.log",
+      "sha256": "eaffc26ce8cf289282d699448ddb5e631078dfabf148f1daef29aff3c092469d"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-summary.json",
+      "sha256": "00f0a5efdb54a0e8dd5a3eba662e4f9c46102ae548150418f1fba72104302637"
+    },
+    {
+      "path": "output/autonomy-v2/baseline-tests.log",
+      "sha256": "5cd9991e3b48a91117c5dd14dec7e621353717f9d2d169eabb25892caa6e2640"
+    },
+    {
+      "path": "output/autonomy-v2/budget-ledger.json",
+      "sha256": "2c673cd69076c5c1f570222de13640decc93994584e1f5539b060a9a01cdbecd"
+    },
+    {
+      "path": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/bundle.json",
+      "sha256": "c0899448dd82f8ec19ce7ba8503b51a81faccb2532abec7cd11f11f14704e05a"
+    },
+    {
+      "path": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/case_003-v2-r1.json",
+      "sha256": "4aae699bf144cd345e4be39238a50735d366732b889a3c7c12209581e88e230c"
+    },
+    {
+      "path": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/case_004-v2-r1.json",
+      "sha256": "f7c913c8908de33c5386d9fbc461e71808fd845a8523b48d096852e10c134ef9"
+    },
+    {
+      "path": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/human-review.pending.json",
+      "sha256": "e71ca9322b98bfbcb8c7b8079a303445c0e42e1f7237a833682e705bce105c29"
+    },
+    {
+      "path": "output/autonomy-v2/final-live/00cd146a-72a1-4f37-aa7d-0adfb395bda1/plan.json",
+      "sha256": "b74f258dacb9cab10d84ff16eb6184bd1be0bb1729f25a0070b0dd37d235ddaa"
+    },
+    {
+      "path": "output/autonomy-v2/final-tests-v2.2.log",
+      "sha256": "45bbde5b97eb40307dfe633f03740000ddf0f97ac785ccf31d70243f9ccd9ab5"
+    },
+    {
+      "path": "output/autonomy-v2/final-tests.log",
+      "sha256": "dec3a45e795ae77a206ad0b3468dd980f981600f5fc269bc30da610424e74200"
+    },
+    {
+      "path": "output/autonomy-v2/freeze.json",
+      "sha256": "57c8cc797acb8a1e8bb9cf61d9e1c1c07a0a059c2575066e5d21a346fbf1d2d3"
+    },
+    {
+      "path": "output/autonomy-v2/implementation-tests.log",
+      "sha256": "e2604387204bfe78d25fb3f209cd49c4c85185a2ee3b3d12d3ed40a99fc1ea6a"
+    },
+    {
+      "path": "output/autonomy-v2/live-smoke/4dc0f201-f380-4b28-ac5c-1ff893248f78/bundle.json",
+      "sha256": "55a9f8ab1ad5ca0429ba2cfa8f766379bc13bf3028338c13c322eed658eb2c43"
+    },
+    {
+      "path": "output/autonomy-v2/live-smoke/4dc0f201-f380-4b28-ac5c-1ff893248f78/case_001-v2-r1.json",
+      "sha256": "b5071602e895302c0952daf258b9f41e4f067aed229b82f91e419cc64bb0788a"
+    },
+    {
+      "path": "output/autonomy-v2/live-smoke/4dc0f201-f380-4b28-ac5c-1ff893248f78/human-review.pending.json",
+      "sha256": "8d3bacb48d9466ce36b03a052e058dab32d5a24e439935768186de73aa9902a0"
+    },
+    {
+      "path": "output/autonomy-v2/live-smoke/4dc0f201-f380-4b28-ac5c-1ff893248f78/plan.json",
+      "sha256": "8c7c6a112eeee8c886c1aac12503fa50305bb8efa779623ad764b97a58adda1f"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/bundle.json",
+      "sha256": "88bd5f6ef123b1838865ca6696fdea85d25d0ccc024663383a27bc927567fe2c"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_001-legacy-r1.json",
+      "sha256": "bcd68750f05b5f531d24474d99d164e021186aec63b4c292032e187207de8d4f"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_001-v2-r1.json",
+      "sha256": "f29f0d2e2185d56b43d18a091c83dee7391a3bf5e09bc1b30fce2a8e96df8185"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_003-legacy-r1.json",
+      "sha256": "7e60f9c44fe5ee1b53e7f8c772ae24f8c7b99cdea232d717a08b979d2cab801a"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_003-v2-r1.json",
+      "sha256": "f9f5678b96902d14c35813de2a5576c29de6bfc8173459f6476c139430b85186"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_004-legacy-r1.json",
+      "sha256": "6ed9a0726b700397a2d97edb7cc8862d2c30ced03ca7aec0997bacfd3bd18429"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_004-v2-r1.json",
+      "sha256": "dc12ef67a8a6dfcf04f069e9c79122ae61ec8117263ed4e0b97789fe9d590378"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_006-legacy-r1.json",
+      "sha256": "5de1ed865b62c3936d7c55ffbde641b03476fee8a4546a01902e03524a817813"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/case_006-v2-r1.json",
+      "sha256": "eeea90087855ff9b22286b5fa3eb4faac45bbf3a9575619737a697d0187e5176"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/human-review.pending.json",
+      "sha256": "245fc57753e8ea8754b42a52501f51083faf73f7db7beca0ef12721e04e1bd39"
+    },
+    {
+      "path": "output/autonomy-v2/paired/03592f6e-7a28-4d7e-87cf-41ab9e8a1e96/plan.json",
+      "sha256": "e948380c220020e8193dda971a08c26e499c6b1f6dc8815297158bba8b19d04b"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-live/c1da8f32-e19c-4ca6-b6ea-cfa7248f926a/bundle.json",
+      "sha256": "2bc09d552a61794e36b24688f744ede6986eb2e88e60a81b29bd9e8d39d25910"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-live/c1da8f32-e19c-4ca6-b6ea-cfa7248f926a/case_001-v2-r1.json",
+      "sha256": "5fd8912d919d68ced53693e300477d89a24917ee9bc521f2cb08fa37cb213ccf"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-live/c1da8f32-e19c-4ca6-b6ea-cfa7248f926a/human-review.pending.json",
+      "sha256": "ed3a6b36970560dbed1a2339a839f68576d45de244fad82b49186f14cfafb4bd"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-live/c1da8f32-e19c-4ca6-b6ea-cfa7248f926a/plan.json",
+      "sha256": "9232d82431d409b97a2a755b3d84afe84f64eedb705d8b8a57e06e3d45f762ec"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-wiring/de2c0125-03e9-49e3-a61f-0d5168b444ad/bundle.json",
+      "sha256": "fd36c548bf92c5e99129f8de7da29a00f8dcd125245810a2416f572cd73da897"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-wiring/de2c0125-03e9-49e3-a61f-0d5168b444ad/case_001-v2-r1.json",
+      "sha256": "82ca2fe1afab9a0e3760a3a5f39574f01bb487b7967357b8b2453c5c2fed024c"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-wiring/de2c0125-03e9-49e3-a61f-0d5168b444ad/human-review.pending.json",
+      "sha256": "00c7a05dcea6bc1b7b187ec4099c8189c162172f81a3db5c20b2aaedde0ed504"
+    },
+    {
+      "path": "output/autonomy-v2/renamed-wiring/de2c0125-03e9-49e3-a61f-0d5168b444ad/plan.json",
+      "sha256": "716753db1dbb4bbd30177cf76186864ec9b2994bdc1a0177f34a1396a6078424"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/bundle.json",
+      "sha256": "bd7fc089f4fc55a49ad5808078554c2442eb65fe5a2aebe0107d1db1affc7303"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r1-c1.json",
+      "sha256": "c8d8ba26dacb3fb4d5c348b4d7d928b47a3f1623aba74f93aee31d8eda97a449"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r1-c2.json",
+      "sha256": "cea8e10908eced6e03412b822b5e45cb71aa586f8fb1bfc12f5fb9fe24b67eb7"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r1-c3.json",
+      "sha256": "c44139b4388d2d741de4d1bdbb5a224655b9a0f95a412eef49233fbb3028f0a4"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r1-c4.json",
+      "sha256": "4c93116ec1f1669b22645c86bd18b32b4cb7f322eed39a48161a1eb6076c886a"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r1-c5.json",
+      "sha256": "47fd28b4312f8893ffd57bbc884ee55cb3ddabde08de890335ea48eb0ae29998"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r2-c1.json",
+      "sha256": "32697ec3f855147f299ec82ca6fe7f9fbca80f161d92ec16ed06c267456cd37c"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r2-c2.json",
+      "sha256": "fd0dd7a14c62fa72c313c864f241a8d92875bf476fc2116532ce413ce819b842"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r2-c3.json",
+      "sha256": "795859c92ffc90320bf256aea1b2ae7e8fcebc6dfd6f706fdc92db690d63ba69"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r2-c4.json",
+      "sha256": "ca585791bb587acb3d77213e509e073f5347f2b151ccc8b5d248f9d4e1bd3251"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r2-c5.json",
+      "sha256": "5fe7eb9c166e9db0208e10b0140dceadbd17d8818083b431f26038c7fd5cb183"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r3-c1.json",
+      "sha256": "dfb1c3b7380dc9219179ba8fbbe3104cf964945a53534e399b20f573445289e3"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r3-c2.json",
+      "sha256": "edf6bc3d2b766f25466abc5336f3d3cea2ca785ee5772a8c67b42076521edf9a"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r3-c3.json",
+      "sha256": "443424230c681af43db40943662e4d86a496e403a9f85db5be8a94e054dcf511"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r3-c4.json",
+      "sha256": "6e1516e62b3a399b054b064bbc45b708ee734680930cc938879dee60a735ce36"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/case_001-v2-r3-c5.json",
+      "sha256": "9bd86c3f0cd03d27aafd38978315094c1ff7a187a6fb944ba568ba710407f35d"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/human-review.pending.json",
+      "sha256": "97d4eabbe5ee117938abd8b383ed2ea589b76ffbf0f0fbda9caf92416948642f"
+    },
+    {
+      "path": "output/autonomy-v2/review-stability/98ea17b5-439f-46b5-ac77-6feabb581398/plan.json",
+      "sha256": "3e8b44a7930a3b2bce2cfbdb05219712d61667b83499b33e3d0393bd5882cd63"
+    },
+    {
+      "path": "output/autonomy-v2/scripted/257f6e2d-c6eb-4f19-a8f0-79b271e6f9f7/bundle.json",
+      "sha256": "70af32f06e9bd9785b9abdb87b12839ed2c89fb9a1cf5da9191b2d74234e4061"
+    },
+    {
+      "path": "output/autonomy-v2/scripted/257f6e2d-c6eb-4f19-a8f0-79b271e6f9f7/case_001-v2-r1.json",
+      "sha256": "9366d65d0790dd5d9487ec7c771b500c343132487a2c86a27bcbddee6c799ee9"
+    },
+    {
+      "path": "output/autonomy-v2/scripted/257f6e2d-c6eb-4f19-a8f0-79b271e6f9f7/case_004-v2-r1.json",
+      "sha256": "9a0dca4b7715d883644159b4668f3c676f984430c29614c77e20dd1fc4b10a3f"
+    },
+    {
+      "path": "output/autonomy-v2/scripted/257f6e2d-c6eb-4f19-a8f0-79b271e6f9f7/human-review.pending.json",
+      "sha256": "e7d14ec59bfc8960ac9e47e932ced1cbe07c3f827d03e98ce3a66a4e16b98d3b"
+    },
+    {
+      "path": "output/autonomy-v2/scripted/257f6e2d-c6eb-4f19-a8f0-79b271e6f9f7/plan.json",
+      "sha256": "72707d371280fb9cb1ca79989f46659c7baec5af4b1eea3fe3b0ee2f5e03ae2c"
+    },
+    {
+      "path": "output/autonomy-v2/user-originals/evals/multi-prompt-simplification-validation-20261017.json",
+      "sha256": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197"
+    }
+  ]
+}

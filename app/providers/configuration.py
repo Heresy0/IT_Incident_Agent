@@ -21,6 +21,7 @@ def nonblank(value):
 
 Name = Annotated[str, Field(min_length=1, max_length=80), AfterValidator(nonblank)]
 Query = Annotated[str, Field(min_length=1, max_length=8000), AfterValidator(nonblank)]
+Description = Annotated[str, Field(min_length=1, max_length=600), AfterValidator(nonblank)]
 EnvName = Annotated[str, Field(pattern=r'^[A-Za-z_][A-Za-z0-9_]{0,79}$')]
 TargetName = Annotated[str, Field(min_length=1, max_length=80, pattern=r'^[A-Za-z0-9_-]+$')]
 
@@ -48,6 +49,22 @@ class MetricDefinition(ConfigModel):
     unit: Name
     aggregation: Name = 'registered'
     freshness_query: Query | None = None
+    description: Description | None = None
+    observed_object: Name | None = None
+    kind: Literal['gauge', 'counter', 'rate', 'histogram', 'summary', 'unknown'] | None = None
+    sampling: Description | None = None
+    source: Name | None = None
+    version: Name | None = None
+    limitations: Description | None = None
+
+
+class LogDescription(ConfigModel):
+    description: Description | None = None
+    observed_object: Name | None = None
+    fields: dict[Name, Description] = Field(default_factory=dict, max_length=16)
+    source: Name | None = None
+    version: Name | None = None
+    limitations: Description | None = None
 
 
 class Observations(ConfigModel):
@@ -55,6 +72,7 @@ class Observations(ConfigModel):
     loki: Endpoint | None = None
     metrics: dict[Metric, MetricDefinition] = Field(default_factory=dict)
     log_queries: dict[Literal['resource', 'dependency', 'configuration'], Query] = Field(default_factory=dict)
+    log_metadata: dict[Literal['resource', 'dependency', 'configuration'], LogDescription] = Field(default_factory=dict)
     log_mapping: LogMapping = Field(default_factory=LogMapping)
     changes: list[dict[str, Any]] = Field(default_factory=list)
     owners: list[dict[str, Any]] = Field(default_factory=list)
@@ -139,7 +157,7 @@ MESSAGES = {
     'string_pattern_mismatch': '字段格式不符合登记或工具范围规则。',
 }
 SCHEMA_FIELDS = set().union(*(set(model.model_fields) for model in (
-    Endpoint, MetricDefinition, Observations, SymptomCheck, RepairTarget, ServiceConfig, ServicesDocument, LogMapping,
+    Endpoint, MetricDefinition, LogDescription, Observations, SymptomCheck, RepairTarget, ServiceConfig, ServicesDocument, LogMapping,
     RunbookRAGConfig)))
 
 
@@ -196,7 +214,7 @@ def safe_location(location, data):
             else:
                 path += '.' + part
             current = current.get(part) if isinstance(current, dict) else None
-        dynamic = part in {'metrics', 'repairs', 'log_queries'}
+        dynamic = part in {'metrics', 'repairs', 'log_queries', 'log_metadata', 'fields'}
     return path
 
 

@@ -9,6 +9,22 @@ from evidence.contracts import Ticket
 from providers.fixtures import ProviderError
 
 
+def public_capability(definition, *, metric=False):
+    """Allowlisted, bounded metadata; source queries and endpoints stay private."""
+    from providers.http import safe_text
+    fields = {'description', 'observed_object', 'source', 'version', 'limitations'}
+    if metric:
+        fields |= {'unit', 'aggregation', 'kind', 'sampling'}
+    result = {key: safe_text(value, max_chars=600) for key, value in definition.items()
+              if key in fields and isinstance(value, str)}
+    result.setdefault('description', 'unknown')
+    if not metric:
+        result['fields'] = {safe_text(key, max_chars=80): safe_text(value, max_chars=600)
+                            for key, value in list(definition.get('fields', {}).items())[:16]
+                            if isinstance(key, str) and isinstance(value, str)}
+    return result
+
+
 class ObservationProvider(Protocol):
     name: str
     binding: 'ServiceBinding'
@@ -45,7 +61,8 @@ class ServiceRegistry:
     def catalog(self, principal):
         return [{'service': binding.service, 'environment': binding.environment, 'service_version': binding.version,
                  'allowed_dependencies': list(binding.dependencies),
-                 'metrics': [{'name': name, 'unit': item['unit']} for name, item in binding.observations.get('metrics', {}).items()]}
+                 'metrics': [{'name': name, **public_capability(item, metric=True)}
+                             for name, item in binding.observations.get('metrics', {}).items()]}
                 for binding in self._bindings if binding.tenant_id == principal.tenant_id and principal.user_id in binding.users]
 
     def resolve(self, snapshot, principal):

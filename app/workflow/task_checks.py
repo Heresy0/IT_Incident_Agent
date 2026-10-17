@@ -1,13 +1,12 @@
 """Mechanical coverage of declared task checks; deliberately not a semantic judge."""
 from datetime import datetime
-from tools.query_coverage import covers
+from tools.query_coverage import complete_read, covers, matching_reads
 
 
 def completion(checks, executor):
     results, gaps, limits = [], [], []
     for check in checks:
-        matches = [row for row in executor.check_results.values()
-                   if row['tool'] == check['tool'] and covers(check['tool'], row['args'], check['args'])]
+        matches = matching_reads(check['tool'], check['args'], executor.check_results)
         assessed = []
         for row in matches:
             status = ('failed' if row['status'] == 'error' else 'truncated' if row['truncated']
@@ -68,15 +67,14 @@ def log_query_feedback(executor):
         if row['tool'] != 'get_service_logs':
             continue
         args = row['args']
-        complete = row['status'] != 'error' and not row['truncated']
+        complete = complete_read(row)
         restricted = [key for key in ('level', 'error_code') if args.get(key) is not None]
         # Ordinary unfiltered samples are already in collection/evidence. Only
         # repeat metadata needed to interpret restrictions or incomplete reads.
         if complete and row['status'] == 'ok' and not restricted:
             continue
         if complete and restricted and any(
-                other['tool'] == 'get_service_logs' and other['status'] != 'error'
-                and not other['truncated']
+                other['tool'] == 'get_service_logs' and complete_read(other)
                 and not any(other['args'].get(key) is not None for key in ('level', 'error_code'))
                 and covers('get_service_logs', other['args'], args)
                 for other in executor.check_results.values()):

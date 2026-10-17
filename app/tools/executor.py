@@ -7,9 +7,9 @@ from api.auth import Principal
 from runtime.context import ExecutionError, RunContext, activate
 from evidence.contracts import (TOOL_ARGS, INVESTIGATION_TOOLS, KNOWLEDGE_TOOLS, SINGLE_TOOLS, Evidence,
                         ToolResult, ToolError, ReferenceOption, EvidenceRef)
-from providers.fixtures import ProviderError
+from providers.fixtures import ProviderError, visible
 from pydantic import ValidationError
-from tools.query_coverage import covering_empty
+from tools.query_coverage import covering_empty, read_state
 
 
 def reference_field_paths(payload, prefix=""):
@@ -44,17 +44,42 @@ class ToolExecutor:
             setattr(child, field, deepcopy(getattr(self, field)))
         return child
 
-    def capabilities(self):
+    def capabilities(self, *, generic=False):
         """Public registration names only; never expose endpoint URLs or query templates."""
         if not hasattr(self.provider, 'binding'):
+            if generic:
+                base = self.provider
+                while hasattr(base, 'base'):
+                    base = base.base
+                data = getattr(base, '_data', {})
+                definitions = {row['metric']: {key: row[key] for key in ('unit', 'aggregation') if key in row}
+                               for row in data.get('metrics', [])
+                               if row.get('service') == self.scope.service
+                               and row.get('environment') == self.scope.environment
+                               and visible(row, self.principal)}
+                from providers.registry import public_capability
+                categories = list(TOOL_ARGS['get_service_logs'].model_json_schema()['properties']['category']['enum'])
+                return {'registered_metrics': {name: public_capability(item, metric=True)
+                            for name, item in sorted(definitions.items())},
+                        'registered_log_categories': categories,
+                        'log_channels': {name: public_capability({}) for name in categories}}
             return {}
         config = self.provider.binding.observations
+        if generic:
+            from providers.registry import public_capability
+            categories = sorted(config.get('log_queries', {})) if config.get('loki') else []
+            return {'registered_metrics': {name: public_capability(item, metric=True)
+                        for name, item in sorted(config.get('metrics', {}).items())}
+                        if config.get('prometheus') else {},
+                    'registered_log_categories': categories,
+                    'log_channels': {name: public_capability(config.get('log_metadata', {}).get(name, {}))
+                                     for name in categories}}
         return {'registered_metrics': {k: {'unit': v.get('unit', '')}
                     for k, v in config.get('metrics', {}).items()} if config.get('prometheus') else {},
                 'registered_log_categories': sorted(config.get('log_queries', {}))
                     if config.get('loki') else []}
 
-    def schemas(self):
+    def schemas(self, *, generic=False):
         allowed = self.allowed_tools()
         descriptions = {
             "get_service_metrics": "Read symptom-relevant metrics and healthy controls within ticket window. dependency_error_rate measures dependency failures; pool_usage/pool_wait measure application connection pressure; db_cpu is a database control; request_error_rate/request_latency show impact. Select a small useful set, not every metric. At most 60 points per metric; 1m/5m granularity.",
@@ -71,7 +96,7 @@ class ToolExecutor:
             'Available metrics and units: ' + json.dumps({k: v.get('unit', '') for k, v in definitions.items()})
             + '. Select a small useful set. Missing samples do not establish health.')
         descriptions['search_runbooks'] = 'Search registered applicable readable runbooks, at most 4 passages.'
-        capabilities = self.capabilities()
+        capabilities = self.capabilities(generic=generic)
         if capabilities:
             descriptions['get_service_logs'] = ('仅查询已登记的日志类别：'
                 + json.dumps(capabilities['registered_log_categories'])
@@ -81,14 +106,28 @@ class ToolExecutor:
         schemas = [{"type": "function", "function": {"name": n, "description": descriptions[n],
                 "parameters": TOOL_ARGS[n].model_json_schema()}} for n in sorted(allowed)]
         for schema in schemas:
-            if self.role != 'single' and schema['function']['name'] in {
+            if (generic or self.role != 'single') and schema['function']['name'] in {
                     'get_service_metrics', 'get_service_logs', 'get_recent_changes'}:
                 schema['function']['description'] += (
                     ' Target is the ticket service ' + self.scope.service + ' in ' + self.scope.environment
                     + '. Logs may record its dependency interactions, but this tool cannot read a remote '
                     'service\'s own configuration, deployment history or raw requests. '
                     'Do not describe a ticket-service query as a remote-service check.')
-            if schema['function']['name'] == 'get_service_logs' and self.role != 'single':
+            if schema['function']['name'] == 'get_service_logs' and generic:
+                schema['function']['description'] = (
+                    'Read one registered log channel within the ticket service and authorized window. '
+                    'Available channels and field descriptions: '
+                    + json.dumps(capabilities.get('log_channels', {}), ensure_ascii=False)
+                    + '. Channel names identify registered data partitions; unknown descriptions '
+                    'do not establish a causal meaning. level and error_code are exact field filters, '
+                    'not message searches. Normally inspect unfiltered records first. A complete empty '
+                    'result only covers this channel, window and filter. Truncated results are incomplete. '
+                    'At most 50 records. This does not read a remote dependency\'s internal state.')
+                schema['function']['parameters']['properties']['level']['description'] = (
+                    'Optional exact level filter. Omit for exploration; filtering can hide records at other levels.')
+                schema['function']['parameters']['properties']['error_code']['description'] = (
+                    'Optional exact error_code field filter; not a message search. Prefer values observed in source fields.')
+            elif schema['function']['name'] == 'get_service_logs' and self.role != 'single':
                 schema['function']['description'] = (
                     'Read registered logs in the ticket window. Category describes the emitting boundary, '
                     'not the suspected root cause: dependency includes remote request outcomes '
@@ -109,6 +148,19 @@ class ToolExecutor:
                     values = sorted({row[field] for row in logs if row.get(field) is not None})
                     schema['function']['parameters']['properties'][field]['enum'] = [None, *values]
             if schema['function']['name'] == 'get_service_metrics':
+                if generic:
+                    schema['function']['description'] = (
+                        'Read selected registered metrics within the authorized ticket-service window. '
+                        'Available metric metadata: '
+                        + json.dumps(capabilities.get('registered_metrics', {}), ensure_ascii=False)
+                        + '. Unknown semantics must remain unknown; metric names alone do not establish '
+                        'thresholds, health or cause. At most 60 points per metric. Sampling may be '
+                        'adjusted to fit evidence capacity; the response records requested and actual '
+                        'granularity. Missing or sparse samples cannot rule out brief events. '
+                        'A narrower authorized window may provide more useful samples.')
+                    schema['function']['parameters']['properties']['metrics']['description'] = (
+                        'Choose a small relevant set from the registered metric names using their supplied '
+                        'metadata. Unknown descriptions do not imply a diagnostic role.')
                 if capabilities:
                     schema['function']['parameters']['properties']['metrics']['items']['enum'] = sorted(capabilities['registered_metrics'])
                 elif definitions and self.role != 'single':
@@ -223,6 +275,11 @@ class ToolExecutor:
             'status': result.status, 'truncated': result.truncated,
             'evidence_ids': [e.evidence_id for e in result.evidence],
             'error': result.error.code if result.error else None}
+        self.check_results[signature]['read_state'] = read_state(self.check_results[signature])
+        if name == 'get_service_metrics' and self.check_results[signature]['read_state'] == 'complete':
+            missing = sorted(set(args.metrics) - {e.payload.get('metric') for e in result.evidence})
+            if missing:
+                self.check_results[signature].update(read_state='missing_samples', missing_metrics=missing)
         return result
 
     def _query(self, name, args):

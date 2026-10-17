@@ -70,7 +70,7 @@ def request_json(base, method, path, *, params=None, authorization_env=None, tra
 
 def safe_text(text, *, max_chars=1800):
     # Only sanitized log messages enter model prompts/evidence, never raw log documents.
-    text = re.sub(r'(?i)bearer\s+\S+', 'Bearer [REDACTED]', str(text))
+    text = re.sub(r'(?i)\b(bearer|basic)\s+[^\s,;"\'}]+', r'\1 [REDACTED]', str(text))
     text = re.sub(r'''(?i)(["']?(?:password|token|api[_-]?key|secret|authorization|access_token|refresh_token)["']?\s*[=:]\s*)(?:"[^"]*"|'[^']*'|[^\s,;}]+)''',
                   r'\1[REDACTED]', text)
     text = re.sub(r'(?i)([a-z][a-z0-9+.-]*://)[^/@\s]+:[^/@\s]+@', r'\1[REDACTED]@', text)

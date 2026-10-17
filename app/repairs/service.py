@@ -96,6 +96,7 @@ class RepairService:
 
     def from_recommendation(self, iid, payload, principal):
         run = self.workflow.get_run(payload['run_id'], principal)
+        self._eligible_engine(run)
         if not run or run['config'].get('incident_id') != iid:
             raise IncidentError('REPAIR_REQUIRES_REVIEWED_DIAGNOSIS')
         actions = (run.get('result') or {}).get('output', {}).get('recommended_actions', [])
@@ -128,11 +129,19 @@ class RepairService:
     def propose(self, iid, payload, principal):
         return self._propose(iid, payload, principal)
 
+    @staticmethod
+    def _eligible_engine(run):
+        if run and (run.get('config', {}).get('run_spec', {}).get('engine_id') == 'autonomous_v2'
+                    or (run.get('result') or {}).get('engine_id') == 'autonomous_v2'
+                    or (run.get('result') or {}).get('repair_eligible') is False):
+            raise IncidentError('REPAIR_ENGINE_NOT_ELIGIBLE', 422)
+
     def _propose(self, iid, payload, principal, *, recommendation_source=None):
         payload = RepairProposal.model_validate(payload).model_dump(exclude_none=True)
         if payload['action'] in {'start_service', 'resume_service', 'reload_config', 'resume_consumer', 'refresh_cache'} and not payload.get('approval_details'):
             raise IncidentError('REPAIR_RECOMMENDATION_INCOMPLETE', 422)
         run = self.workflow.get_run(payload['run_id'], principal)
+        self._eligible_engine(run)
         if run and (run.get('result') or {}).get('purpose') == 'status_check':
             raise IncidentError('REPAIR_REQUIRES_INCIDENT_DIAGNOSIS', 422)
         if (not run or run['status'] != 'completed' or run['config'].get('incident_id') != iid
@@ -213,6 +222,7 @@ class RepairService:
         return plan
 
     def _valid(self, incident, plan, principal):
+        self._eligible_engine(self.workflow.get_run(plan['proposal']['run_id'], principal))
         self._current(incident, plan['proposal'])
         if datetime.now(timezone.utc) >= datetime.fromisoformat(plan['expires_at']):
             raise IncidentError('REPAIR_EXPIRED')
