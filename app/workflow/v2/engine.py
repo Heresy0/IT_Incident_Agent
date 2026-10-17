@@ -23,7 +23,7 @@ from workflow.v2.contracts import (draft_schema, parse_draft, draft_input, sourc
 from workflow.v2.review import review_draft
 
 ENGINE_ID = 'autonomous_v2'
-ENGINE_VERSION = 'autonomous_v2.3'
+ENGINE_VERSION = 'autonomous_v2.4'
 PROMPT_VERSION = 'autonomous_step_v1'
 
 STEP_PROMPT = """你负责自主只读取证。根据工单、可用能力、已经取得的来源与实际查询台账，选择当前最有价值的一项检查。
@@ -460,26 +460,19 @@ def publish(draft, reviews, executor, context, failures, stop, events, ticket, d
             gaps.append(f"{row['tool']}：" + ('查询失败 ' + str(row['error']) if row['status'] == 'error' else '样本截断'))
     gaps.extend(f"{f['stage']}：{f.get('code', 'INVALID_ITEM')}（{f.get('category', 'protocol')}）" for f in unresolved_failures)
     facts = [f.model_dump(mode='json') for f in draft.facts]
-    semantic_ok = bool(hypotheses) and any(h['status'] == 'supported' and h['level'] == 'mechanism' for h in hypotheses) and bool(actions)
-    all_reviewed = bool(targets) and set(by_id) == set(targets) and all(
-        r.protocol_status == 'valid' and r.relation in {'supported', 'contradicted'} for r in by_id.values())
-    completed = bool(facts) and not unresolved_failures and (
-        ticket.purpose == 'status_check' or semantic_ok and all_reviewed)
-    status = 'completed' if completed else 'partial'
-    reason = 'STATUS_CHECK_COMPLETED' if completed and ticket.purpose == 'status_check' else 'FINISHED' if completed else stop if stop != 'FINISHED' else 'NEEDS_INFORMATION'
-    context.stop_reason = reason
+    from workflow.v2.outcome import classify_outcome
+    outcome = classify_outcome(draft, reviews, executor, failures, stop, ticket,
+                               collection=collection_view(executor))
+    context.stop_reason = outcome.pop('reason')
     if not executor.evidence:
         gaps.append('未取得当前观测；不能确认故障机制或服务健康。')
-    valid_reviews = [r for r in review_items if r.protocol_status == 'valid']
     used_ids = {ref.evidence_id for target in [*draft.facts, *draft.claims, *draft.next_steps]
                 for ref in target.refs}
     used_ids.update(ref.evidence_id for claim in draft.claims for ref in claim.counter_refs)
     used_ids.update(ref.evidence_id for review in review_items for ref in review.refs)
     result = {'run_id': context.run_id, 'engine_id': ENGINE_ID, 'workflow_version': ENGINE_VERSION,
         'prompt_version': PROMPT_VERSION, 'task_type': 'incident_collaboration', 'workflow': 'autonomous_v2',
-        'purpose': ticket.purpose, 'status': status,
-        'review_status': 'passed' if completed and ticket.purpose == 'diagnosis' else 'needs_information' if valid_reviews else 'not_performed',
-        'business_result': ('status_checked' if ticket.purpose == 'status_check' else 'diagnosis_available') if completed else 'needs_information',
+        'purpose': ticket.purpose, **outcome,
         'data_source': executor.provider.name, 'repair_eligible': False,
         'semantic_review': {'judgment_source': 'model', 'human_verified': False,
                             'causality_verified_by_program': False},
@@ -492,12 +485,11 @@ def publish(draft, reviews, executor, context, failures, stop, events, ticket, d
         'reviews': [{'revision': 1, 'review': reviews.model_dump(mode='json')}],
         'drafts': [{'revision': 1, 'draft': draft.model_dump(mode='json')}],
         'task_results': [{'role': 'investigation', 'goal': '根据实际反馈自主选择登记只读检查',
-                          'status': 'completed' if stop == 'FINISHED' else 'partial', 'execution_status': 'completed',
+                          'status': 'completed' if outcome['run_outcome']['execution']['status'] == 'completed' else 'partial',
+                          'execution_status': outcome['run_outcome']['execution']['status'],
                           'model_calls': decisions, 'tool_calls': context.counts['tool_calls']}],
         'events': list(events), 'negotiation': [], 'rework_rounds': 0, 'repairs': repairs['repairs'],
-        'memory_enabled': False, 'run_summary': context.summary(),
-        'diagnosis_readiness': {'report_status': 'reviewed_with_limitations' if completed and gaps else 'reviewed' if completed else 'incomplete',
-                               'meaning': '源字段事实与模型语义审阅分开；有限结论不证明唯一根因、服务全面正常或已经恢复。'}}
+        'memory_enabled': False, 'run_summary': context.summary()}
     result['final'] = render_report(result)
     return result
 

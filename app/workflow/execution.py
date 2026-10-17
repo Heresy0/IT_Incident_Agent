@@ -59,9 +59,13 @@ class IncidentAdapter:
                                                'can_authorize_repair': False}}}
         if engine == 'legacy':
             from workflow.graph import WORKFLOW_VERSION
-        run_spec = {'engine_id': engine, 'engine_version': 'autonomous_v2.3' if engine == 'autonomous_v2' else WORKFLOW_VERSION,
+            engine_version, prompt_version = WORKFLOW_VERSION, 'legacy'
+        else:
+            from workflow.v2.engine import ENGINE_VERSION, PROMPT_VERSION
+            engine_version, prompt_version = ENGINE_VERSION, PROMPT_VERSION
+        run_spec = {'engine_id': engine, 'engine_version': engine_version,
                     'contract_version': 'atomic_draft_v1' if engine == 'autonomous_v2' else 'legacy',
-                    'prompt_version': 'autonomous_step_v1' if engine == 'autonomous_v2' else 'legacy',
+                    'prompt_version': prompt_version,
                     'capability_version': 'generic_capabilities_v1', 'source_version': version,
                     'source_version_full': full_version,
                     'model_settings_sha256': model_settings_sha256, 'configuration_sha256': configuration_sha256,
