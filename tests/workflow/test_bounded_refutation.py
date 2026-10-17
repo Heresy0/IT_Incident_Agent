@@ -123,7 +123,8 @@ class BoundedRefutationTests(unittest.TestCase):
                               conservative=True, bounded_refutation=True)
         self.assertNotIn('refutation_basis', old['$defs']['Assessment']['properties'])
         self.assertNotIn('RefutationBasis', old['$defs'])
-        rule = new['$defs']['Assessment']['allOf'][0]
+        rule = next(rule for rule in new['$defs']['Assessment']['allOf']
+                    if rule['then'].get('required') == ['refutation_basis'])
         self.assertEqual(rule['if']['properties']['verdict']['const'], 'not_supported')
         self.assertEqual(rule['then']['required'], ['refutation_basis'])
 

@@ -5,6 +5,7 @@ from typing import Any, Mapping
 from agents.contracts import EvidenceNeed
 from evidence.contracts import Evidence, EvidenceRef
 import json
+import re
 
 REPAIR_POLICY = 'collection_one_review_one_v1'
 REVIEW_STAGE_POLICY = 'collection_one_review_stages_one_v2'
@@ -94,6 +95,21 @@ def diagnosis_schema(schema, *, canonical_checks=False):
 def reviewer_schema(schema, needs, targets, *, conservative=False, bounded_refutation=False):
     schema = deepcopy(schema)
     assessment = schema['$defs']['Assessment']
+    hypotheses = [key for key in targets if key.startswith('H')]
+    manual_checks = [key for key, target in targets.items()
+                     if key.startswith('A') and target.kind == 'manual_check']
+    if hypotheses:
+        assessment.setdefault('allOf', []).append({
+            'if': {'properties': {'target_id': {'enum': hypotheses}}, 'required': ['target_id']},
+            'then': {'properties': {'supported_scope': {'enum': ['full', 'partial', 'none']}},
+                     'required': ['supported_scope']}})
+    if manual_checks:
+        assessment.setdefault('allOf', []).append({
+            'if': {'properties': {'target_id': {'enum': manual_checks}, 'verdict': {'const': 'uncertain'}},
+                   'required': ['target_id', 'verdict']},
+            'then': {'properties': {'uncertainty_basis': {'enum': [
+                'relevance_gap', 'scope_or_safety_gap', 'assumed_outcome', 'future_result_only']}},
+                     'required': ['uncertainty_basis']}})
     if bounded_refutation:
         assessment.setdefault('allOf', []).append({
             'if': {'properties': {'target_id': {'enum': [k for k in targets if k.startswith('H')]},
@@ -355,7 +371,7 @@ def parse_role_output(role, schema, content, view: RoleContractContext, *, emit)
 
 def correction_instruction(role, schema, details, purpose):
     """Keep role-specific correction text together with its output contract."""
-    from agents.contracts import ObservationReview
+    from agents.contracts import DiagnosisSelection, ObservationReview
     instruction = '按提供的契约和已观测编号纠正一次。' + json.dumps(details, ensure_ascii=False)
     if role == 'reviewer':
         instruction += ('。refs只选实际观测字段REF，未确认原因保留在unverified_causes。'
@@ -365,6 +381,27 @@ def correction_instruction(role, schema, details, purpose):
             instruction += ('。纠正引用时同时核对全部uncertain问题：实际阻塞的N必须有自己的blocker，'
                 '或request_evidence.need_id指向该N。按input.uncertain_need_rule填写，不为通过自动改判supported。')
     elif role == 'diagnosis':
+        if schema is DiagnosisSelection and details['reason'] == 'schema_mismatch':
+            errors = details.get('details', [])
+            bad_format = any(error.get('type') == 'string_pattern_mismatch'
+                and re.fullmatch(r'findings\.[0-9]+\.refs\.[0-9]+\.reference_id', error.get('path', ''))
+                for error in errors)
+            empty_refs = any(error.get('type') == 'too_short'
+                and re.fullmatch(r'findings\.[0-9]+\.refs', error.get('path', ''))
+                for error in errors)
+            if bad_format:
+                instruction += ('。引用编号格式错误：按错误路径修正 reference_id，必须是 REF_ 加 24 位小写十六进制字符。'
+                    '从原输入 input.evidence[].reference_options 中逐字选择完整编号，EV_ 不能代替字段引用。'
+                    '不要自行拼接、缩短或猜测编号，不能用含义无关的有效编号填充。'
+                    '若没有支持该陈述的观测，删除该 finding 并在 missing_information 保留具体信息缺口。')
+            if empty_refs:
+                instruction += ('。finding 引用列表为空：每条 finding 必须至少一个实际支持该陈述的字段引用，'
+                    '从原输入 input.evidence[].reference_options 选择。若没有支持该陈述的观测，删除该 finding，'
+                    '按实际 collection 记录将缺失、失败或尚未核实的信息写入 missing_information；'
+                    '不要把查询失败写成查询为空，不要借用负责人信息证明业务状态。')
+            if bad_format or empty_refs:
+                instruction += ('保留其他已有证据支持的 finding、未知事项和适用的人工核查建议，不为通过而编造原因或查询结果。'
+                    '若没有可发布观测，findings 可以为空列表。按原契约返回完整 JSON，不改变原有其他字段要求。')
         if details['reason'] in {'UNKNOWN_REFERENCE', 'DUPLICATE_REFERENCE', 'reference_mismatch'}:
             instruction += ('。按 details.path 修正引用；REF_ 是字段引用编号，EV_ 是证据编号，不能混用。'
                 '同一编号可分别用于不同观测或假设，但每个 refs/support_refs/counter_refs 列表内不得重复。'

@@ -80,6 +80,9 @@ def closure_models(*, reject_action=False, request_more=False):
             'need_assessments':[{'need_id':key,'verdict':'uncertain','reason':'没有当前业务观测'}
                 for key in payload['required_need_ids']],
             'follow_up_reason':'受限收尾保留业务未知，不要求追加查询'}
+        if reject_action:
+            for assessment in result['assessments']:
+                assessment['uncertainty_basis'] = 'relevance_gap'
         if request_more:
             result['request_evidence']={'need_id':'N1','missing_observation':'仍缺业务表现',
                 'expected_value':'明确现象','checks':[]}

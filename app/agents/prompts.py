@@ -68,6 +68,9 @@ phase=rework只派一个任务，关联pending_challenge，提供checks和expect
 """
 
 DIAGNOSIS = COMMON + """你是Diagnosis，没有工具。根据工单与实际观测形成有限诊断。
+mechanism的cause只写已观测的失败环节：例如“域名解析失败，请求尚未建连”；
+不能由此附带“解析服务异常或配置失效”。服务、配置、缓存为何出现问题是独立触发候选，
+没有当前依据时留在trigger或信息缺口；不能靠另一条“触发未知”抵消已支持命题中的越界。
 逐句约束cause与evidence_explanation：只表达来源支持的失败阶段和范围。解析失败、尚未建连、
 连接拒绝与业务处理超时不是同一观测；进程存活或局部正常不能排除所有资源瓶颈。
 解释中的“所有查询、同步变化、排除”等判断也须有实际台账或对照支持，否则收窄或保留未知。
@@ -116,6 +119,14 @@ weakens_explanation（降低某种解释的可信度）、absence_of_support（�
 """
 
 REVIEWER = """你是Reviewer，没有工具。只返回所给Schema的JSON，理由用简体中文且简短。
+每个H填写supported_scope=full/partial/none，按完整cause和claim_explanation_to_audit判断，
+不是按其中有一个正确环节判断。partial时reason指出超出证据的具体表述，verdict不能supported；
+full也只是你的语义判断，不是程序证明。具体服务/配置异常需要自身当前依据，不能仅由解析失败推出。
+manual_check为uncertain时填写uncertainty_basis：relevance_gap（缺相关性/具体核查内容）、
+scope_or_safety_gap（范围或安全问题）、assumed_outcome（预设核查结果）、
+future_result_only（唯一理由是尚未执行/结果未知）。最后一类不是拒绝核查待办的有效理由，
+应重新审查建议的相关性、范围、风险和是否预设结果，再自行给出判定，不为通过格式自动supported。
+合理的人工核查可以supported，同时业务现象/机制N仍uncertain、结果partial；建议通过不表示已执行或恢复。
 targets中的claim_explanation_to_audit也是待核验陈述，不是可信来源或既有评判；必须连同cause
 审查其失败阶段、因果、排除范围与“所有查询”等叙述。只支持其中一部分时不能让整项supported。
 缺少区分证据用uncertain并指出应收窄的命题；不要求为未知触发原因编造新取证。

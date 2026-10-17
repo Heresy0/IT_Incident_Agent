@@ -369,6 +369,11 @@ class Collaboration:
                  for row in self.task_input()]
         rework_budget = self.rework_budget(pending_model_calls=1, additional=self.reworks == 1)
         return {"targets": targets, "required_target_ids": list(targets),
+                'assessment_policy': {
+                    'version': 'scope_and_manual_check_v1',
+                    'hypotheses': 'supported_scope评价整个cause及claim_explanation_to_audit；partial/none不能supported，reason指出未获支持部分。未知trigger不能抵消cause越界。',
+                    'manual_checks': 'uncertain须用uncertainty_basis说明真实问题；future_result_only不能单独否定待办。不得把建议通过当作执行完成、业务证据或恢复。',
+                    'gates': '程序仅检查声明与判定一致性，不证明语义判断正确，不自动提升verdict。'},
                 'claim_explanation_policy': 'claim_explanation_to_audit是待核验的原始陈述，不是来源或既有通过结论；连同cause中的因果、排除范围和查询叙述逐项复核。',
                 **self.diagnostic_pack_input(),
                 'evidence_needs': needs, 'required_need_ids': list(self.evidence_needs),
@@ -521,11 +526,40 @@ class Collaboration:
                 'instruction': '受限交接没有当前业务观测，核心symptom/mechanism只能uncertain，不能用负责人、查询错误或人工待办关闭。'}])
         audit = ReviewAudit(hint_status=list(getattr(self, 'review_hint_status', [])))
         try:
-            return validate_review(review, self.review_context(), audit=audit, emit=self.event)
+            checked = validate_review(review, self.review_context(), audit=audit, emit=self.event)
+            self.validate_assessment_scope(review)
+            return checked
         finally:
             # Diagnostic effects survive failed candidates; verdict/need state is not committed here.
             self.review_hint_status = audit.hint_status
             self.extra_gaps.extend(audit.limitations)
+
+    def validate_assessment_scope(self, review):
+        """Check declared audit consistency, never infer or promote a semantic verdict."""
+        required = getattr(self.models['reviewer'], 'json_output', False)
+        targets = self.targets()
+        for index, assessment in enumerate(review.assessments):
+            path = f'assessments.{index}'
+            if assessment.target_id.startswith('H'):
+                if required and assessment.supported_scope is None:
+                    raise ProtocolError('HYPOTHESIS_SCOPE_REQUIRED', [{
+                        'path': path + '.supported_scope',
+                        'instruction': '按完整cause及解释填写full/partial/none；部分有据时reason指出未获支持部分，不能支持整项。'}])
+                if assessment.verdict == 'supported' and assessment.supported_scope in {'partial', 'none'}:
+                    raise ProtocolError('HYPOTHESIS_SCOPE_CONFLICT', [{
+                        'path': path + '.verdict', 'target_id': assessment.target_id,
+                        'instruction': '不能同时声明仅部分/无支持并支持整个H。重新核对原文；保留真实未知，不自动改为full或编造证据。'}])
+            target = targets[assessment.target_id]
+            if (assessment.target_id.startswith('A') and target.kind == 'manual_check'
+                    and assessment.verdict == 'uncertain'):
+                if required and assessment.uncertainty_basis is None:
+                    raise ProtocolError('MANUAL_CHECK_BASIS_REQUIRED', [{
+                        'path': path + '.uncertainty_basis',
+                        'instruction': '说明相关性、范围安全或预设结果等实际问题；只因尚未执行不能否定核查待办。'}])
+                if assessment.uncertainty_basis == 'future_result_only':
+                    raise ProtocolError('MANUAL_CHECK_FUTURE_RESULT_ONLY', [{
+                        'path': path + '.uncertainty_basis', 'target_id': assessment.target_id,
+                        'instruction': '核查用于取得未知信息，不要求结果已取得。重新审阅相关性、范围、风险及结果预设后自行判定；不得为通过契约自动supported。'}])
 
     def diagnose(self):
         if not self.prepare_diagnosis_entry():

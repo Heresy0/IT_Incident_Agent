@@ -181,6 +181,10 @@ class Assessment(Contract):
     reason: str = Field(min_length=1, max_length=500)
     evidence_ids: list[str] = Field(default_factory=list, max_length=8)
     refutation_basis: RefutationBasis | None = None
+    supported_scope: Literal['full', 'partial', 'none'] | None = Field(default=None,
+        description='H only: whether the complete cause AND explanation are supported. Partial support cannot approve the whole hypothesis. Optional for saved legacy reports.')
+    uncertainty_basis: Literal['relevance_gap', 'scope_or_safety_gap', 'assumed_outcome', 'future_result_only'] | None = Field(default=None,
+        description='Uncertain manual_check only: identify the actual objection. A future result alone is not an objection to proposing a check. Optional for saved legacy reports.')
 
 
 class EvidenceRequest(Contract):

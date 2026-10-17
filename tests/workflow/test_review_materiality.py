@@ -53,6 +53,12 @@ class ReviewMaterialityTests(unittest.TestCase):
                     verdict='uncertain', evidence_ids=[], reason='action预设维护方已经调整策略')
             data['request_evidence'] = None
             data['follow_up_reason'] = '人工保留未知；建议措辞需要修正时无需为此查询新证据'
+            # Explicit scripted audit decisions; these do not establish model quality.
+            for assessment in data['assessments']:
+                if assessment['target_id'].startswith('H'):
+                    assessment['supported_scope'] = 'full' if assessment['verdict']=='supported' else 'partial'
+                if assessment['target_id']=='A1' and assessment['verdict']=='uncertain':
+                    assessment['uncertainty_basis'] = 'assumed_outcome'
             return json_response(data)
         models['diagnosis'] = AlterOutput(models['diagnosis'], diagnosis)
         models['reviewer'] = AlterOutput(models['reviewer'], reviewer)
