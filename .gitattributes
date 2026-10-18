@@ -87,3 +87,9 @@
 /tests/evals/test_rca_independent*.py -text
 /tests/evals/test_rca_cross_case_scoring.py -text
 /examples/showcase/interview-closeout-validation.json -text
+
+# Browser acceptance receipts bind exact helper and screenshot provenance.
+/scripts/demo_frontend_acceptance.py -text
+/scripts/check_frontend_acceptance.py -text
+/tests/evals/test_frontend_acceptance.py -text
+/evals/frontend-demo-validation-*.json -text

@@ -1,0 +1,415 @@
+{
+  "schema_version": "frontend-demo-validation-v1",
+  "status": "passed",
+  "created_at_utc": "2026-10-18T10:55:33.315416+00:00",
+  "reviewer_type": "ai",
+  "human_verified": false,
+  "is_gold": false,
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "a31eeecec68bc4230f143b8f3fd0def30040c59e",
+  "scope": "Actual existing Vue UI in a browser, real HTTP authentication and APIs, real PostgreSQL storage, real SSE. No application-source or diagnosis-logic changes.",
+  "diagnosis_quality_rescored": false,
+  "new_provider_calls": 0,
+  "actual_live_repairs": 0,
+  "preservation": {
+    "prior_tracked_files_unchanged_except_attributes": 1021,
+    "application_python_files_unchanged": 98,
+    "frontend_source_files_unchanged": 9,
+    "original_dirty_status": [
+      " M app/agents/prompts.py",
+      "?? evals/multi-prompt-simplification-validation-20261017.json",
+      "?? tests/workflow/test_prompt_query_boundaries.py"
+    ],
+    "original_dirty_sha256": {
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "evals/multi-prompt-simplification-validation-20261017.json": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "tests/workflow/test_prompt_query_boundaries.py": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    },
+    "configuration_sha256_unchanged": {
+      ".env": "8561ac2f3834e2f4ce0b5b38fe965bd3d8b2b6a7d578febf56d6a4cd372a22c8",
+      "config.json": "fd71cdfed057bd06a472c90e79c84a61a13aa40f0670ec8c97c5417ca3033138",
+      ".auth.local.json": "1e08e907a578d87ec075dac40523abb5fc0b39fe0a911ab406a751f58db91d8b",
+      ".demo-credentials.local.json": "b8c5618119d4c1cf76a9207f131d7247478c8795073d38b7dca347cb1a18e612",
+      "services.local.json": "62922ee7b38a7b8f8ef9dc9a6cddbfb01c46deb6f0095e0cb5e7ca889b2b47a7"
+    },
+    "previous_rca_scorecard_and_adjudication_unchanged": true,
+    "previous_flash_request_count_unchanged": 275
+  },
+  "environment": {
+    "frontend": "Existing Vue production build, served unchanged by StaticFiles",
+    "browser": "Actual in-app browser, default viewport",
+    "backend": "Existing create_app, routers, WorkflowService and PostgresRunStore",
+    "database": {
+      "kind": "PostgreSQL",
+      "image": "postgres:16-alpine",
+      "container": "incident-frontend-acceptance-20261018",
+      "container_id": "d441faafd1db62b65086005a5acefe87f2bec8414ab4045f63c7073aa7c6397a",
+      "label": "codex.task=frontend-acceptance-20261018",
+      "host": "127.0.0.1",
+      "port": 55435,
+      "database": "incident_frontend_acceptance_test",
+      "daily_database_used": false
+    },
+    "frontend_build": {
+      "passed": true,
+      "vite_version": "7.3.1",
+      "elapsed_seconds": 4.1,
+      "command": "node node_modules/vite/bin/vite.js build",
+      "working_directory": "front/agent_front",
+      "proof": "Successful execution recorded in this task."
+    },
+    "frontend_typecheck": {
+      "passed": true,
+      "command": "node node_modules/vue-tsc/bin/vue-tsc.js --build tsconfig.json",
+      "working_directory": "front/agent_front",
+      "proof": "Successful exit code 0 recorded in this task."
+    }
+  },
+  "browser_acceptance": {
+    "passed_checks": 11,
+    "total_checks": 11,
+    "observation_source": "Actual browser actions and DOM text; not API-only inference.",
+    "checks": [
+      {
+        "check": "recorded_completed_visible",
+        "passed": true
+      },
+      {
+        "check": "partial_review_report_visible",
+        "report_id": "RCA_f3419b816c1fee595a11cb0b",
+        "run_id": "9f25a17d-a833-4608-81e0-a26330f6308e",
+        "passed": true
+      },
+      {
+        "check": "partial-protocol_report_visible",
+        "report_id": "RCA_420b7fbfd6c5456f3a03e3b0",
+        "run_id": "0d3c83dc-28ef-4c37-8119-c46f23adba52",
+        "passed": true
+      },
+      {
+        "check": "partial-scope_report_visible",
+        "report_id": "RCA_9d4a701949062fbdb3ee4e14",
+        "run_id": "42c68803-f6db-45a8-9b66-689396db2b7d",
+        "passed": true
+      },
+      {
+        "check": "original_evidence_payload_and_hash_visible",
+        "report_id": "RCA_9d4a701949062fbdb3ee4e14",
+        "evidence_id": "EV_bdca776bbef13a9ece4593c0",
+        "passed": true,
+        "expected_hash": "41db592725cba1d2c4a8e2f5458e6cd61a6aeb19390e24c283869959fd52d957"
+      },
+      {
+        "check": "original_report_text_preserved",
+        "report_id": "RCA_9d4a701949062fbdb3ee4e14",
+        "passed": true
+      },
+      {
+        "check": "partial_refresh_reauthentication_and_replay",
+        "report_id": "RCA_9d4a701949062fbdb3ee4e14",
+        "run_id": "42c68803-f6db-45a8-9b66-689396db2b7d",
+        "passed": true,
+        "event_count_before": 86,
+        "event_count_after": 86,
+        "reauthentication_required": true
+      },
+      {
+        "check": "actual_ui_create_start_sse_and_report",
+        "passed": true,
+        "event_count": 33,
+        "semantic_quality_scored": false,
+        "new_provider_calls": 0
+      },
+      {
+        "check": "manual_event_replay_preserves_report_and_sequence",
+        "passed": true,
+        "event_count": 33
+      },
+      {
+        "check": "control_refresh_preserves_single_run",
+        "passed": true,
+        "event_count": 33,
+        "reauthentication_required": true
+      },
+      {
+        "check": "postgres_backend_restart_and_browser_restore",
+        "passed": true,
+        "event_count": 33,
+        "report_unchanged": true
+      }
+    ],
+    "full_observations": {
+      "path": "output/frontend-acceptance-20261018/browser/observations.json",
+      "sha256": "38b5bd82227fda7555187402b093df46c48e3a7007cab89afb898c296cf78092"
+    },
+    "screenshots": [
+      {
+        "path": "output/frontend-acceptance-20261018/browser/completed.png",
+        "sha256": "5be65c119cb39e14eda85cd7507ce1fe9f17bbf2a2742befd0e5ffc68f161262"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-proof.png",
+        "sha256": "2962030f63587809beb1f5b5021f1b1c11a8efe9d61a4c6215f8b66b9c38d326"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-report-header.png",
+        "sha256": "01b15273d344bc1bef278ce5ada2e17ea0260dc2b4a17c5b24a685e4100a02ab"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial.png",
+        "sha256": "c01626a736bc7d6f428cea936846e5b16760339969404b9b6316d41283912b8e"
+      }
+    ],
+    "dom_snapshots": [
+      {
+        "path": "output/frontend-acceptance-20261018/browser/after-backend-restart.dom.txt",
+        "sha256": "4925cf4e19b6e6ab6e741f19952e28d643d7885fa538d7f9646956d52f97c49d"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/completed.dom.txt",
+        "sha256": "a7fc488092b7102cef41383efb01072749be689e2927dd9bda6a64a684625173"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/control-after-refresh.dom.txt",
+        "sha256": "4925cf4e19b6e6ab6e741f19952e28d643d7885fa538d7f9646956d52f97c49d"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/control-start.dom.txt",
+        "sha256": "4925cf4e19b6e6ab6e741f19952e28d643d7885fa538d7f9646956d52f97c49d"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/evidence-expanded.dom.txt",
+        "sha256": "6cdcc958a6de347bd8aad9aa3149290c1f682d5a9e71f082536c09887a2ec057"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-after-refresh.dom.txt",
+        "sha256": "c6f6f326daaf88deb1c90cb8ccc619fd508b30c517da06c3a5c7d43c5dacc2c7"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-protocol.dom.txt",
+        "sha256": "623ec5370bd76575ce5ee494b436571c16f754b2896dedaf7c54fe42f4b19ce4"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-review.dom.txt",
+        "sha256": "c23818b2e16ad7d66e34909c69317a8a2e8e128e259952aae89e5a588398bc49"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/browser/partial-scope.dom.txt",
+        "sha256": "72c870b709dc916aa3531f70ff5d452fcef4a12d694ff87b0b45779d5aa8f176"
+      }
+    ]
+  },
+  "http_acceptance": {
+    "passed_checks": 21,
+    "total_checks": 21,
+    "checks": {
+      "real_http_health": true,
+      "actual_vue_html": true,
+      "asset:favicon.ico": true,
+      "asset:index.html": true,
+      "asset:assets/index-BX1d1sCi.css": true,
+      "asset:assets/index-CzcGhrC0.js": true,
+      "RCA_039725703fc870ff7cdd540e:persisted_content": true,
+      "RCA_039725703fc870ff7cdd540e:sse_content_and_sequence": true,
+      "RCA_039725703fc870ff7cdd540e:cursor_no_duplicate_final": true,
+      "RCA_f3419b816c1fee595a11cb0b:persisted_content": true,
+      "RCA_f3419b816c1fee595a11cb0b:sse_content_and_sequence": true,
+      "RCA_f3419b816c1fee595a11cb0b:cursor_no_duplicate_final": true,
+      "RCA_420b7fbfd6c5456f3a03e3b0:persisted_content": true,
+      "RCA_420b7fbfd6c5456f3a03e3b0:sse_content_and_sequence": true,
+      "RCA_420b7fbfd6c5456f3a03e3b0:cursor_no_duplicate_final": true,
+      "RCA_9d4a701949062fbdb3ee4e14:persisted_content": true,
+      "RCA_9d4a701949062fbdb3ee4e14:sse_content_and_sequence": true,
+      "RCA_9d4a701949062fbdb3ee4e14:cursor_no_duplicate_final": true,
+      "control:c87e5624-0e32-44d0-818d-a20ff86e02aa:complete_report": true,
+      "control:c87e5624-0e32-44d0-818d-a20ff86e02aa:sse": true,
+      "authentication_required": true
+    },
+    "replayed_reports": [
+      {
+        "report_id": "RCA_039725703fc870ff7cdd540e",
+        "source_path": "output/rca-cross-case-study-20261018/live/39811ae6-9874-45c2-a21f-5dbafe4bc140/RCA_039725703fc870ff7cdd540e.json",
+        "new_diagnosis": false,
+        "report_sha256": "25d05551be9a9949cfd17f5047ac7fe1dae633e739fcfe709d3d08275b1f75be",
+        "new_provider_calls": 0,
+        "incident_id": "b40a5b3c-704f-4884-a354-96e5cacdb410",
+        "run_id": "193c1e93-3a47-430c-b017-c88252d17bba",
+        "title": "[历史Flash回放] rca_independent_001 第1次 completed",
+        "status": "completed",
+        "case_id": "rca_independent_001",
+        "repeat": 1,
+        "event_count": 61,
+        "final_count": 1,
+        "native_fields_preserved": true,
+        "sse_verified": true
+      },
+      {
+        "report_id": "RCA_f3419b816c1fee595a11cb0b",
+        "source_path": "output/rca-cross-case-study-20261018/live/39811ae6-9874-45c2-a21f-5dbafe4bc140/RCA_f3419b816c1fee595a11cb0b.json",
+        "new_diagnosis": false,
+        "report_sha256": "028f46863b450ec3470133ccc34ae8e3d20aacfa8e296c36215aae142064f392",
+        "new_provider_calls": 0,
+        "incident_id": "35f0282f-2fa8-4f9f-a957-827f991cd8a7",
+        "run_id": "9f25a17d-a833-4608-81e0-a26330f6308e",
+        "title": "[历史Flash回放] rca_independent_003 第2次 partial",
+        "status": "partial",
+        "case_id": "rca_independent_003",
+        "repeat": 2,
+        "event_count": 86,
+        "final_count": 1,
+        "native_fields_preserved": true,
+        "sse_verified": true
+      },
+      {
+        "report_id": "RCA_420b7fbfd6c5456f3a03e3b0",
+        "source_path": "output/rca-cross-case-study-20261018/live/39811ae6-9874-45c2-a21f-5dbafe4bc140/RCA_420b7fbfd6c5456f3a03e3b0.json",
+        "new_diagnosis": false,
+        "report_sha256": "eaf819f7034ca06a9617803a285dbf075abbef0264408a8e131c35aaf072e6bd",
+        "new_provider_calls": 0,
+        "incident_id": "55910219-ddb6-4f1e-97a9-ec79a896fa9e",
+        "run_id": "0d3c83dc-28ef-4c37-8119-c46f23adba52",
+        "title": "[历史Flash回放] rca_independent_005 第2次 partial",
+        "status": "partial",
+        "case_id": "rca_independent_005",
+        "repeat": 2,
+        "event_count": 61,
+        "final_count": 1,
+        "native_fields_preserved": true,
+        "sse_verified": true
+      },
+      {
+        "report_id": "RCA_9d4a701949062fbdb3ee4e14",
+        "source_path": "output/rca-cross-case-study-20261018/live/39811ae6-9874-45c2-a21f-5dbafe4bc140/RCA_9d4a701949062fbdb3ee4e14.json",
+        "new_diagnosis": false,
+        "report_sha256": "b7ddd6b634d2396104afce598526e85e9b67d37555e7f85c90c321b335dbf060",
+        "new_provider_calls": 0,
+        "incident_id": "b2187c6a-7486-4c88-8b93-eeea6787dd04",
+        "run_id": "42c68803-f6db-45a8-9b66-689396db2b7d",
+        "title": "[历史Flash回放] rca_independent_005 第3次 partial",
+        "status": "partial",
+        "case_id": "rca_independent_005",
+        "repeat": 3,
+        "event_count": 86,
+        "final_count": 1,
+        "native_fields_preserved": true,
+        "sse_verified": true
+      }
+    ],
+    "new_control_runs": [
+      {
+        "incident_id": "03de6c84-cdb0-4ce2-803a-f0a1922167d1",
+        "run_id": "c87e5624-0e32-44d0-818d-a20ff86e02aa",
+        "status": "completed",
+        "execution_mode": "scripted_control_only",
+        "engine_id": "autonomous_v2",
+        "report_available": true,
+        "new_provider_calls": 0,
+        "event_count": 33,
+        "final_count": 1,
+        "result_canonical_sha256": "9bfad0ae8d0df4ed2475c4daf8f98cd31033fbdd514cd54cdc76598532748974"
+      }
+    ],
+    "reports_native_content_unchanged": true,
+    "one_final_event_per_run": true,
+    "refresh_did_not_create_a_new_run": true,
+    "manual_replay_did_not_create_a_new_run": true,
+    "backend_restart_preserved_reports_events_and_run_count": true,
+    "phase_receipts": [
+      {
+        "path": "output/frontend-acceptance-20261018/http-before-start.json",
+        "sha256": "a15d0fef6a093a7d8ce7ae5c2cf5fb704aeff731021dc300c82e252c4416b985"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/http-after-partial-refresh.json",
+        "sha256": "a15d0fef6a093a7d8ce7ae5c2cf5fb704aeff731021dc300c82e252c4416b985"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/http-after-ui-start.json",
+        "sha256": "b2a9cfc5f09ccc8be274d78d974e55323f5c3555325624f92a5a1f33b155b681"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/http-before-restart.json",
+        "sha256": "b2a9cfc5f09ccc8be274d78d974e55323f5c3555325624f92a5a1f33b155b681"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/http-after-restart.json",
+        "sha256": "7ef4ed0450216d36b548fc9e99373bfe027e337d1eea4d2ca8a3c36fd6b8aed7"
+      },
+      {
+        "path": "output/frontend-acceptance-20261018/http-final.json",
+        "sha256": "7ef4ed0450216d36b548fc9e99373bfe027e337d1eea4d2ca8a3c36fd6b8aed7"
+      }
+    ]
+  },
+  "guard_tests": {
+    "passed": 7,
+    "total": 7,
+    "elapsed_seconds": 1.347,
+    "command": ".venv/Scripts/python.exe -m unittest tests.evals.test_frontend_acceptance -v",
+    "log": {
+      "path": "output/frontend-acceptance-20261018/guard-tests.log",
+      "sha256": "90eafd9e5334cba88e28a0b31333a7971a84de936c7a7c99e8dbf5cfe796f88b"
+    },
+    "self_contained_unit_fixtures": true
+  },
+  "source_bindings": [
+    {
+      "path": "scripts/demo_frontend_acceptance.py",
+      "sha256": "43cabe7578c36c966d29e3f56d6d8637fd5c6b1382f94039cb730c29589815d3"
+    },
+    {
+      "path": "scripts/check_frontend_acceptance.py",
+      "sha256": "29f9cf16f5eef567ac425c49f6575e343c85d684bfe3772827c98798f7b78e05"
+    },
+    {
+      "path": "tests/evals/test_frontend_acceptance.py",
+      "sha256": "2178c357c22ac4673cb69eb789a2eb8b74eb3674c13ea99539464d0ad7e96923"
+    },
+    {
+      "path": "output/frontend-acceptance-20261018/freeze.json",
+      "sha256": "a73d4426a084cbd70a6ac209dba4b3df9a0281f17c469bc595e61883977fca5b"
+    },
+    {
+      "path": "output/frontend-acceptance-20261018/server/session.json",
+      "sha256": "a5e8c2cf249ae02acbc177f9bbfc2ab97a3c21e8e8ef7f64320fb49c0b736447"
+    }
+  ],
+  "browser_reproduction_steps": [
+    "Open http://127.0.0.1:8176 and authenticate with the synthetic acceptance token.",
+    "Select the four incidents explicitly titled historical Flash replay: one completed, three partial.",
+    "Check report text, the supported and unresolved/tentative labels, source payloads and SHA256.",
+    "Expand original-report statistics; compare with the source frozen report.",
+    "Reload the page, reauthenticate as required, and verify the same run and event sequence.",
+    "Create a new case_001 development incident and start the existing free scripted demonstration.",
+    "Check actual tool events and the final report; this control is excluded from semantic scores.",
+    "Replay events, refresh and restart the test backend; verify no duplicate run or final event."
+  ],
+  "launch": {
+    "url": "http://127.0.0.1:8176",
+    "synthetic_acceptance_token": "frontend-acceptance-local-operator",
+    "dsn_env": "FRONTEND_ACCEPTANCE_DSN",
+    "test_dsn": "postgresql://acceptance:acceptance-local-only@127.0.0.1:55435/incident_frontend_acceptance_test",
+    "server_argv": [
+      ".venv/Scripts/python.exe",
+      "scripts/demo_frontend_acceptance.py",
+      "--serve"
+    ],
+    "read_only_check_argv": [
+      ".venv/Scripts/python.exe",
+      "scripts/check_frontend_acceptance.py",
+      "--output",
+      "output/frontend-acceptance-recheck.json"
+    ],
+    "stop": "Stop only the acceptance server, then docker stop incident-frontend-acceptance-20261018. The test database is retained; no automatic table deletion."
+  },
+  "limitations": [
+    "New diagnosis startup uses the existing free scripted control, not a fresh real-model call.",
+    "Four real Flash outputs are recorded replays imported with explicit provenance; they are not new diagnoses.",
+    "Replay import adds only owner/application envelopes. Native status, diagnosis text, evidence and review fields remain unchanged.",
+    "This validates frontend delivery and replay, not root-cause accuracy or improved model capability.",
+    "Authentication remains memory-only; refreshing intentionally requires reauthentication.",
+    "Replay incidents have no registered live service, so the repair panel shows an unregistered-source notice; repairs are outside this acceptance.",
+    "The default in-app browser viewport was used; a desktop/device matrix was not tested.",
+    "No human root-cause gold or human adjudication is claimed."
+  ]
+}
