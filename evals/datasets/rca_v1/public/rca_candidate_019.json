@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_019",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "Requests wait for a local mutex and miss their deadlines.",
+      "scope": {
+        "service": "component_019",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_019"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_019",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q31 mutex wait=2100ms ending at local deadline; lock owner id=73; owner stack was not captured."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_019",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q31 never attempted a network call; CPU remains12%."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

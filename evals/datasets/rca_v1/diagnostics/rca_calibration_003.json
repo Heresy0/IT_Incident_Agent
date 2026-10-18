@@ -1,0 +1,52 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      }
+    },
+    {
+      "tool": "get_recent_changes",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "06:08配置更新触发了06:04已经记录的首次拒绝。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "early-failure",
+          "message"
+        ],
+        [
+          "later-change",
+          "summary"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "拒绝记录早于配置更新，仅凭此次更新时间无法将它作为该记录的起因。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "early-failure",
+          "message"
+        ],
+        [
+          "later-change",
+          "summary"
+        ]
+      ]
+    }
+  ]
+}

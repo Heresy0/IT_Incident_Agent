@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_44",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "Some requests fail name lookup; a separate request also waits for a local worker.",
+      "scope": {
+        "service": "component_71ee45a3",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_4de240a8"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "lookup",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_71ee45a3",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "LOOKUP_SERVFAIL",
+        "level": "ERROR",
+        "message": "request=r17 failed before connect because name lookup returned SERVFAIL; resolver internal state was not observed."
+      },
+      {
+        "id": "queue",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_71ee45a3",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "resource",
+        "error_code": "WORKER_WAIT",
+        "level": "ERROR",
+        "message": "request=r18 exceeded local worker-acquisition deadline; request=r18 never attempted name lookup."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

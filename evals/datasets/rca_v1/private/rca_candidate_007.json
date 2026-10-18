@@ -1,0 +1,154 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_candidate_007",
+  "split": "candidate_acceptance",
+  "independence_group": "candidate_template_name_resolution",
+  "origin": "authored_synthetic_provisional",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_007",
+    "time_window": {
+      "start": "2026-10-18T06:00:00+00:00",
+      "end": "2026-10-18T06:20:00+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "本地搜索后缀改为错误域，使短名称被解析成不存在的名称。",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "错误名称展开导致NXDOMAIN，连接尚未开始。"
+    }
+  ],
+  "reference_explanation": "错误名称展开导致NXDOMAIN，连接尚未开始。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "错误名称展开导致NXDOMAIN，连接尚未开始。",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Organizational origin of the stated local condition remains outside scope."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "记录中明确写道：06:03 resolver search suffix changed svc.internal -> old.invalid; application still uses short name ledger.",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "supported"
+    },
+    {
+      "control_id": "control_02",
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "new_authored_candidate",
+    "reference_basis": "Author-written synthetic records and proposed interpretation, not executed fault injection.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "No actual fault injection or intervention has been executed; replay statements are authored synthetic observations."
+    ]
+  }
+}

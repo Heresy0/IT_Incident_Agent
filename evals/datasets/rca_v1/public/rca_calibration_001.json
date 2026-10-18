@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_41",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "Business /submit requests fail; a /ready probe sometimes succeeds.",
+      "scope": {
+        "service": "component_3d914f93",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_f17d5e93"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "probe",
+        "timestamp": "2026-10-18T06:04:00+00:00",
+        "service": "component_3d914f93",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "PROBE_OK",
+        "level": "INFO",
+        "message": "GET /ready returned HTTP 200; route=/ready; no /submit request was sent by this probe."
+      },
+      {
+        "id": "business",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_3d914f93",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "READ_DEADLINE",
+        "level": "ERROR",
+        "message": "POST /submit to dependency exceeded the read deadline and returned HTTP 504."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

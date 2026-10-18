@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_46",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "Requests return 502 after payload validation; local validation records are available in another channel.",
+      "scope": {
+        "service": "component_25fc0e70",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_0f8be79d"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "generic-failure",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_25fc0e70",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "GATEWAY_FAILURE",
+        "level": "ERROR",
+        "message": "request=r21 returned HTTP 502; downstream response was not recorded by this channel."
+      },
+      {
+        "id": "local-detail",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_25fc0e70",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "error_code": "LOCAL_SCHEMA_REJECTED",
+        "level": "ERROR",
+        "message": "request=r21 rejected locally: payload schema field mode was invalid; no outgoing connection was attempted."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_metrics",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "metrics": [
+          "signal_a",
+          "signal_b"
+        ],
+        "granularity": "1m"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "06:05的工作槽等待为800ms，且数据库处理器利用率为100%。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "wait",
+          "value"
+        ],
+        [
+          "cpu",
+          "value"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "06:05的数据库处理器利用率为100%。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "cpu",
+          "value"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_03",
+      "statement": "06:05的工作槽等待为800ms。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "wait",
+          "value"
+        ]
+      ]
+    }
+  ]
+}

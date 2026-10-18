@@ -1,0 +1,49 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      }
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "resource"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "r17在连接之前因名称解析返回SERVFAIL而失败；尚未定位解析器内部起因。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "lookup",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "所有失败请求的唯一原因均为名称解析器自身宕机。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "lookup",
+          "message"
+        ],
+        [
+          "queue",
+          "message"
+        ]
+      ]
+    }
+  ]
+}

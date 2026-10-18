@@ -1,0 +1,102 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_calibration_005",
+  "split": "calibration",
+  "independence_group": "old_source_future_manual_check",
+  "origin": "authored_synthetic_provisional",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "mechanism_only",
+  "scope": {
+    "service": "component_811786ad",
+    "time_window": {
+      "start": "2026-10-18T06:00:00+00:00",
+      "end": "2026-10-18T06:20:00+00:00"
+    },
+    "causal_level": "mechanism_only",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [],
+  "causal_edges": [],
+  "reference_explanation": "Existing source-based review/control case; no independently verified root-cause truth.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "Existing source-based review/control case; no independently verified root-cause truth.",
+      "acceptable_observation_sets": [
+        [
+          "remote-reject"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Root cause is not independently established by this calibration material."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "remote-reject"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "remote-reject"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "对端认证配置已确认错误。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "remote-reject",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": "future_manual_check",
+    "source_origin": "existing_development_source_control",
+    "reference_basis": "Author-written synthetic records and proposed interpretation, not executed fault injection.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "Already used during development and earlier real-model studies; calibration only, never held-out acceptance."
+    ]
+  }
+}

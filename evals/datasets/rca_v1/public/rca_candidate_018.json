@@ -1,0 +1,89 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_018",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "New outbound connections fail in a long-running local process.",
+      "scope": {
+        "service": "component_018",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_018"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_018",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q28 socket() returns EMFILE; process fd count=1024; rlimit_nofile=1024; no SYN sent."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_018",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Descriptor trace: failed-response cleanup path leaves one socket open per attempt; same owner stack accounts for 1000 retained sockets."
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T06:07:00+00:00",
+        "service": "component_018",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Synthetic fixture replay: same workload with cleanup close enabled => fd count stays24 and socket succeeds; close disabled => count rises to limit."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

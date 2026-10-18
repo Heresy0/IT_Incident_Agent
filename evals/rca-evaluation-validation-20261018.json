@@ -1,0 +1,849 @@
+{
+  "schema_version": "rca-evaluation-implementation-validation-v1",
+  "created_at_utc": "2026-10-18T07:47:57.078376+00:00",
+  "scope": "evaluation_only; no business, prompts, model defaults or default budgets changed",
+  "implementation_status": "implemented_and_automatically_verified",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "b7ff90c9cb4e759a7a666d0e0900b712dfcaaeac",
+  "source_preservation": {
+    "status": "passed",
+    "initial_freeze": {
+      "path": "output/rca-evaluation-study-20261018/freeze.json",
+      "sha256": "dc79adf369f32ecb7820c76ff90b537646179eca522139733beebb056ac48cea"
+    },
+    "application_file_count": 98,
+    "application_sha256": {
+      "app/app_main.py": "dc49ba7a6384951690636749561ea8643ea730a3a302a8a774f0e88982f97b89",
+      "app/agents/contracts.py": "a4cc9577141d3aec0817b7e92a0d071da9bdd7591139c2fdc6b6952ac0eb665d",
+      "app/agents/investigation.py": "3fe6d36f9b57dac06413cfdd633187e01edbd7f15b8616960abf55861005f090",
+      "app/agents/investigation_prompt.py": "614d242e151b6ade46f60b168c51cb9071cd36de752249776dbea3d688dda2bb",
+      "app/agents/models.py": "e6ca498a24ea8db6300831d649ec5fc63284ee65d13c6cde77be19a6812754d5",
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "app/agents/protocol.py": "2f7f50c0325303972f0fdb1a09bcc0010d710433f30f58fd666d90362b7bcd1a",
+      "app/agents/role_runner.py": "244213e6d762b2ea9974982b3d1f8d64718163cf58d0a7eb10b321b642089d14",
+      "app/agents/scripted.py": "a840fe8e7802ee94029fff84d428193a92cc15a03b0d57385fd33119c979d4ab",
+      "app/agents/scripted_investigation.py": "1b570cf7f9fba5927f6e22a31a489a7887e5b990a6c2d49f7bdc3a6ff30d35b7",
+      "app/agents/single.py": "f7b5e91f0b6bb690df83fddc4f410d920c83604a0995efa17e211abcbc1becbb",
+      "app/agents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/api/auth.py": "8f32624daa4e0aad0cf93d8a162250ae18486dcd874dc7c9c61c1a3a1b3517eb",
+      "app/api/health.py": "022750c290966788a90013a94d8cda4e446aa047b7cdb5e704559fd69afa723b",
+      "app/api/incidents.py": "7c8e60a7c90d093d7bedea35d0a1d5a4facec52fb02f59b3291d5c0249bb7387",
+      "app/api/repairs.py": "53ce29f9be25b4fbf4b2fe9ac385c08496d19ca4ede3c254a5d91246b97fcaa2",
+      "app/api/runbooks.py": "bf4565629151696c70ea360c77656afe21ee279e343b545fed560e84d53cd483",
+      "app/api/runs.py": "0ad8f4e3e93b18357d4e1b22d6d86408c40f1e1a79bf643e861bcc74814efdce",
+      "app/api/schemas.py": "ade553292e72fb40a633069592db9f4d9b640a1949bf0c787203c462edbc2719",
+      "app/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/config/incident.py": "c2762cbfae0194785c0cda0fd0a07208cf1e90763886ec9a0668b30a74b55424",
+      "app/config/settings.py": "a107b72b7d19f382fd265115a9126027755983adda1e3b76b249c9b118ac90d0",
+      "app/config/__init__.py": "acc23040200104b6d21843d5d364c16034003e3f81f20d396e8bf0a54f4efff5",
+      "app/evidence/completion.py": "22403333f49429bf584a2ea17f0bd240e273eb437ca68f1ac0bb57366fc5a935",
+      "app/evidence/contracts.py": "d5224281522ddfcdc278287090c86e5770ce0a7cee0d0cd60193ee3b318d836e",
+      "app/evidence/diagnosis.py": "d649932cad44183bcab48e7c33d5d471a0f77ca760b1fb87239f662c4646158f",
+      "app/evidence/model_view.py": "a194a50fd2be8fc06523809b926a133eb28eaf77d81edd81e2b6dacb04b870a8",
+      "app/evidence/observations.py": "a62375efc482d4097b03ee5b53f0723e70bc4612388ab802630787d170c9a552",
+      "app/evidence/ownership.py": "0c09349d5a63833ac8c48624901cf869cbd3d1d5e37318a70c793cb6aea1c667",
+      "app/evidence/render.py": "df822fcb01d1800f28c1a2850da4fb5307b3b04bfb0fac9204926c270e29b55f",
+      "app/evidence/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/incidents/contracts.py": "23a76d20db99ac217da25af072233d1b0904ae726d66fddf7f5ca7256e8905b6",
+      "app/incidents/support.py": "87386dfd624e568c77e73c789d793589924d24527e797493fd424b5587416a68",
+      "app/incidents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/knowledge/chunking.py": "44cda506b48b8049bf473a16fdc21898be2f94015158f48d1996a350ee694b44",
+      "app/knowledge/configuration.py": "6713d05f9ef0b5c1b0ec7079356d7c23717fc608dbdb112481049a89374919db",
+      "app/knowledge/database.py": "233677685cb6aa9f1a6acbcd1a3fd7f5d4d655d20258b04a1998f40c03e11878",
+      "app/knowledge/ingest.py": "6dcf0cc8f6a5bb12f7beca31dddb21de046e8403b7a450a3181a60fd0ec0d858",
+      "app/knowledge/retrieval.py": "7c4d70439ebadf3e26b393fa6c983ca6702f4fce8f6bf6352cdc43814a9decca",
+      "app/knowledge/__init__.py": "366b6c8192d3c6096cc412b1785aee445c10241ae96956b9c7453e6535ed86f1",
+      "app/observability/telemetry.py": "3d3c93592eb5693e82f66ff3e97973bb9f8abe00ef17e6ab576702e5b2ee17c3",
+      "app/observability/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/providers/bound.py": "83d0ba99a045f6f26a7d4de02f3626b67230cecbfb02cab316267dabd3f2fda6",
+      "app/providers/configuration.py": "5a9f05ababbfec85f2498c5e32890028954c96c02a75deb774250563af0d1ab4",
+      "app/providers/fixtures.py": "7a9f204c609cd4ad3690c6b9bdc93df3653e8d54649c93f166b0d949b9d8f5d8",
+      "app/providers/history.py": "8f425bb6476efa583936f1923bcb2791db3bc321747d1537cf0090a9ebf1db62",
+      "app/providers/http.py": "8d64b9c7f5e6a75ce46a8ec546aff75f41dcf9a05988a33014d66c1df3af8fb0",
+      "app/providers/logs.py": "60419cd2080f49c23522355dbf8bbc7f4f4fc7a90de416a8791a2654d69e0295",
+      "app/providers/registry.py": "80d3644bcdcfd0c865136950fb32eb6675a6aa5125ddecad50b020885cc76c4a",
+      "app/providers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/repairs/application.py": "1a959e439074524963faea0273b3727f931e1377610bcbe4f3f9460da08a0463",
+      "app/repairs/contracts.py": "fbb7715213113c8264ad96837b622c41029b556bce0c0b388e1e16d814aa4f06",
+      "app/repairs/executors.py": "c5bf15c0f9bc40bbb7e2ce32d2439ec64495325a9719411d09bbd7e8aad72837",
+      "app/repairs/service.py": "37bcf90d7d18dc2d2b24e550da48c3c48d03acff0670d7538817b24f8c28a936",
+      "app/repairs/verification.py": "fdf2a08c94a9d446cff8e51491d4422627dd994f4a112826a8240abefb8432b8",
+      "app/repairs/__init__.py": "e54368c62dc3fc7e08f6f52323b81d7133ccf169638d2d238c7d12c356667c0e",
+      "app/runtime/branch.py": "6df10425a1e379e36feca784c5ef7ffaff6eb043071d2cea448a360d413dac5b",
+      "app/runtime/context.py": "65663424f03cf80ab151871334f7ffa3d09a87ac07a942f78ec0e67380983579",
+      "app/runtime/version.py": "7d76206e4519464b93a0896f33ab5e6f8ebe883f4071deb0568f728a16590fbe",
+      "app/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/storage/incidents.py": "6281044a5953afd8dc711ca35ac6fd4150dee5417c3b66761b5efd5f8bcdba43",
+      "app/storage/repairs.py": "f395ee0db85d4a00e6ae97e4f27e873375bea5d5dfee5f1950007dfc8ef96164",
+      "app/storage/runs.py": "c52f0dfed710e5e0c595a4e5b0288c3bbc870e756cb993839c7d660bb3adf7f6",
+      "app/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/tools/executor.py": "6cb821aabb18007455ff420fe17d8009734e0e35e10636d63fb3a79a9bf5134a",
+      "app/tools/query_coverage.py": "60c028915c0178fe4e5cdb212c7a3cd117a363cfc226a63c75554107d0197f82",
+      "app/tools/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/workflow/collection.py": "563796917062cec0508719f189e62c5de4f1d914d87da50e8b78ff6f8ebaff74",
+      "app/workflow/coordinator.py": "952679ed9d6db8ebe9287a8e92b9729b762b685a53a01aab17383067cc312c11",
+      "app/workflow/dependencies.py": "ee12568397c7af578ba33c465687fab9016de75e52bcb00c5817f5115c27f7bc",
+      "app/workflow/diagnostic_audit.py": "69a766b2dd1bcaf6e79baab9d001f8c0a377c03483bb59da57a4bf22ea2e4e7a",
+      "app/workflow/diagnostic_pack.py": "f925a9db5c34173bcd5f29a66770f2a0bea0f83ec92b6950bbeb9cee2c54f71e",
+      "app/workflow/evidence_needs.py": "a72218faa39def4b8c55ab0c8a8478710391bd7b1d1c1e031d98f3bd6d8e802b",
+      "app/workflow/execution.py": "1adad90ccc11581367806c26756fc11525e694d5a9cb6eb230566b5d43061053",
+      "app/workflow/graph.py": "323bd082c685b35dc629065743cd1deb2a230a4718aa26497ab8abc0c5a73132",
+      "app/workflow/handoff.py": "7352499779dd9fae5d0369ea695ca8cf3508c791ac7c0e21c0a16e876d24047b",
+      "app/workflow/model_input.py": "1c9b529ce9b63879e74f6ecf988d32b31f668709868ff14403aaa5b5c5634b68",
+      "app/workflow/planning.py": "54d95bf63deaf08c94225fe0a24b0ba594aed899b3ad900260a86c60eef5f3bb",
+      "app/workflow/policy.py": "b189ba5a616336cb8c66a48b246f1531ceaf226b5c1ef4a02cc469efe6124353",
+      "app/workflow/reporting.py": "9db7b2f2861ffc5b4197fb46a6cea0aeab458c7233d0ef9af8054f43ac28f57f",
+      "app/workflow/review.py": "7bc77900af0ef1f2449efad1cde0ca975073c7bab232b61ab1d145e03daa934c",
+      "app/workflow/review_outcome.py": "e5fe836b96f70aa423765bdbdeb95e1e4ebca76e4b1a42771eb2099322f33342",
+      "app/workflow/review_protection.py": "3eb60cc9737e6f30dd911f939a8f51d7d0a8bcb4beb1ed4f155b0c115478f3a0",
+      "app/workflow/rollout.py": "29bd58a9f9136969b070c55055025ffc79b99549127b95d402822e01f1730c15",
+      "app/workflow/service.py": "72534949eb5888326ee9c5e43b376864817b6132c364a13d65b9e9e3250f68d7",
+      "app/workflow/state.py": "559f8a9c1a4d04777989e2c6cb706829e7335e37fae8c426a23fae3316b3ba21",
+      "app/workflow/task_checks.py": "871fada6aa216f8413d85e4a9a7e8ca63304bb7e693949aecfc0d300b3523f88",
+      "app/workflow/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/workflow/v2/challenge.py": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114",
+      "app/workflow/v2/contracts.py": "5b4f7763e9dae52e9f440808b89d6beff888401fee15da87d05e4a03077ae452",
+      "app/workflow/v2/engine.py": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+      "app/workflow/v2/outcome.py": "1612abb0b9d5b74de29393a8598ec749ac92fd83d867e3a22b24f307c2513719",
+      "app/workflow/v2/policy.py": "1a068872f518fede64e946d4c4fcd1e18e5442f07b87dbb773f599c280c73f61",
+      "app/workflow/v2/questions.py": "7925329374a980299d925e579bba404ea718bb7fde4f629d5dea4e325fae0650",
+      "app/workflow/v2/review.py": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+      "app/workflow/v2/rework.py": "2041bb3585d7efd6d3b01457ea4c7605347d5203d875c85f2f6c9a0e22c06f22",
+      "app/workflow/v2/scripted.py": "1f99a3e8ea52bb72aaa8cb39be4208cb9b21efbe913df236753416a3ccca5e4a",
+      "app/workflow/v2/__init__.py": "7f00a8608293dcfa57467b886b980b6e5ad4a3eb5f12a02981f24cd8d127c4a5"
+    },
+    "original_uncommitted_sha256": {
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "evals/multi-prompt-simplification-validation-20261017.json": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "tests/workflow/test_prompt_query_boundaries.py": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    },
+    "protected_configuration_sha256": {
+      ".env": "8561ac2f3834e2f4ce0b5b38fe965bd3d8b2b6a7d578febf56d6a4cd372a22c8",
+      "config.json": "fd71cdfed057bd06a472c90e79c84a61a13aa40f0670ec8c97c5417ca3033138"
+    },
+    "snapshot_used_for_live_runs": {
+      "source_root": "D:\\code\\it_incident_agent\\output\\rca-evaluation-study-20261018\\snapshot",
+      "app_root": "D:\\code\\it_incident_agent\\output\\rca-evaluation-study-20261018\\snapshot\\app",
+      "source_version": "6314e5e1a65e932c",
+      "app_source_sha256": {
+        "app/agents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/agents/contracts.py": "a4cc9577141d3aec0817b7e92a0d071da9bdd7591139c2fdc6b6952ac0eb665d",
+        "app/agents/investigation.py": "3fe6d36f9b57dac06413cfdd633187e01edbd7f15b8616960abf55861005f090",
+        "app/agents/investigation_prompt.py": "614d242e151b6ade46f60b168c51cb9071cd36de752249776dbea3d688dda2bb",
+        "app/agents/models.py": "e6ca498a24ea8db6300831d649ec5fc63284ee65d13c6cde77be19a6812754d5",
+        "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+        "app/agents/protocol.py": "2f7f50c0325303972f0fdb1a09bcc0010d710433f30f58fd666d90362b7bcd1a",
+        "app/agents/role_runner.py": "244213e6d762b2ea9974982b3d1f8d64718163cf58d0a7eb10b321b642089d14",
+        "app/agents/scripted.py": "a840fe8e7802ee94029fff84d428193a92cc15a03b0d57385fd33119c979d4ab",
+        "app/agents/scripted_investigation.py": "1b570cf7f9fba5927f6e22a31a489a7887e5b990a6c2d49f7bdc3a6ff30d35b7",
+        "app/agents/single.py": "f7b5e91f0b6bb690df83fddc4f410d920c83604a0995efa17e211abcbc1becbb",
+        "app/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/api/auth.py": "8f32624daa4e0aad0cf93d8a162250ae18486dcd874dc7c9c61c1a3a1b3517eb",
+        "app/api/health.py": "022750c290966788a90013a94d8cda4e446aa047b7cdb5e704559fd69afa723b",
+        "app/api/incidents.py": "7c8e60a7c90d093d7bedea35d0a1d5a4facec52fb02f59b3291d5c0249bb7387",
+        "app/api/repairs.py": "53ce29f9be25b4fbf4b2fe9ac385c08496d19ca4ede3c254a5d91246b97fcaa2",
+        "app/api/runbooks.py": "bf4565629151696c70ea360c77656afe21ee279e343b545fed560e84d53cd483",
+        "app/api/runs.py": "0ad8f4e3e93b18357d4e1b22d6d86408c40f1e1a79bf643e861bcc74814efdce",
+        "app/api/schemas.py": "ade553292e72fb40a633069592db9f4d9b640a1949bf0c787203c462edbc2719",
+        "app/app_main.py": "dc49ba7a6384951690636749561ea8643ea730a3a302a8a774f0e88982f97b89",
+        "app/config/__init__.py": "acc23040200104b6d21843d5d364c16034003e3f81f20d396e8bf0a54f4efff5",
+        "app/config/incident.py": "c2762cbfae0194785c0cda0fd0a07208cf1e90763886ec9a0668b30a74b55424",
+        "app/config/settings.py": "a107b72b7d19f382fd265115a9126027755983adda1e3b76b249c9b118ac90d0",
+        "app/evidence/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/evidence/completion.py": "22403333f49429bf584a2ea17f0bd240e273eb437ca68f1ac0bb57366fc5a935",
+        "app/evidence/contracts.py": "d5224281522ddfcdc278287090c86e5770ce0a7cee0d0cd60193ee3b318d836e",
+        "app/evidence/diagnosis.py": "d649932cad44183bcab48e7c33d5d471a0f77ca760b1fb87239f662c4646158f",
+        "app/evidence/model_view.py": "a194a50fd2be8fc06523809b926a133eb28eaf77d81edd81e2b6dacb04b870a8",
+        "app/evidence/observations.py": "a62375efc482d4097b03ee5b53f0723e70bc4612388ab802630787d170c9a552",
+        "app/evidence/ownership.py": "0c09349d5a63833ac8c48624901cf869cbd3d1d5e37318a70c793cb6aea1c667",
+        "app/evidence/render.py": "df822fcb01d1800f28c1a2850da4fb5307b3b04bfb0fac9204926c270e29b55f",
+        "app/incidents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/incidents/contracts.py": "23a76d20db99ac217da25af072233d1b0904ae726d66fddf7f5ca7256e8905b6",
+        "app/incidents/support.py": "87386dfd624e568c77e73c789d793589924d24527e797493fd424b5587416a68",
+        "app/knowledge/__init__.py": "366b6c8192d3c6096cc412b1785aee445c10241ae96956b9c7453e6535ed86f1",
+        "app/knowledge/chunking.py": "44cda506b48b8049bf473a16fdc21898be2f94015158f48d1996a350ee694b44",
+        "app/knowledge/configuration.py": "6713d05f9ef0b5c1b0ec7079356d7c23717fc608dbdb112481049a89374919db",
+        "app/knowledge/database.py": "233677685cb6aa9f1a6acbcd1a3fd7f5d4d655d20258b04a1998f40c03e11878",
+        "app/knowledge/ingest.py": "6dcf0cc8f6a5bb12f7beca31dddb21de046e8403b7a450a3181a60fd0ec0d858",
+        "app/knowledge/retrieval.py": "7c4d70439ebadf3e26b393fa6c983ca6702f4fce8f6bf6352cdc43814a9decca",
+        "app/observability/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/observability/telemetry.py": "3d3c93592eb5693e82f66ff3e97973bb9f8abe00ef17e6ab576702e5b2ee17c3",
+        "app/providers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/providers/bound.py": "83d0ba99a045f6f26a7d4de02f3626b67230cecbfb02cab316267dabd3f2fda6",
+        "app/providers/configuration.py": "5a9f05ababbfec85f2498c5e32890028954c96c02a75deb774250563af0d1ab4",
+        "app/providers/fixtures.py": "7a9f204c609cd4ad3690c6b9bdc93df3653e8d54649c93f166b0d949b9d8f5d8",
+        "app/providers/history.py": "8f425bb6476efa583936f1923bcb2791db3bc321747d1537cf0090a9ebf1db62",
+        "app/providers/http.py": "8d64b9c7f5e6a75ce46a8ec546aff75f41dcf9a05988a33014d66c1df3af8fb0",
+        "app/providers/logs.py": "60419cd2080f49c23522355dbf8bbc7f4f4fc7a90de416a8791a2654d69e0295",
+        "app/providers/registry.py": "80d3644bcdcfd0c865136950fb32eb6675a6aa5125ddecad50b020885cc76c4a",
+        "app/repairs/__init__.py": "e54368c62dc3fc7e08f6f52323b81d7133ccf169638d2d238c7d12c356667c0e",
+        "app/repairs/application.py": "1a959e439074524963faea0273b3727f931e1377610bcbe4f3f9460da08a0463",
+        "app/repairs/contracts.py": "fbb7715213113c8264ad96837b622c41029b556bce0c0b388e1e16d814aa4f06",
+        "app/repairs/executors.py": "c5bf15c0f9bc40bbb7e2ce32d2439ec64495325a9719411d09bbd7e8aad72837",
+        "app/repairs/service.py": "37bcf90d7d18dc2d2b24e550da48c3c48d03acff0670d7538817b24f8c28a936",
+        "app/repairs/verification.py": "fdf2a08c94a9d446cff8e51491d4422627dd994f4a112826a8240abefb8432b8",
+        "app/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/runtime/branch.py": "6df10425a1e379e36feca784c5ef7ffaff6eb043071d2cea448a360d413dac5b",
+        "app/runtime/context.py": "65663424f03cf80ab151871334f7ffa3d09a87ac07a942f78ec0e67380983579",
+        "app/runtime/version.py": "7d76206e4519464b93a0896f33ab5e6f8ebe883f4071deb0568f728a16590fbe",
+        "app/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/storage/incidents.py": "6281044a5953afd8dc711ca35ac6fd4150dee5417c3b66761b5efd5f8bcdba43",
+        "app/storage/repairs.py": "f395ee0db85d4a00e6ae97e4f27e873375bea5d5dfee5f1950007dfc8ef96164",
+        "app/storage/runs.py": "c52f0dfed710e5e0c595a4e5b0288c3bbc870e756cb993839c7d660bb3adf7f6",
+        "app/tools/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/tools/executor.py": "6cb821aabb18007455ff420fe17d8009734e0e35e10636d63fb3a79a9bf5134a",
+        "app/tools/query_coverage.py": "60c028915c0178fe4e5cdb212c7a3cd117a363cfc226a63c75554107d0197f82",
+        "app/workflow/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "app/workflow/collection.py": "563796917062cec0508719f189e62c5de4f1d914d87da50e8b78ff6f8ebaff74",
+        "app/workflow/coordinator.py": "952679ed9d6db8ebe9287a8e92b9729b762b685a53a01aab17383067cc312c11",
+        "app/workflow/dependencies.py": "ee12568397c7af578ba33c465687fab9016de75e52bcb00c5817f5115c27f7bc",
+        "app/workflow/diagnostic_audit.py": "69a766b2dd1bcaf6e79baab9d001f8c0a377c03483bb59da57a4bf22ea2e4e7a",
+        "app/workflow/diagnostic_pack.py": "f925a9db5c34173bcd5f29a66770f2a0bea0f83ec92b6950bbeb9cee2c54f71e",
+        "app/workflow/evidence_needs.py": "a72218faa39def4b8c55ab0c8a8478710391bd7b1d1c1e031d98f3bd6d8e802b",
+        "app/workflow/execution.py": "1adad90ccc11581367806c26756fc11525e694d5a9cb6eb230566b5d43061053",
+        "app/workflow/graph.py": "323bd082c685b35dc629065743cd1deb2a230a4718aa26497ab8abc0c5a73132",
+        "app/workflow/handoff.py": "7352499779dd9fae5d0369ea695ca8cf3508c791ac7c0e21c0a16e876d24047b",
+        "app/workflow/model_input.py": "1c9b529ce9b63879e74f6ecf988d32b31f668709868ff14403aaa5b5c5634b68",
+        "app/workflow/planning.py": "54d95bf63deaf08c94225fe0a24b0ba594aed899b3ad900260a86c60eef5f3bb",
+        "app/workflow/policy.py": "b189ba5a616336cb8c66a48b246f1531ceaf226b5c1ef4a02cc469efe6124353",
+        "app/workflow/reporting.py": "9db7b2f2861ffc5b4197fb46a6cea0aeab458c7233d0ef9af8054f43ac28f57f",
+        "app/workflow/review.py": "7bc77900af0ef1f2449efad1cde0ca975073c7bab232b61ab1d145e03daa934c",
+        "app/workflow/review_outcome.py": "e5fe836b96f70aa423765bdbdeb95e1e4ebca76e4b1a42771eb2099322f33342",
+        "app/workflow/review_protection.py": "3eb60cc9737e6f30dd911f939a8f51d7d0a8bcb4beb1ed4f155b0c115478f3a0",
+        "app/workflow/rollout.py": "29bd58a9f9136969b070c55055025ffc79b99549127b95d402822e01f1730c15",
+        "app/workflow/service.py": "72534949eb5888326ee9c5e43b376864817b6132c364a13d65b9e9e3250f68d7",
+        "app/workflow/state.py": "559f8a9c1a4d04777989e2c6cb706829e7335e37fae8c426a23fae3316b3ba21",
+        "app/workflow/task_checks.py": "871fada6aa216f8413d85e4a9a7e8ca63304bb7e693949aecfc0d300b3523f88",
+        "app/workflow/v2/__init__.py": "7f00a8608293dcfa57467b886b980b6e5ad4a3eb5f12a02981f24cd8d127c4a5",
+        "app/workflow/v2/challenge.py": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114",
+        "app/workflow/v2/contracts.py": "5b4f7763e9dae52e9f440808b89d6beff888401fee15da87d05e4a03077ae452",
+        "app/workflow/v2/engine.py": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+        "app/workflow/v2/outcome.py": "1612abb0b9d5b74de29393a8598ec749ac92fd83d867e3a22b24f307c2513719",
+        "app/workflow/v2/policy.py": "1a068872f518fede64e946d4c4fcd1e18e5442f07b87dbb773f599c280c73f61",
+        "app/workflow/v2/questions.py": "7925329374a980299d925e579bba404ea718bb7fde4f629d5dea4e325fae0650",
+        "app/workflow/v2/review.py": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+        "app/workflow/v2/rework.py": "2041bb3585d7efd6d3b01457ea4c7605347d5203d875c85f2f6c9a0e22c06f22",
+        "app/workflow/v2/scripted.py": "1f99a3e8ea52bb72aaa8cb39be4208cb9b21efbe913df236753416a3ccca5e4a"
+      }
+    },
+    "original_changes_excluded_from_commit": true
+  },
+  "implemented": {
+    "public_private_input_boundary": "allowlisted public observations; truth and expected relation never worker context",
+    "three_modes": {
+      "e2e": "unchanged native engine",
+      "sufficient_evidence": "registered actual prefix reads then draft/review/challenge; sufficiency not yet human confirmed",
+      "fixed_review": "one original statement per run; original native reviewer target"
+    },
+    "strict_root_outcomes": "human-confirmed causal conditions, chain, mechanism, scope and actually acquired evidence; unsupported/wrong definitive causes separately counted",
+    "unknown_boundary": "explicit missing information and a discriminating next step required by human rubric",
+    "stability": "run results plus case majority/all-repeat success; related variants grouped; no 90-independent-observation claim",
+    "review": "blinded evidence first, then saved first-review SHA and private root comparison; two independent human reviews, explicit single-human disclosure or independent human adjudication",
+    "resources": "call/tool/budget/structured-failure/repeated-decision/token/cost/latency metrics separate from accuracy",
+    "no_rank_probability_metrics": "no Top1 or ECE without a ranked calibrated output contract"
+  },
+  "new_source_files": [
+    {
+      "path": "evals/rca_contracts.py",
+      "sha256": "68a900f4f8821a42f2b9308dcd461f37d282cb1aea0a3cf4710e139716a9c1fa"
+    },
+    {
+      "path": "evals/rca_cases.py",
+      "sha256": "8eadf688454f10dac680c162225c6a9c77c26555fc17234c4ea85c2467da1966"
+    },
+    {
+      "path": "evals/rca_scoring.py",
+      "sha256": "0b875b339d789dd6cb384595c1d423b4baee50434bf540b85154bdc2d54f4ec6"
+    },
+    {
+      "path": "scripts/evaluate_rca.py",
+      "sha256": "dc0c23f660c534f09f0aaa7c50b9d180d6c74dea576bf2a9138dadac7c8df430"
+    },
+    {
+      "path": "scripts/review_rca.py",
+      "sha256": "4744782dbf2a96f64ac50e834635aac5ecb9d1090d4cf2ab59b7f21b82692909"
+    },
+    {
+      "path": "scripts/summarize_rca.py",
+      "sha256": "665ec242b8f01ba77ed171c3818d298189973cf0ac4e09543be55137709c1f5a"
+    },
+    {
+      "path": "tests/evals/test_rca_cases.py",
+      "sha256": "ebd038f84e9cf8a3d64b63065737ae949a416821e6d6a91bd83a232786b53e6c"
+    },
+    {
+      "path": "tests/evals/test_rca_contracts.py",
+      "sha256": "2bb8417f1d89bc1f3d0541d8f968c7f2676f14c443ae605b9103b13558745f88"
+    },
+    {
+      "path": "tests/evals/test_rca_evaluation.py",
+      "sha256": "6e706f380f8b1ff219cd7347da04beb8eb2d80c7bc902c79f5d3892e093997a8"
+    },
+    {
+      "path": "tests/evals/test_rca_pipeline.py",
+      "sha256": "06180e413547cc6c08a95669b3b4031041e1711b4f11d4f2004aed718f9ae09b"
+    },
+    {
+      "path": "tests/evals/test_rca_review.py",
+      "sha256": "14d668bdaefc6d3f651105d792aa6293116017c4e131c0a645c49d09e4c2c7a1"
+    },
+    {
+      "path": "tests/evals/test_rca_scoring.py",
+      "sha256": "74da6ecea56de47b4b7bd56b6809feb2022de5737dcccef740e6db91c66f4c58"
+    }
+  ],
+  "dataset": {
+    "manifest": {
+      "path": "evals/datasets/rca_v1/manifest.json",
+      "sha256": "f4703534ed66cf352c79a5db90a099525873cbd94a83a28fe5044beb2784c482"
+    },
+    "fingerprint": "51baa7d36a4ddc53e75ad87ce4884f57ee0d904568d14c40ac8d36d44923427b",
+    "files": 115,
+    "total_cases": 38,
+    "calibration_cases": 8,
+    "candidate_cases": 30,
+    "proposed_candidate_strata": {
+      "root_identifiable": 18,
+      "mechanism_only": 6,
+      "not_identifiable": 6
+    },
+    "candidate_independence_groups": 25,
+    "all_independence_groups": 33,
+    "origin": "authored_synthetic_provisional",
+    "truth_status": "pending_human_review",
+    "holdout_sealed": false,
+    "human_gold_cases": 0,
+    "truth_and_diagnostic_query_reachability": {
+      "cases": 38,
+      "status": "passed_in_free_tests",
+      "establishes_causal_truth": false
+    },
+    "provenance_limitation": "Authored observations and candidate causes do not establish a reproduced fault or confirmed incident. Human source confirmation and evidence attachments are still required."
+  },
+  "automated_validation": {
+    "new_rca_suite": {
+      "path": "output/rca-evaluation-study-20261018/rca-tests.log",
+      "sha256": "d645c66f6a7880fd21db21d1d495f33c5a0eb523f2df2f4c9edfc31cd25ee09c",
+      "tests": 66,
+      "seconds": 36.414,
+      "status": "passed"
+    },
+    "all_evaluation_tests": {
+      "path": "output/rca-evaluation-study-20261018/evaluation-tests-full-access.log",
+      "sha256": "eb5ccb67e6ff3d61b8ab4cfd8f5d91e2ea7808f8f545b9e7bc000f308f246a97",
+      "tests": 350,
+      "seconds": 87.414,
+      "status": "passed",
+      "execution_environment": "workspace temporary directory and permitted local asyncio socketpair; free doubles, no model requests"
+    },
+    "initial_environment_failure": {
+      "log": {
+        "path": "output/rca-evaluation-study-20261018/evaluation-tests.log",
+        "sha256": "eeacf612ffb0de1cbaeed709bc91d91e1ec77549828f569bbdf83123f33b366b"
+      },
+      "status": "interrupted_after_temp_permission_errors",
+      "cause": "Windows sandbox default temp replacement permission; unchanged single old test passes with workspace TEMP/TMP/TMPDIR",
+      "isolated_failure": {
+        "path": "output/rca-evaluation-study-20261018/old-ledger-isolated-default-temp.log",
+        "sha256": "945e1d1f680673a9870c15b8ce8d78850152f51f0148490a363401fa6d94f5fc"
+      },
+      "isolated_pass": {
+        "path": "output/rca-evaluation-study-20261018/old-ledger-isolated-workspace-temp.log",
+        "sha256": "42ab8d05214727292ea1f296644a178f2e2bce2aa144c03390ba0f2ea1b64d05"
+      },
+      "source_changes_for_workaround": false
+    },
+    "restricted_asyncio_environment": {
+      "log": {
+        "path": "output/rca-evaluation-study-20261018/evaluation-tests-workspace-temp.log",
+        "sha256": "3242bcb0ccce4f739c5e8be326d1f9e7ad9e1aa7c8081c61058b03c2b5791dad"
+      },
+      "status": "interrupted_after_309_pass_lines_at_old_asyncio_test",
+      "cause": "Windows asyncio initialization stuck in socket.socketpair accept in restricted sandbox, before application validation starts",
+      "bounded_stack": {
+        "path": "output/rca-evaluation-study-20261018/old-rollout-bounded-stack.log",
+        "sha256": "093a1fb7d7a43ded371065bee23d0a732481e18c6561c1b52ff01693d781afb4"
+      },
+      "source_changes_for_workaround": false
+    },
+    "independent_ai_code_reviews_not_human_gold": [
+      {
+        "path": "output/rca-evaluation-study-20261018/runner-independent-review.json",
+        "sha256": "1aa7936d1305125ef5b003b2e8881da84070842935b49850f6ba49c76003a47e"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/human-gate-independent-review.json",
+        "sha256": "7e3ed7ed42fccc9e5334e7e6ccb736f5334f3b965fa8d0a70e7ef9dfbd697832"
+      }
+    ],
+    "human_semantic_judgments_performed_by_ai": 0
+  },
+  "live_observation_only": {
+    "status": "complete_observation_collection",
+    "model": "qwen3.7-flash",
+    "model_settings": {
+      "temperature": 0,
+      "max_output_tokens": 2200,
+      "request_timeout": 30,
+      "max_retries": 0,
+      "response_format": "json_object"
+    },
+    "cases": [
+      "rca_candidate_001",
+      "rca_candidate_019",
+      "rca_candidate_025"
+    ],
+    "stages": [
+      "e2e",
+      "sufficient_evidence",
+      "fixed_review"
+    ],
+    "repeats": 1,
+    "plan": {
+      "path": "output/rca-evaluation-study-20261018/live-plan/plan.json",
+      "sha256": "119a9b8cce8223eb5546153da43465f8d9ce49e524562301d09cfba76367e2b5"
+    },
+    "bundle": {
+      "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/bundle.json",
+      "sha256": "10ba2f3b28f2b67aa9fec798d17a4fb828914d0f9c086ca84816bc97d8bf24cd"
+    },
+    "reports": [
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_90d69946eda73fe1f90de35a.json",
+        "sha256": "f5a69c531482087dbcf824c04c6a5e9b19d2848f1a3d6a609f95fb10cfe5eb9c"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_8ebc76358199c53dc2aa6978.json",
+        "sha256": "99ee52fea4af347dc679f04adf805feba0e33f1edfd17dc0f01b864e8896b7fb"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_325b7cad138c730ab4d95e5b.json",
+        "sha256": "c8a6c6ffa72f1d7244961eadc2eb2c626272d7076c4dc36bb0030af59cedee90"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_51ac205be5fe40782b3a6b5c.json",
+        "sha256": "7cdccbb06cda6f4a58dfa77fe657add407c0276faad475aa0bedf496aedebe68"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_93dff1ac5293af153225b270.json",
+        "sha256": "dfdaa84f64523fdc6dcd9f0e39094eb6ce4edf852d032b449941cf562371a44d"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_63ef4c8710329517de81d839.json",
+        "sha256": "6de3253e07d20ee72eb9af9809f5b0c2886f39468192b18391091d3cff3aa363"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_74e40dcd7a070ffe5ec42d49.json",
+        "sha256": "1e7d9465d02d40176d8ed73c54882fd8f29329692e8134f1c6e27795d2d9ba98"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_c4afa8bc814b99908b6ca2aa.json",
+        "sha256": "6ce54c5fe958b762c15682442579eb0f59aafa4c6c699b58d301554cc1b3cdd5"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_27aec2e5056df4a5e8f60988.json",
+        "sha256": "208cb34d403c795fa33b40eee9b61678ccabad48db89b36a80062e1b65690caa"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_a1bf9085b6f682dd03d0739a.json",
+        "sha256": "addd47c501625be1a82281b85bd0eac5a23c7520d3ca8338de0b2c707408564f"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_bc5d8a298420547c70962f2d.json",
+        "sha256": "0e49fc79c5025b5f47774ecda28ea9e2294b22790817d341d4f0b3b0e6d091ec"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/RCA_e9d98febe4c15096a535f17e.json",
+        "sha256": "c1d2a07d594ce093271d0c721a583a9c595e7923747a0024911ac640f47c8ad0"
+      }
+    ],
+    "planned_runs": 12,
+    "recorded_runs": 12,
+    "pending_runs": 0,
+    "maximum_model_calls": 192,
+    "ledger": {
+      "path": "output/rca-evaluation-study-20261018/live-ledger.json",
+      "sha256": "f7f52a1aef88db7d9222a0b8aa0a0d1f0ddbc2daf6e3cb057ca382cba7ab5314"
+    },
+    "accounting_reconciliation": "passed_exact_reservation_settlement_and_report_binding",
+    "charged_requests": 45,
+    "known_usage_calls": 45,
+    "unknown_usage_calls": 0,
+    "charged_tokens_known_or_upper_bound": {
+      "input_tokens": 103689,
+      "output_tokens": 7572
+    },
+    "known_input_tokens": 103689,
+    "known_output_tokens": 7572,
+    "model_seconds": 118.26999999999771,
+    "pending_reservations": 0,
+    "persistence_errors": [],
+    "admission_closed": false,
+    "admission_close_reason": null,
+    "provider_error_codes": {},
+    "rate_card": {
+      "path": "output/rca-evaluation-study-20261018/rate-card.json",
+      "sha256": "55d883936ea4c46c5ea9ff7b3e11ae1a270f914ba2dbfde4fa7315f351fc395e"
+    },
+    "cost_estimate": {
+      "currency": "CNY",
+      "estimated_total": 0.026795400000000004,
+      "known_usage_estimated_subtotal": 0.026795400000000004,
+      "unknown_usage_calls": 0,
+      "unpriced_calls": 0,
+      "is_actual_vendor_bill": false,
+      "status": "estimated",
+      "priced_calls": 45,
+      "input_tier_unmatched_calls": 0,
+      "source_url": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
+      "effective_date": "2026-10-18",
+      "pricing_scope": {
+        "provider": "aliyun_model_studio",
+        "region": "china_beijing",
+        "billing_mode": "online_realtime",
+        "basis": "published_non_cached_list_price",
+        "discounts_and_free_quota": "not_included"
+      },
+      "estimate_kind": "published_non_cached_list_price_not_actual_bill"
+    },
+    "cost_limitations": "Frozen declared gross noncached rate card, not a provider invoice; unknown usage is not zero.",
+    "resource_summary": {
+      "path": "output/rca-evaluation-study-20261018/live-summary.pending.json",
+      "sha256": "f33056400c5826ca6b45958872b06d8e0a09646c830132c77c9f7795c3f227d2"
+    },
+    "resource_groups": {
+      "baseline:e2e": {
+        "runs": 3,
+        "charged_calls": 28,
+        "delivery_statuses": {
+          "completed": 2,
+          "partial": 1
+        },
+        "known_usage_calls": 28,
+        "unknown_usage_calls": 0,
+        "provider_failures": 0,
+        "runs_with_provider_failures": 0,
+        "provider_failure_codes": {},
+        "structured_unrecovered": 2,
+        "terminal_structured_interruptions": 0,
+        "native_model_calls_known": 28,
+        "native_model_calls_unassessed_runs": 0,
+        "tool_calls_known": 10,
+        "tool_calls_unassessed_runs": 0,
+        "worker_wall_seconds": {
+          "known": 3,
+          "unknown": 0,
+          "sum": 75.0009999999993,
+          "mean": 25.0003333333331,
+          "median": 24.46900000000005,
+          "p95": 28.109999999999673,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "budget_violation_runs": 0,
+        "budget_unassessed_runs": 0,
+        "collection_stop_reasons": {
+          "FINISHED": 2,
+          "NO_NEW_QUERIES": 1
+        },
+        "repeated_decisions": 6,
+        "collection_decisions": 18,
+        "repeated_fraction": 0.3333333333333333,
+        "duration_ms": {
+          "known": 3,
+          "unknown": 0,
+          "sum": 67564,
+          "mean": 22521.333333333332,
+          "median": 21875,
+          "p95": 25735,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "cost": {
+          "currency": "CNY",
+          "estimated_total": 0.0179688,
+          "known_usage_estimated_subtotal": 0.0179688,
+          "unknown_usage_calls": 0,
+          "unpriced_calls": 0,
+          "is_actual_vendor_bill": false,
+          "status": "estimated",
+          "priced_calls": 28,
+          "input_tier_unmatched_calls": 0,
+          "source_url": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
+          "effective_date": "2026-10-18",
+          "pricing_scope": {
+            "provider": "aliyun_model_studio",
+            "region": "china_beijing",
+            "billing_mode": "online_realtime",
+            "basis": "published_non_cached_list_price",
+            "discounts_and_free_quota": "not_included"
+          },
+          "estimate_kind": "published_non_cached_list_price_not_actual_bill"
+        }
+      },
+      "baseline:sufficient_evidence": {
+        "runs": 3,
+        "charged_calls": 8,
+        "delivery_statuses": {
+          "partial": 3
+        },
+        "known_usage_calls": 8,
+        "unknown_usage_calls": 0,
+        "provider_failures": 0,
+        "runs_with_provider_failures": 0,
+        "provider_failure_codes": {},
+        "structured_unrecovered": 0,
+        "terminal_structured_interruptions": 0,
+        "native_model_calls_known": 8,
+        "native_model_calls_unassessed_runs": 0,
+        "tool_calls_known": 7,
+        "tool_calls_unassessed_runs": 0,
+        "worker_wall_seconds": {
+          "known": 3,
+          "unknown": 0,
+          "sum": 37.03099999999995,
+          "mean": 12.34366666666665,
+          "median": 12.45299999999952,
+          "p95": 12.780999999999949,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "budget_violation_runs": 0,
+        "budget_unassessed_runs": 0,
+        "collection_stop_reasons": {},
+        "repeated_decisions": 0,
+        "collection_decisions": 0,
+        "repeated_fraction": null,
+        "duration_ms": {
+          "known": 3,
+          "unknown": 0,
+          "sum": 29608,
+          "mean": 9869.333333333334,
+          "median": 10015,
+          "p95": 10343,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "cost": {
+          "currency": "CNY",
+          "estimated_total": 0.0044456,
+          "known_usage_estimated_subtotal": 0.0044456,
+          "unknown_usage_calls": 0,
+          "unpriced_calls": 0,
+          "is_actual_vendor_bill": false,
+          "status": "estimated",
+          "priced_calls": 8,
+          "input_tier_unmatched_calls": 0,
+          "source_url": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
+          "effective_date": "2026-10-18",
+          "pricing_scope": {
+            "provider": "aliyun_model_studio",
+            "region": "china_beijing",
+            "billing_mode": "online_realtime",
+            "basis": "published_non_cached_list_price",
+            "discounts_and_free_quota": "not_included"
+          },
+          "estimate_kind": "published_non_cached_list_price_not_actual_bill"
+        }
+      },
+      "baseline:fixed_review": {
+        "runs": 6,
+        "charged_calls": 9,
+        "delivery_statuses": {
+          "fixed_review_completed": 6
+        },
+        "known_usage_calls": 9,
+        "unknown_usage_calls": 0,
+        "provider_failures": 0,
+        "runs_with_provider_failures": 0,
+        "provider_failure_codes": {},
+        "structured_unrecovered": 0,
+        "terminal_structured_interruptions": 0,
+        "native_model_calls_known": 9,
+        "native_model_calls_unassessed_runs": 0,
+        "tool_calls_known": 14,
+        "tool_calls_unassessed_runs": 0,
+        "worker_wall_seconds": {
+          "known": 6,
+          "unknown": 0,
+          "sum": 36.54900000000089,
+          "mean": 6.091500000000148,
+          "median": 6.0395000000003165,
+          "p95": 7.219000000000051,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "budget_violation_runs": 0,
+        "budget_unassessed_runs": 0,
+        "collection_stop_reasons": {},
+        "repeated_decisions": 0,
+        "collection_decisions": 0,
+        "repeated_fraction": null,
+        "duration_ms": {
+          "known": 6,
+          "unknown": 0,
+          "sum": 22328,
+          "mean": 3721.3333333333335,
+          "median": 3750.0,
+          "p95": 4750,
+          "p95_method": "nearest_rank",
+          "small_sample": true
+        },
+        "cost": {
+          "currency": "CNY",
+          "estimated_total": 0.004381,
+          "known_usage_estimated_subtotal": 0.004381,
+          "unknown_usage_calls": 0,
+          "unpriced_calls": 0,
+          "is_actual_vendor_bill": false,
+          "status": "estimated",
+          "priced_calls": 9,
+          "input_tier_unmatched_calls": 0,
+          "source_url": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
+          "effective_date": "2026-10-18",
+          "pricing_scope": {
+            "provider": "aliyun_model_studio",
+            "region": "china_beijing",
+            "billing_mode": "online_realtime",
+            "basis": "published_non_cached_list_price",
+            "discounts_and_free_quota": "not_included"
+          },
+          "estimate_kind": "published_non_cached_list_price_not_actual_bill"
+        }
+      }
+    },
+    "human_reviewed_reports": 0,
+    "human_gold_cases": 0,
+    "formal_metrics": null,
+    "completion_is_accuracy": false,
+    "no_semantic_pass_fail_claim": true
+  },
+  "formal_baseline_plan": {
+    "plan": {
+      "path": "output/rca-evaluation-study-20261018/full-baseline-plan/plan.json",
+      "sha256": "fe5e57abccd84adbf7d13a43b3efc657f36f7aece21da9c1dba4b026d73618f5"
+    },
+    "candidate_cases": 30,
+    "repeats": 3,
+    "planned_runs": 90,
+    "maximum_model_calls": 1440,
+    "executed": false,
+    "status": "pending_human_truth_confirmation_and_new_version_sealing",
+    "note": "This is an executable frozen collection plan, not an executed acceptance. Reviewed or used-for-tuning cases must not be relabeled as independent holdout."
+  },
+  "human_review": {
+    "status": "pending_human_review",
+    "ai_judgments_used_as_gold": false,
+    "all_dataset_truth_template": {
+      "path": "output/rca-evaluation-study-20261018/data-review/truth-review.template.json",
+      "sha256": "8cf0cb97e2a98b66a3f87d492266fbc64e3140b03d6efd65791feadf0e3b6c2e"
+    },
+    "all_dataset_truth_panel": {
+      "path": "output/rca-evaluation-study-20261018/data-review/truth-packets.private.json",
+      "sha256": "e27e4250a8858548afd549413f7952ceeba15ca0e13bad392dbe9d3a12b62c98"
+    },
+    "live_panels_and_templates": [
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/evidence-packets.json",
+        "sha256": "3cc7dc27525e675da5e1fabe15b6af362d3b32a87c7ce1f82669c74c8f625f87"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/evidence-review.template.json",
+        "sha256": "ffddddc4f73b26189dd3997f255df7365db28cc7858facc5a3d0e78fa6110278"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/linkage.private.json",
+        "sha256": "13a0c63a47989fa76526684d0d489c1a487a6a602c26f95ce808a65f0ee7825c"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/root-match-packets.private.json",
+        "sha256": "9b6dcd1477656443c11698dff7bc9c03646999207afa0c0490ec1b492d5d1279"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/root-review.template.json",
+        "sha256": "f00cfe0868d9081e8428fc7db1e4161ec26af796bae743474eca1da2f986e0ad"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/truth-packets.private.json",
+        "sha256": "ad9a4b49fc29d02e0c8c069887a56240cc104bbaf8617c9d605f5f2a35ccc2db"
+      },
+      {
+        "path": "output/rca-evaluation-study-20261018/live-review/truth-review.template.json",
+        "sha256": "1db92137222a5325e7bae8949f41f2c8dcf3c5b56d0cf30d4fd01a076fcad214"
+      }
+    ],
+    "pending_join": {
+      "path": "output/rca-evaluation-study-20261018/live-human-review.pending.json",
+      "sha256": "ce1a56c1c7ee261f4e05d8bd08b94572e958d2370fe8862cd4deb83357833db5"
+    },
+    "pending_rows": {
+      "evidence": 12,
+      "root_match": 12,
+      "truth": 3
+    },
+    "workflow": [
+      "人工先核验案例来源、可辨识边界和候选因果条件，提供实际复现或事故确证附件及其哈希；当前全部待审核。",
+      "每位人工审阅者先独立查看 evidence-packets.json，完成并保存 evidence-review.template.json 的副本；此时不要查看私有根因对照包。",
+      "再查看 root-match-packets.private.json，在 root-review 副本中绑定同一人的第一步文档 SHA，逐项判断因果条件、范围和证据是否成立。",
+      "truth-review 中的固定命题关系需逐句人工确认，案例审核通过不会自动批准标签。",
+      "默认两名独立人工一致才可计分；争议保留待裁决，可由独立人工仲裁并绑定原文档 SHA；单审必须显式启用并披露。",
+      "使用 review_rca.py import 导入人工文档，再用 summarize_rca.py 重新验证原始绑定并汇总；不要由 AI 填写人工身份或判断字段。"
+    ],
+    "identity_limit": "Human identity and personal review are operator attestations; this standalone JSON workflow is not an authenticated reviewer identity service.",
+    "example_import_argv": [
+      ".venv/Scripts/python.exe",
+      "scripts/review_rca.py",
+      "import",
+      "--review-dir",
+      "output/rca-evaluation-study-20261018/live-review",
+      "--evidence-review",
+      "<human-A-evidence.json>",
+      "--evidence-review",
+      "<human-B-evidence.json>",
+      "--root-review",
+      "<human-A-root.json>",
+      "--root-review",
+      "<human-B-root.json>",
+      "--truth-review",
+      "<human-A-truth.json>",
+      "--truth-review",
+      "<human-B-truth.json>",
+      "--artifact-root",
+      "<confirmed-evidence-directory>",
+      "--output",
+      "<joined-human-review.json>"
+    ],
+    "example_summary_argv": [
+      ".venv/Scripts/python.exe",
+      "scripts/summarize_rca.py",
+      "--bundle",
+      "output/rca-evaluation-study-20261018/live/40d1862c-a700-4cb1-bbc7-6d63a01c9eb5/bundle.json",
+      "--human-review",
+      "<joined-human-review.json>",
+      "--review-dir",
+      "output/rca-evaluation-study-20261018/live-review",
+      "--artifact-root",
+      "<confirmed-evidence-directory>",
+      "--rate-card",
+      "output/rca-evaluation-study-20261018/rate-card.json",
+      "--output",
+      "<human-reviewed-summary.json>"
+    ]
+  },
+  "acceptance": {
+    "evaluation_implementation": "passed_automated_checks",
+    "root_cause_capability": "pending_human_review",
+    "formal_metrics": null,
+    "independent_holdout_acceptance": null,
+    "production_accuracy": null,
+    "human_gold_cases": 0,
+    "human_reviewed_reports": 0,
+    "not_established": [
+      "root cause accuracy",
+      "critical evidence acquisition quality",
+      "semantic false judgment rate",
+      "causal truth of authored cases",
+      "production reliability"
+    ]
+  }
+}

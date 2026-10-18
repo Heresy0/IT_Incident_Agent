@@ -1,0 +1,80 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_43",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "Failures were observed before a later settings update; compare the recorded timestamps.",
+      "scope": {
+        "service": "component_44cb730c",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_7747622b"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "early-failure",
+        "timestamp": "2026-10-18T06:04:00+00:00",
+        "service": "component_44cb730c",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "AUTH_REJECTED",
+        "level": "ERROR",
+        "message": "Business request failed with AUTH_REJECTED; first failure recorded by this source at 06:04."
+      }
+    ],
+    "changes": [
+      {
+        "id": "later-change",
+        "timestamp": "2026-10-18T06:08:00+00:00",
+        "service": "component_44cb730c",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "version": "v7",
+        "summary": "Authentication audience setting updated at 06:08.",
+        "config_summary": {
+          "auth_audience": "scope-b"
+        }
+      }
+    ],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

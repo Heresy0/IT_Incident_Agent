@@ -1,0 +1,157 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_candidate_025",
+  "split": "candidate_acceptance",
+  "independence_group": "candidate_template_missing_remote",
+  "origin": "authored_synthetic_provisional",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "not_identifiable",
+  "scope": {
+    "service": "component_025",
+    "time_window": {
+      "start": "2026-10-18T06:00:00+00:00",
+      "end": "2026-10-18T06:20:00+00:00"
+    },
+    "causal_level": "not_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [],
+  "causal_edges": [],
+  "reference_explanation": "现有记录只确认502结果，无法区分本地映射、代理故障或远端响应。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "现有记录只确认502结果，无法区分本地映射、代理故障或远端响应。",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Failure-emitting component and any remote root cause."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_recent_changes",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00"
+      },
+      "expected_observation_ids": [],
+      "expected_error": "SOURCE_NOT_CONFIGURED"
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_recent_changes",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00"
+      },
+      "expected_observation_ids": [],
+      "expected_error": "SOURCE_NOT_CONFIGURED"
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "记录中明确写道：request=q37 emitted HTTP502; original exception, downstream status and wire trace were not captured.",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "supported"
+    },
+    {
+      "control_id": "control_02",
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "new_authored_candidate",
+    "reference_basis": "Author-written synthetic records and proposed interpretation, not executed fault injection.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "No actual fault injection or intervention has been executed; replay statements are authored synthetic observations."
+    ]
+  }
+}

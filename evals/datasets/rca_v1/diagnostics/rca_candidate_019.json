@@ -1,0 +1,45 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      }
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "resource"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "记录中明确写道：request=q31 mutex wait=2100ms ending at local deadline; lock owner id=73; owner stack was not captured.",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    }
+  ]
+}

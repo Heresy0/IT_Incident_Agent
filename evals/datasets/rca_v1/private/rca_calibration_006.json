@@ -1,0 +1,138 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_calibration_006",
+  "split": "calibration",
+  "independence_group": "old_source_followup_available",
+  "origin": "authored_synthetic_provisional",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_25fc0e70",
+    "time_window": {
+      "start": "2026-10-18T06:00:00+00:00",
+      "end": "2026-10-18T06:20:00+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "本地payload的mode值不符合当前schema。",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "本地schema校验拒绝载荷并产生502，未建立对外连接。"
+    }
+  ],
+  "reference_explanation": "本地schema校验拒绝载荷并产生502，未建立对外连接。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "本地schema校验拒绝载荷并产生502，未建立对外连接。",
+      "acceptable_observation_sets": [
+        [
+          "local-detail"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Root cause is not independently established by this calibration material."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "local-detail"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "generic-failure"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "local-detail"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "generic-failure"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "request=r21的502已经确认由对端数据库故障导致。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "generic-failure",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": "followup_available",
+    "source_origin": "existing_development_source_control",
+    "reference_basis": "Author-written synthetic records and proposed interpretation, not executed fault injection.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "Already used during development and earlier real-model studies; calibration only, never held-out acceptance."
+    ]
+  }
+}
