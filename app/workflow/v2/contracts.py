@@ -10,9 +10,9 @@ from typing import Any, Literal
 
 from pydantic import Field, ValidationError
 
-from agents.protocol import compact_schema
+from runtime.schema import compact_schema
 from evidence.contracts import Contract, EvidenceRef, Finding, ReferenceSelection
-from evidence.diagnosis import ProtocolError, diagnosis_reference_options, expand_refs
+from evidence.references import ProtocolError, diagnosis_reference_options, expand_refs
 from evidence.model_view import evidence_view
 from evidence.observations import source_statement
 
@@ -132,7 +132,7 @@ def _validation_errors(exc, path, target_id):
 
 
 def resolve_refs(refs, executor, *, alias_map=None, path='refs'):
-    """Resolve exact selectors and reuse the legacy immutable-source validation."""
+    """Resolve exact selectors through shared immutable-source validation."""
     aliases = reference_aliases(executor) if alias_map is None else alias_map
     registered = {ref.model_dump_json(): rid for rid, ref in executor.references.items()}
     selections = []

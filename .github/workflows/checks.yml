@@ -16,8 +16,8 @@ jobs:
       - run: python -m unittest discover -s tests -t . -p 'test_*.py' -v
       - run: python scripts/probe_incident_tools.py
       - run: python -m evals.incident.check_fixtures
-      - run: python scripts/showcase_incident.py
-      - run: python scripts/demo_parallel_collection.py
+      - run: python main.py --fake --case case_001
+      - run: python main.py --fake --case case_003
       - run: python -m compileall -q app
   frontend:
     runs-on: ubuntu-latest
@@ -57,4 +57,4 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m unittest tests.storage.test_incident_postgres tests.storage.test_runbook_pgvector -v
+      - run: python -m unittest tests.storage.test_v2_postgres tests.storage.test_runbook_pgvector -v

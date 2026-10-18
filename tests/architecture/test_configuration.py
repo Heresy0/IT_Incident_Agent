@@ -54,19 +54,6 @@ class ConfigurationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             IncidentConfig.from_file()
 
-    def test_both_comparison_plans_follow_env_and_explicit_model_override(self):
-        from scripts.compare_incident import main as incident_main
-        from scripts.compare_independent import main as independent_main
-        (self.root / '.env').write_text('MODEL=configured-model\nDASHSCOPE_API_KEY=env-secret-canary\n', encoding='utf-8')
-        for main in (incident_main, independent_main):
-            for args, expected in (([], 'configured-model'), (['--model', 'explicit-model'], 'explicit-model')):
-                with self.subTest(main=main.__module__, args=args), redirect_stdout(io.StringIO()) as output:
-                    self.assertEqual(main(['--plan', *args]), 0)
-                text = output.getvalue()
-                plan = json.loads(text)
-                # Development plans report their intended model even before live execution.
-                self.assertEqual(plan['configuration']['model'], expected)
-                self.assertNotIn('canary', text)
 
     def test_app_settings_use_the_same_env_and_process_precedence(self):
         env_file = self.root / '.env'

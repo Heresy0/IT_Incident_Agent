@@ -108,14 +108,16 @@ class IncidentAPITests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/v1/incidents').status_code, 401)
         self.assertFalse(self.store.incidents)
 
-    def test_new_development_case_runs_through_existing_m4_adapter(self):
+    def test_new_development_case_is_delivered_by_v2_without_scripted_causal_gold(self):
         fields = next(row['fields'] for row in catalog(self.owner) if row['case_id'] == 'case_005')
         incident = self.create(**fields)
         run_id = self.start(incident)
         result = self.result(run_id)
-        self.assertEqual(result['status'], 'completed')
+        self.assertEqual(result['status'], 'partial')
+        self.assertEqual(result['engine_id'], 'autonomous_v2')
+        self.assertTrue(result['final'])
         self.assertEqual(result['incident_id'], incident['id'])
-        self.assertIn('认证模式', result['output']['hypotheses'][0]['cause'])
+        self.assertIn('HTTP 401', result['output']['hypotheses'][0]['cause'])
 
     def test_owner_isolation_for_incidents_runs_and_events(self):
         incident = self.create(); run_id = self.start(incident); self.result(run_id)
@@ -216,12 +218,12 @@ class IncidentAPITests(unittest.TestCase):
         self.result(self.start(incident, 'retry'))
 
     def test_live_adapter_injected_free_model_uses_requested_global_budget(self):
-        from tests.workflow.test_planned_default import planned_models
+        from workflow.v2.scripted import scripted_model
         self.service._base_config = TestConfig(api_key='injected-free')
         calls = []
         def factory(*args):
             calls.append(True)
-            return planned_models()
+            return scripted_model(None)
         self.service._incident.model_factory = factory
         incident = self.create()
         run_id = self.start(incident, 'live_injected', execution_mode='live', model_budget=6, tool_budget=4)
@@ -229,11 +231,11 @@ class IncidentAPITests(unittest.TestCase):
         self.assertLessEqual(result['run_summary']['model_calls'], 6)
         self.assertLessEqual(result['run_summary']['tool_calls'], 4)
         self.assertEqual(result['execution_mode'], 'live')
-        self.assertEqual(result['collection_execution']['investigation_mode'], 'programmatic')
+        self.assertEqual(result['engine_id'], 'autonomous_v2')
         self.assertGreater(result['run_summary']['tool_calls'], 0)
         self.assertTrue(result['reviews'])
-        self.assertTrue(all(t['model_calls'] == 0 for t in result['task_results'] if t['role'] == 'investigation'))
-        self.assertFalse(result['blind_review_enabled'])
+        self.assertEqual(result['execution_variant'], 'closed_loop')
+        self.assertTrue(result['semantic_review']['challenge_enabled'])
         self.assertEqual(self.store.get(run_id)['config']['limits']['model_calls'], 6)
         self.assertEqual(self.start(incident, 'live_injected', execution_mode='live', model_budget=6, tool_budget=4), run_id)
         self.assertEqual(calls, [True])

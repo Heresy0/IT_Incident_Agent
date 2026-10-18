@@ -202,7 +202,8 @@ class RoleEvaluationTests(unittest.TestCase):
         self.assertTrue(plan['plan_only'])
         self.assertEqual(plan['paid_requests_sent'], 0)
         self.assertIn('provider_configuration_sha256', plan)
-        self.assertIn('app/agents/prompts.py', plan['app_source_sha256'])
+        self.assertIn('app/workflow/v2/engine.py', plan['app_source_sha256'])
+        self.assertNotIn('app/agents/prompts.py', plan['app_source_sha256'])
         for secret in ('private-key', 'private-endpoint', 'hidden-extra'):
             self.assertNotIn(secret, raw)
 

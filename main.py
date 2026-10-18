@@ -12,10 +12,7 @@ def _bootstrap() -> None:
 def main() -> None:
     _bootstrap()
     from scripts.investigate_incident import main as run_main
-    args = sys.argv[1:]
-    if '--workflow' not in args and not any(a.startswith('--workflow=') for a in args):
-        args = ['--workflow', 'collaboration', *args]
-    raise SystemExit(run_main(args))
+    raise SystemExit(run_main(sys.argv[1:]))
 
 
 if __name__ == "__main__":

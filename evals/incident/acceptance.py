@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 from evidence.contracts import Evidence, InvestigationOutput
-from agents.investigation import validate_output
+from evidence.validation import validate_output
 
 ROOT = Path(__file__).resolve().parents[2]
 

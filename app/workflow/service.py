@@ -22,9 +22,9 @@ class CapacityExceeded(RuntimeError):
 class WorkflowService:
     def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None,
                  service_registry=None, repair_executors=None, incident_engine=None, incident_rollout=None):
-        self.incident_engine = incident_engine or os.getenv('INCIDENT_ENGINE', 'legacy')
-        if self.incident_engine not in {'legacy', 'autonomous_v2'}:
-            raise ValueError('Unsupported INCIDENT_ENGINE')
+        self.incident_engine = incident_engine or os.getenv('INCIDENT_ENGINE', 'autonomous_v2')
+        if self.incident_engine != 'autonomous_v2':
+            raise ValueError('Only autonomous_v2 is active; restore rollback/pre-legacy-retirement-20261018 for the retired engine.')
         self._config_path = config_path
         self._store_lock = Lock()
         self._base_config = config
@@ -150,9 +150,11 @@ class WorkflowService:
             try:
                 model_config = deepcopy(self._base_config)
                 provider_registry = deepcopy(self.services)
-                run_id, created, config = self._store.begin_diagnosis(iid, run_id, execution, principal,
-                    self._incident.metadata(execution, incident=incident, principal=principal,
-                                            registry=provider_registry, config=model_config))
+                metadata = self._incident.metadata(execution, incident=incident, principal=principal,
+                                                   registry=provider_registry, config=model_config)
+                if metadata['run_spec']['engine_id'] != 'autonomous_v2':
+                    raise IncidentError('DIAGNOSIS_NOT_ADMITTED: ' + metadata['run_spec']['rollout']['reason'], status=409)
+                run_id, created, config = self._store.begin_diagnosis(iid, run_id, execution, principal, metadata)
                 if not created:
                     self._capacity.release()
                     return run_id, True

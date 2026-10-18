@@ -11,7 +11,7 @@ from typing import Literal
 
 from pydantic import Field, ValidationError
 
-from agents.protocol import compact_schema
+from runtime.schema import compact_schema
 from evidence.contracts import Contract
 from workflow.v2.contracts import (ClaimInput, Draft, NextStep, NextStepInput,
                                    parse_draft, source_facts, _error, _validation_errors)

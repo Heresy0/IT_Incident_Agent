@@ -6,7 +6,7 @@ import unittest
 from langchain_core.messages import AIMessage, HumanMessage
 
 from scripts.demo_frontend_live_acceptance import LiveLedger, RecordedFlash, configure_demo, MODEL, TENANT, validate_execution
-from scripts.demo_frontend_acceptance import validate_dsn
+from scripts.frontend_demo_support import validate_dsn
 
 
 class FrontendLiveGuards(unittest.TestCase):
@@ -120,7 +120,7 @@ class FrontendLiveGuards(unittest.TestCase):
                 self.assertEqual(spec['configuration_sha256'], plan['configuration_sha256'])
                 changed = service._incident.metadata({**execution, 'model_budget': 12},
                     incident=incident, principal=principal)['run_spec']
-                self.assertEqual(changed['engine_id'], 'legacy')
+                self.assertEqual(changed['engine_id'], 'disabled')
         finally:
             service.close()
 

@@ -143,7 +143,7 @@ class RolloutPolicy:
     def select(self, incident, principal, registry, *, source_version, review_policy_version,
                configuration_sha256=None):
         summary = self.summary(source_version, review_policy_version, configuration_sha256)
-        engine, reason, bucket = 'legacy', 'rollout_off', None
+        engine, reason, bucket = 'disabled', 'rollout_off', None
         if self.mode != 'off':
             if summary['acceptance']['verdict'] != 'pass':
                 reason = summary['acceptance']['reason']
@@ -161,7 +161,7 @@ class RolloutPolicy:
                 else:
                     reason = 'canary_not_selected'
         summary.update(selected_engine=engine, reason=reason, bucket=bucket)
-        return {'engine_id': engine, 'execution_variant': self.variant if engine == 'autonomous_v2' else 'legacy',
+        return {'engine_id': engine, 'execution_variant': self.variant if engine == 'autonomous_v2' else 'disabled',
                 'enable_rework': engine == 'autonomous_v2' and self.variant == 'closed_loop',
                 'enable_challenge': engine == 'autonomous_v2' and self.variant == 'closed_loop' and self.enable_challenge,
                 'rollout': summary}

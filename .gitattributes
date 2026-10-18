@@ -1,3 +1,36 @@
+# Frozen legacy snapshots retain original bytes and whitespace across checkouts.
+/archive/legacy/** -text -whitespace
+/archive/legacy/**/*.py text eol=crlf -whitespace
+/archive/legacy/app/evidence/completion.py text eol=lf
+/archive/legacy/app/workflow/handoff.py text eol=lf
+/archive/legacy/evals/independent/control.py text eol=lf
+/archive/legacy/evals/independent/scoring.py text eol=lf
+/archive/legacy/evals/paired_metrics.py text eol=lf
+/archive/legacy/evals/showcase_live/scoring.py text eol=lf
+/archive/legacy/evals/targeted/scoring.py text eol=lf
+/archive/legacy/scripts/compare_showcase_live.py text eol=lf
+/archive/legacy/scripts/compare_targeted.py text eol=lf
+/archive/legacy/scripts/demo_remediation.py text eol=lf
+/archive/legacy/scripts/evaluate_independent.py text eol=lf
+/archive/legacy/scripts/evaluate_paired.py text eol=lf
+/archive/legacy/scripts/evaluate_targeted.py text eol=lf
+/archive/legacy/scripts/interview_demo_models.py text eol=lf
+/archive/legacy/scripts/prepare_showcase_review.py text eol=lf
+/archive/legacy/scripts/validate_autonomous_rollout.py text eol=lf
+/archive/legacy/tests/agents/test_single_progress.py text eol=lf
+/archive/legacy/tests/evals/test_budget_matrix_evaluation.py text eol=lf
+/archive/legacy/tests/evals/test_frozen_version_evaluation.py text eol=lf
+/archive/legacy/tests/evals/test_interview_demo.py text eol=lf
+/archive/legacy/tests/evals/test_paired_metrics.py text eol=lf
+/archive/legacy/tests/evals/test_rollout_validation.py text eol=lf
+/archive/legacy/tests/evals/test_showcase.py text eol=lf
+/archive/legacy/tests/workflow/test_diagnosis_reference_feedback.py text eol=lf
+/archive/legacy/tests/workflow/test_multi_minimal_handoff.py text eol=lf
+/archive/legacy/tests/workflow/test_prompt_query_boundaries.py text eol=lf
+/archive/legacy/tests/workflow/test_remediation.py text eol=lf
+/archive/legacy/tests/workflow/test_review_feedback_boundaries.py text eol=lf
+/archive/legacy/tests/workflow/test_review_scope_contract.py text eol=lf
+
 # Keep retired snapshots byte-identical to archive/research/manifest.json.
 # The original snapshots use CRLF, except these two original LF files.
 /archive/research/** text eol=crlf

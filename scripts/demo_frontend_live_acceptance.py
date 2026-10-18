@@ -19,7 +19,7 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'app'), str(ROOT)]
 
-from scripts.demo_frontend_acceptance import TOKEN, validate_dsn
+from scripts.frontend_demo_support import TOKEN, validate_dsn
 from workflow.service import WorkflowService
 
 MODEL = 'qwen3.7-flash'
@@ -258,7 +258,14 @@ def main(argv=None):
                 def status(identity=Depends(get_current_principal)):
                     if identity != principal:
                         raise HTTPException(403, 'Acceptance identity required.')
-                    return {**session, 'model_ledger': ledger.summary()}
+                    # Inspect admission without persisting a run or building a model.
+                    active_spec = None
+                    if baseline:
+                        incident = service.get_incident(baseline[0]['id'], principal)
+                        active_spec = service._incident.metadata(
+                            {'execution_mode': 'live', 'model_budget': 16, 'tool_budget': 8},
+                            incident=incident, principal=principal)['run_spec']
+                    return {**session, 'model_ledger': ledger.summary(), 'active_run_spec': active_spec}
 
                 app.mount('/', StaticFiles(directory=str(static), html=True), name='actual_vue_frontend')
                 write(args.output / 'session.json', session)

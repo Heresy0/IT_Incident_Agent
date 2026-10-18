@@ -1,8 +1,8 @@
 # IT Incident Agent
 
-基于 LangGraph、FastAPI、PostgreSQL 和 Vue 的故障辅助诊断项目。从工单出发，在授权和预算内自主查询指标、日志与变更，形成带证据引用的诊断，审阅后交付报告和人工核查项。
+基于 FastAPI、PostgreSQL 和 Vue 的故障辅助诊断项目。v2 使用受预算约束的自主调查循环，从工单出发查询指标、日志与变更，形成带证据引用的诊断，审阅后交付报告和人工核查项。原 LangGraph 诊断链路已归档。
 
-本页是统一阅读入口。2026-10-18 整理时，分支为 `codex/autonomous-investigation-v2`：本机 **8176 演示显式运行 `autonomous_v2 / closed_loop`**，使用真实 Flash 和合成只读观测；通用 `WorkflowService` 的默认引擎仍为 `legacy`。启动入口决定实际运行链路，不能把已有演示配置理解为全局默认已切换。
+本页是统一阅读入口。分支 `codex/autonomous-investigation-v2` 的普通后端、CLI 和 CI 演示已统一到 **`autonomous_v2 / closed_loop`**。本机 8176 使用真实 Flash 和合成只读观测。旧版执行代码退出当前运行目录，完整源码与恢复方式见[旧版归档](archive/legacy/README.md)。准入未通过时明确拒绝启动，不再静默回退旧版。
 
 ## 从这里阅读
 
@@ -16,6 +16,7 @@
 | 配置普通本地开发环境 | [Windows 启动说明](README_LOCAL.md) |
 | 查找历史优化、失败记录和旧版流程 | [历史实验归档索引](archive/experiments/README.md) |
 | 查找已退役的研究系统源码 | [研究归档说明](archive/research/README.md) |
+| 恢复完整旧版诊断链路 | [旧版源码清单与回滚步骤](archive/legacy/README.md) |
 
 ## 快速核验
 

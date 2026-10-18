@@ -45,7 +45,7 @@ class RolloutPolicyTests(unittest.TestCase):
             configuration_sha256=versions.get('configuration_sha256', CONFIGURATION))
 
     def test_percent_boundaries_and_request_independent_stable_incident_bucket(self):
-        for percent, expected in ((0, 'legacy'), (100, 'autonomous_v2')):
+        for percent, expected in ((0, 'disabled'), (100, 'autonomous_v2')):
             policy = RolloutPolicy(mode='canary', percent=percent, gate=accepted())
             self.assertEqual(self.select(policy)['engine_id'], expected)
         policy = RolloutPolicy(mode='canary', percent=37, salt='fixed-test-salt', gate=accepted())
@@ -56,14 +56,14 @@ class RolloutPolicyTests(unittest.TestCase):
         self.assertIs(type(first['rollout']['bucket']), int)
         self.assertLess(first['rollout']['bucket'], 10000)
 
-    def test_acceptance_missing_hold_or_drift_always_keeps_legacy(self):
+    def test_acceptance_missing_hold_or_drift_always_denies_execution(self):
         for gate in (None, accepted(verdict='hold'), accepted(source_version=SOURCE[:12]),
                      accepted(review_policy_version='obsolete-review'), accepted(configuration_sha256=None),
                      accepted(configuration_sha256='d' * 64)):
             for mode in ('canary', 'full'):
                 with self.subTest(mode=mode, gate=gate):
                     decision = self.select(RolloutPolicy(mode=mode, percent=100, gate=gate))
-                    self.assertEqual(decision['engine_id'], 'legacy')
+                    self.assertEqual(decision['engine_id'], 'disabled')
                     self.assertEqual(decision['rollout']['acceptance']['verdict'], 'hold')
                     self.assertFalse(decision['enable_rework'])
         self.assertEqual(self.select(RolloutPolicy(mode='full', gate=accepted()))['engine_id'], 'autonomous_v2')
@@ -83,7 +83,7 @@ class RolloutPolicyTests(unittest.TestCase):
                                               execution_mode='scripted_control_only')]
         for changed in variants:
             decision = self.select(policy, configuration_sha256=changed)
-            self.assertEqual(decision['engine_id'], 'legacy')
+            self.assertEqual(decision['engine_id'], 'disabled')
             self.assertEqual(decision['rollout']['acceptance']['reason'], 'acceptance_configuration_changed')
 
     def test_allowlists_filter_authorized_audience_and_do_not_grant_access(self):
@@ -94,10 +94,10 @@ class RolloutPolicyTests(unittest.TestCase):
         self.assertTrue(decision['enable_rework'])
         self.assertTrue(decision['enable_challenge'])
         for principal in (Principal('other-tenant', 'reader'), Principal('private-tenant', 'other-reader')):
-            self.assertEqual(self.select(policy, principal=principal)['engine_id'], 'legacy')
-        self.assertEqual(self.select(policy, incident={**self.incident, 'service': 'unregistered'})['engine_id'], 'legacy')
-        self.assertEqual(self.select(replace(policy, services=('not-selected',)))['engine_id'], 'legacy')
-        self.assertEqual(self.select(replace(policy, tenants=('not-selected',)))['engine_id'], 'legacy')
+            self.assertEqual(self.select(policy, principal=principal)['engine_id'], 'disabled')
+        self.assertEqual(self.select(policy, incident={**self.incident, 'service': 'unregistered'})['engine_id'], 'disabled')
+        self.assertEqual(self.select(replace(policy, services=('not-selected',)))['engine_id'], 'disabled')
+        self.assertEqual(self.select(replace(policy, tenants=('not-selected',)))['engine_id'], 'disabled')
 
     def test_public_summary_contains_digests_and_counts_without_other_audience_identifiers(self):
         policy = RolloutPolicy(mode='full', salt='private-routing-salt', tenants=('private-tenant',),
@@ -197,11 +197,10 @@ class RolloutLifecycleTests(unittest.TestCase):
         self.assertFalse(first['repair_eligible'])
         self.assertEqual(self.start(incident, 'stable-key'), (run_id, True))
         subsequent = self.create()
-        next_run, _ = self.start(subsequent, 'after-rollback')
-        second = self.result(next_run)
-        self.assertEqual(second['engine_id'], 'legacy')
-        self.assertFalse(second['run_spec']['enable_rework'])
-        self.assertEqual(second['run_spec']['rollout']['mode'], 'off')
+        from incidents.support import IncidentError
+        with self.assertRaisesRegex(IncidentError, 'DIAGNOSIS_NOT_ADMITTED'):
+            self.start(subsequent, 'after-rollback')
+        self.assertEqual(len(self.store.runs), 1)
 
         async def replay(principal):
             return [event async for event in self.service.events(run_id, 0, principal)]
@@ -215,15 +214,14 @@ class RolloutLifecycleTests(unittest.TestCase):
     def test_default_hold_prevents_full_rollout_even_with_explicit_development_engine(self):
         self.service.incident_engine = 'autonomous_v2'
         self.service.configure_incident_rollout({'mode': 'full', 'variant': 'closed_loop'})
-        run_id, _ = self.start(self.create(), 'hold')
-        result = self.result(run_id)
-        self.assertEqual(result['engine_id'], 'legacy')
-        self.assertEqual(result['run_spec']['rollout']['acceptance']['verdict'], 'hold')
+        from incidents.support import IncidentError
+        with self.assertRaisesRegex(IncidentError, 'acceptance_missing'):
+            self.start(self.create(), 'hold')
+        self.assertFalse(self.store.runs)
 
     def test_shadow_is_only_an_offline_snapshot_request_and_never_runs_a_second_engine(self):
         self.accept_policy(shadow=True)
-        with patch('workflow.v2.engine.investigate', side_effect=self.fake_v2) as primary, \
-             patch('workflow.coordinator.collaborate', side_effect=AssertionError('production shadow read')):
+        with patch('workflow.v2.engine.investigate', side_effect=self.fake_v2) as primary:
             run_id, _ = self.start(self.create(), 'shadow-intent')
             result = self.result(run_id)
         self.assertEqual(primary.call_count, 1)
@@ -280,14 +278,14 @@ class RolloutLifecycleTests(unittest.TestCase):
                 (execution, SimpleNamespace(model='test-model', base_url='', extra_body={'setting': 'changed'}))):
             changed = self.service._incident.metadata(changed_execution, incident=incident,
                 principal=self.owner, config=changed_config)
-            self.assertEqual(changed['run_spec']['engine_id'], 'legacy')
+            self.assertEqual(changed['run_spec']['engine_id'], 'disabled')
             self.assertEqual(changed['run_spec']['rollout']['acceptance']['reason'],
                              'acceptance_configuration_changed')
         original = self.service.incident_rollout
         for policy in (replace(original, variant='single_pass'), replace(original, enable_challenge=False)):
             self.service.configure_incident_rollout(policy)
             changed = self.service._incident.metadata(execution, incident=incident, principal=self.owner)
-            self.assertEqual(changed['run_spec']['engine_id'], 'legacy')
+            self.assertEqual(changed['run_spec']['engine_id'], 'disabled')
 
 
 if __name__ == '__main__':

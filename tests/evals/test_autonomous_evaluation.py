@@ -57,7 +57,7 @@ class AutonomousEvaluationTests(unittest.TestCase):
         self.assertTrue(plan['plan_only'])
         self.assertEqual(plan['paid_requests_sent'], 0)
         self.assertEqual(plan['model_settings']['model'], 'frozen-model')
-        self.assertEqual(plan['arms'], ['legacy', 'v2'])
+        self.assertEqual(plan['arms'], ['v2'])
         self.assertGreaterEqual(len(set(plan['world']['services'].values())), 2)
         self.assertFalse(plan['world']['profile_required'])
         self.assertFalse(plan['world']['external_blind_evaluation'])

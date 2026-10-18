@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'app'))
 
 from api.auth import get_current_principal
-from agents.investigation import validate_output
+from evidence.validation import validate_output
 from evidence.contracts import Finding, InvestigationOutput
 from fastapi.security import HTTPAuthorizationCredentials
 from providers.registry import ServiceRegistry

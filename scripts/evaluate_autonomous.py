@@ -341,14 +341,10 @@ def capture_e2e(case, arm, world, model, limits):
     context = RunContext(limits=limits, scope=provider.ticket().scope,
                          emit=lambda e: events.append({**e, 'seq': len(events) + 1}))
     try:
-        if arm == 'legacy':
-            from workflow.coordinator import collaborate
-            result = collaborate({role: model for role in ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer')},
-                                 provider, PRINCIPAL, context=context, event_log=events,
-                                 investigation_mode='programmatic', knowledge_mode='programmatic')
-        else:
-            from workflow.v2.engine import investigate
-            result = investigate(model, provider, PRINCIPAL, context=context, limits=limits, event_log=events)
+        if arm != 'v2':
+            raise ValueError('Legacy execution is archived; restore rollback/pre-legacy-retirement-20261018.')
+        from workflow.v2.engine import investigate
+        result = investigate(model, provider, PRINCIPAL, context=context, limits=limits, event_log=events)
     except Exception as exc:
         result = {'status': 'failed', 'review_status': 'not_performed', 'execution_error': safe_exception(exc),
                   'evidence': [], 'events': events, 'run_summary': context.summary()}
@@ -452,7 +448,7 @@ def parse_args(argv=None):
     modes.add_argument('--live', action='store_true')
     parser.add_argument('--stage', choices=('e2e', 'review'), default='e2e')
     parser.add_argument('--cases', nargs='+', default=list(DEFAULT_CASES))
-    parser.add_argument('--arms', nargs='+', choices=('legacy', 'v2'))
+    parser.add_argument('--arms', nargs='+', choices=('v2',))
     parser.add_argument('--repeats', type=int, default=1)
     parser.add_argument('--model-budget', type=int, default=12)
     parser.add_argument('--tool-budget', type=int, default=8)
@@ -464,7 +460,7 @@ def parse_args(argv=None):
                         help='Rename observation identifiers and supply evaluation-only public quantity metadata')
     parser.add_argument('--output', type=Path, default=ROOT / 'output' / 'autonomous-evaluation')
     args = parser.parse_args(argv)
-    args.arms = args.arms or (['v2'] if args.scripted or args.stage == 'review' else ['legacy', 'v2'])
+    args.arms = args.arms or ['v2']
     if not 1 <= args.repeats <= 5 or not 3 <= args.model_budget <= 32 or not 1 <= args.tool_budget <= 48 \
             or not 20 <= args.seconds <= 300 or len(args.arms) != len(set(args.arms)):
         parser.error('Invalid repeats, budgets or duplicate arms')

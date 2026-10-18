@@ -11,8 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'app'), str(ROOT)]
-from scripts.check_frontend_acceptance import validate_origin
-from scripts.demo_frontend_acceptance import TOKEN
+from scripts.frontend_demo_support import TOKEN, validate_origin
 from scripts.demo_frontend_live_acceptance import read, write, MODEL
 
 
@@ -21,10 +20,15 @@ def canonical_sha(value):
                                     separators=(',', ':')).encode()).hexdigest()
 
 
-def check(base_url, output, run_ids):
+def check(base_url, output, run_ids, baseline=None):
     import httpx
     validate_origin(base_url)
     output = Path(output)
+    prior_receipt = read(Path(baseline)) if baseline else None
+    prior_state = read(Path(baseline).parent / 'status.json') if baseline else None
+    if prior_receipt and not prior_receipt.get('passed'):
+        raise ValueError('Historical baseline must have passed before source migration.')
+    prior_runs = {r['run_id']: r for r in prior_receipt['runs']} if prior_receipt else {}
     with httpx.Client(base_url=base_url, headers={'Authorization': f'Bearer {TOKEN}'},
                       timeout=25, trust_env=False) as client:
         def get(path):
@@ -41,6 +45,13 @@ def check(base_url, output, run_ids):
             'isolated_database': state['daily_database_used'] is False,
             'no_real_repair_executors': state['live_repair_executors'] is False,
             'actual_vue_served': 'id="app"' in get('/').text}
+        from runtime.version import implementation_version
+        active = state.get('active_run_spec') or {}
+        checks['current_source_matches_admission'] = plan['source_version'] == implementation_version()
+        checks['current_admission_actually_selects_v2_closed_loop'] = (
+            active.get('engine_id') == 'autonomous_v2' and active.get('execution_variant') == 'closed_loop'
+            and active.get('enable_rework') and active.get('enable_challenge')
+            and active.get('source_version_full') == plan['source_version'])
         rows = []
         for run_id in run_ids:
             run = get('/api/v1/runs/' + run_id).json()
@@ -48,6 +59,8 @@ def check(base_url, output, run_ids):
             if run['status'] == 'running':
                 raise ValueError('Wait for the existing run to terminate; this checker never restarts it.')
             result, spec = run['result'], run['config']['run_spec']
+            historical = prior_runs.get(run_id)
+            accepted_plan = prior_state['admission'] if historical else plan
             events_text = get('/api/v1/runs/' + run_id + '/events').text
             events = [json.loads(line[6:]) for line in events_text.splitlines() if line.startswith('data: ')]
             write(output / 'events' / f'{run_id}.json', events)
@@ -63,8 +76,9 @@ def check(base_url, output, run_ids):
                 'actual_v2_closed_loop': spec['engine_id'] == 'autonomous_v2'
                     and spec['execution_variant'] == 'closed_loop' and spec['enable_rework']
                     and spec['enable_challenge'] and result['execution_variant'] == 'closed_loop',
-                'frozen_source_and_configuration': spec['source_version_full'] == plan['source_version']
-                    and spec['configuration_sha256'] == plan['configuration_sha256'],
+                'frozen_source_and_configuration': spec['source_version_full'] == accepted_plan['source_version']
+                    and spec['configuration_sha256'] == accepted_plan['configuration_sha256']
+                    and (not historical or historical['native_run_sha256'] == canonical_sha(run)),
                 'real_tool_reads': any(e['type'] == 'tool_result' for e in events) and bool(result.get('evidence')),
                 'typed_review_executed': 'review_v2_batch' in types,
                 'report_persisted': bool(result.get('final')),
@@ -124,9 +138,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-url', default='http://127.0.0.1:8176')
     parser.add_argument('--run-id', action='append', required=True)
+    parser.add_argument('--baseline', type=Path, help='Prior passed receipt binding historical reports to their original source.')
     parser.add_argument('--output', type=Path, default=ROOT / 'output/frontend-live-acceptance-20261018/http')
     args = parser.parse_args(argv)
-    result = check(args.base_url, args.output, args.run_id)
+    result = check(args.base_url, args.output, args.run_id, args.baseline)
     print(json.dumps({'passed': result['passed'], 'checks': len(result['checks']),
                       'runs': result['runs'], 'model_ledger': result['model_ledger']}, ensure_ascii=False))
     return 0 if result['passed'] else 1

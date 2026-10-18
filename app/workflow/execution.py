@@ -29,7 +29,7 @@ class IncidentAdapter:
         from runtime.version import implementation_version
         full_version = implementation_version()
         version = full_version[:12]
-        engine = getattr(self.service, 'incident_engine', 'legacy')
+        engine = 'autonomous_v2'
         config = config or (self.service._base_config if self.service else None)
         settings = {'model': getattr(config, 'model', 'unknown'), 'base_url': getattr(config, 'base_url', ''),
                     'extra_body': getattr(config, 'extra_body', {}), 'temperature': 0, 'max_tokens': 2200}
@@ -38,8 +38,8 @@ class IncidentAdapter:
         from workflow.v2.review import REVIEW_POLICY_VERSION
         from workflow.rollout import configuration_fingerprint
         rollout = getattr(self.service, 'incident_rollout', None)
-        variant = rollout.variant if rollout else 'single_pass' if engine == 'autonomous_v2' else 'legacy'
-        challenge = bool(rollout and variant == 'closed_loop' and rollout.enable_challenge)
+        variant = rollout.variant if rollout else 'closed_loop'
+        challenge = variant == 'closed_loop' and (rollout.enable_challenge if rollout else True)
         configuration_sha256 = configuration_fingerprint(model_settings_sha256, variant, challenge, limits,
                                                          execution_mode=execution['execution_mode'])
         if rollout is not None:
@@ -48,23 +48,19 @@ class IncidentAdapter:
                 configuration_sha256=configuration_sha256)
             engine = decision['engine_id']
         else:
-            decision = {'execution_variant': 'single_pass' if engine == 'autonomous_v2' else 'legacy',
-                        'enable_rework': False,
-                        'enable_challenge': False,
-                        'rollout': {'policy_version': 'legacy_compatibility',
-                                    'mode': 'development_override' if engine == 'autonomous_v2' else 'off',
+            decision = {'execution_variant': 'closed_loop',
+                        'enable_rework': True,
+                        'enable_challenge': True,
+                        'rollout': {'policy_version': 'v2_default',
+                                    'mode': 'default_closed_loop',
                                     'selected_engine': engine, 'acceptance': {'verdict': 'hold'},
                                     'shadow': {'requested': False, 'mode': 'offline_snapshot_only',
                                                'production_executed': False, 'production_dual_reads': False,
                                                'can_authorize_repair': False}}}
-        if engine == 'legacy':
-            from workflow.graph import WORKFLOW_VERSION
-            engine_version, prompt_version = WORKFLOW_VERSION, 'legacy'
-        else:
-            from workflow.v2.engine import ENGINE_VERSION, PROMPT_VERSION
-            engine_version, prompt_version = ENGINE_VERSION, PROMPT_VERSION
+        from workflow.v2.engine import ENGINE_VERSION, PROMPT_VERSION
+        engine_version, prompt_version = ENGINE_VERSION, PROMPT_VERSION
         run_spec = {'engine_id': engine, 'engine_version': engine_version,
-                    'contract_version': 'atomic_draft_v1' if engine == 'autonomous_v2' else 'legacy',
+                    'contract_version': 'atomic_draft_v1',
                     'prompt_version': prompt_version,
                     'capability_version': 'generic_capabilities_v1', 'source_version': version,
                     'source_version_full': full_version,
@@ -84,7 +80,7 @@ class IncidentAdapter:
                 run_spec['provider_binding_sha256'] = 'unavailable'
         return {"model": "scripted" if execution["execution_mode"] == "scripted_control_only" else settings['model'],
                 "workflow_version": run_spec['engine_version'],
-                "workflow_engine": "autonomous_loop" if engine == 'autonomous_v2' else "langgraph", "source_version": version,
+                "workflow_engine": "autonomous_loop", "source_version": version,
                 "limits": limits, 'run_spec': run_spec}
 
     def scope(self, request):
@@ -100,8 +96,8 @@ class IncidentAdapter:
 
     def execute(self, request, context, events):
         snapshot = request["incident_snapshot"]
-        engine = request.get('run_spec', {}).get('engine_id', 'legacy')
-        if engine not in {'legacy', 'autonomous_v2'}:
+        engine = request.get('run_spec', {}).get('engine_id', 'autonomous_v2')
+        if engine != 'autonomous_v2':
             return self.failure(request, context, 'ENGINE_VERSION_UNAVAILABLE')
         expected_source = request.get('run_spec', {}).get('source_version_full')
         if expected_source:
@@ -137,12 +133,8 @@ class IncidentAdapter:
                 result.update(status='partial', business_result='needs_information',
                               final='真实数据源不能使用固定案例脚本诊断；请显式选择live并提供模型和工具预算。')
                 return result
-            if engine == 'autonomous_v2':
-                from workflow.v2.scripted import scripted_model
-                models = scripted_model(provider)
-            else:
-                from agents.scripted import scripted_models
-                models = scripted_models()
+            from workflow.v2.scripted import scripted_model
+            models = scripted_model(provider)
         else:
             from agents.models import build_roles
             config = request.get('_model_config', self.service._base_config)
@@ -150,21 +142,14 @@ class IncidentAdapter:
                 return self.failure(request, context, "AUTH_ERROR")
             models = (self.model_factory(config.api_key, config.model) if self.model_factory else
                       build_roles(config.api_key, config.model, base_url=config.base_url, extra_body=config.extra_body))
-        if engine == 'autonomous_v2':
-            from workflow.v2.engine import investigate
-            result = investigate(models, provider, self.principal(request), context=context, event_log=events,
-                                 enable_rework=bool(request.get('run_spec', {}).get('enable_rework', False)),
-                                 enable_challenge=bool(request.get('run_spec', {}).get('enable_challenge', False)))
-        else:
-            from workflow.coordinator import collaborate
-            from evidence.render import render
-            result = collaborate(models, provider, self.principal(request), context=context, event_log=events,
-                                 investigation_mode='agent' if mode == 'scripted_control_only' else 'programmatic')
-            result['final'] = render(result)
+        from workflow.v2.engine import investigate
+        result = investigate(models, provider, self.principal(request), context=context, event_log=events,
+                             enable_rework=bool(request.get('run_spec', {}).get('enable_rework', False)),
+                             enable_challenge=bool(request.get('run_spec', {}).get('enable_challenge', False)))
         effective_config = request.get('_model_config', self.service._base_config)
         result.update(execution_mode=mode, model="scripted" if mode == "scripted_control_only" else effective_config.model,
                       engine_id=engine, run_spec=request.get('run_spec', {}))
-        result.update(task_type="incident", workflow="autonomous_v2" if engine == 'autonomous_v2' else 'collaboration',
+        result.update(task_type="incident", workflow="autonomous_v2", incident_id=snapshot['id'],
                       incident_snapshot=snapshot, memory_enabled=False)
         return result
 
@@ -172,7 +157,7 @@ class IncidentAdapter:
         return {"run_id": context.run_id, "task_type": "incident", "incident_id": request["incident_snapshot"]["id"],
             "incident_snapshot": request["incident_snapshot"], "execution_mode": request["execution"]["execution_mode"],
             "status": "failed", "business_result": "needs_information", "review_status": "not_performed",
-            "engine_id": request.get('run_spec', {}).get('engine_id', 'legacy'), "repair_eligible": False,
+            "engine_id": request.get('run_spec', {}).get('engine_id', 'autonomous_v2'), "repair_eligible": False,
             'run_spec': request.get('run_spec', {}),
             "final": "诊断未完成，请查看运行记录并补充信息或重新诊断。", "memory_enabled": False,
             "run_summary": {**context.summary(), "termination_reason": code}, "evidence": [], "sources": []}

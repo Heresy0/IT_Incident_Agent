@@ -49,7 +49,7 @@ def main():
         destination = ROOT / 'output/postgres-acceptance.log'
         destination.parent.mkdir(exist_ok=True)
         with destination.open('w', encoding='utf-8') as log:
-            result = subprocess.run([sys.executable, '-m', 'unittest', 'tests.storage.test_incident_postgres', 'tests.storage.test_runbook_pgvector', '-v'],
+            result = subprocess.run([sys.executable, '-m', 'unittest', 'tests.storage.test_v2_postgres', 'tests.storage.test_runbook_pgvector', '-v'],
                 cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=120)
         print('数据库验收通过。' if result.returncode == 0 else '数据库验收失败；请查看output/postgres-acceptance.log。')
         if result.returncode == 0:

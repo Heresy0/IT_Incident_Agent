@@ -1,0 +1,238 @@
+{
+  "schema_version": "legacy-retirement-and-v2-decoupling-validation-v1",
+  "date": "2026-10-18",
+  "status": "passed",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "da288f60724848215dbcc49bc380aa047f0d914a",
+  "scope": "Retire legacy execution, extract deterministic shared helpers, unify API/CLI/CI on v2, preserve evidence and rebind the isolated local demo. No new paid model runs.",
+  "rollback": {
+    "tag": "rollback/pre-legacy-retirement-20261018",
+    "self_contained_git_bundle_verified": true,
+    "isolated_git_checkout_restored": true,
+    "tracked_files_byte_exactly_restored": 1036,
+    "standard_flow_free_rehearsal": {
+      "status": "completed",
+      "review_status": "passed",
+      "model_calls_scripted": 4,
+      "tool_calls": 2,
+      "paid_requests": 0
+    },
+    "preserved_original_cli_limitation": "Restored main.py --fake case_001 still produced MODEL_OUTPUT_INVALID; raw log retained and old prompts were not changed. Recovery correctness is verified by exact bytes and the original standard-flow rehearsal."
+  },
+  "archival": {
+    "files": 136,
+    "by_original_root": {
+      "app": 27,
+      "evals": 10,
+      "scripts": 29,
+      "tests": 70
+    },
+    "files_deleted_without_archive": 0,
+    "original_whitespace_and_line_endings_preserved": true,
+    "archived_tests_excluded_from_current_discovery": true
+  },
+  "shared_capabilities": {
+    "schema": "app/runtime/schema.py",
+    "source_validation": "app/evidence/validation.py",
+    "source_reference_expansion": "app/evidence/references.py",
+    "extracted_function_ASTs_equal_originals": true,
+    "fresh_runtime_imports_work_with_all_retired_modules_blocked": true
+  },
+  "runtime_entries": {
+    "api_default": "autonomous_v2/closed_loop",
+    "cli_default": "autonomous_v2/closed_loop",
+    "ci_controls": "unified v2 CLI and current tests",
+    "explicit_legacy_engine": "rejected; use full rollback",
+    "failed_admission": "409 before run persistence or worker submission; no silent legacy fallback",
+    "previously_admitted_specs_keep_frozen_flags": true,
+    "historical_report_readback_supported": true
+  },
+  "v2_model_prompts": {
+    "STEP_PROMPT": {
+      "unchanged": true,
+      "sha256": "ba65f3817efbf620ef06dc6bfe4e79b9196612084945f465429453a47cb0d2cd"
+    },
+    "DRAFT_PROMPT": {
+      "unchanged": true,
+      "sha256": "9575621b2a504d8411efd235f52e76983e537a030a292fccbf9eae6b40e56896"
+    },
+    "REVISION_PROMPT": {
+      "unchanged": true,
+      "sha256": "45f973c104182d55acbb927f17c11fff254319e5333fef93c65574963b6e48a2"
+    },
+    "REVIEW_PROMPT": {
+      "unchanged": true,
+      "sha256": "0f7ed9fbbee467c551d191c490a6a415d504a7e994bb914119af79de66f239c6"
+    },
+    "CHALLENGE_PROMPT": {
+      "unchanged": true,
+      "sha256": "1048a0ec34303ece35abe7e30730d2962a672ad483a9d098346fec330bd1c660"
+    }
+  },
+  "new_agents_added": 0,
+  "original_files_checked": 6741,
+  "preserved_evidence": {
+    "evaluation_json": {
+      "files": 381,
+      "unchanged": true
+    },
+    "fixtures": {
+      "files": 44,
+      "unchanged": true
+    },
+    "original_local_documents": {
+      "files": 114,
+      "unchanged": true
+    },
+    "research_archive": {
+      "files": 55,
+      "unchanged": true
+    },
+    "frontend_including_served_assets": {
+      "files": 25,
+      "unchanged": true
+    },
+    "original_evidence_output": {
+      "files": 5571,
+      "unchanged": true
+    },
+    "original_logs": {
+      "files": 5,
+      "unchanged": true
+    },
+    "machine_credentials_and_service_config": {
+      "files": 4,
+      "unchanged": true
+    }
+  },
+  "new_application_fingerprint": "748b2a02ac1b54a3",
+  "previous_application_fingerprint": "6314e5e1a65e932c",
+  "source_fingerprint_changed_as_expected": true,
+  "verification": {
+    "current_tests": {
+      "tests": 651,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_tests": [],
+      "external_connections_blocked": 0,
+      "paid_model_calls": 0,
+      "passed": true
+    },
+    "database_integration_tests": {
+      "tests": 19,
+      "passed": 19,
+      "failed": 0,
+      "image": "pgvector/pgvector:0.8.7-pg16-bookworm",
+      "isolated_temporary_container_removed": true,
+      "initial_plain_postgres_missing_vector_diagnosed_without_application_change": true,
+      "initial_new_test_database_removed": true,
+      "demo_database_used_by_tests": false
+    },
+    "fixtures_checked": 6,
+    "tool_probe_passed": true,
+    "current_scripted_cli_cases": [
+      "case_001",
+      "case_003"
+    ],
+    "diagnostic_quality_scored": false,
+    "documentation_targets_checked": 59,
+    "missing_documentation_targets": [],
+    "archive_index_checkout": {
+      "archived_files_verified_after_index_checkout": 136,
+      "global_autocrlf_during_check": false,
+      "original_CRLF_snapshots": 107,
+      "original_LF_snapshots": 29,
+      "all_frozen_file_hashes_match": true
+    },
+    "git_staged_diff_check_passed": true
+  },
+  "demo_8176": {
+    "passed": true,
+    "http_checks": 46,
+    "execution_variant": "closed_loop",
+    "current_pure_admission_inspection_selects_v2": true,
+    "new_source_binding_matches_running_service": true,
+    "restarted_with_original_database_and_persistent_model_ledger": true,
+    "existing_run_records_unchanged": 7,
+    "existing_reports_retain_original_source_binding": true,
+    "served_frontend_assets_unchanged": true,
+    "model_calls_before": 23,
+    "model_calls_after": 23,
+    "new_paid_model_calls": 0,
+    "new_live_diagnoses_started": 0,
+    "remaining_call_cap": 9,
+    "scope": "Fresh-source admission plus scripted controls and read-only historical report/SSE delivery; no fresh real-model end-to-end run."
+  },
+  "local_artifacts": [
+    {
+      "path": "output/legacy-retirement-20261018/freeze.json",
+      "sha256": "ddee7c03c711888447c98a3e6ee49261ce5d067012200f20d7a9387b9bd7cb58"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/rollback-verification.json",
+      "sha256": "90af0fb5ccf811af43df2df7acf5720fe217c3434276a52b01c75b1549768b07"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/preservation.json",
+      "sha256": "0ab05afbd104055df765992dcdd8eeba36b5c568219d8865bfa618cd3cff72bf"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/v2-source-binding.json",
+      "sha256": "b94eef4379482f125c9766b6ee3e28b1ba1416d72238bc8412dfc03dc3de8259"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/active-tests.json",
+      "sha256": "d9af043725e197162dc9862ecc0b57e8ae311ef4aef570235495a949260b7a24"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/active-tests.log",
+      "sha256": "d130a15c0c7d654ed93f54b9e942c5b82cdadcc3881fac9e97d4c99a7a19f7fb"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/postgres-tests.log",
+      "sha256": "99d0b7abd495d52f4450c602734b7e828ace3c3b0ff66c1d0501cbda2c78e270"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/rollback-standard.log",
+      "sha256": "3f85db49f0bd60262a78698b65294342fe1d4fed39c429c195ecdbd9596d882f"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/rollback-cli.log",
+      "sha256": "b131870af62096118dc09460af95cba8f64cd8e1586fd0710f7ff5a4d99f5e52"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/fixtures-check.log",
+      "sha256": "6cbae4aa2bccceeeb6fc841060a8258616b143369351e5856596487602766b54"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/tools-probe.log",
+      "sha256": "184c2a0c76759481b2abebf3184d7a4dccd1773f1fef3804911a6fde9077d4ba"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/server-before/admission.json",
+      "sha256": "2e8721f798a302cc5979d969f408905f6dbdd2a95bcb4ee2435bd5098ac1b207"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/server-before/session.json",
+      "sha256": "c59748a5f550298aef90b7dad85c3be76bd1fb030d9f77b0afcec4e42eeaa79c"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/legacy-retirement-before/receipt.json",
+      "sha256": "d7c69151ae40baf863de6820616368589bbd369ac6e62baaecf8818ebf2326a4"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/legacy-retirement-after/receipt.json",
+      "sha256": "651508c4f8824f865e382056d2b908e26b46aa23a5df8697b67eac22d4cb7e30"
+    },
+    {
+      "path": "output/legacy-retirement-20261018/archive-checkout-verification.json",
+      "sha256": "4d9b9596947ae40929dd98afec4fd05e0271489dbdec3b01f3862e89d4fadc76"
+    }
+  ],
+  "limitations": [
+    "Engineering acceptance only; no new real-model root-cause accuracy, cost or latency measurement.",
+    "Historical evaluations remain bound to their original source snapshots and adjudication provenance.",
+    "Current test count excludes retired legacy-only tests; it is not a diagnostic quality improvement metric."
+  ]
+}

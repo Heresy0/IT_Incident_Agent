@@ -11,9 +11,9 @@ from typing import Literal
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import Field, ValidationError
 
-from agents.protocol import compact_schema
+from runtime.schema import compact_schema
 from evidence.contracts import Contract
-from evidence.diagnosis import ProtocolError
+from evidence.references import ProtocolError
 from runtime.context import ExecutionError, activate, invoke_chat_model
 from workflow.v2.contracts import ReferenceInput, draft_input, resolve_refs, _error, _validation_errors
 from workflow.v2.review import ReviewBatch, evidence_pack_version, review_matches

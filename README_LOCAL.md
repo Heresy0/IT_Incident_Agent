@@ -1,21 +1,20 @@
 # Windows 本地启动
 
-本页用于普通本地开发配置，入口仍可能采用 `legacy`。当前分支 8176 的真实 Flash v2 闭环演示由独立脚本显式配置，状态、预算及只读核验见 [v2 导览](examples/current-v2.md)；统一文档入口见 [README](README.md)。已有 8176 实例无需为阅读或整理文档重启。
+本页用于普通本地开发配置，普通后端和 CLI 已统一使用 v2 完整闭环。8176 的真实 Flash 演示保留独立预算与隔离数据库，状态和只读核验见 [v2 导览](examples/current-v2.md)；旧版恢复见[归档说明](archive/legacy/README.md)。统一文档入口见 [README](README.md)。
 
 当前后端只运行 IT 工单链路。源码结构和能力以[项目入口](README.md)为准；研究源码和旧演示资料集中在 archive/research，只供追溯。前端已提供轻量 IT 调试页面。历史试点结果见本地[真实联调验收与稳定版收尾](docs/真实联调验收与稳定版收尾-20261010.md)。
 
 ## 免费流程演示
 
-已有本项目 Python 环境时直接运行：
+已有本项目 Python 环境时，在仓库根目录运行统一 v2 入口：
 
 ```powershell
-cd D:\code\it_incident_agent
-.\.venv\Scripts\python.exe scripts/showcase_incident.py
+.\.venv\Scripts\python.exe main.py --fake --case case_001 --output output/v2-demo
 ```
 
-会生成 `output/showcase/<批次>/index.html`、`summary.json` 和报告。三条演示使用真实图、脚本模型与合成观测，覆盖正常诊断、一次实际补查、预算不足退出；同时运行同预算模拟对照及现有约束测试。没有模型 Key、数据库或 Docker 也能运行，不产生付费调用或真实修复。新机器先按下节创建虚拟环境并安装依赖，演示无需设置身份或启动数据库。
+使用实际 v2 调查、逐项审阅和有界返工链路，模型决策为脚本替身，观测为合成数据。输出 JSON 和 Markdown 报告，不需要模型 Key、数据库或 Docker，不产生付费请求；这些结果不计模型质量。
 
-架构取舍、历史真实对照、验证结果和人工评分入口见 [公开验证材料](examples/showcase/README.md)。真实服务原始记录与未公开评分保留在本地；已提交的合成验证档案按各自范围公开，助手分析不当作人工确认。
+真实 Flash 前端演示与历史报告的只读核验见 [v2 导览](examples/current-v2.md)。旧版展示、对照与研究代码见[归档恢复说明](archive/legacy/README.md)，不再作为当前运行入口。
 
 ## 首次准备
 
@@ -54,7 +53,7 @@ $env:PYTHONIOENCODING='utf-8'
 .\.venv\Scripts\python.exe -m evals.incident.check_fixtures
 ```
 
-main.py 默认运行五角色 LangGraph 协作；只排查取证可加 --workflow investigation。--fake 是脚本控制演示，不是自主决策成绩，completed 也不会把工单变为已解决。原始输出写入 output，已被 Git 忽略。
+main.py 默认运行 v2 完整闭环；旧参数 --workflow collaboration 是同一 v2 入口的兼容写法。独立 investigation 旧入口已退役，需恢复完整旧版使用。--fake 是脚本控制演示，不是自主决策成绩；completed 不会自动解决工单。输出写入被 Git 忽略的 output/。
 
 ## 持久化后端
 
@@ -169,10 +168,10 @@ GET /metrics 返回 Prometheus 格式的 it_incident_* 指标，需要 operator 
 ```powershell
 $env:PYTHONPATH='app'
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t . -p 'test_*.py'
-.\.venv\Scripts\python.exe scripts/compare_incident.py --fake --output output/incident-comparison
+.\.venv\Scripts\python.exe main.py --fake --case case_001 --output output/v2-demo
 ```
 
-数据库集成只接受明确隔离的 *_test 库；配置 INCIDENT_TEST_POSTGRES_DSN 后，运行 tests.storage.test_incident_postgres。不能把日常使用的业务库作为测试库。测试只清理本次随机租户的合成记录。
+数据库集成只接受明确隔离的 *_test 库；配置 INCIDENT_TEST_POSTGRES_DSN 后，运行 tests.storage.test_v2_postgres。不能把日常使用的业务库作为测试库。测试只清理本次随机租户的合成记录。
 
 目录、导入、脚本和 CI 已按新模块同步；研究专用测试退出当前 CI，在历史归档中保留。过往研究分数和免费控制成绩都不代表 IT 业务准确率。
 
@@ -181,13 +180,11 @@ $env:PYTHONPATH='app'
 下面的命令仅供用户明确决定执行时使用，本轮没有执行：
 
 ```powershell
-# 单角色探针始终保持最多3模型请求/6工具尝试。
-.\.venv\Scripts\python.exe scripts/investigate_incident.py --workflow investigation --live --probe --case case_001 --output output/incident-live
-# 协作需显式提供预算，不自动批量复测。
+# 统一 v2 闭环需显式提供预算，不自动批量复测。
 .\.venv\Scripts\python.exe main.py --live --case case_003 --model-budget 16 --tool-budget 8 --output output/incident-live
 ```
 
-Key、身份或预算不满足时在请求前停止。未知 Token/费用继续记为 unknown，不估造价格。六个Agent工具仍只读；修复使用单独的审批与执行API，写操作不进入自由工具循环。
+Key、身份或预算不满足时在请求前停止。未知 Token/费用继续记为 unknown，不估造价格。六类调查工具仍只读；修复使用单独的审批与执行API，写操作不进入自由工具循环。
 
 ## 通用接入和修复
 
