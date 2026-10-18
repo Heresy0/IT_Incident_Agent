@@ -93,3 +93,7 @@
 /scripts/check_frontend_acceptance.py -text
 /tests/evals/test_frontend_acceptance.py -text
 /evals/frontend-demo-validation-*.json -text
+/scripts/demo_frontend_live_acceptance.py -text
+/scripts/check_frontend_live_acceptance.py -text
+/tests/evals/test_frontend_live_acceptance.py -text
+/evals/frontend-live-validation-*.json -text

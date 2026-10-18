@@ -1,0 +1,262 @@
+{
+  "schema_version": "frontend-real-flash-closed-loop-validation-v1",
+  "created_at_utc": "2026-10-18T12:46:59.685524+00:00",
+  "status": "execution_and_delivery_passed_quality_unscored",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "0f447498559dbaddfe40f87d8ff984ff2166c8d7",
+  "scope": "Actual Vue-created new incidents and paid Flash starts; existing v2 closed loop; loopback isolated PostgreSQL; synthetic fixture observations.",
+  "root_cause_accuracy_scored": false,
+  "human_verified": false,
+  "is_gold": false,
+  "runtime": {
+    "url": "http://127.0.0.1:8176",
+    "model": "qwen3.7-flash",
+    "engine": "autonomous_v2",
+    "engine_version": "autonomous_v2.4",
+    "variant": "closed_loop",
+    "enable_rework": true,
+    "enable_challenge": true,
+    "fixed_ui_budget": {
+      "model_calls": 16,
+      "tool_calls": 8,
+      "seconds": 180
+    },
+    "global_call_cap": 32,
+    "call_cap_remaining_at_acceptance": 9,
+    "config": {
+      "path": "output/frontend-live-acceptance-20261018/server/admission.json",
+      "sha256": "2e8721f798a302cc5979d969f408905f6dbdd2a95bcb4ee2435bd5098ac1b207"
+    },
+    "daily_database_used": false,
+    "production_quality_gate_changed": false,
+    "admission_authority": "Explicit user-requested isolated demo execution only, not semantic quality certification.",
+    "other_budget_behavior": "The isolated demo service checks the 16/8 live envelope after normal API authentication and parsing. Other envelopes are rejected locally. Offline tested; online negative POST was not executed."
+  },
+  "preservation": {
+    "protected_files": 227,
+    "changed_protected_files": [],
+    "business_application_source": "6314e5e1a65e932c",
+    "application_and_frontend_source_changed": false,
+    "original_uncommitted_files_preserved": [
+      "app/agents/prompts.py",
+      "evals/multi-prompt-simplification-validation-20261017.json",
+      "tests/workflow/test_prompt_query_boundaries.py"
+    ],
+    "existing_five_run_records_byte_equivalent": true,
+    "existing_48_cross_case_reports_hash_verified": true,
+    "freeze": {
+      "path": "output/frontend-live-acceptance-20261018/freeze.json",
+      "sha256": "7b31774e1e524d062c0f4543112c6e8e1a8c71c1f020f69e8f0205957a6bf9d4"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "c6b716dc-58a2-480e-a31c-a2d8e08b1bd3",
+      "incident_id": "22989729-18db-4652-9b78-d7f5e7c4c47c",
+      "case_id": "case_001",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 7,
+      "tool_calls": 3,
+      "input_tokens": 27401,
+      "output_tokens": 1172,
+      "duration_ms": 24656,
+      "event_count": 52,
+      "challenge_count": 1,
+      "rework_rounds": 0,
+      "rework_reasons": [
+        "NO_CURRENT_REVIEW_OBJECTION"
+      ],
+      "evidence_count": 9,
+      "report_sha256": "e0a1c687559629df9659a8e6834d5149121db5782c0a0c9f7ab95575cc37db15",
+      "native_run_sha256": "78178690e258e3e8cedbc10ee3c3a86b45ac9b885beaf41ecd34ac3be830e162"
+    },
+    {
+      "run_id": "83e2695d-0c63-41d2-88ab-db1b1c08b34b",
+      "incident_id": "1a324b8c-09ce-45d4-ae51-a4d2abcd713b",
+      "case_id": "case_003",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 16,
+      "tool_calls": 8,
+      "input_tokens": 91763,
+      "output_tokens": 3199,
+      "duration_ms": 55594,
+      "event_count": 124,
+      "challenge_count": 2,
+      "rework_rounds": 1,
+      "rework_reasons": [
+        "REWORK_LIMIT_REACHED"
+      ],
+      "evidence_count": 17,
+      "report_sha256": "6673c02c3acfd3ed9b349ff520afcd01f825619919a2cd4c5d144b7119390590",
+      "native_run_sha256": "83248d6ec2d563615e54745076a10831b0e6bab89be554f4465d14575775fb57"
+    }
+  ],
+  "real_model_accounting": {
+    "admitted_calls": 23,
+    "maximum_calls": 32,
+    "remaining_calls": 9,
+    "known_usage_calls": 23,
+    "unknown_usage_calls": 0,
+    "input_tokens_known": 119164,
+    "output_tokens_known": 4371,
+    "model": "qwen3.7-flash",
+    "is_vendor_bill": false,
+    "role_counts": {
+      "investigation": 15,
+      "diagnosis": 2,
+      "reviewer": 3,
+      "challenger": 3
+    },
+    "api_credentials_logged": false,
+    "automatic_client_retries": 0,
+    "raw_call_records": {
+      "path": "output/frontend-live-acceptance-20261018/server/model-ledger.json",
+      "sha256": "539950fecb32144fa8b7e2ffb339f173a04b9957e5e206bb1876b8321a29dca5"
+    }
+  },
+  "cost_estimate": {
+    "currency": "CNY",
+    "estimated_total": 0.0273296,
+    "basis": "Archived 2026-10-18 noncached public price scenario, <=32k input tier: CNY0.2/M input and CNY0.8/M output.",
+    "source_snapshot": {
+      "path": "output/rca-cross-case-study-20261018/rate-card.json",
+      "sha256": "55d883936ea4c46c5ea9ff7b3e11ae1a270f914ba2dbfde4fa7315f351fc395e"
+    },
+    "actual_vendor_bill": false
+  },
+  "http_acceptance": {
+    "passed": 44,
+    "total": 44,
+    "after_restart": true,
+    "receipt": {
+      "path": "output/frontend-live-acceptance-20261018/http-final/receipt.json",
+      "sha256": "d7c69151ae40baf863de6820616368589bbd369ac6e62baaecf8818ebf2326a4"
+    }
+  },
+  "browser_acceptance": {
+    "passed": 12,
+    "total": 12,
+    "checks": {
+      "case003_original_report_exact": true,
+      "case003_expanded_payload_exact": true,
+      "case003_rework_text_visible": true,
+      "case003_report_has_expected_run": true,
+      "case003_manual_replay_same_run": true,
+      "case003_refresh_restores_same_report": true,
+      "backend_restart_restores_same_report": true,
+      "case001_created_and_started_from_actual_ui": true,
+      "case003_created_and_started_from_actual_ui": true,
+      "case001_sse_and_report_displayed": true,
+      "refresh_replay_restart_no_added_model_calls": true,
+      "restart_preserved_native_run_bytes": true
+    },
+    "evidence": {
+      "path": "output/frontend-live-acceptance-20261018/browser/observations.json",
+      "sha256": "4f6504542a91a9e0f9c495d14f033cb318398be16ec82c27b9406b3ed7e42990"
+    },
+    "screenshots": [
+      {
+        "path": "output/frontend-live-acceptance-20261018/browser/case001-report.png",
+        "sha256": "6e0dda5a987259996a26dd944ab6c494501a93282d9e92a836570ccc4c617fe6"
+      },
+      {
+        "path": "output/frontend-live-acceptance-20261018/browser/case003-rework-proof.png",
+        "sha256": "c41576cb99bdebda518f82414d2f1ae4682dacbcb913bd68f1b4731ddd9c13fb"
+      }
+    ]
+  },
+  "free_guard_tests": {
+    "passed": 14,
+    "total": 14,
+    "log": {
+      "path": "output/frontend-live-acceptance-20261018/guard-tests-final.log",
+      "sha256": "9450b80039d8b504a5d9189d89924c0eac1b686d0ae8280d3c563701f394cfb4"
+    },
+    "initial_setup_failure": "First run had four Windows sandbox temp-directory atomic-replace permission errors. Tests then used workspace-owned temporary directories; all 13 passed without paid calls.",
+    "discarded_approach": "An added in-memory body-forwarding test exposed HTTP middleware incompatibility. The middleware approach was removed; the final local service guard runs after normal API body parsing, forwards valid requests unchanged, and rejects mismatched budgets before starting. Final 14 free tests pass."
+  },
+  "rework_observation": {
+    "run_id": "83e2695d-0c63-41d2-88ab-db1b1c08b34b",
+    "rounds": 1,
+    "queries_before": 8,
+    "queries_after": 8,
+    "new_observations": 0,
+    "changed_targets": [
+      "C2"
+    ],
+    "revised_target_reviewed_again": true,
+    "tool_budget_already_exhausted": true,
+    "meaning": "The actual revision/review path was exercised; this is not a successful new-evidence acquisition or a semantic-accuracy improvement claim."
+  },
+  "automatic_approval_review": {
+    "rejected_action": "Online negative POST with mismatched model budget",
+    "executed": false,
+    "reason": "If rejection protection failed, it could start an unapproved alternative-budget paid diagnosis.",
+    "safer_alternative": "Offline mismatch rejection test and GET-only post-restart verification.",
+    "required_user_goal_blocked": false
+  },
+  "limitations": [
+    "Only two previously available synthetic development cases; not a blind or production RCA evaluation.",
+    "Both completed statuses are native workflow outcomes, not two verified root-cause successes.",
+    "Second-run rework only revised wording; the tool budget was exhausted, no new evidence was acquired.",
+    "Current report causal wording still requires independent review; no human adjudication or new accuracy metric is claimed.",
+    "UI welcome text still mentions five Agents from the legacy interface; actual frozen runtime specs are v2 closed loop.",
+    "Browser refresh intentionally requires reauthentication because the token is memory-only.",
+    "The Flash alias is fixed, but provider internal weights are not proven pinned.",
+    "No application-source, prompt, default-engine, daily data-source or repair-permission change.",
+    "Online wrong-budget negative test was rejected by automatic approval and was not sent."
+  ],
+  "sources": {
+    "helpers": [
+      {
+        "path": "scripts/demo_frontend_live_acceptance.py",
+        "sha256": "837cd17a5086955c56a4860f74c1aedd0ae5acb02090c6e387d955f26ebec04d"
+      },
+      {
+        "path": "scripts/check_frontend_live_acceptance.py",
+        "sha256": "27e95864b03ab4377bbd312029c48d82a3ddf7c61e485090aaf5ef5a76772d4a"
+      },
+      {
+        "path": "tests/evals/test_frontend_live_acceptance.py",
+        "sha256": "9b4d0ba8d9d782bbbde95037d8ef21b89e8f9abce7d8d69875612d950f3e7d75"
+      }
+    ],
+    "run_artifacts": [
+      {
+        "run_id": "c6b716dc-58a2-480e-a31c-a2d8e08b1bd3",
+        "native_http": {
+          "path": "output/frontend-live-acceptance-20261018/http-final/runs/c6b716dc-58a2-480e-a31c-a2d8e08b1bd3.json",
+          "sha256": "d4ee14aabc445417dc395b9ab7574a5ffa495f400cd082d1a3a210c0c6c09e99"
+        },
+        "sse_events": {
+          "path": "output/frontend-live-acceptance-20261018/http-final/events/c6b716dc-58a2-480e-a31c-a2d8e08b1bd3.json",
+          "sha256": "a80c16db81246a42fb3d79fd52861adc42347caf58de452e361c8430283dd0b7"
+        }
+      },
+      {
+        "run_id": "83e2695d-0c63-41d2-88ab-db1b1c08b34b",
+        "native_http": {
+          "path": "output/frontend-live-acceptance-20261018/http-final/runs/83e2695d-0c63-41d2-88ab-db1b1c08b34b.json",
+          "sha256": "6d71543af8c78ffaa299566150bdddaf99377b2fc7aab266aad8cc1b81d94abb"
+        },
+        "sse_events": {
+          "path": "output/frontend-live-acceptance-20261018/http-final/events/83e2695d-0c63-41d2-88ab-db1b1c08b34b.json",
+          "sha256": "d38cb2b49b07af1b91fb08c46444fcf9fbaee895022d5c4d035653f56285b404"
+        }
+      }
+    ],
+    "session": {
+      "path": "output/frontend-live-acceptance-20261018/server/session.json",
+      "sha256": "c59748a5f550298aef90b7dad85c3be76bd1fb030d9f77b0afcec4e42eeaa79c"
+    }
+  },
+  "reproduction": {
+    "serve": "Set FRONTEND_ACCEPTANCE_DSN to the existing isolated loopback *_test DSN; run .venv/Scripts/python.exe scripts/demo_frontend_live_acceptance.py --serve --port 8176. Existing model credentials are read privately from current configuration.",
+    "ui": "Open http://127.0.0.1:8176; use the existing synthetic demo token; create a development-case incident; choose live and budgets 16/8 before starting.",
+    "read_only_check": "python scripts/check_frontend_live_acceptance.py --run-id c6b716dc-58a2-480e-a31c-a2d8e08b1bd3 --run-id 83e2695d-0c63-41d2-88ab-db1b1c08b34b"
+  }
+}
