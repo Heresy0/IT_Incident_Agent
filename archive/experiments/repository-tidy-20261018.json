@@ -1,0 +1,158 @@
+{
+  "schema_version": "repository-tidy-validation-v1",
+  "date": "2026-10-18",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "5410b6045eae1911acc9799012993676d7e0dae2",
+  "status": "passed",
+  "scope": "Documentation entry, indexed experiment archival and rebuildable bytecode cleanup; no runtime behavior changes.",
+  "archive_method": "Keep frozen evidence, experiments, tests and rollback source at original paths; group through archive index. Archive former root README with historical banner and rebased relative links.",
+  "existing_tracked_documents_changed": [
+    "README.md",
+    "README_LOCAL.md"
+  ],
+  "new_tracked_documents": [
+    "examples/current-v2.md",
+    "archive/experiments/README.md",
+    "archive/experiments/legacy-default-README.md"
+  ],
+  "new_local_ignored_document": "docs/README.md",
+  "original_files_checked": 6779,
+  "changed_original_files": [
+    "README.md",
+    "README_LOCAL.md"
+  ],
+  "preservation": {
+    "application": {
+      "files": 107,
+      "unchanged": true
+    },
+    "frontend_including_served_dist": {
+      "files": 25,
+      "unchanged": true
+    },
+    "original_evaluations_and_fixtures": {
+      "files": 495,
+      "unchanged": true
+    },
+    "original_output_and_logs": {
+      "files": 5538,
+      "unchanged": true
+    },
+    "original_local_documents": {
+      "files": 113,
+      "unchanged": true
+    },
+    "rollback_archive_and_historic_examples": {
+      "files": 192,
+      "unchanged": true
+    },
+    "scripts_and_tests": {
+      "files": 208,
+      "unchanged": true
+    }
+  },
+  "original_uncommitted_files": {
+    "app/agents/prompts.py": {
+      "unchanged": true,
+      "sha256": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37"
+    },
+    "evals/multi-prompt-simplification-validation-20261017.json": {
+      "unchanged": true,
+      "sha256": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197"
+    },
+    "tests/workflow/test_prompt_query_boundaries.py": {
+      "unchanged": true,
+      "sha256": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    }
+  },
+  "application_fingerprint": "6314e5e1a65e932c",
+  "application_fingerprint_unchanged": true,
+  "cleanup": {
+    "removed_cache_directories": 34,
+    "removed_cache_files": 351,
+    "removed_cache_bytes": 5380064,
+    "removed_duplicate_logs": 0,
+    "log_retention_reason": "Frozen references or active demo directory; original logs preserved."
+  },
+  "duplicate_log_audit": {
+    "text_reference_files_scanned": 6543,
+    "identical_content_groups": 10,
+    "unreferenced_log_candidates": [
+      "output/frontend-live-acceptance-20261018/server/runtime-after-restart.log"
+    ],
+    "excluded_active_runtime_directory": "output/frontend-live-acceptance-20261018/server/",
+    "deleted_logs": [],
+    "result": "All repeated logs retained because frozen references exist or they are inside the active demo directory."
+  },
+  "verification": {
+    "archive_and_import_boundary_tests": {
+      "passed": 2,
+      "failed": 0
+    },
+    "synthetic_development_fixtures_checked": 6,
+    "documentation_local_targets_checked": 178,
+    "documentation_missing_targets": [],
+    "full_regression_run": false,
+    "directory_level_probe": "Stopped at unrelated local TestClient API case after no progress; not counted as passing. No application change was made to address it.",
+    "test_log_restoration": {
+      "original_log_restored": true,
+      "appended_bytes_archived": 110239
+    },
+    "original_readme_backup_exact": true,
+    "archived_readme_body_preserved_except_relative_links": true,
+    "git_diff_check_passed": true
+  },
+  "demo_8176": {
+    "http_checks_before": 44,
+    "http_checks_after": 44,
+    "all_http_checks_passed": true,
+    "server_status_byte_equivalent_json": true,
+    "server_restarted": false,
+    "same_two_live_reports_and_five_original_runs": true,
+    "live_report_sha256": {
+      "c6b716dc-58a2-480e-a31c-a2d8e08b1bd3": "e0a1c687559629df9659a8e6834d5149121db5782c0a0c9f7ab95575cc37db15",
+      "83e2695d-0c63-41d2-88ab-db1b1c08b34b": "6673c02c3acfd3ed9b349ff520afcd01f825619919a2cd4c5d144b7119390590"
+    },
+    "model_calls_before": 23,
+    "model_calls_after": 23,
+    "cleanup_paid_model_calls": 0,
+    "served_frontend_assets_changed": false,
+    "runtime_configuration_and_persistent_ledger_changed": false,
+    "database_or_container_operations": false
+  },
+  "local_audit_artifacts": [
+    {
+      "path": "output/repository-tidy-20261018/before-files.json",
+      "sha256": "b9dd52ce3f75ce187b0be60ea1c7c9cc70eafaf196d3651908a83cacea1f7521"
+    },
+    {
+      "path": "output/repository-tidy-20261018/cleanup-plan.json",
+      "sha256": "fb6ef53db75149235829ccc534494ca0ddf0aee6386f821b4f5bfcc7a51ae900"
+    },
+    {
+      "path": "output/repository-tidy-20261018/removed-caches.json",
+      "sha256": "04e2ca94111f9d3bf44c4108c4fc544f1c786cf715330cd1ed3d27913a145d89"
+    },
+    {
+      "path": "output/repository-tidy-20261018/preservation.json",
+      "sha256": "cac3d335abe076b446f5c846f819dc231f7f81bcb4fedf6ace0eeee6dc249257"
+    },
+    {
+      "path": "output/repository-tidy-20261018/structure-tests.log",
+      "sha256": "445ef703796a4b6cd26af932f83ebc33068a68c5818d6c50243f9fc9fe053202"
+    },
+    {
+      "path": "output/repository-tidy-20261018/fixtures-check.log",
+      "sha256": "6cbae4aa2bccceeeb6fc841060a8258616b143369351e5856596487602766b54"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/tidy-before/receipt.json",
+      "sha256": "d7c69151ae40baf863de6820616368589bbd369ac6e62baaecf8818ebf2326a4"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/tidy-after/receipt.json",
+      "sha256": "d7c69151ae40baf863de6820616368589bbd369ac6e62baaecf8818ebf2326a4"
+    }
+  ],
+  "evaluation_quality_scored": false
+}
