@@ -6,14 +6,16 @@
 
 | 入口 | 实际含义 |
 | --- | --- |
-| `scripts/demo_frontend_live_acceptance.py --serve` | 隔离的 8176 演示：真实 `qwen3.7-flash`，`autonomous_v2 / closed_loop`，启用 challenge 和最多一次语义返工 |
+| `scripts/demo_frontend_live_acceptance.py --serve --maximum-model-calls 55` | 本机现有账本的 8176 演示：真实 `qwen3.7-flash`，`autonomous_v2 / closed_loop`，启用 challenge 和最多一次语义返工 |
 | `WorkflowService`、普通后端与 `main.py` | 默认 `autonomous_v2 / closed_loop`；显式旧引擎配置报错，准入失败拒绝启动 |
 | `scripts/demo_frontend_acceptance.py` | 保存报告的回放与脚本控制验收；与真实演示共用 frontend_demo_support 的身份和环境校验 |
 | 归档中的 `scripts/demo_standard_flow.py` | 恢复完整旧版后免费排练；不计自主模型质量 |
 
 本机 8176 已在运行，前端是 `front/agent_front/dist/` 中的 Vue 构建产物，使用隔离 PostgreSQL。真实模型配合合成 fixture 观测，未连接生产故障或真实修复执行器。克隆代码不会自动恢复这些本地资源。
 
-演示配置由 [live 辅助脚本](../scripts/demo_frontend_live_acceptance.py)显式建立，不修改日常配置：每次运行固定最多 16 次模型、8 次工具、180 秒；全局付费请求上限 32 次，记账文件为 `output/frontend-live-acceptance-20261018/server/model-ledger.json`。整理前已用 23 次。这些是本次演示的预算，不是建议修改所有入口的默认预算。
+演示配置由 [live 辅助脚本](../scripts/demo_frontend_live_acceptance.py)显式建立，不修改日常配置：每次运行固定最多 16 次模型、8 次工具、180 秒。记账文件为 `output/frontend-live-acceptance-20261018/server/model-ledger.json`，本次获用户授权后将总上限从 32 增至 55，保留原有 23 次调用并追加扩额记录；补做两次诊断后累计 47 次、剩余 8 次。这些是本次演示的预算，不是所有入口的默认预算。
+
+重启本机现有演示需沿用原数据库、原 output 目录及 `--maximum-model-calls 55`。首次扩额时显式使用 `--extend-ledger`，先停止旧服务；账本会记录旧上限、新上限、既有调用数和既有调用内容摘要。后续相同上限的重启不再次扩额，不允许静默重置或降低上限。默认新账本仍为 32 次；不要删除账本来重置额度。
 
 ## v2 代码怎样工作
 
@@ -35,19 +37,22 @@
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/check_frontend_live_acceptance.py `
-  --run-id c6b716dc-58a2-480e-a31c-a2d8e08b1bd3 `
-  --run-id 83e2695d-0c63-41d2-88ab-db1b1c08b34b `
-  --baseline output/frontend-live-acceptance-20261018/legacy-retirement-before/receipt.json `
+  --run-id 749a58b3-a2be-4102-a76f-cd87d0791646 `
+  --run-id a2634656-9003-41cf-8f18-1fea535e0756 `
   --output output/frontend-live-acceptance-20261018/manual-readonly-check
 ```
 
 该脚本只 GET 现有健康状态、报告和 SSE，并读取账本；不新建工单或发起模型调用。服务端同时检查现有工单的当前准入配置，不创建运行。`--baseline` 绑定历史报告的原始源码与内容；新运行准入则必须匹配当前源码。输出目录应直接位于 `output/frontend-live-acceptance-20261018/` 下，以便找到相邻的 `server/` 与 `before/` 记录。不要删除账本来重置调用额度，也不要删除正在被服务使用的前端构建目录。
 
-已有两次从前端创建并启动的真实 Flash 运行：一条取证后完成审阅，另一条经历质疑、一次修订及最终审阅；后者返工前已用完工具预算，返工期间没有取得新证据。因此只能据此证明闭环执行与交付，不能宣称该次返工改善了补证或证明根因正确。详见[原始验收摘要](../evals/frontend-live-validation-20261018.json)。
+退役后已用相同 Flash、案例和单次预算从前端新增两次真实运行，应用指纹为 `748b2a02ac1b54a3`：case_001 用 14 次模型、5 次工具、43.750 秒；case_003 用 10 次模型、6 次工具、27.828 秒。两次都完成取证、逐项审阅、语义挑战和报告交付，刷新页面重新登录后可回读，不增加调用；联合检查退役前后报告、历史记录、SSE 和账本的 76 项检查全部通过。
+
+这两次因 `NO_CURRENT_REVIEW_OBJECTION` 均未实际返工，本轮不声称已验证真实返工执行；对应控制路径由免费测试覆盖。退役前的 case_003 曾经历一次修订和最终审阅，但返工前已用完工具预算，未取得新证据。详见[退役后验收摘要](../evals/frontend-post-retirement-validation-20261018.json)及[原始验收摘要](../evals/frontend-live-validation-20261018.json)。
+
+完成交付不等于根因准确。case_001 本次有 6 次重复查询决策；case_003 的挑战模型直接比较请求速率与连接数并据此支持容量不足，存在量纲和因果论证不足的问题。后者如实记录为 AI 复核发现、待人工核验，不作为人工金标。本次未修改业务代码或扩大质量结论。
 
 ## 评估分开阅读
 
-下列质量数字属于各自冻结时点的源码。本轮旧版退役未新增模型调用或重新评分，只验证共享能力、运行入口、控制流程和历史报告交付。
+下列质量数字属于各自冻结时点的源码。旧版退役提交本身未新增模型调用；后续补做的前端验收新增 24 次真实调用，验证退役后执行与交付，没有重新评分根因准确率。
 
 | 要回答的问题 | 对应材料 | 解释边界 |
 | --- | --- | --- |

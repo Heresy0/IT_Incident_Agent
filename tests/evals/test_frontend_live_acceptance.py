@@ -79,6 +79,46 @@ class FrontendLiveGuards(unittest.TestCase):
             self.assertEqual(saved['run_id'], 'unit-run')
             self.assertEqual(saved['response_model'], MODEL)
 
+    def test_explicit_cap_extension_preserves_calls_and_records_authorization(self):
+        from scripts.demo_frontend_live_acceptance import digest
+        from runtime.context import ExecutionError
+        with self.temporary() as folder:
+            ledger = LiveLedger(folder, maximum=1)
+            ledger.admit('original-run', 'investigation', [])
+            path = Path(folder) / 'model-ledger.json'
+            original = json.loads(path.read_text(encoding='utf-8'))['calls']
+            extended = LiveLedger(folder, maximum=2, allow_extension=True, extension_reason='unit-authorized')
+            saved = json.loads(path.read_text(encoding='utf-8'))
+            self.assertEqual(saved['calls'], original)
+            extension = saved['budget_extensions'][0]
+            self.assertEqual(extension['previous_maximum_calls'], 1)
+            self.assertEqual(extension['maximum_calls'], 2)
+            self.assertEqual(extension['preserved_calls_sha256'], digest(original))
+            self.assertEqual(extension['reason'], 'unit-authorized')
+            self.assertEqual(extended.summary()['unknown_usage_calls'], 1)
+            extended.admit('new-run', 'reviewer', [])
+            restarted = LiveLedger(folder, maximum=2)
+            with self.assertRaises(ExecutionError):
+                restarted.admit('third-run', 'reviewer', [])
+            saved = json.loads(path.read_text(encoding='utf-8'))
+            self.assertEqual(saved['calls'][:1], original)
+            self.assertEqual(len(saved['budget_extensions']), 1)
+
+    def test_extension_cannot_lower_cap_change_model_or_omit_reason(self):
+        with self.temporary() as folder:
+            LiveLedger(folder, maximum=2)
+            path = Path(folder) / 'model-ledger.json'
+            before = path.read_bytes()
+            for maximum, allowed, reason in ((3, False, 'unit'), (3, True, None), (1, True, 'unit')):
+                with self.subTest(maximum=maximum, allowed=allowed, reason=reason), self.assertRaises(ValueError):
+                    LiveLedger(folder, maximum=maximum, allow_extension=allowed, extension_reason=reason)
+                self.assertEqual(path.read_bytes(), before)
+            saved = json.loads(before)
+            saved['model'] = 'different-model'
+            path.write_text(json.dumps(saved), encoding='utf-8')
+            with self.assertRaises(ValueError):
+                LiveLedger(folder, maximum=3, allow_extension=True, extension_reason='unit')
+
     def test_failed_request_is_not_retried_or_converted_to_zero_usage(self):
         from runtime.context import RunContext, activate, ExecutionError
         class Failing:
@@ -93,7 +133,7 @@ class FrontendLiveGuards(unittest.TestCase):
             self.assertEqual(inner.attempts, 1)
             self.assertEqual(ledger.summary()['unknown_usage_calls'], 1)
 
-    def test_exact_budget_admitted_with_closed_loop_and_other_budget_falls_back(self):
+    def test_exact_budget_admitted_with_closed_loop_and_other_budget_denied(self):
         from api.auth import Principal
         from config.incident import IncidentConfig
         from providers.registry import ServiceRegistry
@@ -106,7 +146,8 @@ class FrontendLiveGuards(unittest.TestCase):
             incident_rollout=RolloutPolicy(mode='off'))
         try:
             with self.temporary() as folder:
-                plan = configure_demo(service, Path(folder) / 'admission.json')
+                plan = configure_demo(service, Path(folder) / 'admission.json', maximum_model_calls=55)
+                self.assertEqual(plan['maximum_live_model_calls'], 55)
                 from providers.bound import catalog
                 fields = catalog(principal)[0]['fields']
                 fields['purpose'] = 'diagnosis'

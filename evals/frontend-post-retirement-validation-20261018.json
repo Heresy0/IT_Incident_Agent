@@ -1,0 +1,242 @@
+{
+  "schema_version": "frontend-post-retirement-real-flash-validation-v1",
+  "created_at_utc": "2026-10-18T14:54:04.361007+00:00",
+  "status": "execution_and_delivery_passed_real_rework_not_exercised_quality_unscored",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "79697526c45f8023c382a6bb113b9612791e1c61",
+  "application_source_version": "748b2a02ac1b54a3",
+  "scope": "退役后从真实 Vue 前端新建工单并启动 Flash；合成 fixture 观测、隔离数据库、真实付费调用。只调整验收设施，不改业务代码。",
+  "model": "qwen3.7-flash",
+  "engine": "autonomous_v2",
+  "variant": "closed_loop",
+  "per_run_budget": {
+    "model_calls": 16,
+    "tool_calls": 8,
+    "seconds": 180
+  },
+  "same_model_and_budget_as_prior_runs": true,
+  "current_configuration_sha256": "85562f08dd6c624ff7f10982a4581930baa1f2e9f341704febd0ae25e0eb8ba9",
+  "ledger": {
+    "before_calls": 23,
+    "previous_cap": 32,
+    "new_cap": 55,
+    "new_calls": 24,
+    "after_calls": 47,
+    "remaining_calls": 8,
+    "extension": [
+      {
+        "authorized_at_utc": "2026-10-18T14:40:20.649749+00:00",
+        "previous_maximum_calls": 32,
+        "maximum_calls": 55,
+        "additional_calls": 23,
+        "preserved_calls": 23,
+        "preserved_calls_sha256": "d0575cde4ec173659f6e493887702beb2c24a19accd754eb9b2672cf696d7657",
+        "reason": "explicit_user_requested_post_retirement_frontend_acceptance"
+      }
+    ],
+    "new_input_tokens": 114835,
+    "new_output_tokens": 4399,
+    "all_new_usage_known": true,
+    "is_vendor_bill": false,
+    "currency_cost_scored": false
+  },
+  "runs": [
+    {
+      "run_id": "749a58b3-a2be-4102-a76f-cd87d0791646",
+      "incident_id": "51a11130-41f9-4a24-bff0-aaa45f1d04f8",
+      "case_id": "case_001",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 14,
+      "tool_calls": 5,
+      "input_tokens": 67288,
+      "output_tokens": 2605,
+      "duration_ms": 43750,
+      "event_count": 101,
+      "challenge_count": 1,
+      "rework_rounds": 0,
+      "rework_reasons": [
+        "NO_CURRENT_REVIEW_OBJECTION"
+      ],
+      "evidence_count": 10,
+      "report_sha256": "5455a87ff582c07cfb064bb324ce30793383ebd3661cf6e283480d79b43532e2",
+      "native_run_sha256": "420fdb88816b0055e15cd01875db68a41c2307924f1433c6d595d2e010742dd6",
+      "source_version": "748b2a02ac1b54a3",
+      "repeated_query_decisions": 6,
+      "empty_tool_results": 1,
+      "protocol_failures": 0,
+      "protocol_failure_history": 0,
+      "protocol_errors": [],
+      "actual_rework_performed": false,
+      "key_observed_codes": [
+        "UPSTREAM_TIMEOUT",
+        "UPSTREAM_UNREACHABLE",
+        "DB_PING_OK"
+      ],
+      "deterministic_source_references_valid": true
+    },
+    {
+      "run_id": "a2634656-9003-41cf-8f18-1fea535e0756",
+      "incident_id": "082b3b42-e5fb-4acb-a008-9021992da479",
+      "case_id": "case_003",
+      "status": "completed",
+      "review_status": "passed",
+      "termination_reason": "FINISHED",
+      "model_calls": 10,
+      "tool_calls": 6,
+      "input_tokens": 47547,
+      "output_tokens": 1794,
+      "duration_ms": 27828,
+      "event_count": 79,
+      "challenge_count": 1,
+      "rework_rounds": 0,
+      "rework_reasons": [
+        "NO_CURRENT_REVIEW_OBJECTION"
+      ],
+      "evidence_count": 11,
+      "report_sha256": "d899c9cd529aaa8e3f6d03e2ecf66d1b10e62b1130e0f591cbd915cbb4dc63ca",
+      "native_run_sha256": "3e402aba62f67f19a3f8a449cc02b33cfddd7641dd685341637636b9e29944e4",
+      "source_version": "748b2a02ac1b54a3",
+      "repeated_query_decisions": 0,
+      "empty_tool_results": 2,
+      "protocol_failures": 0,
+      "protocol_failure_history": 0,
+      "protocol_errors": [],
+      "actual_rework_performed": false,
+      "key_observed_codes": [
+        "DB_PING_OK",
+        "POOL_ACQUIRE_TIMEOUT"
+      ],
+      "deterministic_source_references_valid": true
+    }
+  ],
+  "prior_comparison": [
+    {
+      "case_id": "case_001",
+      "prior_run_id": "c6b716dc-58a2-480e-a31c-a2d8e08b1bd3",
+      "new_run_id": "749a58b3-a2be-4102-a76f-cd87d0791646",
+      "prior": {
+        "model_calls": 7,
+        "tool_calls": 3,
+        "duration_ms": 24656,
+        "input_tokens": 27401,
+        "output_tokens": 1172,
+        "rework_rounds": 0
+      },
+      "new": {
+        "model_calls": 14,
+        "tool_calls": 5,
+        "duration_ms": 43750,
+        "input_tokens": 67288,
+        "output_tokens": 2605,
+        "rework_rounds": 0
+      },
+      "interpretation": "各时点每案例一次运行，不能据此归因性能变化或宣称准确率提高。"
+    },
+    {
+      "case_id": "case_003",
+      "prior_run_id": "83e2695d-0c63-41d2-88ab-db1b1c08b34b",
+      "new_run_id": "a2634656-9003-41cf-8f18-1fea535e0756",
+      "prior": {
+        "model_calls": 16,
+        "tool_calls": 8,
+        "duration_ms": 55594,
+        "input_tokens": 91763,
+        "output_tokens": 3199,
+        "rework_rounds": 1
+      },
+      "new": {
+        "model_calls": 10,
+        "tool_calls": 6,
+        "duration_ms": 27828,
+        "input_tokens": 47547,
+        "output_tokens": 1794,
+        "rework_rounds": 0
+      },
+      "interpretation": "各时点每案例一次运行，不能据此归因性能变化或宣称准确率提高。"
+    }
+  ],
+  "preservation": {
+    "app_and_served_frontend_unchanged": true,
+    "application_source_version": "748b2a02ac1b54a3",
+    "original_23_calls_unchanged": true,
+    "original_call_files_byte_unchanged": true,
+    "original_seven_runs_unchanged": true,
+    "original_evaluation_json_count": 381,
+    "original_evaluation_json_unchanged": true,
+    "original_local_credentials_unchanged": true,
+    "existing_dirty_files": "",
+    "existing_calls_preserved_in_backup": "output\\frontend-live-acceptance-20261018\\post-retirement-before\\server-backup"
+  },
+  "checks": {
+    "http_checks_passed": 76,
+    "http_checks_failed": 0,
+    "free_controls": {
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "paid_requests": 0,
+      "command": ".venv/Scripts/python.exe -m unittest tests.evals.test_frontend_live_acceptance tests.evals.test_frontend_acceptance tests.architecture.test_v2_retirement tests.workflow.test_review_closed_loop tests.workflow.test_closed_loop_publication tests.workflow.test_rework_query_recovery tests.workflow.test_semantic_challenge",
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": "D:\\code\\it_incident_agent\\app;D:\\code\\it_incident_agent"
+      },
+      "exit_code": 0,
+      "reported_elapsed_seconds": 6.744,
+      "provenance": "Summary transcribed from the completed command output; not a real-model quality result."
+    },
+    "deterministic_source_references_rechecked": {
+      "case_001": 14,
+      "case_003": 14
+    },
+    "deterministic_reference_recheck_scope": "Stored output.findings source references; semantic claims are not judged by this check.",
+    "new_live_runs_created_and_started_by_browser": 2,
+    "new_live_rework_rounds": 0,
+    "rework_gate_reason": "NO_CURRENT_REVIEW_OBJECTION",
+    "real_rework_branch_coverage": "本轮未触发；不能用退役前返工记录冒充退役后真实返工。",
+    "rework_control_tests_passed": true,
+    "both_reports_visible_in_browser": true,
+    "refresh_requires_original_demo_login": true,
+    "reports_visible_after_relogin_and_switch": true,
+    "model_calls_after_refresh_readback_and_final_gets": 47,
+    "historical_run_delivery_preserved": true
+  },
+  "semantic_review": {
+    "source": "AI",
+    "human_verified": false,
+    "is_gold": false,
+    "root_cause_accuracy_scored": false,
+    "formal_accuracy": null,
+    "finding": {
+      "case_id": "case_003",
+      "target_id": "C2",
+      "status": "AI发现，待人工核验",
+      "observation": "语义挑战将100 requests/s与20个连接直接比较，认为请求速率远超并发处理能力，仍给出covered。",
+      "reason": "请求速率与连接数单位不同，缺少连接持有时长或并发数据，不能仅凭该比较证明容量不足。已有满池及等待日志可支持资源争用，但不能补足这段容量论证。",
+      "does_not_establish": "不证明旧版退役引入了该语义问题；没有独立人工金标，不转换为准确率。"
+    }
+  },
+  "limitations": [
+    "仅两个合成案例、每案例一次新运行；不是统计意义上的质量非劣检验。",
+    "两次真实运行未触发返工；免费控制测试不替代真实返工覆盖。",
+    "case_001有6次重复查询决策，效率不稳定仍存在。",
+    "completed与模型审阅passed不等于根因正确；本轮没有重新评分根因准确率。",
+    "演示剩余8次总调用，少于单次16次上限，不保证下一次复杂运行完整。"
+  ],
+  "test_invocation_note": "最初直接unittest命令缺少供子进程继承的PYTHONPATH，导致一次app_main导入失败；按项目app与根目录配置后62项控制测试全部通过，未修改业务代码。",
+  "artifacts": {
+    "manifest": {
+      "path": "output/frontend-live-acceptance-20261018/post-retirement-final/artifact-manifest.json",
+      "sha256": "b78c6a0d2931362b448cb267f16c6d647f0e364d55910547c6bd9888fc055c0c"
+    },
+    "receipt": {
+      "path": "output/frontend-live-acceptance-20261018/post-retirement-final/receipt.json",
+      "sha256": "6aeccff8d4f4b5b330fa7cd13f4860a01f3470ba0a380888e015d7b9d7f9f1a9"
+    },
+    "browser_screenshot": "output/frontend-live-acceptance-20261018/post-retirement-after/case003-delivered.png"
+  },
+  "restart": "原数据库与output目录不变；scripts/demo_frontend_live_acceptance.py --serve --port 8176 --maximum-model-calls 55；重启不加额度、不清账。"
+}

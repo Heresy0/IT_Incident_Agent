@@ -65,7 +65,9 @@ class ClosedLoopDemoService(WorkflowService):
 
 class LiveLedger:
     """One persistent admission cap, including failed or unknown-usage calls."""
-    def __init__(self, folder, maximum=MODEL_CAP):
+    def __init__(self, folder, maximum=MODEL_CAP, *, allow_extension=False, extension_reason=None):
+        if type(maximum) is not int or maximum < 1:
+            raise ValueError('A positive integer model-call cap is required.')
         self.folder = Path(folder)
         self.folder.mkdir(parents=True, exist_ok=True)
         self.path = self.folder / 'model-ledger.json'
@@ -73,8 +75,20 @@ class LiveLedger:
         self.maximum = maximum
         if self.path.exists():
             saved = read(self.path)
-            if saved.get('maximum_calls') != maximum or saved.get('model') != MODEL:
+            if saved.get('model') != MODEL:
                 raise ValueError('Existing paid admission envelope changed; refusing reset.')
+            previous = saved.get('maximum_calls')
+            if previous != maximum:
+                if (not allow_extension or type(previous) is not int or maximum <= previous
+                        or not isinstance(extension_reason, str) or not extension_reason.strip()):
+                    raise ValueError('Existing paid admission envelope changed; explicit increase and reason required.')
+                saved.setdefault('budget_extensions', []).append({
+                    'authorized_at_utc': datetime.now(timezone.utc).isoformat(),
+                    'previous_maximum_calls': previous, 'maximum_calls': maximum,
+                    'additional_calls': maximum - previous, 'preserved_calls': len(saved['calls']),
+                    'preserved_calls_sha256': digest(saved['calls']), 'reason': extension_reason})
+                saved['maximum_calls'] = maximum
+                write(self.path, saved)
         else:
             write(self.path, {'schema_version': 'frontend-live-model-ledger-v1',
                 'model': MODEL, 'maximum_calls': maximum, 'calls': []})
@@ -143,7 +157,7 @@ class RecordedFlash:
             self.ledger.settle(row)
 
 
-def configure_demo(service, artifact):
+def configure_demo(service, artifact, *, maximum_model_calls=MODEL_CAP):
     """Bind the operator-requested demo admission to exact source and settings."""
     from runtime.version import implementation_version
     from workflow.rollout import RolloutPolicy, AcceptanceGate, configuration_fingerprint
@@ -163,7 +177,7 @@ def configure_demo(service, artifact):
             'model': MODEL, 'provider_host': urlsplit(config.base_url).hostname,
             'execution_mode': 'live', 'execution_variant': 'closed_loop',
             'enable_rework': True, 'enable_challenge': True, 'limits': limits,
-            'tenant': TENANT, 'service': SERVICE, 'maximum_live_model_calls': MODEL_CAP,
+            'tenant': TENANT, 'service': SERVICE, 'maximum_live_model_calls': maximum_model_calls,
             'planned_ui_cases': ['case_001', 'case_003'], 'fixture_observations_are_synthetic': True,
             'human_semantic_gold': False, 'production_quality_gate_changed': False,
             'repair_eligible': False}
@@ -182,10 +196,14 @@ def main(argv=None):
     parser.add_argument('--port', type=int, default=8176)
     parser.add_argument('--dsn-env', default='FRONTEND_ACCEPTANCE_DSN')
     parser.add_argument('--output', type=Path, default=ROOT / 'output/frontend-live-acceptance-20261018/server')
+    parser.add_argument('--maximum-model-calls', type=int, default=MODEL_CAP,
+                        help='Persistent total cap; existing calls continue counting.')
+    parser.add_argument('--extend-ledger', action='store_true',
+                        help='Explicitly increase the existing total cap without resetting calls; stop the old server first.')
     args = parser.parse_args(argv)
     if not args.serve:
         print(json.dumps({'plan_only': True, 'model': MODEL, 'loopback_only': True,
-            'execution_variant': 'closed_loop', 'maximum_live_model_calls': MODEL_CAP,
+            'execution_variant': 'closed_loop', 'maximum_live_model_calls': args.maximum_model_calls,
             'synthetic_observations': True, 'real_provider_calls': 0}))
         return 0
     validate_dsn(os.getenv(args.dsn_env, ''))
@@ -218,7 +236,8 @@ def main(argv=None):
         parser.error('This Flash acceptance is limited to the configured official DashScope endpoint.')
     dsn = os.environ[args.dsn_env]
     config = replace(base_config, model=MODEL, postgres_dsn=dsn)
-    ledger = LiveLedger(args.output)
+    ledger = LiveLedger(args.output, maximum=args.maximum_model_calls, allow_extension=args.extend_ledger,
+                        extension_reason='explicit_user_requested_post_retirement_frontend_acceptance')
     principal = Principal(TENANT, USER, 'operator')
     auth = args.output / 'auth.local.json'
     write(auth, {'principals': [{**principal.__dict__, 'token_sha256': hashlib.sha256(TOKEN.encode()).hexdigest()}]})
@@ -238,7 +257,7 @@ def main(argv=None):
         service = ClosedLoopDemoService('unused', store=store, config=config,
             incident_model_factory=factory, service_registry=ServiceRegistry([]),
             incident_engine='autonomous_v2', incident_rollout=RolloutPolicy(mode='off'), max_concurrency=1)
-        plan = configure_demo(service, args.output / 'admission.json')
+        plan = configure_demo(service, args.output / 'admission.json', maximum_model_calls=ledger.maximum)
         try:
             service.start()
             baseline = service.list_incidents(principal, 0, 100)
@@ -270,7 +289,7 @@ def main(argv=None):
                 app.mount('/', StaticFiles(directory=str(static), html=True), name='actual_vue_frontend')
                 write(args.output / 'session.json', session)
                 print(json.dumps({'url': session['base_url'], 'model': MODEL,
-                    'variant': 'closed_loop', 'max_model_calls_total': MODEL_CAP,
+                    'variant': 'closed_loop', 'max_model_calls_total': ledger.maximum,
                     'preserved_incidents': len(baseline), 'credential_values_logged': False}), flush=True)
                 uvicorn.run(app, host='127.0.0.1', port=args.port, access_log=False, log_level='warning')
         finally:
