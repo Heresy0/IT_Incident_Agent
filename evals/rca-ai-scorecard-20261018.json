@@ -1,0 +1,1850 @@
+{
+  "schema_version": "rca-ai-scorecard-v1",
+  "status": "scored",
+  "adjudication_source": "ai",
+  "reviewer_type": "ai",
+  "nonblind": true,
+  "human_verified": false,
+  "is_gold": false,
+  "human_verified_formal_metrics": null,
+  "candidate_case_count": 3,
+  "native_reports_scored": 18,
+  "ai_adjudicated_metrics": {
+    "native_experiment:e2e": {
+      "cases": 3,
+      "runs": 9,
+      "repeats_per_case": 3,
+      "strict_root_location_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "strict_root_location_case_majority": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0
+      },
+      "strict_root_location_case_all_repeats": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0
+      },
+      "mechanism_location": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "unknown_boundary": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "wrong_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "wrong_or_unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "cases_with_any_wrong_confirmation": 0,
+      "cases_with_any_unsupported_confirmation": 0,
+      "cases_with_any_boundary_overreach": 0,
+      "boundary_overreach": {
+        "numerator": 0,
+        "denominator": 6,
+        "rate": 0.0
+      },
+      "answerable_abstention": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "root_evidence_chain_sufficiency": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "mechanism_evidence_chain_sufficiency": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_condition_correct_run_rate": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_chain_correct_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "root_case_successes_out_of_repeats": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0
+      },
+      "independence_warning": "repetitions_and_variants_are_correlated_not_independent_incidents",
+      "completion_is_not_accuracy": true
+    },
+    "native_experiment:sufficient_evidence": {
+      "cases": 3,
+      "runs": 9,
+      "repeats_per_case": 3,
+      "strict_root_location_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "strict_root_location_case_majority": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0
+      },
+      "strict_root_location_case_all_repeats": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0
+      },
+      "mechanism_location": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "unknown_boundary": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "wrong_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "wrong_or_unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "cases_with_any_wrong_confirmation": 0,
+      "cases_with_any_unsupported_confirmation": 0,
+      "cases_with_any_boundary_overreach": 0,
+      "boundary_overreach": {
+        "numerator": 0,
+        "denominator": 6,
+        "rate": 0.0
+      },
+      "answerable_abstention": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333
+      },
+      "root_evidence_chain_sufficiency": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "mechanism_evidence_chain_sufficiency": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_condition_correct_run_rate": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_chain_correct_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "root_case_successes_out_of_repeats": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0
+      },
+      "independence_warning": "repetitions_and_variants_are_correlated_not_independent_incidents",
+      "completion_is_not_accuracy": true
+    }
+  },
+  "native_run_scores": [
+    {
+      "report_id": "RCA_ea1d682937078fb938d44901",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_001",
+      "repeat": 1,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": true,
+        "abstained_from_root": false,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": false,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": true,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_236beea63405e953ee6a5781",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_001",
+      "repeat": 1,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": false,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": false,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": true,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": true,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_84a343281fdb5521a6272c99",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_001",
+      "repeat": 2,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": true,
+        "abstained_from_root": false,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": true,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_55edb43649569862bf1cbd32",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_001",
+      "repeat": 2,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": true,
+        "abstained_from_root": false,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": false,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": true,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_4ae11e83d2fcf3ec259c7ae6",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_001",
+      "repeat": 3,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": true,
+        "abstained_from_root": false,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": false,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": true,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_bbc1416563f1f1d7b023d824",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_001",
+      "repeat": 3,
+      "identifiability": "root_identifiable",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": true,
+        "abstained_from_root": false,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": false,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": true,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_82509e6b96692e1f296ce918",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_019",
+      "repeat": 1,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_d56fb37b15772a18141cee9b",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_019",
+      "repeat": 1,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_004cbf0a09c48472c8119c50",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_019",
+      "repeat": 2,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_87026a22ad27f1343dd80366",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_019",
+      "repeat": 2,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_d5298683c05195bcda0066b3",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_019",
+      "repeat": 3,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_14307b1e6b47a57244ca24ee",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_019",
+      "repeat": 3,
+      "identifiability": "mechanism_only",
+      "judgment": {
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "mechanism_correct": true,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": true,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": true,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": true,
+        "causal_condition_correct": true,
+        "causal_chain_correct": true,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_1492940c4c3957a9e2cd3d95",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_025",
+      "repeat": 1,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_e7c46f76acab55b12cc0b60b",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_025",
+      "repeat": 1,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_718bb3df9ee287a6350c1e4c",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_025",
+      "repeat": 2,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": false,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": false
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_9193267b5d7291db15067772",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_025",
+      "repeat": 2,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_ed2b0b213fb4d9271597bdfc",
+      "condition": "native_experiment",
+      "mode": "e2e",
+      "case_id": "rca_candidate_025",
+      "repeat": 3,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": true
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    },
+    {
+      "report_id": "RCA_47dd58b2633036d894c8898f",
+      "condition": "native_experiment",
+      "mode": "sufficient_evidence",
+      "case_id": "rca_candidate_025",
+      "repeat": 3,
+      "identifiability": "not_identifiable",
+      "judgment": {
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "mechanism_correct": false,
+        "wrong_definitive_cause": false,
+        "root_claim_made": false,
+        "abstained_from_root": true,
+        "evidence_chain_sufficient": false,
+        "scope_correct": true,
+        "unsupported_definitive_cause": false,
+        "unknown_boundary_preserved": true,
+        "missing_discriminating_information_identified": true,
+        "discriminating_next_step_proposed": false,
+        "established_assertions_supported": false
+      },
+      "metrics": {
+        "strict_root_success": false,
+        "mechanism_success": false,
+        "unknown_boundary_success": false,
+        "wrong_confirmation": false,
+        "unsupported_confirmation": false,
+        "wrong_or_unsupported_confirmation": false,
+        "boundary_overreach": false,
+        "answerable_abstention": false,
+        "evidence_chain_sufficient": false,
+        "causal_condition_correct": false,
+        "causal_chain_correct": false,
+        "has_output": true,
+        "delivery_failed": false,
+        "mechanical_references_valid": true
+      }
+    }
+  ],
+  "discriminating_next_step_on_incomplete_root_cases": {
+    "e2e": {
+      "numerator": 0,
+      "denominator": 6,
+      "rate": 0.0
+    },
+    "sufficient_evidence": {
+      "numerator": 0,
+      "denominator": 6,
+      "rate": 0.0
+    }
+  },
+  "diagnostic_semantics": {
+    "reviewed_reports": 45,
+    "eligible_reports": 36,
+    "excluded_reports": 9,
+    "excluded_reasons": {
+      "Compound epistemic/all/unique-cause statement is ambiguous; retained for descriptive wording sensitivity only.": 3,
+      "ambiguous_metaclaim_universal_unique_causality": 3,
+      "compound_meta_claim_and_universal_uniqueness_ambiguity": 3
+    },
+    "accuracy": {
+      "primary": {
+        "numerator": 33,
+        "denominator": 36,
+        "rate": 0.9166666666666666
+      },
+      "final": {
+        "numerator": 30,
+        "denominator": 36,
+        "rate": 0.8333333333333334
+      }
+    },
+    "groups": [
+      {
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v2",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v2",
+        "runs": 3,
+        "primary": {
+          "numerator": 0,
+          "denominator": 3,
+          "rate": 0.0
+        },
+        "final": {
+          "numerator": 0,
+          "denominator": 3,
+          "rate": 0.0
+        }
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v2",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "full_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "no_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "wrong_field",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "full_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "no_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "wrong_field",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "full_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "no_refs",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "wrong_field",
+        "runs": 3,
+        "primary": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "final": {
+          "numerator": 0,
+          "denominator": 3,
+          "rate": 0.0
+        }
+      }
+    ],
+    "run_scores": [
+      {
+        "report_id": "RCI_ef444f85c05faf1c06bed1d9",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v1",
+        "repeat": 1,
+        "eligible": false,
+        "exclusion_reason": "Compound epistemic/all/unique-cause statement is ambiguous; retained for descriptive wording sensitivity only.",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_f8d89ef912b9bc8d3a16305f",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v2",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_ea5cbdc9b332f4df4e49a5f3",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "full_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_99e6e8ce2cbb657440462096",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "no_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_c65a6a4e0a68cd37e4ba20dc",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "wrong_field",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_aaccc51933e3b79f5c929e68",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v2",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_597b2f61e04d33ce68f1fc4d",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v1",
+        "repeat": 2,
+        "eligible": false,
+        "exclusion_reason": "Compound epistemic/all/unique-cause statement is ambiguous; retained for descriptive wording sensitivity only.",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_accfff198991e2b7d946612d",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "no_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_c0a1547619489410d6fa4a12",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "wrong_field",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_0218489463ad69da247e3025",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "full_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_975221f006c6ee3e1c1ecab3",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v1",
+        "repeat": 3,
+        "eligible": false,
+        "exclusion_reason": "Compound epistemic/all/unique-cause statement is ambiguous; retained for descriptive wording sensitivity only.",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_7e5f4d27072f94ed12f5dfd0",
+        "case_id": "rca_candidate_001",
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v2",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_62b8515166a66abd0c782083",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "wrong_field",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_87d4b150969e74e72853327b",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "full_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_04403dfcc74159d7df586948",
+        "case_id": "rca_candidate_001",
+        "group_id": "reproduced_001_refs",
+        "condition": "no_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_d79572715c8869f473f865fb",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v2",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": false,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_44d11d2f695d1e843e270eb4",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v1",
+        "repeat": 1,
+        "eligible": false,
+        "exclusion_reason": "ambiguous_metaclaim_universal_unique_causality",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_fa58978b303842ad426349d7",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "no_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_8a66883dd8b1a4fdf7e90fa9",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "wrong_field",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_03e2bb3c40daa51f545915bd",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "full_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_2e06602787b479c7109e70df",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v1",
+        "repeat": 2,
+        "eligible": false,
+        "exclusion_reason": "ambiguous_metaclaim_universal_unique_causality",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_234c638896f96a9d66834016",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v2",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": false,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_90fd9e9cc8acb47289bb9c85",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "wrong_field",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_855e3cfaebc25579e5df001a",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "full_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_bed4a4d8e09406ce9a584ae8",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "no_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_3c3dc43b20b94a293fec5802",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v2",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": false,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_e27a8de9c680ac49378aaeea",
+        "case_id": "rca_candidate_019",
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v1",
+        "repeat": 3,
+        "eligible": false,
+        "exclusion_reason": "ambiguous_metaclaim_universal_unique_causality",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_a9ba165e17970ed43f7760e9",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "full_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_1bb21229549ea5a2f0f50ef9",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "no_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_b7f898918238fd8e7729d458",
+        "case_id": "rca_candidate_019",
+        "group_id": "reproduced_019_refs",
+        "condition": "wrong_field",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_f6e147d570cf15ef5a9edb3a",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v1",
+        "repeat": 1,
+        "eligible": false,
+        "exclusion_reason": "compound_meta_claim_and_universal_uniqueness_ambiguity",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_7ba58f122bf740a11b1b9554",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v2",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_990b934b44fff3f77db22193",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "wrong_field",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "partial",
+        "primary_correct": true,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_6ad0de0c4fcb62bb49884dca",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "full_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_d81a54c644d4e1b2d351e11b",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "no_refs",
+        "repeat": 1,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_1e29aa4cd6a12bd02d7675d6",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v2",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_98a3b08029c08f6cb1c3d987",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v1",
+        "repeat": 2,
+        "eligible": false,
+        "exclusion_reason": "compound_meta_claim_and_universal_uniqueness_ambiguity",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_1a45d023bad16aa8737e01e1",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "full_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_25bfa1ea1d9a4bc1b8235c5a",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "no_refs",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_85a4a8a05b7cc57c98496764",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "wrong_field",
+        "repeat": 2,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "partial",
+        "primary_correct": true,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_62379684d0653b8631b84e0c",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v1",
+        "repeat": 3,
+        "eligible": false,
+        "exclusion_reason": "compound_meta_claim_and_universal_uniqueness_ambiguity",
+        "acceptable_relations": [],
+        "primary_relation": "contradicted",
+        "final_relation": "contradicted",
+        "primary_correct": null,
+        "final_correct": null
+      },
+      {
+        "report_id": "RCI_3fb6c393e4bffaca90c3c83d",
+        "case_id": "rca_candidate_025",
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v2",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "insufficient"
+        ],
+        "primary_relation": "insufficient",
+        "final_relation": "insufficient",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_8cf1703904fe9eea355723bd",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "no_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      },
+      {
+        "report_id": "RCI_639c6d3797724f447603b040",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "wrong_field",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "partial",
+        "primary_correct": true,
+        "final_correct": false
+      },
+      {
+        "report_id": "RCI_c8a05bc74db85bf4e51cb005",
+        "case_id": "rca_candidate_025",
+        "group_id": "reproduced_025_refs",
+        "condition": "full_refs",
+        "repeat": 3,
+        "eligible": true,
+        "exclusion_reason": null,
+        "acceptable_relations": [
+          "supported"
+        ],
+        "primary_relation": "supported",
+        "final_relation": "supported",
+        "primary_correct": true,
+        "final_correct": true
+      }
+    ]
+  },
+  "production_accuracy": null,
+  "independent_holdout_accuracy": null,
+  "limitations": [
+    "Completed AI adjudication; not a human attestation or independent human gold.",
+    "Three development cases with three correlated repetitions; no production accuracy claim.",
+    "Strict root, mechanism and unknown-boundary success have separate eligible denominators.",
+    "Historical ambiguous wording is retained but excluded from semantic accuracy.",
+    "Root scoring uses final published assertions; draft/review errors are recorded separately."
+  ],
+  "created_at_utc": "2026-10-18T09:14:50.947469+00:00",
+  "dataset_fingerprint": "47619a58ba7f6b9fc513d3056976efcc4336572a14a9131ed595b5ffbc7a0cb0",
+  "model": "qwen3.7-flash",
+  "inputs": {
+    "adjudication": {
+      "path": "evals/rca-ai-adjudication-20261018.json",
+      "sha256": "991029c4e8cc5fea2ccecb41f5faf751f6da397c2c7c24d8967a44adf90a5b57"
+    },
+    "native_bundle": {
+      "path": "D:\\code\\it_incident_agent\\output\\rca-integration-study-20261018\\native\\a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46\\bundle.json",
+      "sha256": "d318f2a72199e56391ee6842bf18d95ce433a7234fa5dedc1da7f81010957e6b"
+    },
+    "diagnostic_bundle": {
+      "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/bundle.json",
+      "sha256": "77a5aa08b78b6f03bd34a0463059c532c446d02275171db46167abf8b9810c93"
+    },
+    "scoring_source": {
+      "path": "evals/rca_scoring.py",
+      "sha256": "0b875b339d789dd6cb384595c1d423b4baee50434bf540b85154bdc2d54f4ec6"
+    },
+    "scoring_entrypoint": {
+      "path": "scripts/score_rca_ai_adjudication.py",
+      "sha256": "cee1176c3b41db9c607d378671fa31ef3058555309661359a495a7799f1d3492"
+    }
+  },
+  "citation_integrity": {
+    "status": "passed",
+    "citations_checked": 296,
+    "distinct_files": 73
+  },
+  "new_evaluated_provider_calls": 0
+}

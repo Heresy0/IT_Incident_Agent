@@ -1,0 +1,278 @@
+{
+  "schema_version": "rca-ai-scoring-validation-v1",
+  "status": "passed",
+  "created_at_utc": "2026-10-18T09:16:50.422410+00:00",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "656ab4cddd5494ae92b208d4adec031fa25fe1fb",
+  "scoring_complete": true,
+  "adjudication_source": "ai",
+  "nonblind": true,
+  "human_verified": false,
+  "is_gold": false,
+  "new_evaluated_provider_calls": 0,
+  "scorecard": {
+    "path": "evals/rca-ai-scorecard-20261018.json",
+    "sha256": "b02f3866f88618fbb1f95c3478392b6198b8aa0e74d3ad79ae5b9df1bd760af4"
+  },
+  "adjudication": {
+    "path": "evals/rca-ai-adjudication-20261018.json",
+    "sha256": "991029c4e8cc5fea2ccecb41f5faf751f6da397c2c7c24d8967a44adf90a5b57"
+  },
+  "preservation": {
+    "freeze": {
+      "path": "output/rca-adjudication-20261018/freeze.json",
+      "sha256": "32ba37546a81aeedd359d1befade0580fba23a0ce4592046b0d073757911e1ee"
+    },
+    "protected_files": 428,
+    "all_hashes_unchanged": true,
+    "business_python_files": 98,
+    "original_dirty_status": [
+      " M app/agents/prompts.py",
+      "?? evals/multi-prompt-simplification-validation-20261017.json",
+      "?? tests/workflow/test_prompt_query_boundaries.py"
+    ],
+    "original_human_review_documents_unchanged": true,
+    "original_scoring_formula_unchanged": true,
+    "original_datasets_reports_and_pending_summaries_unchanged": true
+  },
+  "automated_validation": {
+    "tests": 46,
+    "seconds": 18.594,
+    "log": {
+      "path": "output/rca-adjudication-20261018/scoring-tests-final.log",
+      "sha256": "8b47cfb9b4bd3e3eaccb0479d46086bfaa7ba65f36f65c9c1ba47906f4993b83"
+    },
+    "offline_score_replay_identical_except_timestamp": true,
+    "replay": {
+      "path": "output/rca-adjudication-20261018/replayed-scorecard.json",
+      "sha256": "21f16af25648ff4efb84c71f5e33e736dbaa83d53e375bf1760c0a87aa9bf2b4"
+    },
+    "citation_integrity": {
+      "status": "passed",
+      "citations_checked": 296,
+      "distinct_files": 73
+    },
+    "source": [
+      {
+        "path": "scripts/score_rca_ai_adjudication.py",
+        "sha256": "cee1176c3b41db9c607d378671fa31ef3058555309661359a495a7799f1d3492"
+      },
+      {
+        "path": "tests/evals/test_rca_ai_adjudication.py",
+        "sha256": "759953b4977cfb5c7480eb6bbd4ad6c8fc1be3a12415b17ce7fb4fcd94de50ee"
+      }
+    ]
+  },
+  "scores": {
+    "native_experiment:e2e": {
+      "cases": 3,
+      "runs": 9,
+      "repeats_per_case": 3,
+      "strict_root_location_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "strict_root_location_case_majority": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0
+      },
+      "strict_root_location_case_all_repeats": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0
+      },
+      "mechanism_location": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "unknown_boundary": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "wrong_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "wrong_or_unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "cases_with_any_wrong_confirmation": 0,
+      "cases_with_any_unsupported_confirmation": 0,
+      "cases_with_any_boundary_overreach": 0,
+      "boundary_overreach": {
+        "numerator": 0,
+        "denominator": 6,
+        "rate": 0.0
+      },
+      "answerable_abstention": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "root_evidence_chain_sufficiency": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "mechanism_evidence_chain_sufficiency": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_condition_correct_run_rate": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_chain_correct_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "root_case_successes_out_of_repeats": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0
+      },
+      "independence_warning": "repetitions_and_variants_are_correlated_not_independent_incidents",
+      "completion_is_not_accuracy": true
+    },
+    "native_experiment:sufficient_evidence": {
+      "cases": 3,
+      "runs": 9,
+      "repeats_per_case": 3,
+      "strict_root_location_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "strict_root_location_case_majority": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0
+      },
+      "strict_root_location_case_all_repeats": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0
+      },
+      "mechanism_location": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "unknown_boundary": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      },
+      "wrong_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "wrong_or_unsupported_confirmation": {
+        "numerator": 0,
+        "denominator": 9,
+        "rate": 0.0
+      },
+      "cases_with_any_wrong_confirmation": 0,
+      "cases_with_any_unsupported_confirmation": 0,
+      "cases_with_any_boundary_overreach": 0,
+      "boundary_overreach": {
+        "numerator": 0,
+        "denominator": 6,
+        "rate": 0.0
+      },
+      "answerable_abstention": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333
+      },
+      "root_evidence_chain_sufficiency": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "mechanism_evidence_chain_sufficiency": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_condition_correct_run_rate": {
+        "numerator": 3,
+        "denominator": 3,
+        "rate": 1.0
+      },
+      "causal_chain_correct_run_rate": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666
+      },
+      "root_case_successes_out_of_repeats": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0
+      },
+      "independence_warning": "repetitions_and_variants_are_correlated_not_independent_incidents",
+      "completion_is_not_accuracy": true
+    }
+  },
+  "diagnostic_label_accuracy": {
+    "primary": {
+      "numerator": 33,
+      "denominator": 36,
+      "rate": 0.9166666666666666
+    },
+    "final": {
+      "numerator": 30,
+      "denominator": 36,
+      "rate": 0.8333333333333334
+    }
+  },
+  "diagnostic_denominator": {
+    "eligible": 36,
+    "excluded_ambiguous_legacy": 9,
+    "reviewed": 45
+  },
+  "interpretation": [
+    "The main root score uses original whole-report equivalent-fact-path criteria, not a new explicit-citation requirement.",
+    "Explicit integration of the capacity-restoration contrast in the causal explanation remains a separate0/6 diagnostic.",
+    "Only one root-identifiable scenario was repeated three times in each stage. These are development-case AI-adjudicated scores, not production or independent-holdout accuracy.",
+    "An error in a draft, pending candidate, action boundary or review rationale is not silently counted as a final wrong confirmed root.",
+    "Fixed-review accuracy scores native relation labels; correct labels do not certify every word of the review rationale."
+  ],
+  "reproduction_argv": [
+    ".venv/Scripts/python.exe",
+    "scripts/score_rca_ai_adjudication.py",
+    "--adjudication",
+    "evals/rca-ai-adjudication-20261018.json",
+    "--native-bundle",
+    "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/bundle.json",
+    "--diagnostic-bundle",
+    "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/bundle.json",
+    "--dataset",
+    "evals/datasets/rca_reproduced_v1/manifest.json",
+    "--output",
+    "<new-scorecard.json>"
+  ]
+}
