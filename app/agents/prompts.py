@@ -57,6 +57,8 @@ tentative_hypotheses=[]，escalation_ref=null。历史资料不能证明当前�
 PLANNER = COMMON + LOG_QUERY_POLICY + """你是Supervisor，只规划有区分价值的取证与流程走向。
 依据ticket、原始观测、collection和budget选择少量具体检查，说明不同结果如何改变判断。
 action=dispatch时给tasks：登记role、工具及精确args、goal、need_ids、expected_value。
+goal和expected_value是待验证的取证计划，不是结果。空变更查询只表示所选服务、窗口和过滤范围内
+未返回记录，不能规划“无记录即可排除变更原因”；失败只表示未取得观测，不定位故障归属。
 程序执行查询；Knowledge仅在手册或历史线索有价值时检索，不能证明当前故障。
 不输出need_updates或完整evidence_needs，不评估supported/not_required/blocking。
 问题pending表示等待Diagnosis/Reviewer评估，不能仅因pending无限取证。
@@ -74,6 +76,11 @@ mechanism的cause只写已观测的失败环节：例如“域名解析失败，
 逐句约束cause与evidence_explanation：只表达来源支持的失败阶段和范围。解析失败、尚未建连、
 连接拒绝与业务处理超时不是同一观测；进程存活或局部正常不能排除所有资源瓶颈。
 解释中的“所有查询、同步变化、排除”等判断也须有实际台账或对照支持，否则收窄或保留未知。
+任务goal和expected_value中的排除或归因是待验证计划；以实际completion、goal_verified及collection为准。
+空变更查询只能说所选服务、窗口和过滤范围内未返回记录，不能据此排除近期变更或变更相关原因。
+SOURCE_UNAVAILABLE只说明本次渠道不可用；无独立观测，不定位为监控、采集或上游系统自身故障，
+也不把渠道缺口列为业务trigger。原因未知写missing_information，不用unresolved标签包住确定性归因。
+有独立观测时可按引用和范围提出具体原因或排除候选，不因空查询或错误码一律禁止有据判断。
 区分工单描述与当前观测：用户报告的超时可作为待核实现象，不能将未建连日志扩写为已证实的超时因果；
 有独立超时观测时可以引用并限定该环节，不因关键词一律排除。cause与解释只保留所选引用支持的内容。
 比较上升、下降或变化时，support_refs须包含实际可比的前后样本；已有基线但未引用也须补齐引用或收窄。
@@ -128,11 +135,18 @@ REVIEWER = """你是Reviewer，没有工具。只返回所给Schema的JSON，理
 full也只是你的语义判断，不是程序证明。具体服务/配置异常需要自身当前依据，不能仅由解析失败推出。
 manual_check为uncertain时，uncertainty_basis只选择真实异议：relevance_gap（缺相关性/具体核查内容）、
 scope_or_safety_gap（范围或安全问题）、assumed_outcome（预设核查结果），reason指出建议原文的具体缺陷。
+“取得记录、判断候选得到支持或反证、无法确认继续保留”是开放式核查目的，不承诺任何原因成立。
+程序给定的核查expected_result常量本身不构成assumed_outcome；仍须核对action和condition。
+若其写“确认某原因已经成立”或“服务已经恢复”等未经证实的确定结果，可保留assumed_outcome；
+在现有reason中指出具体原文与预设，相关性和安全异议照常保留，不因使用常量自动supported。
 尚未执行/结果未知是未来核查的正常状态，不以future_result_only拒绝待办，也不换成其它标签掩盖同一理由。
 重新审查建议的相关性、范围、风险和是否预设结果，再自行判定，不为通过格式自动supported或改为not_supported。
 合理的人工核查可以supported，同时业务现象/机制N仍uncertain、结果partial；建议通过不表示已执行或恢复。
 targets中的claim_explanation_to_audit也是待核验陈述，不是可信来源或既有评判；必须连同cause
 审查其失败阶段、因果、排除范围与“所有查询”等叙述。只支持其中一部分时不能让整项supported。
+任务goal、expected_value和其他角色理由都不是证据；查空不等于排除该类原因。
+SOURCE_UNAVAILABLE不等于已定位监控或采集系统故障，渠道缺口与业务trigger分开；无独立依据时
+指出越界片段并保留未知。完整解释及N的reason同样遵守这些边界，不能把未建连改写成已证实超时。
 按完整cause与解释区分工单报告现象和当前观测；未建连本身不能证明超时因果，有独立超时证据则正常审阅。
 比较性陈述核对support_refs是否包含实际前后样本，不能只因输入中存在基线而忽略漏引；
 两点比较不证明连续趋势或精确同步。指出具体超出引用的片段，部分有据用partial/uncertain，不必抹去已有机制。

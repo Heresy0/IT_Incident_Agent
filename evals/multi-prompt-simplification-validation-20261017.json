@@ -1,0 +1,119 @@
+{
+  "verification_kind": "multi_prompt_only_query_and_manual_boundaries_v1",
+  "application_version_before": "021a29451b985148",
+  "application_version_after": "8bf35d4cf2f9d978",
+  "changed_application_files": [
+    "app/agents/prompts.py"
+  ],
+  "changed_prompt_constants": [
+    "DIAGNOSIS",
+    "PLANNER",
+    "REVIEWER"
+  ],
+  "other_application_files_unchanged": 86,
+  "other_prompt_AST_unchanged": true,
+  "contracts_and_validation_branches_unchanged": true,
+  "models_budgets_publishers_and_single_prompt_unchanged": true,
+  "schema_versions_unchanged": {
+    "DiagnosisSelection": "2d24dd52f7ae",
+    "ReviewDecision": "7ad6cb86b214"
+  },
+  "prompt_sizes_characters_not_tokens": {
+    "DIAGNOSIS": {
+      "before_chars": 2470,
+      "after_chars": 2759,
+      "delta_chars": 289
+    },
+    "PLANNER": {
+      "before_chars": 1493,
+      "after_chars": 1593,
+      "delta_chars": 100
+    },
+    "REVIEWER": {
+      "before_chars": 2551,
+      "after_chars": 2926,
+      "delta_chars": 375
+    }
+  },
+  "new_regressions": {
+    "tests": 6,
+    "passed": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 7.188,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3480
+  },
+  "related": {
+    "tests": 137,
+    "passed": 137,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 24.563,
+    "successful": true,
+    "external_network_attempts": 0,
+    "credential_read_attempts": 0,
+    "paid_calls": 0,
+    "real_pair_retries": 0,
+    "frozen_files_unchanged": 3480
+  },
+  "full_suite_run_this_turn": false,
+  "single_behavior": {
+    "before_tests": 14,
+    "after_tests": 14,
+    "identical": true,
+    "probe_sha256": "6f77d777a4639da957099ed9259c7d8a457811665979a284c1075278c1da36a2"
+  },
+  "saved_record_audit": {
+    "mode": "read_only_existing_records_no_rescoring",
+    "reports": [
+      {
+        "case_id": "eval_001",
+        "run_id": "407b7c78-616f-439c-9f07-ea2bcd97c60b",
+        "sha256": "81729f09ab9435726ac09f187aa7ba9f62d00a7de84c9e803493596434f21a1f"
+      },
+      {
+        "case_id": "eval_005",
+        "run_id": "f38ddc28-5548-4d3d-a189-c9757af0ff80",
+        "sha256": "517b53f747dd9a70537e46716c3c4dbb1c4c8499ad5eabf37003f1a9accc63fe"
+      }
+    ],
+    "confirmed_original_failures": [
+      "eval_001_legal_assumed_outcome_mislabel",
+      "eval_001_plan_and_hypothesis_empty_query_exclusion",
+      "eval_005_source_unavailable_fault_attribution"
+    ],
+    "note": "Original outputs and assistant judgments retained; no repaired output generated or formal score added."
+  },
+  "old_files_unchanged": 3480,
+  "bound_reports_unchanged": 6,
+  "v6_plan_artifacts_unchanged": 5,
+  "new_test_file": "tests/workflow/test_prompt_query_boundaries.py",
+  "paid_model_calls": 0,
+  "new_real_runs": 0,
+  "real_pair_reruns": 0,
+  "new_assistant_scores": 0,
+  "new_formal_human_scores": 0,
+  "independent_case_model_validation": "not_performed",
+  "limitations": [
+    "Scripted verdicts verify prompt delivery and existing execution controls, not real-model semantic quality.",
+    "A legal assumed_outcome mislabel and false full/supported hypothesis can still pass; no new semantic guard added.",
+    "Additional current observation is an in-memory synthetic positive control, not an independent evaluation case.",
+    "Cross-case generalization, Reviewer error rates, quality and resource changes require independent model validation.",
+    "Old frozen plans still bind their old source version and were not updated to authorize this source."
+  ],
+  "evidence_sha256": {
+    "preservation-before.json": "384cb70eb307822a97b5d36adbf64ede5983e82f872332223459389388417c87",
+    "prompts.before.py": "5affdc16c03f7e2c7ded69a2edbafaac0735c2da25f43f185b6d09bf73aac008",
+    "new-regressions.json": "5fcc91d36cf3923633ca3bc1074ddf211a74e166bfd8f5c831171b2ea1f53408",
+    "related.json": "584fc89bd3de99744393740f79c744ea7966af4e9c9f1c279fe7dbbaa9c2f6d7",
+    "single-before.json": "67a73800c65ec9e13121d3ba764e3f3e9058c830f6620894137c7e3ee54e0313",
+    "single-after.json": "d9b61902c3ad68ff35c48bf142f16a6670ce956ba556ddf213e9296fc66fcbcb"
+  }
+}
