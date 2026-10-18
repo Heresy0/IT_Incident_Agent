@@ -1,0 +1,104 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Executed local program; staging is an authorization label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "independent_observation_001",
+      "title": "Local request observation investigation",
+      "symptoms": "A local request returned an error or an unexpected result during the observed execution. Investigate using available sources.",
+      "scope": {
+        "service": "component_101",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_101",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"holder_transaction_open_during_failed_write\":[true,true,true],\"journal_mode_by_repeat\":[\"delete\",\"delete\",\"delete\"],\"transaction_statement\":\"BEGIN IMMEDIATE\",\"writer_busy_timeout_ms\":20}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_101",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"failed_write_results\":[{\"elapsed_ms\":77.8757999996742,\"error_code\":\"SQLITE_BUSY\",\"error_message\":\"database is locked\",\"error_number\":5,\"holder_transaction_open\":true,\"outcome\":\"failed\",\"repeat\":1},{\"elapsed_ms\":73.37049999841838,\"error_code\":\"SQLITE_BUSY\",\"error_message\":\"database is locked\",\"error_number\":5,\"holder_transaction_open\":true,\"outcome\":\"failed\",\"repeat\":2},{\"elapsed_ms\":68.8903999998729,\"error_code\":\"SQLITE_BUSY\",\"error_message\":\"database is locked\",\"error_number\":5,\"holder_transaction_open\":true,\"outcome\":\"failed\",\"repeat\":3}],\"operation\":\"UPDATE counters SET value = value + 1 WHERE id = 1\"}"
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_101",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"intervention\":\"rollback holder transaction; retry identical writer statement\",\"phase_order\":[\"baseline\",\"fault\",\"restored\"],\"phase_results\":[{\"committed_values\":[1,null,2],\"holder_transaction_open\":[false,true,false],\"outcomes\":[\"committed\",\"failed\",\"committed\"],\"repeat\":1},{\"committed_values\":[1,null,2],\"holder_transaction_open\":[false,true,false],\"outcomes\":[\"committed\",\"failed\",\"committed\"],\"repeat\":2},{\"committed_values\":[1,null,2],\"holder_transaction_open\":[false,true,false],\"outcomes\":[\"committed\",\"failed\",\"committed\"],\"repeat\":3}]}"
+      },
+      {
+        "id": "row_04",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_101",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"holder_transaction_closed_after_trial\":[true,true,true],\"writer_transaction_closed_after_trial\":[true,true,true]}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Executed local program; staging is an authorization label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "independent_observation_004",
+      "title": "Local request observation investigation",
+      "symptoms": "A local request returned an error or an unexpected result during the observed execution. Investigate using available sources.",
+      "scope": {
+        "service": "component_104",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_104",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"consumer_decoder_selection\":\"Content-Encoding header\",\"content_encoding_by_phase\":[\"gzip\",\"deflate\",\"gzip\"],\"observed_body_prefix_hex\":[\"1f8b0800\",\"1f8b0800\",\"1f8b0800\"]}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_104",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"decode_failures\":[{\"body_prefix_hex\":\"1f8b0800\",\"body_sha256\":\"a1e9a1844500cc08b3f8b2fd168915aef9a48dc5857f0faeabc33d1ab792af30\",\"content_encoding\":\"deflate\",\"encoded_bytes\":62,\"error_code\":\"DECOMPRESSION_FAILED\",\"error_message\":\"Error -3 while decompressing data: incorrect header check\",\"exception_type\":\"error\",\"outcome\":\"failed\",\"repeat\":1},{\"body_prefix_hex\":\"1f8b0800\",\"body_sha256\":\"e98f76aa36e785bf264506b2bd968a1c134781b824082d0e97e2b88a02680101\",\"content_encoding\":\"deflate\",\"encoded_bytes\":62,\"error_code\":\"DECOMPRESSION_FAILED\",\"error_message\":\"Error -3 while decompressing data: incorrect header check\",\"exception_type\":\"error\",\"outcome\":\"failed\",\"repeat\":2},{\"body_prefix_hex\":\"1f8b0800\",\"body_sha256\":\"13dd9ebc8508cad41d7d3ee1a53743b82bd2f1928acab91dd528d6b27425fdf9\",\"content_encoding\":\"deflate\",\"encoded_bytes\":62,\"error_code\":\"DECOMPRESSION_FAILED\",\"error_message\":\"Error -3 while decompressing data: incorrect header check\",\"exception_type\":\"error\",\"outcome\":\"failed\",\"repeat\":3}]}"
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_104",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"intervention\":\"set Content-Encoding from deflate to gzip; decode identical response bytes\",\"phase_order\":[\"baseline\",\"fault\",\"restored\"],\"phase_results\":[{\"body_identical_across_phases\":true,\"content_encodings\":[\"gzip\",\"deflate\",\"gzip\"],\"outcomes\":[\"decoded\",\"failed\",\"decoded\"],\"repeat\":1},{\"body_identical_across_phases\":true,\"content_encodings\":[\"gzip\",\"deflate\",\"gzip\"],\"outcomes\":[\"decoded\",\"failed\",\"decoded\"],\"repeat\":2},{\"body_identical_across_phases\":true,\"content_encodings\":[\"gzip\",\"deflate\",\"gzip\"],\"outcomes\":[\"decoded\",\"failed\",\"decoded\"],\"repeat\":3}]}"
+      },
+      {
+        "id": "row_04",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_104",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"body_identical_across_phases\":[true,true,true],\"gzip_roundtrip_matches_original\":[true,true,true]}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

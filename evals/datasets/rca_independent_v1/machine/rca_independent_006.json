@@ -1,0 +1,464 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_006",
+  "family": "character_decoder_mismatch",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "model_calls": 0,
+  "original_incident_reproduced": false,
+  "status": "passed",
+  "executed_at_utc": "2026-10-18T09:32:31.263402+00:00",
+  "wall_seconds": 0.0003632000007200986,
+  "parameters": {
+    "input_hex": "e8aea2e58d95e5b7b2e694afe4bb98",
+    "encodings": [
+      "utf-8",
+      "ascii",
+      "utf-8"
+    ],
+    "decode_errors_policy": "strict",
+    "repeats": 3
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "baseline": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      },
+      "fault": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      },
+      "restored": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "repeat": 2,
+      "baseline": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      },
+      "fault": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      },
+      "restored": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "repeat": 3,
+      "baseline": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      },
+      "fault": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      },
+      "restored": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_baseline_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_1_ascii_raises_unicode_decode_error",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      }
+    },
+    {
+      "check": "repeat_1_restored_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_1_fixed_bytes_and_strict_mode",
+      "passed": true,
+      "observed": {
+        "input_sha256": [
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+        ]
+      }
+    },
+    {
+      "check": "repeat_2_baseline_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_2_ascii_raises_unicode_decode_error",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      }
+    },
+    {
+      "check": "repeat_2_restored_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_2_fixed_bytes_and_strict_mode",
+      "passed": true,
+      "observed": {
+        "input_sha256": [
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+        ]
+      }
+    },
+    {
+      "check": "repeat_3_baseline_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_3_ascii_raises_unicode_decode_error",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "ascii",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": false,
+        "exception_type": "UnicodeDecodeError",
+        "exception_message": "'ascii' codec can't decode byte 0xe8 in position 0: ordinal not in range(128)",
+        "error_start": 0,
+        "error_end": 1,
+        "error_reason": "ordinal not in range(128)"
+      }
+    },
+    {
+      "check": "repeat_3_restored_utf8_decode",
+      "passed": true,
+      "observed": {
+        "configured_encoding": "utf-8",
+        "input_bytes": 15,
+        "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "decode_errors_policy": "strict",
+        "success": true,
+        "decoded_text": "订单已支付",
+        "decoded_utf8_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+        "exception_type": null
+      }
+    },
+    {
+      "check": "repeat_3_fixed_bytes_and_strict_mode",
+      "passed": true,
+      "observed": {
+        "input_sha256": [
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+          "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+        ]
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "measurements": [
+          {
+            "repeat": 1,
+            "before_encoding": "utf-8",
+            "changed_encoding": "ascii",
+            "input_bytes": 15,
+            "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+            "errors_policy": "strict"
+          },
+          {
+            "repeat": 2,
+            "before_encoding": "utf-8",
+            "changed_encoding": "ascii",
+            "input_bytes": 15,
+            "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+            "errors_policy": "strict"
+          },
+          {
+            "repeat": 3,
+            "before_encoding": "utf-8",
+            "changed_encoding": "ascii",
+            "input_bytes": 15,
+            "input_sha256": "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697",
+            "errors_policy": "strict"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "dependency",
+      "message": {
+        "columns": [
+          "repeat",
+          "configured_encoding",
+          "success",
+          "exception_type",
+          "error_start",
+          "error_end",
+          "error_reason"
+        ],
+        "measurements": [
+          [
+            1,
+            "ascii",
+            false,
+            "UnicodeDecodeError",
+            0,
+            1,
+            "ordinal not in range(128)"
+          ],
+          [
+            2,
+            "ascii",
+            false,
+            "UnicodeDecodeError",
+            0,
+            1,
+            "ordinal not in range(128)"
+          ],
+          [
+            3,
+            "ascii",
+            false,
+            "UnicodeDecodeError",
+            0,
+            1,
+            "ordinal not in range(128)"
+          ]
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "dependency",
+      "message": {
+        "columns": [
+          "repeat",
+          "before_encoding",
+          "before_success",
+          "before_decoded_text",
+          "restored_encoding",
+          "restored_success",
+          "restored_decoded_text",
+          "restored_input_sha256"
+        ],
+        "measurements": [
+          [
+            1,
+            "utf-8",
+            true,
+            "订单已支付",
+            "utf-8",
+            true,
+            "订单已支付",
+            "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+          ],
+          [
+            2,
+            "utf-8",
+            true,
+            "订单已支付",
+            "utf-8",
+            true,
+            "订单已支付",
+            "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+          ],
+          [
+            3,
+            "utf-8",
+            true,
+            "订单已支付",
+            "utf-8",
+            true,
+            "订单已支付",
+            "6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697"
+          ]
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The configured decoder changed from UTF-8 to ASCII while the input remained non-ASCII UTF-8.",
+    "mechanism": "Strict ASCII decoding rejects the first byte above 127 with UnicodeDecodeError.",
+    "reference_explanation": "Identical input hashes decode to the same text before and after UTF-8 restoration, but fail at byte zero under ASCII.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "decoder configuration mismatch",
+      "ASCII decoder on UTF-8 bytes",
+      "encoding mismatch",
+      "字符解码配置错误",
+      "用ASCII解码UTF8字节"
+    ],
+    "forbidden_assertions": [
+      "The input bytes changed or were truncated between phases.",
+      "The source database stored corrupted bytes."
+    ],
+    "limitations": [
+      "This is a Python bytes.decode experiment with one fixed Unicode payload.",
+      "It does not reproduce storage corruption or identify who changed a production configuration."
+    ]
+  },
+  "limitations": [
+    "This is a Python bytes.decode experiment with one fixed Unicode payload.",
+    "It does not reproduce storage corruption or identify who changed a production configuration."
+  ],
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

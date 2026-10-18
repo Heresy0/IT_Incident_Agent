@@ -1,0 +1,226 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_independent_006",
+  "split": "candidate_acceptance",
+  "independence_group": "independent_program_character_decoder_mismatch",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_106",
+    "time_window": {
+      "start": "2026-10-18T09:32:30.898461+00:00",
+      "end": "2026-10-18T09:32:32.449639+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "The configured decoder changed from UTF-8 to ASCII while the input remained non-ASCII UTF-8.",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "Identical input hashes decode to the same text before and after UTF-8 restoration, but fail at byte zero under ASCII."
+    }
+  ],
+  "reference_explanation": "Identical input hashes decode to the same text before and after UTF-8 restoration, but fail at byte zero under ASCII.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "Identical input hashes decode to the same text before and after UTF-8 restoration, but fail at byte zero under ASCII.",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Production behavior, original incidents and organizational causes are outside this local experiment."
+    ],
+    "forbidden_assertions": [
+      "The input bytes changed or were truncated between phases.",
+      "The source database stored corrupted bytes."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "观测记录row_01的类别为configuration。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "category"
+        ]
+      ],
+      "expected_relation": "supported"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_distinct_local_mechanism",
+    "reference_basis": "Actual controlled execution; final scored judgments are separately attributed to AI.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "One controlled case per distinct executable mechanism; repetitions are correlated."
+    ]
+  },
+  "reference_mechanism": {
+    "causal_condition": "The configured decoder changed from UTF-8 to ASCII while the input remained non-ASCII UTF-8.",
+    "mechanism": "Strict ASCII decoding rejects the first byte above 127 with UnicodeDecodeError.",
+    "reference_explanation": "Identical input hashes decode to the same text before and after UTF-8 restoration, but fail at byte zero under ASCII.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "decoder configuration mismatch",
+      "ASCII decoder on UTF-8 bytes",
+      "encoding mismatch",
+      "字符解码配置错误",
+      "用ASCII解码UTF8字节"
+    ],
+    "forbidden_assertions": [
+      "The input bytes changed or were truncated between phases.",
+      "The source database stored corrupted bytes."
+    ],
+    "limitations": [
+      "This is a Python bytes.decode experiment with one fixed Unicode payload.",
+      "It does not reproduce storage corruption or identify who changed a production configuration."
+    ]
+  },
+  "acquisition_eligibility": {
+    "required_evidence_available": true,
+    "initial_ticket_contains_required_evidence": false,
+    "rationale": "All key rows are query-reachable; neutral ticket contains symptoms and scope only, without observations or interventions."
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "40557f9fa07c0540bb22219a67d0db5caf6794998040d3957ff667c7ae7bd24c"
+    },
+    "artifacts": [
+      {
+        "path": "machine/rca_independent_006.json",
+        "sha256": "3e0cfaffa943c34503153ffad97a7abf5e1651acef989154134b138333f8862c",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_a.py",
+        "sha256": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_b.py",
+        "sha256": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_cases.py",
+        "sha256": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca_independent.py",
+        "sha256": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "input_hex": "e8aea2e58d95e5b7b2e694afe4bb98",
+      "encodings": [
+        "utf-8",
+        "ascii",
+        "utf-8"
+      ],
+      "decode_errors_policy": "strict",
+      "repeats": 3
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "This is a Python bytes.decode experiment with one fixed Unicode payload.",
+      "It does not reproduce storage corruption or identify who changed a production configuration."
+    ]
+  }
+}

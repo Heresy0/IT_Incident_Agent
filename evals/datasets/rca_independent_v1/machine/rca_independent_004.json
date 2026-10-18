@@ -1,0 +1,403 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_004",
+  "family": "gzip_content_encoding_mismatch",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "model_calls": 0,
+  "business_application_imported": false,
+  "original_incident_reproduced": false,
+  "parameters": {
+    "body_format": "gzip",
+    "gzip_mtime": 0,
+    "content_encoding_by_phase": [
+      "gzip",
+      "deflate",
+      "gzip"
+    ],
+    "consumer_decoder_selection": "Content-Encoding header"
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "baseline": {
+        "content_encoding": "gzip",
+        "body_sha256": "a1e9a1844500cc08b3f8b2fd168915aef9a48dc5857f0faeabc33d1ab792af30",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 1,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "eccdf854c27a71d2226273279d34a247e5e635e62aebf11da81f09047f1178d1",
+        "error_code": null
+      },
+      "fault": {
+        "content_encoding": "deflate",
+        "body_sha256": "a1e9a1844500cc08b3f8b2fd168915aef9a48dc5857f0faeabc33d1ab792af30",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "failed",
+        "error_code": "DECOMPRESSION_FAILED",
+        "exception_type": "error",
+        "error_message": "Error -3 while decompressing data: incorrect header check"
+      },
+      "restored": {
+        "content_encoding": "gzip",
+        "body_sha256": "a1e9a1844500cc08b3f8b2fd168915aef9a48dc5857f0faeabc33d1ab792af30",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 1,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "eccdf854c27a71d2226273279d34a247e5e635e62aebf11da81f09047f1178d1",
+        "error_code": null
+      },
+      "body_identical_across_phases": true,
+      "gzip_roundtrip_matches_original": true
+    },
+    {
+      "repeat": 2,
+      "baseline": {
+        "content_encoding": "gzip",
+        "body_sha256": "e98f76aa36e785bf264506b2bd968a1c134781b824082d0e97e2b88a02680101",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 2,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "454487ead284e0b2820f862b3ea086bf3bc95d23fea0318e9f4bede145cd296c",
+        "error_code": null
+      },
+      "fault": {
+        "content_encoding": "deflate",
+        "body_sha256": "e98f76aa36e785bf264506b2bd968a1c134781b824082d0e97e2b88a02680101",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "failed",
+        "error_code": "DECOMPRESSION_FAILED",
+        "exception_type": "error",
+        "error_message": "Error -3 while decompressing data: incorrect header check"
+      },
+      "restored": {
+        "content_encoding": "gzip",
+        "body_sha256": "e98f76aa36e785bf264506b2bd968a1c134781b824082d0e97e2b88a02680101",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 2,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "454487ead284e0b2820f862b3ea086bf3bc95d23fea0318e9f4bede145cd296c",
+        "error_code": null
+      },
+      "body_identical_across_phases": true,
+      "gzip_roundtrip_matches_original": true
+    },
+    {
+      "repeat": 3,
+      "baseline": {
+        "content_encoding": "gzip",
+        "body_sha256": "13dd9ebc8508cad41d7d3ee1a53743b82bd2f1928acab91dd528d6b27425fdf9",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 3,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "967632ef6c7695c4983d8f2ad2e826195f1bc17fa77bd6634e2c25408bec2357",
+        "error_code": null
+      },
+      "fault": {
+        "content_encoding": "deflate",
+        "body_sha256": "13dd9ebc8508cad41d7d3ee1a53743b82bd2f1928acab91dd528d6b27425fdf9",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "failed",
+        "error_code": "DECOMPRESSION_FAILED",
+        "exception_type": "error",
+        "error_message": "Error -3 while decompressing data: incorrect header check"
+      },
+      "restored": {
+        "content_encoding": "gzip",
+        "body_sha256": "13dd9ebc8508cad41d7d3ee1a53743b82bd2f1928acab91dd528d6b27425fdf9",
+        "body_prefix_hex": "1f8b0800",
+        "encoded_bytes": 62,
+        "outcome": "decoded",
+        "decoded_document": {
+          "request": 3,
+          "value": "local-observation"
+        },
+        "decoded_sha256": "967632ef6c7695c4983d8f2ad2e826195f1bc17fa77bd6634e2c25408bec2357",
+        "error_code": null
+      },
+      "body_identical_across_phases": true,
+      "gzip_roundtrip_matches_original": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_actual_gzip_baseline_decodes",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_mismatched_header_decoder_fails",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_corrected_header_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_wire_bytes_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_actual_gzip_baseline_decodes",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_mismatched_header_decoder_fails",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_corrected_header_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_wire_bytes_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_actual_gzip_baseline_decodes",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_mismatched_header_decoder_fails",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_corrected_header_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_wire_bytes_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "content_encoding_by_phase": [
+          "gzip",
+          "deflate",
+          "gzip"
+        ],
+        "consumer_decoder_selection": "Content-Encoding header",
+        "observed_body_prefix_hex": [
+          "1f8b0800",
+          "1f8b0800",
+          "1f8b0800"
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "dependency",
+      "message": {
+        "decode_failures": [
+          {
+            "repeat": 1,
+            "content_encoding": "deflate",
+            "body_sha256": "a1e9a1844500cc08b3f8b2fd168915aef9a48dc5857f0faeabc33d1ab792af30",
+            "body_prefix_hex": "1f8b0800",
+            "encoded_bytes": 62,
+            "outcome": "failed",
+            "error_code": "DECOMPRESSION_FAILED",
+            "exception_type": "error",
+            "error_message": "Error -3 while decompressing data: incorrect header check"
+          },
+          {
+            "repeat": 2,
+            "content_encoding": "deflate",
+            "body_sha256": "e98f76aa36e785bf264506b2bd968a1c134781b824082d0e97e2b88a02680101",
+            "body_prefix_hex": "1f8b0800",
+            "encoded_bytes": 62,
+            "outcome": "failed",
+            "error_code": "DECOMPRESSION_FAILED",
+            "exception_type": "error",
+            "error_message": "Error -3 while decompressing data: incorrect header check"
+          },
+          {
+            "repeat": 3,
+            "content_encoding": "deflate",
+            "body_sha256": "13dd9ebc8508cad41d7d3ee1a53743b82bd2f1928acab91dd528d6b27425fdf9",
+            "body_prefix_hex": "1f8b0800",
+            "encoded_bytes": 62,
+            "outcome": "failed",
+            "error_code": "DECOMPRESSION_FAILED",
+            "exception_type": "error",
+            "error_message": "Error -3 while decompressing data: incorrect header check"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "dependency",
+      "message": {
+        "intervention": "set Content-Encoding from deflate to gzip; decode identical response bytes",
+        "phase_order": [
+          "baseline",
+          "fault",
+          "restored"
+        ],
+        "phase_results": [
+          {
+            "repeat": 1,
+            "outcomes": [
+              "decoded",
+              "failed",
+              "decoded"
+            ],
+            "content_encodings": [
+              "gzip",
+              "deflate",
+              "gzip"
+            ],
+            "body_identical_across_phases": true
+          },
+          {
+            "repeat": 2,
+            "outcomes": [
+              "decoded",
+              "failed",
+              "decoded"
+            ],
+            "content_encodings": [
+              "gzip",
+              "deflate",
+              "gzip"
+            ],
+            "body_identical_across_phases": true
+          },
+          {
+            "repeat": 3,
+            "outcomes": [
+              "decoded",
+              "failed",
+              "decoded"
+            ],
+            "content_encodings": [
+              "gzip",
+              "deflate",
+              "gzip"
+            ],
+            "body_identical_across_phases": true
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_04",
+      "category": "dependency",
+      "message": {
+        "body_identical_across_phases": [
+          true,
+          true,
+          true
+        ],
+        "gzip_roundtrip_matches_original": [
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The Content-Encoding header changes to deflate although the response bytes remain a gzip stream.",
+    "mechanism": "The consumer follows the header and passes gzip bytes to the zlib deflate decoder, which fails; restoring gzip selects the matching decoder.",
+    "reference_explanation": "The encoded body SHA256 is identical in all three phases; changing only the declared encoding causes failure and changing it back restores the same document.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "Content-Encoding与gzip正文不一致",
+      "gzip数据被错误声明为deflate",
+      "wrong content-encoding selects incompatible decoder"
+    ],
+    "forbidden_assertions": [
+      "正文损坏已证实",
+      "网络截断已证实",
+      "TLS故障",
+      "数据库崩溃",
+      "production proxy incident"
+    ],
+    "limitations": [
+      "This uses local byte buffers and standard-library decoders; no HTTP server, proxy or network transfer is exercised.",
+      "It identifies a declared-encoding mismatch, not why a real deployment generated such a header."
+    ]
+  },
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

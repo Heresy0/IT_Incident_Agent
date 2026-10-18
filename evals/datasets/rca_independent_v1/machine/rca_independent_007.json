@@ -1,0 +1,772 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_007",
+  "family": "cache_invalidation_omission",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "model_calls": 0,
+  "original_incident_reproduced": false,
+  "status": "passed",
+  "executed_at_utc": "2026-10-18T09:32:31.263925+00:00",
+  "wall_seconds": 0.0004963999999745283,
+  "parameters": {
+    "storage": "in_memory_versioned_source_and_read_through_cache",
+    "lookup_key": "stock:item-42",
+    "initial_source_value": 12,
+    "updated_source_value": 9,
+    "invalidate_on_source_update": false,
+    "restoration_operation": "explicit_cache_invalidate",
+    "repeats": 3
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "baseline": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "fault": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      },
+      "restored": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "source_update": {
+        "before": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "after": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "invalidate_on_source_update": false,
+        "invalidations_performed": 0
+      },
+      "direct_source_read_control": {
+        "key": "stock:item-42",
+        "value": 9,
+        "version": 2
+      },
+      "invalidation": {
+        "key": "stock:item-42",
+        "removed": true,
+        "removed_entry_version": 1
+      }
+    },
+    {
+      "repeat": 2,
+      "baseline": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "fault": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      },
+      "restored": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "source_update": {
+        "before": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "after": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "invalidate_on_source_update": false,
+        "invalidations_performed": 0
+      },
+      "direct_source_read_control": {
+        "key": "stock:item-42",
+        "value": 9,
+        "version": 2
+      },
+      "invalidation": {
+        "key": "stock:item-42",
+        "removed": true,
+        "removed_entry_version": 1
+      }
+    },
+    {
+      "repeat": 3,
+      "baseline": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "fault": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      },
+      "restored": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      },
+      "source_update": {
+        "before": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "after": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "invalidate_on_source_update": false,
+        "invalidations_performed": 0
+      },
+      "direct_source_read_control": {
+        "key": "stock:item-42",
+        "value": 9,
+        "version": 2
+      },
+      "invalidation": {
+        "key": "stock:item-42",
+        "removed": true,
+        "removed_entry_version": 1
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_baseline_cache_miss_matches_source",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_1_source_update_leaves_stale_cached_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      }
+    },
+    {
+      "check": "repeat_1_eviction_refreshes_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_1_source_unchanged_during_cache_intervention",
+      "passed": true,
+      "observed": {
+        "direct_source_read_control": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "before_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "after_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        }
+      }
+    },
+    {
+      "check": "repeat_2_baseline_cache_miss_matches_source",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_2_source_update_leaves_stale_cached_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      }
+    },
+    {
+      "check": "repeat_2_eviction_refreshes_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_2_source_unchanged_during_cache_intervention",
+      "passed": true,
+      "observed": {
+        "direct_source_read_control": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "before_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "after_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        }
+      }
+    },
+    {
+      "check": "repeat_3_baseline_cache_miss_matches_source",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_3_source_update_leaves_stale_cached_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 12,
+          "version": 1,
+          "cache_hit": true,
+          "source_reads_for_lookup": 0
+        },
+        "invalidations_total": 0,
+        "observed_value_matches_source": false,
+        "observed_version_matches_source": false
+      }
+    },
+    {
+      "check": "repeat_3_eviction_refreshes_value",
+      "passed": true,
+      "observed": {
+        "lookup_key": "stock:item-42",
+        "source_snapshot": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "read_result": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2,
+          "cache_hit": false,
+          "source_reads_for_lookup": 1
+        },
+        "invalidations_total": 1,
+        "observed_value_matches_source": true,
+        "observed_version_matches_source": true
+      }
+    },
+    {
+      "check": "repeat_3_source_unchanged_during_cache_intervention",
+      "passed": true,
+      "observed": {
+        "direct_source_read_control": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "before_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        },
+        "after_eviction_source": {
+          "key": "stock:item-42",
+          "value": 9,
+          "version": 2
+        }
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "measurements": [
+          {
+            "repeat": 1,
+            "before": {
+              "key": "stock:item-42",
+              "value": 12,
+              "version": 1
+            },
+            "after": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            },
+            "invalidate_on_source_update": false,
+            "invalidations_performed": 0
+          },
+          {
+            "repeat": 2,
+            "before": {
+              "key": "stock:item-42",
+              "value": 12,
+              "version": 1
+            },
+            "after": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            },
+            "invalidate_on_source_update": false,
+            "invalidations_performed": 0
+          },
+          {
+            "repeat": 3,
+            "before": {
+              "key": "stock:item-42",
+              "value": 12,
+              "version": 1
+            },
+            "after": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            },
+            "invalidate_on_source_update": false,
+            "invalidations_performed": 0
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "resource",
+      "message": {
+        "columns": [
+          "repeat",
+          "lookup_key",
+          "source_value",
+          "source_version",
+          "cached_value",
+          "cached_version",
+          "cache_hit",
+          "source_reads_for_lookup",
+          "invalidations_total"
+        ],
+        "measurements": [
+          [
+            1,
+            "stock:item-42",
+            9,
+            2,
+            12,
+            1,
+            true,
+            0,
+            0
+          ],
+          [
+            2,
+            "stock:item-42",
+            9,
+            2,
+            12,
+            1,
+            true,
+            0,
+            0
+          ],
+          [
+            3,
+            "stock:item-42",
+            9,
+            2,
+            12,
+            1,
+            true,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "resource",
+      "message": {
+        "columns": [
+          "repeat",
+          "initial_read_value",
+          "initial_source_version",
+          "eviction_removed",
+          "evicted_version",
+          "after_source_value",
+          "after_source_version",
+          "after_read_value",
+          "after_read_version",
+          "after_cache_hit",
+          "after_source_reads"
+        ],
+        "measurements": [
+          [
+            1,
+            12,
+            1,
+            true,
+            1,
+            9,
+            2,
+            9,
+            2,
+            false,
+            1
+          ],
+          [
+            2,
+            12,
+            1,
+            true,
+            1,
+            9,
+            2,
+            9,
+            2,
+            false,
+            1
+          ],
+          [
+            3,
+            12,
+            1,
+            true,
+            1,
+            9,
+            2,
+            9,
+            2,
+            false,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "observation_id": "row_04",
+      "category": "resource",
+      "message": {
+        "measurements": [
+          {
+            "repeat": 1,
+            "direct_source_read": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            }
+          },
+          {
+            "repeat": 2,
+            "direct_source_read": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            }
+          },
+          {
+            "repeat": 3,
+            "direct_source_read": {
+              "key": "stock:item-42",
+              "value": 9,
+              "version": 2
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The source update did not invalidate an existing local cache entry.",
+    "mechanism": "The read-through cache returns its version-one entry without reading the updated version-two source; explicit eviction forces a fresh source read.",
+    "reference_explanation": "The source changes from value12/version1 to value9/version2 while cached reads remain12/version1. With source and lookup key unchanged, evicting that entry produces9/version2.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "resource"
+    ],
+    "acceptable_aliases": [
+      "missing cache invalidation",
+      "stale cache entry after source update",
+      "cache coherence failure",
+      "源数据更新未失效缓存",
+      "缓存陈旧",
+      "缓存失效缺失"
+    ],
+    "forbidden_assertions": [
+      "The source write failed.",
+      "Eviction permanently fixes future updates.",
+      "A real distributed Redis cluster was reproduced."
+    ],
+    "limitations": [
+      "This is one actual in-memory cache and source, without distributed consistency or a cache server.",
+      "Explicit eviction restores this lookup; automatic invalidation remains disabled, so future updates can reproduce the problem."
+    ]
+  },
+  "limitations": [
+    "This is one actual in-memory cache and source, without distributed consistency or a cache server.",
+    "Explicit eviction restores this lookup; automatic invalidation remains disabled, so future updates can reproduce the problem."
+  ],
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

@@ -78,4 +78,12 @@
 /evals/rca-ai-*.json -text
 /scripts/score_rca_ai_adjudication.py -text
 /tests/evals/test_rca_ai_adjudication.py -text
+/evals/datasets/rca_independent_v1/** -text
+/evals/rca-cross-case-*.json -text
+/evals/rca_independent*.py -text
+/evals/rca_cross_case_scoring.py -text
+/scripts/reproduce_rca_independent.py -text
+/scripts/summarize_rca_cross_case.py -text
+/tests/evals/test_rca_independent*.py -text
+/tests/evals/test_rca_cross_case_scoring.py -text
 /examples/showcase/interview-closeout-validation.json -text

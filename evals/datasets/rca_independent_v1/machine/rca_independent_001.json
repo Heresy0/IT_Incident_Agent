@@ -1,0 +1,352 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_001",
+  "family": "sqlite_transaction_write_lock",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "model_calls": 0,
+  "business_application_imported": false,
+  "original_incident_reproduced": false,
+  "parameters": {
+    "database_engine": "sqlite3",
+    "journal_mode": "DELETE",
+    "writer_timeout_ms": 20,
+    "holder_transaction": "BEGIN IMMEDIATE",
+    "statement": "UPDATE counters SET value = value + 1 WHERE id = 1"
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "journal_mode_observed": "delete",
+      "writer_busy_timeout_ms": 20,
+      "baseline": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 1,
+        "elapsed_ms": 6.560599998920225
+      },
+      "fault": {
+        "holder_transaction_open": true,
+        "outcome": "failed",
+        "error_code": "SQLITE_BUSY",
+        "error_number": 5,
+        "error_message": "database is locked",
+        "elapsed_ms": 77.8757999996742
+      },
+      "restored": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 2,
+        "elapsed_ms": 8.198800000172923
+      },
+      "holder_transaction_closed": true,
+      "writer_transaction_closed": true
+    },
+    {
+      "repeat": 2,
+      "journal_mode_observed": "delete",
+      "writer_busy_timeout_ms": 20,
+      "baseline": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 1,
+        "elapsed_ms": 6.651899999269517
+      },
+      "fault": {
+        "holder_transaction_open": true,
+        "outcome": "failed",
+        "error_code": "SQLITE_BUSY",
+        "error_number": 5,
+        "error_message": "database is locked",
+        "elapsed_ms": 73.37049999841838
+      },
+      "restored": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 2,
+        "elapsed_ms": 7.24380000065139
+      },
+      "holder_transaction_closed": true,
+      "writer_transaction_closed": true
+    },
+    {
+      "repeat": 3,
+      "journal_mode_observed": "delete",
+      "writer_busy_timeout_ms": 20,
+      "baseline": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 1,
+        "elapsed_ms": 8.921099999497528
+      },
+      "fault": {
+        "holder_transaction_open": true,
+        "outcome": "failed",
+        "error_code": "SQLITE_BUSY",
+        "error_number": 5,
+        "error_message": "database is locked",
+        "elapsed_ms": 68.8903999998729
+      },
+      "restored": {
+        "holder_transaction_open": false,
+        "outcome": "committed",
+        "error_code": null,
+        "value_after": 2,
+        "elapsed_ms": 6.861399999252171
+      },
+      "holder_transaction_closed": true,
+      "writer_transaction_closed": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_actual_lock_timeout",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_release_restores_same_write",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_connections_clean",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_actual_lock_timeout",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_release_restores_same_write",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_connections_clean",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_actual_lock_timeout",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_release_restores_same_write",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_connections_clean",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "writer_busy_timeout_ms": 20,
+        "transaction_statement": "BEGIN IMMEDIATE",
+        "journal_mode_by_repeat": [
+          "delete",
+          "delete",
+          "delete"
+        ],
+        "holder_transaction_open_during_failed_write": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "dependency",
+      "message": {
+        "operation": "UPDATE counters SET value = value + 1 WHERE id = 1",
+        "failed_write_results": [
+          {
+            "repeat": 1,
+            "holder_transaction_open": true,
+            "outcome": "failed",
+            "error_code": "SQLITE_BUSY",
+            "error_number": 5,
+            "error_message": "database is locked",
+            "elapsed_ms": 77.8757999996742
+          },
+          {
+            "repeat": 2,
+            "holder_transaction_open": true,
+            "outcome": "failed",
+            "error_code": "SQLITE_BUSY",
+            "error_number": 5,
+            "error_message": "database is locked",
+            "elapsed_ms": 73.37049999841838
+          },
+          {
+            "repeat": 3,
+            "holder_transaction_open": true,
+            "outcome": "failed",
+            "error_code": "SQLITE_BUSY",
+            "error_number": 5,
+            "error_message": "database is locked",
+            "elapsed_ms": 68.8903999998729
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "dependency",
+      "message": {
+        "intervention": "rollback holder transaction; retry identical writer statement",
+        "phase_results": [
+          {
+            "repeat": 1,
+            "outcomes": [
+              "committed",
+              "failed",
+              "committed"
+            ],
+            "committed_values": [
+              1,
+              null,
+              2
+            ],
+            "holder_transaction_open": [
+              false,
+              true,
+              false
+            ]
+          },
+          {
+            "repeat": 2,
+            "outcomes": [
+              "committed",
+              "failed",
+              "committed"
+            ],
+            "committed_values": [
+              1,
+              null,
+              2
+            ],
+            "holder_transaction_open": [
+              false,
+              true,
+              false
+            ]
+          },
+          {
+            "repeat": 3,
+            "outcomes": [
+              "committed",
+              "failed",
+              "committed"
+            ],
+            "committed_values": [
+              1,
+              null,
+              2
+            ],
+            "holder_transaction_open": [
+              false,
+              true,
+              false
+            ]
+          }
+        ],
+        "phase_order": [
+          "baseline",
+          "fault",
+          "restored"
+        ]
+      }
+    },
+    {
+      "observation_id": "row_04",
+      "category": "dependency",
+      "message": {
+        "holder_transaction_closed_after_trial": [
+          true,
+          true,
+          true
+        ],
+        "writer_transaction_closed_after_trial": [
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "An uncommitted BEGIN IMMEDIATE transaction holds the SQLite write lock while a second connection has a 20 ms busy timeout.",
+    "mechanism": "The second connection cannot acquire the database write lock and returns SQLITE_BUSY; rollback of the holder permits the identical write.",
+    "reference_explanation": "The same file and writer statement commit before contention and after releasing the holder; only the held-transaction phase returns SQLITE_BUSY.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "SQLite写锁被未提交事务持有",
+      "SQLite写事务锁竞争",
+      "未提交事务导致database is locked",
+      "SQLite writer lock contention"
+    ],
+    "forbidden_assertions": [
+      "数据库进程崩溃",
+      "网络超时",
+      "连接池耗尽",
+      "deadlock confirmed",
+      "production incident reproduced"
+    ],
+    "limitations": [
+      "A local SQLite file and two connections are exercised; no remote database or production incident is asserted.",
+      "This demonstrates bounded lock contention, not a database deadlock or the business reason the holder transaction was left open."
+    ]
+  },
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

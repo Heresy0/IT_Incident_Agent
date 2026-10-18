@@ -1,0 +1,104 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Executed local program; staging is an authorization label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "independent_observation_003",
+      "title": "Local request observation investigation",
+      "symptoms": "A local request returned an error or an unexpected result during the observed execution. Investigate using available sources.",
+      "scope": {
+        "service": "component_103",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_103",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"algorithm\":\"HMAC-SHA256\",\"phase_key_ids\":[{\"phase\":\"baseline\",\"signing_key_id\":\"generation_1\",\"verifier_key_id\":\"generation_1\"},{\"phase\":\"fault\",\"signing_key_id\":\"generation_2\",\"verifier_key_id\":\"generation_1\"},{\"phase\":\"restored\",\"signing_key_id\":\"generation_2\",\"verifier_key_id\":\"generation_2\"}]}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_103",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"verification_results\":[{\"error_code\":\"HMAC_SIGNATURE_MISMATCH\",\"outcome\":\"rejected\",\"payload_sha256\":\"a521d0ff61a0bb43db49490335ef780ae9337c01e609ffee33d4e3edd3286a99\",\"repeat\":1,\"signature_sha256\":\"5afb9905d2ff32c007af7b4f9e5cfe10e8695df016346461d06d28d4e9cdfa08\",\"signing_key_id\":\"generation_2\",\"verified\":false,\"verifier_key_id\":\"generation_1\"},{\"error_code\":\"HMAC_SIGNATURE_MISMATCH\",\"outcome\":\"rejected\",\"payload_sha256\":\"ae6e3327498d32e826e5efa637aaf6de0dc0dc122fd458648033f75d1c804e30\",\"repeat\":2,\"signature_sha256\":\"0d934a0a0ded713eaf1103fd3b3c59b7db2e2b8fc25fd7219cd49b93440492fd\",\"signing_key_id\":\"generation_2\",\"verified\":false,\"verifier_key_id\":\"generation_1\"},{\"error_code\":\"HMAC_SIGNATURE_MISMATCH\",\"outcome\":\"rejected\",\"payload_sha256\":\"5708612610415a6b324fb9bb49d46e8da60f327797845849a29fc08c5f8dd668\",\"repeat\":3,\"signature_sha256\":\"30fb3791ecc3fd542f49ff27af26a3f8496127a1c1df91e7c20090e97cb56965\",\"signing_key_id\":\"generation_2\",\"verified\":false,\"verifier_key_id\":\"generation_1\"}]}"
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_103",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"intervention\":\"load generation_2 at verifier; verify identical payload and signature\",\"phase_order\":[\"baseline\",\"fault\",\"restored\"],\"phase_results\":[{\"fault_and_restored_signature_identical\":true,\"payload_identical_across_phases\":true,\"repeat\":1,\"verified\":[true,false,true]},{\"fault_and_restored_signature_identical\":true,\"payload_identical_across_phases\":true,\"repeat\":2,\"verified\":[true,false,true]},{\"fault_and_restored_signature_identical\":true,\"payload_identical_across_phases\":true,\"repeat\":3,\"verified\":[true,false,true]}]}"
+      },
+      {
+        "id": "row_04",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_103",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"fault_and_restored_signature_identical\":[true,true,true],\"payload_identical_across_phases\":[true,true,true]}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

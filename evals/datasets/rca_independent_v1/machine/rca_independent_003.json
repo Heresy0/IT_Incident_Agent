@@ -1,0 +1,372 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_003",
+  "family": "hmac_key_rotation_desynchronization",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "model_calls": 0,
+  "business_application_imported": false,
+  "original_incident_reproduced": false,
+  "parameters": {
+    "algorithm": "HMAC-SHA256",
+    "signing_key_ids_by_phase": [
+      "generation_1",
+      "generation_2",
+      "generation_2"
+    ],
+    "verifier_key_ids_by_phase": [
+      "generation_1",
+      "generation_1",
+      "generation_2"
+    ],
+    "key_material_scope": "nonsecret local fixture; not production credentials"
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "baseline": {
+        "signing_key_id": "generation_1",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "a521d0ff61a0bb43db49490335ef780ae9337c01e609ffee33d4e3edd3286a99",
+        "signature_sha256": "e333676c319a846dcdc80ddce4eef3b123ca59647b68411911c61db636d911a5",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "fault": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "a521d0ff61a0bb43db49490335ef780ae9337c01e609ffee33d4e3edd3286a99",
+        "signature_sha256": "5afb9905d2ff32c007af7b4f9e5cfe10e8695df016346461d06d28d4e9cdfa08",
+        "verified": false,
+        "outcome": "rejected",
+        "error_code": "HMAC_SIGNATURE_MISMATCH"
+      },
+      "restored": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_2",
+        "payload_sha256": "a521d0ff61a0bb43db49490335ef780ae9337c01e609ffee33d4e3edd3286a99",
+        "signature_sha256": "5afb9905d2ff32c007af7b4f9e5cfe10e8695df016346461d06d28d4e9cdfa08",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "payload_identical_across_phases": true,
+      "fault_and_restored_signature_identical": true
+    },
+    {
+      "repeat": 2,
+      "baseline": {
+        "signing_key_id": "generation_1",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "ae6e3327498d32e826e5efa637aaf6de0dc0dc122fd458648033f75d1c804e30",
+        "signature_sha256": "b10ad68056a79d13de68bc78ed36ee44dbb9eeb08592b678c1d661cdcdd9404a",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "fault": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "ae6e3327498d32e826e5efa637aaf6de0dc0dc122fd458648033f75d1c804e30",
+        "signature_sha256": "0d934a0a0ded713eaf1103fd3b3c59b7db2e2b8fc25fd7219cd49b93440492fd",
+        "verified": false,
+        "outcome": "rejected",
+        "error_code": "HMAC_SIGNATURE_MISMATCH"
+      },
+      "restored": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_2",
+        "payload_sha256": "ae6e3327498d32e826e5efa637aaf6de0dc0dc122fd458648033f75d1c804e30",
+        "signature_sha256": "0d934a0a0ded713eaf1103fd3b3c59b7db2e2b8fc25fd7219cd49b93440492fd",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "payload_identical_across_phases": true,
+      "fault_and_restored_signature_identical": true
+    },
+    {
+      "repeat": 3,
+      "baseline": {
+        "signing_key_id": "generation_1",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "5708612610415a6b324fb9bb49d46e8da60f327797845849a29fc08c5f8dd668",
+        "signature_sha256": "a45e089a22c3cb011d7b0bf94d72894c1a34a5ec16e2a1c0168a1a7102cf32e3",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "fault": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_1",
+        "payload_sha256": "5708612610415a6b324fb9bb49d46e8da60f327797845849a29fc08c5f8dd668",
+        "signature_sha256": "30fb3791ecc3fd542f49ff27af26a3f8496127a1c1df91e7c20090e97cb56965",
+        "verified": false,
+        "outcome": "rejected",
+        "error_code": "HMAC_SIGNATURE_MISMATCH"
+      },
+      "restored": {
+        "signing_key_id": "generation_2",
+        "verifier_key_id": "generation_2",
+        "payload_sha256": "5708612610415a6b324fb9bb49d46e8da60f327797845849a29fc08c5f8dd668",
+        "signature_sha256": "30fb3791ecc3fd542f49ff27af26a3f8496127a1c1df91e7c20090e97cb56965",
+        "verified": true,
+        "outcome": "accepted",
+        "error_code": null
+      },
+      "payload_identical_across_phases": true,
+      "fault_and_restored_signature_identical": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_matched_baseline_verifies",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_mismatched_rotation_rejected",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_synchronized_rotation_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_payload_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_matched_baseline_verifies",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_mismatched_rotation_rejected",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_synchronized_rotation_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_payload_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_matched_baseline_verifies",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_mismatched_rotation_rejected",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_synchronized_rotation_restores",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_payload_unchanged",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "algorithm": "HMAC-SHA256",
+        "phase_key_ids": [
+          {
+            "phase": "baseline",
+            "signing_key_id": "generation_1",
+            "verifier_key_id": "generation_1"
+          },
+          {
+            "phase": "fault",
+            "signing_key_id": "generation_2",
+            "verifier_key_id": "generation_1"
+          },
+          {
+            "phase": "restored",
+            "signing_key_id": "generation_2",
+            "verifier_key_id": "generation_2"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "dependency",
+      "message": {
+        "verification_results": [
+          {
+            "repeat": 1,
+            "signing_key_id": "generation_2",
+            "verifier_key_id": "generation_1",
+            "payload_sha256": "a521d0ff61a0bb43db49490335ef780ae9337c01e609ffee33d4e3edd3286a99",
+            "signature_sha256": "5afb9905d2ff32c007af7b4f9e5cfe10e8695df016346461d06d28d4e9cdfa08",
+            "verified": false,
+            "outcome": "rejected",
+            "error_code": "HMAC_SIGNATURE_MISMATCH"
+          },
+          {
+            "repeat": 2,
+            "signing_key_id": "generation_2",
+            "verifier_key_id": "generation_1",
+            "payload_sha256": "ae6e3327498d32e826e5efa637aaf6de0dc0dc122fd458648033f75d1c804e30",
+            "signature_sha256": "0d934a0a0ded713eaf1103fd3b3c59b7db2e2b8fc25fd7219cd49b93440492fd",
+            "verified": false,
+            "outcome": "rejected",
+            "error_code": "HMAC_SIGNATURE_MISMATCH"
+          },
+          {
+            "repeat": 3,
+            "signing_key_id": "generation_2",
+            "verifier_key_id": "generation_1",
+            "payload_sha256": "5708612610415a6b324fb9bb49d46e8da60f327797845849a29fc08c5f8dd668",
+            "signature_sha256": "30fb3791ecc3fd542f49ff27af26a3f8496127a1c1df91e7c20090e97cb56965",
+            "verified": false,
+            "outcome": "rejected",
+            "error_code": "HMAC_SIGNATURE_MISMATCH"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "dependency",
+      "message": {
+        "intervention": "load generation_2 at verifier; verify identical payload and signature",
+        "phase_order": [
+          "baseline",
+          "fault",
+          "restored"
+        ],
+        "phase_results": [
+          {
+            "repeat": 1,
+            "verified": [
+              true,
+              false,
+              true
+            ],
+            "payload_identical_across_phases": true,
+            "fault_and_restored_signature_identical": true
+          },
+          {
+            "repeat": 2,
+            "verified": [
+              true,
+              false,
+              true
+            ],
+            "payload_identical_across_phases": true,
+            "fault_and_restored_signature_identical": true
+          },
+          {
+            "repeat": 3,
+            "verified": [
+              true,
+              false,
+              true
+            ],
+            "payload_identical_across_phases": true,
+            "fault_and_restored_signature_identical": true
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_04",
+      "category": "dependency",
+      "message": {
+        "payload_identical_across_phases": [
+          true,
+          true,
+          true
+        ],
+        "fault_and_restored_signature_identical": [
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The signer has rotated to generation_2 while the verifier still uses generation_1.",
+    "mechanism": "HMAC verification recomputes a different digest with the stale key and rejects it; loading generation_2 verifies the identical signature.",
+    "reference_explanation": "Payload bytes remain unchanged and the fault signature is reused after recovery. The verifier key generation is the changed input that restores verification.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "HMAC验签端密钥轮换未同步",
+      "签名与验签密钥版本不一致",
+      "stale HMAC verifier key after rotation"
+    ],
+    "forbidden_assertions": [
+      "签名算法被破解",
+      "payload篡改已证实",
+      "网络超时",
+      "真实密钥泄露",
+      "production credential incident"
+    ],
+    "limitations": [
+      "Keys are nonsecret synthetic fixture bytes; no authentication server or production credential is used.",
+      "The experiment identifies an unsynchronized key generation, not an organizational cause of a real deployment failure."
+    ]
+  },
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

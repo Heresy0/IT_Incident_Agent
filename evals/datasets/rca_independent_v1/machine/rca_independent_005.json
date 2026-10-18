@@ -1,0 +1,509 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_005",
+  "family": "http_response_framing",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "model_calls": 0,
+  "original_incident_reproduced": false,
+  "status": "passed",
+  "executed_at_utc": "2026-10-18T09:32:31.262837+00:00",
+  "wall_seconds": 0.0018559999989520293,
+  "parameters": {
+    "transport": "local_bytesio_http_wire",
+    "reader": "stdlib http.client.HTTPResponse.read",
+    "body_hex": "7b226f726465725f6964223a34322c227374617465223a2270616964227d",
+    "declared_lengths": [
+      30,
+      41,
+      30
+    ],
+    "repeats": 3
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "baseline": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      },
+      "fault": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      },
+      "restored": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "repeat": 2,
+      "baseline": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      },
+      "fault": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      },
+      "restored": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "repeat": 3,
+      "baseline": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      },
+      "fault": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      },
+      "restored": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_baseline_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_1_oversized_header_incomplete_read",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      }
+    },
+    {
+      "check": "repeat_1_restored_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_1_same_body_and_status",
+      "passed": true,
+      "observed": {
+        "body_sha256": [
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+        ],
+        "parsed_status": [
+          200,
+          200,
+          200
+        ]
+      }
+    },
+    {
+      "check": "repeat_2_baseline_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_2_oversized_header_incomplete_read",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      }
+    },
+    {
+      "check": "repeat_2_restored_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_2_same_body_and_status",
+      "passed": true,
+      "observed": {
+        "body_sha256": [
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+        ],
+        "parsed_status": [
+          200,
+          200,
+          200
+        ]
+      }
+    },
+    {
+      "check": "repeat_3_baseline_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_3_oversized_header_incomplete_read",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 41,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 41,
+        "success": false,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": "IncompleteRead",
+        "exception_message": "IncompleteRead(30 bytes read, 11 more expected)",
+        "expected_additional_bytes": 11
+      }
+    },
+    {
+      "check": "repeat_3_restored_complete",
+      "passed": true,
+      "observed": {
+        "configured_content_length": 30,
+        "wire_body_bytes": 30,
+        "wire_body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "parsed_status": 200,
+        "parsed_content_length": 30,
+        "success": true,
+        "received_bytes": 30,
+        "received_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+        "exception_type": null,
+        "expected_additional_bytes": 0
+      }
+    },
+    {
+      "check": "repeat_3_same_body_and_status",
+      "passed": true,
+      "observed": {
+        "body_sha256": [
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234",
+          "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+        ],
+        "parsed_status": [
+          200,
+          200,
+          200
+        ]
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "reader": "stdlib http.client.HTTPResponse.read",
+        "measurements": [
+          {
+            "repeat": 1,
+            "before_declared_bytes": 30,
+            "changed_declared_bytes": 41,
+            "wire_body_bytes": 30,
+            "body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          },
+          {
+            "repeat": 2,
+            "before_declared_bytes": 30,
+            "changed_declared_bytes": 41,
+            "wire_body_bytes": 30,
+            "body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          },
+          {
+            "repeat": 3,
+            "before_declared_bytes": 30,
+            "changed_declared_bytes": 41,
+            "wire_body_bytes": 30,
+            "body_sha256": "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "dependency",
+      "message": {
+        "columns": [
+          "repeat",
+          "parsed_status",
+          "parsed_content_length",
+          "wire_body_bytes",
+          "received_bytes",
+          "exception_type",
+          "expected_additional_bytes"
+        ],
+        "measurements": [
+          [
+            1,
+            200,
+            41,
+            30,
+            30,
+            "IncompleteRead",
+            11
+          ],
+          [
+            2,
+            200,
+            41,
+            30,
+            30,
+            "IncompleteRead",
+            11
+          ],
+          [
+            3,
+            200,
+            41,
+            30,
+            30,
+            "IncompleteRead",
+            11
+          ]
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "dependency",
+      "message": {
+        "columns": [
+          "repeat",
+          "before_declared_bytes",
+          "before_success",
+          "before_received_bytes",
+          "restored_declared_bytes",
+          "restored_success",
+          "restored_received_bytes",
+          "restored_body_sha256"
+        ],
+        "measurements": [
+          [
+            1,
+            30,
+            true,
+            30,
+            30,
+            true,
+            30,
+            "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          ],
+          [
+            2,
+            30,
+            true,
+            30,
+            30,
+            true,
+            30,
+            "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          ],
+          [
+            3,
+            30,
+            true,
+            30,
+            30,
+            true,
+            30,
+            "3f0310cfcfeeda305b0dd23d539ec6f1c8a5140c729f8d49b3677ef69a0d7234"
+          ]
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The Content-Length header was larger than the actual local response body.",
+    "mechanism": "HTTPResponse.read() expects the declared remaining body bytes and raises IncompleteRead at EOF.",
+    "reference_explanation": "The same body and 200 status are read completely with the measured length, fail with eleven additional declared bytes, and complete after only the header length is restored.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "Content-Length mismatch",
+      "oversized response length",
+      "HTTP body framing error",
+      "Content-Length大于实际响应体",
+      "响应长度声明错误",
+      "响应体长度不匹配"
+    ],
+    "forbidden_assertions": [
+      "The remote database crashed.",
+      "A TCP or production network outage was reproduced."
+    ],
+    "limitations": [
+      "This is a local BytesIO-backed HTTP parser experiment, without a network connection.",
+      "It does not establish which production proxy, server, or code path generated a bad header."
+    ]
+  },
+  "limitations": [
+    "This is a local BytesIO-backed HTTP parser experiment, without a network connection.",
+    "It does not establish which production proxy, server, or code path generated a bad header."
+  ],
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

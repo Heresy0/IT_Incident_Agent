@@ -1,0 +1,232 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_independent_008",
+  "split": "candidate_acceptance",
+  "independence_group": "independent_program_url_prefix_route_mismatch",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_108",
+    "time_window": {
+      "start": "2026-10-18T09:32:30.898461+00:00",
+      "end": "2026-10-18T09:32:32.449639+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "The URL path prefix changed to /api/v2 while the unchanged route table only registered /api/v1.",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "The endpoint, method, query, and route table stay fixed. Only the prefix changes the parsed path; restoring /api/v1 restores route matching and a200 result."
+    }
+  ],
+  "reference_explanation": "The endpoint, method, query, and route table stay fixed. Only the prefix changes the parsed path; restoring /api/v1 restores route matching and a200 result.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "The endpoint, method, query, and route table stay fixed. Only the prefix changes the parsed path; restoring /api/v1 restores route matching and a200 result.",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Production behavior, original incidents and organizational causes are outside this local experiment."
+    ],
+    "forbidden_assertions": [
+      "The registered route was removed.",
+      "A DNS or TCP connection failed.",
+      "The remote service was unavailable."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "观测记录row_01的类别为configuration。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "category"
+        ]
+      ],
+      "expected_relation": "supported"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_distinct_local_mechanism",
+    "reference_basis": "Actual controlled execution; final scored judgments are separately attributed to AI.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "One controlled case per distinct executable mechanism; repetitions are correlated."
+    ]
+  },
+  "reference_mechanism": {
+    "causal_condition": "The URL path prefix changed to /api/v2 while the unchanged route table only registered /api/v1.",
+    "mechanism": "urllib.parse builds /api/v2/orders/42 and the exact GET route lookup returns no match, producing a local404.",
+    "reference_explanation": "The endpoint, method, query, and route table stay fixed. Only the prefix changes the parsed path; restoring /api/v1 restores route matching and a200 result.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "URL path prefix mismatch",
+      "wrong route prefix",
+      "incorrect API version prefix",
+      "路径前缀拼接错误",
+      "URL前缀配置错误",
+      "路由路径不匹配"
+    ],
+    "forbidden_assertions": [
+      "The registered route was removed.",
+      "A DNS or TCP connection failed.",
+      "The remote service was unavailable."
+    ],
+    "limitations": [
+      "This executes urllib.parse and an in-memory exact route matcher without sending HTTP requests.",
+      "It cannot establish behavior of a real gateway, wildcard route matcher, DNS service, or production server."
+    ]
+  },
+  "acquisition_eligibility": {
+    "required_evidence_available": true,
+    "initial_ticket_contains_required_evidence": false,
+    "rationale": "All key rows are query-reachable; neutral ticket contains symptoms and scope only, without observations or interventions."
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "40557f9fa07c0540bb22219a67d0db5caf6794998040d3957ff667c7ae7bd24c"
+    },
+    "artifacts": [
+      {
+        "path": "machine/rca_independent_008.json",
+        "sha256": "ce71233a2b733e8c6c00a3a05983bccf99b19861e75d3bc507c3928a559950d0",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_a.py",
+        "sha256": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_b.py",
+        "sha256": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_cases.py",
+        "sha256": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca_independent.py",
+        "sha256": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "transport": "local_url_parser_and_exact_route_table",
+      "logical_endpoint": "orders/42?include=items",
+      "prefixes": [
+        "/api/v1",
+        "/api/v2",
+        "/api/v1"
+      ],
+      "request_method": "GET",
+      "repeats": 3
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "This executes urllib.parse and an in-memory exact route matcher without sending HTTP requests.",
+      "It cannot establish behavior of a real gateway, wildcard route matcher, DNS service, or production server."
+    ]
+  }
+}

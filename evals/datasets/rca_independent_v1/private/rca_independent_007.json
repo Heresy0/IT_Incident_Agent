@@ -1,0 +1,230 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_independent_007",
+  "split": "candidate_acceptance",
+  "independence_group": "independent_program_cache_invalidation_omission",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_107",
+    "time_window": {
+      "start": "2026-10-18T09:32:30.898461+00:00",
+      "end": "2026-10-18T09:32:32.449639+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "The source update did not invalidate an existing local cache entry.",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "The source changes from value12/version1 to value9/version2 while cached reads remain12/version1. With source and lookup key unchanged, evicting that entry produces9/version2."
+    }
+  ],
+  "reference_explanation": "The source changes from value12/version1 to value9/version2 while cached reads remain12/version1. With source and lookup key unchanged, evicting that entry produces9/version2.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "The source changes from value12/version1 to value9/version2 while cached reads remain12/version1. With source and lookup key unchanged, evicting that entry produces9/version2.",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Production behavior, original incidents and organizational causes are outside this local experiment."
+    ],
+    "forbidden_assertions": [
+      "The source write failed.",
+      "Eviction permanently fixes future updates.",
+      "A real distributed Redis cluster was reproduced."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "resource"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "resource"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "观测记录row_01的类别为configuration。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "category"
+        ]
+      ],
+      "expected_relation": "supported"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_distinct_local_mechanism",
+    "reference_basis": "Actual controlled execution; final scored judgments are separately attributed to AI.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "One controlled case per distinct executable mechanism; repetitions are correlated."
+    ]
+  },
+  "reference_mechanism": {
+    "causal_condition": "The source update did not invalidate an existing local cache entry.",
+    "mechanism": "The read-through cache returns its version-one entry without reading the updated version-two source; explicit eviction forces a fresh source read.",
+    "reference_explanation": "The source changes from value12/version1 to value9/version2 while cached reads remain12/version1. With source and lookup key unchanged, evicting that entry produces9/version2.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "resource"
+    ],
+    "acceptable_aliases": [
+      "missing cache invalidation",
+      "stale cache entry after source update",
+      "cache coherence failure",
+      "源数据更新未失效缓存",
+      "缓存陈旧",
+      "缓存失效缺失"
+    ],
+    "forbidden_assertions": [
+      "The source write failed.",
+      "Eviction permanently fixes future updates.",
+      "A real distributed Redis cluster was reproduced."
+    ],
+    "limitations": [
+      "This is one actual in-memory cache and source, without distributed consistency or a cache server.",
+      "Explicit eviction restores this lookup; automatic invalidation remains disabled, so future updates can reproduce the problem."
+    ]
+  },
+  "acquisition_eligibility": {
+    "required_evidence_available": true,
+    "initial_ticket_contains_required_evidence": false,
+    "rationale": "All key rows are query-reachable; neutral ticket contains symptoms and scope only, without observations or interventions."
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "40557f9fa07c0540bb22219a67d0db5caf6794998040d3957ff667c7ae7bd24c"
+    },
+    "artifacts": [
+      {
+        "path": "machine/rca_independent_007.json",
+        "sha256": "6b4bce1d383cca70cfda3a12990cda0d1f8395ee8023f605bc9901b701b008e0",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_a.py",
+        "sha256": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_b.py",
+        "sha256": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_cases.py",
+        "sha256": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca_independent.py",
+        "sha256": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "storage": "in_memory_versioned_source_and_read_through_cache",
+      "lookup_key": "stock:item-42",
+      "initial_source_value": 12,
+      "updated_source_value": 9,
+      "invalidate_on_source_update": false,
+      "restoration_operation": "explicit_cache_invalidate",
+      "repeats": 3
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "This is one actual in-memory cache and source, without distributed consistency or a cache server.",
+      "Explicit eviction restores this lookup; automatic invalidation remains disabled, so future updates can reproduce the problem."
+    ]
+  }
+}

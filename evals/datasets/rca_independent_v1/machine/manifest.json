@@ -1,0 +1,71 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "origin": "local_controlled_program_execution",
+  "started_at": "2026-10-18T09:32:30.898461+00:00",
+  "completed_at": "2026-10-18T09:32:31.449639+00:00",
+  "repeats": 3,
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  },
+  "source_unchanged_during_run": true,
+  "status": "passed",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "model_calls": 0,
+  "original_incident_reproduced": false,
+  "business_application_imported": false,
+  "cases": [
+    {
+      "case_id": "rca_independent_001",
+      "path": "rca_independent_001.json",
+      "sha256": "529d4cd6c629d2dd896b1bcf07e158998e3fd0e5e93649a38420579f740b5154",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_002",
+      "path": "rca_independent_002.json",
+      "sha256": "92aa58199286cd783e2da90f3641f13c6a81d9d93bd904997479b8b13d5b9def",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_003",
+      "path": "rca_independent_003.json",
+      "sha256": "6c87e30859e0f4abde8069ef3fecbc858434dd02a0abd6875457982abde98c41",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_004",
+      "path": "rca_independent_004.json",
+      "sha256": "b419f425cf8f916069202ea00f24f908861a86bd9492ba40ef0e7778d3ce8188",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_005",
+      "path": "rca_independent_005.json",
+      "sha256": "22ebc4ee0636db36f1d7d708b1240d7784ffd4887498b37a89f35bb3890dd3cc",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_006",
+      "path": "rca_independent_006.json",
+      "sha256": "3e0cfaffa943c34503153ffad97a7abf5e1651acef989154134b138333f8862c",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_007",
+      "path": "rca_independent_007.json",
+      "sha256": "6b4bce1d383cca70cfda3a12990cda0d1f8395ee8023f605bc9901b701b008e0",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_independent_008",
+      "path": "rca_independent_008.json",
+      "sha256": "ce71233a2b733e8c6c00a3a05983bccf99b19861e75d3bc507c3928a559950d0",
+      "status": "passed"
+    }
+  ]
+}

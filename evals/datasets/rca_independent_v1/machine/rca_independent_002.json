@@ -1,0 +1,431 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_independent_002",
+  "family": "sqlite_missing_index_vm_budget",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "model_calls": 0,
+  "business_application_imported": false,
+  "original_incident_reproduced": false,
+  "parameters": {
+    "database_engine": "sqlite3",
+    "row_count": 4000,
+    "target_lookup": 3999,
+    "automatic_index": false,
+    "index_name": "idx_records_lookup",
+    "statement": "SELECT payload FROM records WHERE lookup = ?",
+    "progress_interval_vm_instructions": 100,
+    "vm_instruction_budget": 1000,
+    "safety_wall_timeout_seconds": 2.0
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "row_count_observed": 4000,
+      "baseline": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      },
+      "fault": {
+        "query_plan": [
+          "SCAN records"
+        ],
+        "outcome": "failed",
+        "error_code": "SQLITE_INTERRUPT",
+        "error_number": 9,
+        "error_message": "interrupted",
+        "progress_callbacks": 10,
+        "observed_vm_progress_instructions": 1000,
+        "interrupt_reason": "vm_instruction_budget"
+      },
+      "restored": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      }
+    },
+    {
+      "repeat": 2,
+      "row_count_observed": 4000,
+      "baseline": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      },
+      "fault": {
+        "query_plan": [
+          "SCAN records"
+        ],
+        "outcome": "failed",
+        "error_code": "SQLITE_INTERRUPT",
+        "error_number": 9,
+        "error_message": "interrupted",
+        "progress_callbacks": 10,
+        "observed_vm_progress_instructions": 1000,
+        "interrupt_reason": "vm_instruction_budget"
+      },
+      "restored": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      }
+    },
+    {
+      "repeat": 3,
+      "row_count_observed": 4000,
+      "baseline": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      },
+      "fault": {
+        "query_plan": [
+          "SCAN records"
+        ],
+        "outcome": "failed",
+        "error_code": "SQLITE_INTERRUPT",
+        "error_number": 9,
+        "error_message": "interrupted",
+        "progress_callbacks": 10,
+        "observed_vm_progress_instructions": 1000,
+        "interrupt_reason": "vm_instruction_budget"
+      },
+      "restored": {
+        "query_plan": [
+          "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+        ],
+        "outcome": "returned",
+        "returned_payloads": [
+          "payload_3999"
+        ],
+        "error_code": null,
+        "progress_callbacks": 0,
+        "observed_vm_progress_instructions": 0,
+        "interrupt_reason": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_indexed_baseline_returns",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_scan_interrupts_at_vm_budget",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_recreated_index_restores_query",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_1_measured_plans_and_rows",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_indexed_baseline_returns",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_scan_interrupts_at_vm_budget",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_recreated_index_restores_query",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_2_measured_plans_and_rows",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_indexed_baseline_returns",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_scan_interrupts_at_vm_budget",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_recreated_index_restores_query",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    },
+    {
+      "check": "repeat_3_measured_plans_and_rows",
+      "passed": true,
+      "observed": {
+        "passed": true
+      }
+    }
+  ],
+  "public_rows": [
+    {
+      "observation_id": "row_01",
+      "category": "configuration",
+      "message": {
+        "statement": "SELECT payload FROM records WHERE lookup = ?",
+        "target_lookup": 3999,
+        "automatic_index": false,
+        "index_operations": [
+          "CREATE INDEX idx_records_lookup ON records(lookup)",
+          "DROP INDEX idx_records_lookup",
+          "CREATE INDEX idx_records_lookup ON records(lookup)"
+        ],
+        "progress_interval_vm_instructions": 100,
+        "vm_instruction_budget": 1000
+      }
+    },
+    {
+      "observation_id": "row_02",
+      "category": "resource",
+      "message": {
+        "row_counts": [
+          4000,
+          4000,
+          4000
+        ],
+        "failed_lookup_results": [
+          {
+            "repeat": 1,
+            "query_plan": [
+              "SCAN records"
+            ],
+            "outcome": "failed",
+            "error_code": "SQLITE_INTERRUPT",
+            "error_number": 9,
+            "error_message": "interrupted",
+            "progress_callbacks": 10,
+            "observed_vm_progress_instructions": 1000,
+            "interrupt_reason": "vm_instruction_budget"
+          },
+          {
+            "repeat": 2,
+            "query_plan": [
+              "SCAN records"
+            ],
+            "outcome": "failed",
+            "error_code": "SQLITE_INTERRUPT",
+            "error_number": 9,
+            "error_message": "interrupted",
+            "progress_callbacks": 10,
+            "observed_vm_progress_instructions": 1000,
+            "interrupt_reason": "vm_instruction_budget"
+          },
+          {
+            "repeat": 3,
+            "query_plan": [
+              "SCAN records"
+            ],
+            "outcome": "failed",
+            "error_code": "SQLITE_INTERRUPT",
+            "error_number": 9,
+            "error_message": "interrupted",
+            "progress_callbacks": 10,
+            "observed_vm_progress_instructions": 1000,
+            "interrupt_reason": "vm_instruction_budget"
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "row_03",
+      "category": "resource",
+      "message": {
+        "intervention": "recreate idx_records_lookup; retry identical lookup and instruction budget",
+        "phase_order": [
+          "baseline",
+          "fault",
+          "restored"
+        ],
+        "phase_results": [
+          {
+            "repeat": 1,
+            "outcomes": [
+              "returned",
+              "failed",
+              "returned"
+            ],
+            "query_plans": [
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ],
+              [
+                "SCAN records"
+              ],
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ]
+            ],
+            "vm_progress": [
+              0,
+              1000,
+              0
+            ]
+          },
+          {
+            "repeat": 2,
+            "outcomes": [
+              "returned",
+              "failed",
+              "returned"
+            ],
+            "query_plans": [
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ],
+              [
+                "SCAN records"
+              ],
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ]
+            ],
+            "vm_progress": [
+              0,
+              1000,
+              0
+            ]
+          },
+          {
+            "repeat": 3,
+            "outcomes": [
+              "returned",
+              "failed",
+              "returned"
+            ],
+            "query_plans": [
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ],
+              [
+                "SCAN records"
+              ],
+              [
+                "SEARCH records USING INDEX idx_records_lookup (lookup=?)"
+              ]
+            ],
+            "vm_progress": [
+              0,
+              1000,
+              0
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "reference": {
+    "causal_condition": "The lookup index is removed while the lookup, rows and 1000-instruction progress-handler budget remain fixed.",
+    "mechanism": "An unindexed table scan exhausts the deterministic VM progress budget and is interrupted; recreating the index permits the same lookup.",
+    "reference_explanation": "The measured query plan changes from indexed SEARCH to SCAN during failure and back to SEARCH after index creation; only the SCAN phase reaches the instruction cutoff.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "resource"
+    ],
+    "acceptable_aliases": [
+      "索引缺失导致全表扫描耗尽VM指令预算",
+      "查询索引被删除触发扫描预算中断",
+      "missing index causes SQLite instruction-budget interruption"
+    ],
+    "forbidden_assertions": [
+      "数据库死锁",
+      "网络超时",
+      "磁盘损坏",
+      "真实SQL耗时超时",
+      "production query latency reproduced"
+    ],
+    "limitations": [
+      "The cutoff is deterministic VM progress, not a measured production response-time deadline.",
+      "The in-memory SQLite table and query are synthetic; no network or production database is queried."
+    ]
+  },
+  "source_sha256": {
+    "evals/rca_independent_experiments_a.py": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+    "evals/rca_independent_experiments_b.py": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+    "evals/rca_independent_cases.py": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+    "scripts/reproduce_rca_independent.py": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86"
+  }
+}

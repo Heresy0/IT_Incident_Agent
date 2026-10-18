@@ -1,0 +1,91 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Executed local program; staging is an authorization label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "independent_observation_006",
+      "title": "Local request observation investigation",
+      "symptoms": "A local request returned an error or an unexpected result during the observed execution. Investigate using available sources.",
+      "scope": {
+        "service": "component_106",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_106",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"measurements\":[{\"before_encoding\":\"utf-8\",\"changed_encoding\":\"ascii\",\"errors_policy\":\"strict\",\"input_bytes\":15,\"input_sha256\":\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\",\"repeat\":1},{\"before_encoding\":\"utf-8\",\"changed_encoding\":\"ascii\",\"errors_policy\":\"strict\",\"input_bytes\":15,\"input_sha256\":\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\",\"repeat\":2},{\"before_encoding\":\"utf-8\",\"changed_encoding\":\"ascii\",\"errors_policy\":\"strict\",\"input_bytes\":15,\"input_sha256\":\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\",\"repeat\":3}]}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_106",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"columns\":[\"repeat\",\"configured_encoding\",\"success\",\"exception_type\",\"error_start\",\"error_end\",\"error_reason\"],\"measurements\":[[1,\"ascii\",false,\"UnicodeDecodeError\",0,1,\"ordinal not in range(128)\"],[2,\"ascii\",false,\"UnicodeDecodeError\",0,1,\"ordinal not in range(128)\"],[3,\"ascii\",false,\"UnicodeDecodeError\",0,1,\"ordinal not in range(128)\"]]}"
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T09:32:31.449639+00:00",
+        "timestamp_basis": "execution_capture_completion_not_individual_request_time",
+        "service": "component_106",
+        "environment": "staging",
+        "data_version": "rca-independent-local-mechanisms-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"columns\":[\"repeat\",\"before_encoding\",\"before_success\",\"before_decoded_text\",\"restored_encoding\",\"restored_success\",\"restored_decoded_text\",\"restored_input_sha256\"],\"measurements\":[[1,\"utf-8\",true,\"订单已支付\",\"utf-8\",true,\"订单已支付\",\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\"],[2,\"utf-8\",true,\"订单已支付\",\"utf-8\",true,\"订单已支付\",\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\"],[3,\"utf-8\",true,\"订单已支付\",\"utf-8\",true,\"订单已支付\",\"6cbfd7f67f68eaba49a00d0797304b810d2b3886bccc9c97cd7f137fc96c4697\"]]}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

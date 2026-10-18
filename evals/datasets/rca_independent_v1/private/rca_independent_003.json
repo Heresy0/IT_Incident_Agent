@@ -1,0 +1,236 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_independent_003",
+  "split": "candidate_acceptance",
+  "independence_group": "independent_program_hmac_key_rotation_desynchronization",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_103",
+    "time_window": {
+      "start": "2026-10-18T09:32:30.898461+00:00",
+      "end": "2026-10-18T09:32:32.449639+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "The signer has rotated to generation_2 while the verifier still uses generation_1.",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "Payload bytes remain unchanged and the fault signature is reused after recovery. The verifier key generation is the changed input that restores verification."
+    }
+  ],
+  "reference_explanation": "Payload bytes remain unchanged and the fault signature is reused after recovery. The verifier key generation is the changed input that restores verification.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "Payload bytes remain unchanged and the fault signature is reused after recovery. The verifier key generation is the changed input that restores verification.",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Production behavior, original incidents and organizational causes are outside this local experiment."
+    ],
+    "forbidden_assertions": [
+      "签名算法被破解",
+      "payload篡改已证实",
+      "网络超时",
+      "真实密钥泄露",
+      "production credential incident"
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03",
+        "row_04"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "观测记录row_01的类别为configuration。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "category"
+        ]
+      ],
+      "expected_relation": "supported"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_distinct_local_mechanism",
+    "reference_basis": "Actual controlled execution; final scored judgments are separately attributed to AI.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "One controlled case per distinct executable mechanism; repetitions are correlated."
+    ]
+  },
+  "reference_mechanism": {
+    "causal_condition": "The signer has rotated to generation_2 while the verifier still uses generation_1.",
+    "mechanism": "HMAC verification recomputes a different digest with the stale key and rejects it; loading generation_2 verifies the identical signature.",
+    "reference_explanation": "Payload bytes remain unchanged and the fault signature is reused after recovery. The verifier key generation is the changed input that restores verification.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "HMAC验签端密钥轮换未同步",
+      "签名与验签密钥版本不一致",
+      "stale HMAC verifier key after rotation"
+    ],
+    "forbidden_assertions": [
+      "签名算法被破解",
+      "payload篡改已证实",
+      "网络超时",
+      "真实密钥泄露",
+      "production credential incident"
+    ],
+    "limitations": [
+      "Keys are nonsecret synthetic fixture bytes; no authentication server or production credential is used.",
+      "The experiment identifies an unsynchronized key generation, not an organizational cause of a real deployment failure."
+    ]
+  },
+  "acquisition_eligibility": {
+    "required_evidence_available": true,
+    "initial_ticket_contains_required_evidence": false,
+    "rationale": "All key rows are query-reachable; neutral ticket contains symptoms and scope only, without observations or interventions."
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "40557f9fa07c0540bb22219a67d0db5caf6794998040d3957ff667c7ae7bd24c"
+    },
+    "artifacts": [
+      {
+        "path": "machine/rca_independent_003.json",
+        "sha256": "6c87e30859e0f4abde8069ef3fecbc858434dd02a0abd6875457982abde98c41",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_a.py",
+        "sha256": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_b.py",
+        "sha256": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_cases.py",
+        "sha256": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca_independent.py",
+        "sha256": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "algorithm": "HMAC-SHA256",
+      "signing_key_ids_by_phase": [
+        "generation_1",
+        "generation_2",
+        "generation_2"
+      ],
+      "verifier_key_ids_by_phase": [
+        "generation_1",
+        "generation_1",
+        "generation_2"
+      ],
+      "key_material_scope": "nonsecret local fixture; not production credentials"
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "Keys are nonsecret synthetic fixture bytes; no authentication server or production credential is used.",
+      "The experiment identifies an unsynchronized key generation, not an organizational cause of a real deployment failure."
+    ]
+  }
+}

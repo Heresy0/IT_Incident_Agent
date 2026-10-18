@@ -1,0 +1,116 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "dataset_version": "rca-independent-local-mechanisms-v1",
+  "holdout_sealed": false,
+  "human_verified": false,
+  "is_gold": false,
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "formal_acceptance_enabled": false,
+  "calibration_cases": 0,
+  "candidate_cases": 8,
+  "intended_candidate_composition": {
+    "root_identifiable": 8,
+    "mechanism_only": 0,
+    "not_identifiable": 0
+  },
+  "independence_policy": "Eight executable failure mechanisms, one local controlled case each; three repetitions do not create more independent cases. Shared harness and authored observability remain limitations.",
+  "cases": [
+    {
+      "case_id": "rca_independent_001",
+      "split": "candidate_acceptance",
+      "scenario_family": "sqlite_transaction_write_lock",
+      "independence_group": "independent_program_sqlite_transaction_write_lock",
+      "public_path": "public/rca_independent_001.json",
+      "public_sha256": "15df730f7da96da0a151692b0d371e2611b57ca1c4e5ded35ed552bb6692bb99",
+      "truth_path": "private/rca_independent_001.json",
+      "truth_sha256": "830a3f4887d5bd422bce40f8f536b51c42346538c1ce1fd670abcb10064a9d8b",
+      "diagnostics_path": "diagnostics/rca_independent_001.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    },
+    {
+      "case_id": "rca_independent_002",
+      "split": "candidate_acceptance",
+      "scenario_family": "sqlite_missing_index_vm_budget",
+      "independence_group": "independent_program_sqlite_missing_index_vm_budget",
+      "public_path": "public/rca_independent_002.json",
+      "public_sha256": "e85823e3f8a66605a5cf7ee6b2aca73ba8a0cbfc1e8cd91c09a2e5f46042ad12",
+      "truth_path": "private/rca_independent_002.json",
+      "truth_sha256": "51fd14321ce4fb0605c5f5bb2379d70c6016d307bb00eaf55edb4038f46d1546",
+      "diagnostics_path": "diagnostics/rca_independent_002.json",
+      "diagnostics_sha256": "70cc80c2f29d9731b4ef81f6b0d1c97088cf97193ba6258559e90a0f4a14498d"
+    },
+    {
+      "case_id": "rca_independent_003",
+      "split": "candidate_acceptance",
+      "scenario_family": "hmac_key_rotation_desynchronization",
+      "independence_group": "independent_program_hmac_key_rotation_desynchronization",
+      "public_path": "public/rca_independent_003.json",
+      "public_sha256": "04e842276979b3761c560c29adb6656e09b5dc76dbe49af18ead25f3aeb04f90",
+      "truth_path": "private/rca_independent_003.json",
+      "truth_sha256": "0492874a4f299e7f641d3fe4963bbec7b9f5b2fffc706d04705d4d16fecfd255",
+      "diagnostics_path": "diagnostics/rca_independent_003.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    },
+    {
+      "case_id": "rca_independent_004",
+      "split": "candidate_acceptance",
+      "scenario_family": "gzip_content_encoding_mismatch",
+      "independence_group": "independent_program_gzip_content_encoding_mismatch",
+      "public_path": "public/rca_independent_004.json",
+      "public_sha256": "2a532da5943e4643d32f6510cec080f739126b8d8d765b2d21a9c108b333e975",
+      "truth_path": "private/rca_independent_004.json",
+      "truth_sha256": "f652e258ecfced29c6e93cb3918bfa4744abb16d084d8b2b2908f047c9319fd5",
+      "diagnostics_path": "diagnostics/rca_independent_004.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    },
+    {
+      "case_id": "rca_independent_005",
+      "split": "candidate_acceptance",
+      "scenario_family": "http_response_framing",
+      "independence_group": "independent_program_http_response_framing",
+      "public_path": "public/rca_independent_005.json",
+      "public_sha256": "7669e9e7ffbcc48107d90d70b0729be83234f42912894e464e20e237f73097f1",
+      "truth_path": "private/rca_independent_005.json",
+      "truth_sha256": "4237899951ea41bb39076e24897feea491209bb04eb1e87bedba00f89ebd3847",
+      "diagnostics_path": "diagnostics/rca_independent_005.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    },
+    {
+      "case_id": "rca_independent_006",
+      "split": "candidate_acceptance",
+      "scenario_family": "character_decoder_mismatch",
+      "independence_group": "independent_program_character_decoder_mismatch",
+      "public_path": "public/rca_independent_006.json",
+      "public_sha256": "af8862285e699a4c41c622b6f8cf7256c0f682b57a86dcfdcd529e0fb86b07d5",
+      "truth_path": "private/rca_independent_006.json",
+      "truth_sha256": "d63c6803dd677b9e3a333c65909b9b4cfadb69c242e5f1270ed6492ec3e9ba2e",
+      "diagnostics_path": "diagnostics/rca_independent_006.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    },
+    {
+      "case_id": "rca_independent_007",
+      "split": "candidate_acceptance",
+      "scenario_family": "cache_invalidation_omission",
+      "independence_group": "independent_program_cache_invalidation_omission",
+      "public_path": "public/rca_independent_007.json",
+      "public_sha256": "29228bdaf8f170f5c23b3108dc20a066eb1a5571802964ffc9a088f68ec77363",
+      "truth_path": "private/rca_independent_007.json",
+      "truth_sha256": "ef8c93b68598ef5c26953b849927edfde6316e108a357a6bdde44649dcde692f",
+      "diagnostics_path": "diagnostics/rca_independent_007.json",
+      "diagnostics_sha256": "70cc80c2f29d9731b4ef81f6b0d1c97088cf97193ba6258559e90a0f4a14498d"
+    },
+    {
+      "case_id": "rca_independent_008",
+      "split": "candidate_acceptance",
+      "scenario_family": "url_prefix_route_mismatch",
+      "independence_group": "independent_program_url_prefix_route_mismatch",
+      "public_path": "public/rca_independent_008.json",
+      "public_sha256": "2a056f5870a71416c46fb92c1bf2703a89aaf16e14d312cd88c2c03bd0b4e6d2",
+      "truth_path": "private/rca_independent_008.json",
+      "truth_sha256": "921acd0fd3e7d18955a1689bcc82b76e18bbad1a7f75ebd21f4cf60755cd56e9",
+      "diagnostics_path": "diagnostics/rca_independent_008.json",
+      "diagnostics_sha256": "be53cf747992652ab1cbcaea3de75aaef75b2468cdeeaba0f0bbfb31abe88c2a"
+    }
+  ]
+}

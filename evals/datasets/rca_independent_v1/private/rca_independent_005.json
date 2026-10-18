@@ -1,0 +1,228 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_independent_005",
+  "split": "candidate_acceptance",
+  "independence_group": "independent_program_http_response_framing",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_105",
+    "time_window": {
+      "start": "2026-10-18T09:32:30.898461+00:00",
+      "end": "2026-10-18T09:32:32.449639+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "The Content-Length header was larger than the actual local response body.",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "The same body and 200 status are read completely with the measured length, fail with eleven additional declared bytes, and complete after only the header length is restored."
+    }
+  ],
+  "reference_explanation": "The same body and 200 status are read completely with the measured length, fail with eleven additional declared bytes, and complete after only the header length is restored.",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "The same body and 200 status are read completely with the measured length, fail with eleven additional declared bytes, and complete after only the header length is restored.",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Production behavior, original incidents and organizational causes are outside this local experiment."
+    ],
+    "forbidden_assertions": [
+      "The remote database crashed.",
+      "A TCP or production network outage was reproduced."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T09:32:30.898461+00:00",
+        "end": "2026-10-18T09:32:32.449639+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02",
+        "row_03"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "观测记录row_01的类别为configuration。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "category"
+        ]
+      ],
+      "expected_relation": "supported"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_distinct_local_mechanism",
+    "reference_basis": "Actual controlled execution; final scored judgments are separately attributed to AI.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "One controlled case per distinct executable mechanism; repetitions are correlated."
+    ]
+  },
+  "reference_mechanism": {
+    "causal_condition": "The Content-Length header was larger than the actual local response body.",
+    "mechanism": "HTTPResponse.read() expects the declared remaining body bytes and raises IncompleteRead at EOF.",
+    "reference_explanation": "The same body and 200 status are read completely with the measured length, fail with eleven additional declared bytes, and complete after only the header length is restored.",
+    "key_observation_ids": [
+      "row_01",
+      "row_02",
+      "row_03"
+    ],
+    "required_categories": [
+      "configuration",
+      "dependency"
+    ],
+    "acceptable_aliases": [
+      "Content-Length mismatch",
+      "oversized response length",
+      "HTTP body framing error",
+      "Content-Length大于实际响应体",
+      "响应长度声明错误",
+      "响应体长度不匹配"
+    ],
+    "forbidden_assertions": [
+      "The remote database crashed.",
+      "A TCP or production network outage was reproduced."
+    ],
+    "limitations": [
+      "This is a local BytesIO-backed HTTP parser experiment, without a network connection.",
+      "It does not establish which production proxy, server, or code path generated a bad header."
+    ]
+  },
+  "acquisition_eligibility": {
+    "required_evidence_available": true,
+    "initial_ticket_contains_required_evidence": false,
+    "rationale": "All key rows are query-reachable; neutral ticket contains symptoms and scope only, without observations or interventions."
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "40557f9fa07c0540bb22219a67d0db5caf6794998040d3957ff667c7ae7bd24c"
+    },
+    "artifacts": [
+      {
+        "path": "machine/rca_independent_005.json",
+        "sha256": "22ebc4ee0636db36f1d7d708b1240d7784ffd4887498b37a89f35bb3890dd3cc",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_a.py",
+        "sha256": "daba8ad8c39072b34f36d724b6e53ca4f1c55970f1d5e84c947708171ab729a6",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_experiments_b.py",
+        "sha256": "da166cd3dfdf457d808bcf19e77427014a199e4a2199bda48167582f69f6ab10",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/rca_independent_cases.py",
+        "sha256": "829dd4c6b5e9b0c7006e274dad1a1877cc389f93c49c373a609ef215bb704ba9",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca_independent.py",
+        "sha256": "80c0d7b1057959eb95d3be24947eaf83cc21af369c76bd8576c4817d003eca86",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "transport": "local_bytesio_http_wire",
+      "reader": "stdlib http.client.HTTPResponse.read",
+      "body_hex": "7b226f726465725f6964223a34322c227374617465223a2270616964227d",
+      "declared_lengths": [
+        30,
+        41,
+        30
+      ],
+      "repeats": 3
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "This is a local BytesIO-backed HTTP parser experiment, without a network connection.",
+      "It does not establish which production proxy, server, or code path generated a bad header."
+    ]
+  }
+}
