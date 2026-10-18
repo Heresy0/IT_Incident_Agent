@@ -1,0 +1,209 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_candidate_025",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "parameters": {
+    "transport": "local_os_pipe",
+    "max_payload_bytes": 4096
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_closed_before_headers",
+        "observed_exception_type": "RemoteDisconnected",
+        "observed_exception_message": "Remote end closed connection without response"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    },
+    {
+      "repeat": 1,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_malformed_status_line",
+        "observed_exception_type": "BadStatusLine",
+        "observed_exception_message": "THIS IS NOT AN HTTP STATUS\r\n"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    },
+    {
+      "repeat": 2,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_closed_before_headers",
+        "observed_exception_type": "RemoteDisconnected",
+        "observed_exception_message": "Remote end closed connection without response"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    },
+    {
+      "repeat": 2,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_malformed_status_line",
+        "observed_exception_type": "BadStatusLine",
+        "observed_exception_message": "THIS IS NOT AN HTTP STATUS\r\n"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    },
+    {
+      "repeat": 3,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_closed_before_headers",
+        "observed_exception_type": "RemoteDisconnected",
+        "observed_exception_message": "Remote end closed connection without response"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    },
+    {
+      "repeat": 3,
+      "public_observation": {
+        "request_id": "q37",
+        "http_status": 502,
+        "body": "Bad Gateway",
+        "original_exception_captured": false,
+        "downstream_status_captured": false,
+        "wire_trace_captured": false,
+        "change_source_status": "SOURCE_NOT_CONFIGURED"
+      },
+      "private_execution_trace": {
+        "failure_kind": "upstream_malformed_status_line",
+        "observed_exception_type": "BadStatusLine",
+        "observed_exception_message": "THIS IS NOT AN HTTP STATUS\r\n"
+      },
+      "gateway_response_bytes_hex": "485454502f312e31203530322042616420476174657761790d0a436f6e74656e742d4c656e6774683a2031310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a4261642047617465776179"
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_real_gateway_client_receives502",
+      "passed": true,
+      "observed": [
+        502,
+        502
+      ]
+    },
+    {
+      "check": "repeat_1_distinct_actual_upstream_parser_failures",
+      "passed": true,
+      "observed": [
+        "RemoteDisconnected",
+        "BadStatusLine"
+      ]
+    },
+    {
+      "check": "repeat_1_same_available_public_observation",
+      "passed": true,
+      "observed": [
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779",
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779"
+      ]
+    },
+    {
+      "check": "repeat_2_real_gateway_client_receives502",
+      "passed": true,
+      "observed": [
+        502,
+        502
+      ]
+    },
+    {
+      "check": "repeat_2_distinct_actual_upstream_parser_failures",
+      "passed": true,
+      "observed": [
+        "RemoteDisconnected",
+        "BadStatusLine"
+      ]
+    },
+    {
+      "check": "repeat_2_same_available_public_observation",
+      "passed": true,
+      "observed": [
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779",
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779"
+      ]
+    },
+    {
+      "check": "repeat_3_real_gateway_client_receives502",
+      "passed": true,
+      "observed": [
+        502,
+        502
+      ]
+    },
+    {
+      "check": "repeat_3_distinct_actual_upstream_parser_failures",
+      "passed": true,
+      "observed": [
+        "RemoteDisconnected",
+        "BadStatusLine"
+      ]
+    },
+    {
+      "check": "repeat_3_same_available_public_observation",
+      "passed": true,
+      "observed": [
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779",
+        "ae961cca9c9420a88720c1d04a08d7afa7e3b50320a2d9cf04eb4dde8786d779"
+      ]
+    }
+  ],
+  "limitations": [
+    "Actual OS pipe byte streams and the stdlib HTTP parser execute two distinct upstream failures, then the same generic502 response. No TCP transport is claimed.",
+    "Only the configured public gateway projection is indistinguishable; private parser exceptions distinguish the causes and are withheld from the model.",
+    "This is an observational-equivalence counterexample within the minimal local gateway. It does not enumerate or prove all production gateway failure modes.",
+    "The source-unavailable flag is an experimental observability configuration, not a claim that a real external source was contacted.",
+    "No production network, remote dependency, DNS, TLS, database, or original incident is exercised."
+  ],
+  "source_sha256": {
+    "D:\\code\\it_incident_agent\\evals\\rca_experiments.py": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+    "D:\\code\\it_incident_agent\\scripts\\reproduce_rca.py": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece"
+  }
+}

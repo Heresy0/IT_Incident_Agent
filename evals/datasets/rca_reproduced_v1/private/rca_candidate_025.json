@@ -1,0 +1,199 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_candidate_025",
+  "split": "candidate_acceptance",
+  "independence_group": "executed_template_executed_gateway_boundary",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "not_identifiable",
+  "scope": {
+    "service": "component_025",
+    "time_window": {
+      "start": "2026-10-18T08:18:25.254010+00:00",
+      "end": "2026-10-18T08:18:30.475951+00:00"
+    },
+    "causal_level": "not_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [],
+  "causal_edges": [],
+  "reference_explanation": "仅凭公开的通用502响应及缺失诊断字段，不能区分实际执行的不同上游协议失败；私有解析异常未提供给模型。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "仅凭公开的通用502响应及缺失诊断字段，不能区分实际执行的不同上游协议失败；私有解析异常未提供给模型。",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "The upstream failure kind and original parser exception are outside the available observation."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_recent_changes",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00"
+      },
+      "expected_observation_ids": [],
+      "expected_error": "SOURCE_NOT_CONFIGURED"
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_recent_changes",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00"
+      },
+      "expected_observation_ids": [],
+      "expected_error": "SOURCE_NOT_CONFIGURED"
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "request=q37收到HTTP 502且原始异常未被采集，并且变更记录源状态为SOURCE_NOT_CONFIGURED。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ]
+      ],
+      "expected_relation": "supported"
+    },
+    {
+      "control_id": "control_02",
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_local_program_observations",
+    "reference_basis": "Passed local-program measurements with raw execution and source snapshots; causal interpretation remains pending human review.",
+    "required_next_step": "Review the measured evidence, information boundary and causal interpretation; machine execution is not human gold.",
+    "notes": [
+      "Measured new local-program scenario; not a reproduction of the original authored v1 incident."
+    ]
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "1842f1e9faa5bf89dd92b3634561bd837e47cab7c6025dc11e50aa3cf3e7a9f6"
+    },
+    "artifacts": [
+      {
+        "path": "machine/experiment_025.json",
+        "sha256": "445e5e1f86e9c1c138f8d05d03ac9556af3e191aa5b62c5d2b148d69800e57b5",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_experiments.py",
+        "sha256": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca.py",
+        "sha256": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "transport": "local_os_pipe",
+      "max_payload_bytes": 4096
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "Actual OS pipe byte streams and the stdlib HTTP parser execute two distinct upstream failures, then the same generic502 response. No TCP transport is claimed.",
+      "Only the configured public gateway projection is indistinguishable; private parser exceptions distinguish the causes and are withheld from the model.",
+      "This is an observational-equivalence counterexample within the minimal local gateway. It does not enumerate or prove all production gateway failure modes.",
+      "The source-unavailable flag is an experimental observability configuration, not a claim that a real external source was contacted.",
+      "No production network, remote dependency, DNS, TLS, database, or original incident is exercised."
+    ]
+  }
+}

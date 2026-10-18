@@ -1,0 +1,53 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "configuration"
+      }
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "resource"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "在本地实验中，相同30请求同时到达的突发负载下，池容量40→4→40时仅容量4的试次出现资源获取超时。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ],
+        [
+          "row_03",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    }
+  ]
+}

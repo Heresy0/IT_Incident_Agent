@@ -1,0 +1,104 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      }
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "resource"
+      }
+    },
+    {
+      "tool": "get_service_metrics",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "metrics": [
+          "observed_1",
+          "observed_2"
+        ],
+        "granularity": "1m"
+      }
+    },
+    {
+      "tool": "get_service_metrics",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "metrics": [
+          "observed_3",
+          "observed_4"
+        ],
+        "granularity": "1m"
+      }
+    },
+    {
+      "tool": "get_service_metrics",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "metrics": [
+          "observed_5",
+          "observed_6"
+        ],
+        "granularity": "1m"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "当前可见失败环节是连接池已用20/20以及连接获取等待达到1500ms期限，仍有45个等待者。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "pool-visible-failure",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "数据库ping在8ms内成功，因此数据库整体健康，可以排除其所有故障。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "db-ping-only",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_03",
+      "statement": "流量增长已经证明pool_max=20配置不足是当前故障的唯一根因。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "traffic-before",
+          "value"
+        ],
+        [
+          "traffic-after",
+          "value"
+        ],
+        [
+          "pool-size-after",
+          "value"
+        ],
+        [
+          "pool-visible-failure",
+          "message"
+        ]
+      ]
+    }
+  ]
+}

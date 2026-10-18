@@ -1,0 +1,173 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_candidate_012",
+  "split": "candidate_acceptance",
+  "independence_group": "candidate_template_routing",
+  "origin": "authored_synthetic_provisional",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "root_identifiable",
+  "scope": {
+    "service": "component_012",
+    "time_window": {
+      "start": "2026-10-18T06:00:00+00:00",
+      "end": "2026-10-18T06:20:00+00:00"
+    },
+    "causal_level": "root_identifiable",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "当前路由表遗漏/submit POST映射。",
+      "kind": "candidate_causal_condition"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "路由匹配在本地失败，健康探针的独立映射不覆盖该业务路径。"
+    }
+  ],
+  "reference_explanation": "路由匹配在本地失败，健康探针的独立映射不覆盖该业务路径。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "路由匹配在本地失败，健康探针的独立映射不覆盖该业务路径。",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02",
+          "row_03"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "Organizational origin of the stated local condition remains outside scope."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01",
+        "row_03"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      },
+      "expected_observation_ids": [
+        "row_01",
+        "row_03"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "记录中明确写道：Loaded route table r7 contains GET /ready and GET /status; previous r6 additionally contained POST /submit.",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "supported"
+    },
+    {
+      "control_id": "control_02",
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "new_authored_candidate",
+    "reference_basis": "Author-written synthetic records and proposed interpretation, not executed fault injection.",
+    "required_next_step": "Independent human review and documented controlled reproduction before sealing or gold use.",
+    "notes": [
+      "No actual fault injection or intervention has been executed; replay statements are authored synthetic observations."
+    ]
+  },
+  "evaluation_question_revision": {
+    "version": "rca-authored-candidate-dataset-v2-atomic-controls",
+    "source_dataset_fingerprint": "51baa7d36a4ddc53e75ad87ce4884f57ee0d904568d14c40ac8d36d44923427b",
+    "source_public_sha256": "e9ae81940de777a4e2e1d2aac5f41053cbd8d5c09ade8a20a95dba85cc56d509",
+    "observations_changed": false,
+    "source_queries_changed": false,
+    "human_adjudication": "pending",
+    "is_gold": false,
+    "edits": [
+      {
+        "control_id": "control_02",
+        "operation": "replace_ambiguous_statement",
+        "previous_statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+        "previous_candidate_relation": "insufficient",
+        "candidate_relation": "insufficient",
+        "reason": "Judge the process-state proposition alone; there is no direct crash or alive-state evidence. Missing evidence is not a contradiction."
+      }
+    ]
+  }
+}

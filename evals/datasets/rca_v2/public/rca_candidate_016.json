@@ -1,0 +1,89 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_016",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "Two write requests stop making progress while CPU stays low.",
+      "scope": {
+        "service": "component_016",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_016"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_016",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Snapshot: request=a holds lock X waits lock Y owned by b; request=b holds Y waits X owned by a; lock owners stable across 10 samples."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_016",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "No timeout or cancellation configured for these lock acquisitions; requests perform no outbound calls while waiting."
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T06:07:00+00:00",
+        "service": "component_016",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Synthetic fixture replay: enforce X-before-Y for both paths => completion; opposing X/Y order at same barrier => wait cycle reproduced."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_47",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "A request timeout is recorded locally; the needed remote records are not accessible through this service.",
+      "scope": {
+        "service": "component_31489056",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_3d745da3"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "local-timeout",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_31489056",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "READ_DEADLINE",
+        "level": "ERROR",
+        "message": "request=r29 exceeded the outbound read deadline; no remote internals or wire response were captured."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": [],
+    "source_errors": {
+      "get_recent_changes": "SOURCE_NOT_CONFIGURED"
+    }
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

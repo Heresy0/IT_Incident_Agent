@@ -1,0 +1,241 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "synthetic_48",
+      "title": "Unseen synthetic request failure",
+      "symptoms": "Requests wait for pooled connections while traffic rises; a database ping succeeds.",
+      "scope": {
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_c7102c4b"
+        ]
+      }
+    },
+    "metrics": [
+      {
+        "id": "in-use",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_1",
+        "value": 20,
+        "unit": "connections",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Number of currently occupied pooled connections.",
+        "observed_object": "application connection pool"
+      },
+      {
+        "id": "waiters",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_3",
+        "value": 45,
+        "unit": "requests",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Requests currently waiting to acquire a pooled connection.",
+        "observed_object": "connection acquisition queue"
+      },
+      {
+        "id": "acquisition",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_4",
+        "value": 1500,
+        "unit": "ms",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Observed acquisition wait ending at the configured deadline.",
+        "observed_object": "connection acquisition attempt"
+      },
+      {
+        "id": "ping",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_5",
+        "value": 8,
+        "unit": "ms",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Duration of one successful database liveness probe.",
+        "observed_object": "single database ping"
+      },
+      {
+        "id": "pool-size-before",
+        "timestamp": "2026-10-18T06:04:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_2",
+        "value": 20,
+        "unit": "connections",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Configured maximum count of pooled connections.",
+        "observed_object": "application connection pool configuration"
+      },
+      {
+        "id": "traffic-before",
+        "timestamp": "2026-10-18T06:04:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_6",
+        "value": 35,
+        "unit": "requests/s",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Number of incoming requests per second.",
+        "observed_object": "service incoming traffic"
+      },
+      {
+        "id": "pool-size-after",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_2",
+        "value": 20,
+        "unit": "connections",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Configured maximum count of pooled connections.",
+        "observed_object": "application connection pool configuration"
+      },
+      {
+        "id": "traffic-after",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "metric": "observed_6",
+        "value": 100,
+        "unit": "requests/s",
+        "aggregation": "mean",
+        "granularity": "1m",
+        "quantity_description": "Number of incoming requests per second.",
+        "observed_object": "service incoming traffic"
+      }
+    ],
+    "logs": [
+      {
+        "id": "pool-visible-failure",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "resource",
+        "error_code": "ACQUIRE_TIMEOUT",
+        "level": "ERROR",
+        "message": "Connection acquisition exceeded 1500ms deadline; in_use=20; pool_max=20; waiters=45."
+      },
+      {
+        "id": "db-ping-only",
+        "timestamp": "2026-10-18T06:10:00+00:00",
+        "service": "component_98010bd9",
+        "environment": "staging",
+        "data_version": "closed-loop-source-controls-v1",
+        "visibility": "public_synthetic",
+        "category": "dependency",
+        "error_code": "DB_PING_OK",
+        "level": "INFO",
+        "message": "One database ping returned successfully in 8ms; this probe did not execute business SQL or inspect locks."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {
+      "observed_1": {
+        "unit": "connections",
+        "aggregation": "mean",
+        "description": "Number of currently occupied pooled connections.",
+        "observed_object": "application connection pool",
+        "source": "rca-authored-candidate-dataset-v1"
+      },
+      "observed_3": {
+        "unit": "requests",
+        "aggregation": "mean",
+        "description": "Requests currently waiting to acquire a pooled connection.",
+        "observed_object": "connection acquisition queue",
+        "source": "rca-authored-candidate-dataset-v1"
+      },
+      "observed_4": {
+        "unit": "ms",
+        "aggregation": "mean",
+        "description": "Observed acquisition wait ending at the configured deadline.",
+        "observed_object": "connection acquisition attempt",
+        "source": "rca-authored-candidate-dataset-v1"
+      },
+      "observed_5": {
+        "unit": "ms",
+        "aggregation": "mean",
+        "description": "Duration of one successful database liveness probe.",
+        "observed_object": "single database ping",
+        "source": "rca-authored-candidate-dataset-v1"
+      },
+      "observed_2": {
+        "unit": "connections",
+        "aggregation": "mean",
+        "description": "Configured maximum count of pooled connections.",
+        "observed_object": "application connection pool configuration",
+        "source": "rca-authored-candidate-dataset-v1"
+      },
+      "observed_6": {
+        "unit": "requests/s",
+        "aggregation": "mean",
+        "description": "Number of incoming requests per second.",
+        "observed_object": "service incoming traffic",
+        "source": "rca-authored-candidate-dataset-v1"
+      }
+    },
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

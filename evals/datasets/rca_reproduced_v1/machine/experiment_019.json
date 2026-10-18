@@ -1,0 +1,272 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "case_id": "rca_candidate_019",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "causal_truth_validated": false,
+  "status": "passed",
+  "parameters": {
+    "acquisition_timeout_ms": 80,
+    "holder_release": "after_waiter_returns"
+  },
+  "trials": [
+    {
+      "repeat": 1,
+      "holder_kind": "awaiting_io_signal",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "awaiting_io_signal",
+          "local_work_iterations": 0,
+          "acquired_at": 9844.8546355,
+          "release_signal_observed": true,
+          "released_at": 9844.9456928
+        },
+        "wait_ms": 90.89180000046326,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    },
+    {
+      "repeat": 1,
+      "holder_kind": "local_maintenance_work",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "local_maintenance_work",
+          "local_work_iterations": 7,
+          "acquired_at": 9844.946272,
+          "work_checksum": "d355d0c5c386cc7a755c91ec0c8199558c03c5d84fcdf505fa5c19abb6c4c282",
+          "released_at": 9845.0384462
+        },
+        "wait_ms": 92.03210000123363,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    },
+    {
+      "repeat": 2,
+      "holder_kind": "awaiting_io_signal",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "awaiting_io_signal",
+          "local_work_iterations": 0,
+          "acquired_at": 9845.0391018,
+          "release_signal_observed": true,
+          "released_at": 9845.1321638
+        },
+        "wait_ms": 92.92220000133966,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    },
+    {
+      "repeat": 2,
+      "holder_kind": "local_maintenance_work",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "local_maintenance_work",
+          "local_work_iterations": 6,
+          "acquired_at": 9845.1326481,
+          "work_checksum": "3c4a0ccbcb0a17c352b5f153c17c0ce701482441b5999bc627913e83f679905b",
+          "released_at": 9845.2251801
+        },
+        "wait_ms": 92.31130000080157,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    },
+    {
+      "repeat": 3,
+      "holder_kind": "awaiting_io_signal",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "awaiting_io_signal",
+          "local_work_iterations": 0,
+          "acquired_at": 9845.2271275,
+          "release_signal_observed": true,
+          "released_at": 9845.3171507
+        },
+        "wait_ms": 89.85890000076324,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    },
+    {
+      "repeat": 3,
+      "holder_kind": "local_maintenance_work",
+      "public_observation": {
+        "request_id": "q31",
+        "acquired": false,
+        "outcome": "local_mutex_acquisition_timeout",
+        "configured_deadline_ms": 80,
+        "owner_stack_captured": false,
+        "outbound_attempted": false
+      },
+      "private_execution_trace": {
+        "owner": {
+          "holder_kind": "local_maintenance_work",
+          "local_work_iterations": 6,
+          "acquired_at": 9845.317652,
+          "work_checksum": "3c4a0ccbcb0a17c352b5f153c17c0ce701482441b5999bc627913e83f679905b",
+          "released_at": 9845.4106205
+        },
+        "wait_ms": 92.83270000014454,
+        "errors": [],
+        "holder_joined": true,
+        "mutex_released": true
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "repeat_1_unheld_baseline_acquires",
+      "passed": true,
+      "observed": {
+        "acquired": true
+      }
+    },
+    {
+      "check": "repeat_1_held_mutex_times_out",
+      "passed": true,
+      "observed": [
+        "local_mutex_acquisition_timeout",
+        "local_mutex_acquisition_timeout"
+      ]
+    },
+    {
+      "check": "repeat_1_different_holder_paths_same_available_observation",
+      "passed": true,
+      "observed": [
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df",
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df"
+      ]
+    },
+    {
+      "check": "repeat_1_holders_cleanup",
+      "passed": true,
+      "observed": [
+        true,
+        true
+      ]
+    },
+    {
+      "check": "repeat_2_unheld_baseline_acquires",
+      "passed": true,
+      "observed": {
+        "acquired": true
+      }
+    },
+    {
+      "check": "repeat_2_held_mutex_times_out",
+      "passed": true,
+      "observed": [
+        "local_mutex_acquisition_timeout",
+        "local_mutex_acquisition_timeout"
+      ]
+    },
+    {
+      "check": "repeat_2_different_holder_paths_same_available_observation",
+      "passed": true,
+      "observed": [
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df",
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df"
+      ]
+    },
+    {
+      "check": "repeat_2_holders_cleanup",
+      "passed": true,
+      "observed": [
+        true,
+        true
+      ]
+    },
+    {
+      "check": "repeat_3_unheld_baseline_acquires",
+      "passed": true,
+      "observed": {
+        "acquired": true
+      }
+    },
+    {
+      "check": "repeat_3_held_mutex_times_out",
+      "passed": true,
+      "observed": [
+        "local_mutex_acquisition_timeout",
+        "local_mutex_acquisition_timeout"
+      ]
+    },
+    {
+      "check": "repeat_3_different_holder_paths_same_available_observation",
+      "passed": true,
+      "observed": [
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df",
+        "9c72e1beb4a2a3780d2459bfe765548a88170599563062bcf5cdb7e54a9368df"
+      ]
+    },
+    {
+      "check": "repeat_3_holders_cleanup",
+      "passed": true,
+      "observed": [
+        true,
+        true
+      ]
+    }
+  ],
+  "limitations": [
+    "Actual local mutex contention demonstrates the wait mechanism. Owner stack and operation are deliberately outside the public observation contract.",
+    "The two real owner paths produce the same available public observation. This constructive ambiguity supports only the mechanism boundary for this experiment.",
+    "The experimental80ms deadline differs from the authored2100ms row. No CPU12% value is measured or claimed.",
+    "Private traces reveal the experimental holder paths; sending them to the model would change the information boundary.",
+    "This does not establish what caused any original incident or authorize a human truth signature."
+  ],
+  "source_sha256": {
+    "D:\\code\\it_incident_agent\\evals\\rca_experiments.py": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+    "D:\\code\\it_incident_agent\\scripts\\reproduce_rca.py": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece"
+  }
+}

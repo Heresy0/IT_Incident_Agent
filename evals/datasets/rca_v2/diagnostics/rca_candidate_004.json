@@ -1,0 +1,45 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "source_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "configuration"
+      }
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "category": "dependency"
+      }
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "记录中明确写道：06:03 client read timeout_ms loaded as 100; previous value=2000.",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "control_id": "control_02",
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    }
+  ]
+}

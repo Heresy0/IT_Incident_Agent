@@ -186,7 +186,11 @@ def build_summary(bundles, dataset, records, sources, comparability, *, human=No
             'selected_candidate_strata': dict(Counter(cases[key]['truth']['identifiability'] for key in selected_ids)),
             'selected_splits': dict(Counter(cases[key]['split'] for key in selected_ids)),
             'candidate_labels_are_not_gold': True, 'holdout_sealed': independent,
-            'origin': 'authored_synthetic_provisional'},
+            'origin': next(iter({c['truth']['origin'] for c in cases.values()}))
+                if len({c['truth']['origin'] for c in cases.values()}) == 1 else 'mixed',
+            'origins': dict(Counter(c['truth']['origin'] for c in cases.values())),
+            'machine_experiment_cases': sum(c['truth']['origin'] == 'executed_synthetic_experiment' for c in cases.values()),
+            'machine_execution_is_human_gold': False},
         'human_review': human_coverage, 'formal_metrics': scored,
         'human_verified': review_ready, 'is_gold': False,
         'formal_status': 'scripted_wiring_only_no_quality_score' if not live_eligible else 'human_reviewed_candidate_descriptive_only' if formal_ready else 'pending_human_review_or_execution',

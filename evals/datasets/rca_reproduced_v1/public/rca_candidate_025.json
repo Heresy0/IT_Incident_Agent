@@ -1,0 +1,81 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Measured local Python program; staging below is the required native authorization scope label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "eval_program_observation_025",
+      "title": "Measured local program observation exercise",
+      "symptoms": "The measured local gateway client receives a generic502 response while detailed upstream diagnostics are absent from the available observation.",
+      "scope": {
+        "service": "component_025",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_025",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"body\":\"Bad Gateway\",\"downstream_status_captured\":false,\"http_status\":502,\"original_exception_captured\":false,\"request_id\":\"q37\",\"wire_trace_captured\":false}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_025",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"change_source_status\":\"SOURCE_NOT_CONFIGURED\",\"request_id\":\"q37\"}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": [],
+    "source_errors": {
+      "get_recent_changes": "SOURCE_NOT_CONFIGURED"
+    }
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

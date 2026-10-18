@@ -1,0 +1,89 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_001",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "Requests time out waiting for pooled connections.",
+      "scope": {
+        "service": "component_001",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_001"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "06:03 applied pool_max=4; previous pool_max=40; traffic stayed 30 requests/s."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q11 acquisition timeout: in_use=4 pool_max=4 waiters=28; SQL hold time stayed 20ms."
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T06:07:00+00:00",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Synthetic fixture replay record: same 30 requests/s and 20ms SQL, pool_max=40 => no acquisition timeout; pool_max=4 => acquisition timeout."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

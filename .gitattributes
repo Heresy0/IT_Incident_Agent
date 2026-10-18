@@ -69,4 +69,10 @@
 /examples/showcase/interview-minimal-repairs-validation.json -text
 /examples/showcase/interview-consolidation.md -text
 /evals/interview_consolidation/README.md -text
+
+# RCA manifests bind exact observation and executed-evidence bytes.
+/evals/datasets/rca_v2/**/*.json -text
+/evals/datasets/rca_reproduced_v1/** -text
+/evals/datasets/rca_integration_v1/**/*.json -text
+/evals/rca-integration-validation-20261018.json -text
 /examples/showcase/interview-closeout-validation.json -text

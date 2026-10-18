@@ -1,0 +1,104 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "observation_origin": "Measured local Python program; staging below is the required native authorization scope label, not a staging deployment.",
+    "ticket": {
+      "incident_id": "eval_program_observation_001",
+      "title": "Measured local program observation exercise",
+      "symptoms": "Some local pooled-resource acquisitions reach their configured deadline under the measured burst load.",
+      "scope": {
+        "service": "component_001",
+        "environment": "staging",
+        "service_version": "local-program-v1",
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "allowed_dependencies": []
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"burst_definition\":\"30 measured request tasks released together at a barrier\",\"parameters\":{\"acquisition_timeout_ms\":100,\"burst_width_ms\":0,\"pool_capacities\":[40,4,40],\"requests_per_window\":30,\"resource_hold_ms\":20,\"smooth_negative_control_capacity\":4,\"window_seconds\":1.0},\"program\":\"local Python semaphore resource model; no SQL or remote database\",\"smooth_definition\":\"30 requests scheduled evenly over one second\"}"
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"trials\":[{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"before\",\"repeat\":1,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"capacity_restored\",\"repeat\":1,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"before\",\"repeat\":2,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"capacity_restored\",\"repeat\":2,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"before\",\"repeat\":3,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":40,\"distribution\":\"burst\",\"max_observed_in_use\":30,\"phase\":\"capacity_restored\",\"repeat\":3,\"request_count\":30,\"resources_released\":true}]}"
+      },
+      {
+        "id": "row_03",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"trials\":[{\"acquired\":24,\"acquisition_timeouts\":6,\"capacity\":4,\"distribution\":\"burst\",\"max_observed_in_use\":4,\"phase\":\"capacity_reduced\",\"repeat\":1,\"request_count\":30,\"resources_released\":true},{\"acquired\":24,\"acquisition_timeouts\":6,\"capacity\":4,\"distribution\":\"burst\",\"max_observed_in_use\":4,\"phase\":\"capacity_reduced\",\"repeat\":2,\"request_count\":30,\"resources_released\":true},{\"acquired\":24,\"acquisition_timeouts\":6,\"capacity\":4,\"distribution\":\"burst\",\"max_observed_in_use\":4,\"phase\":\"capacity_reduced\",\"repeat\":3,\"request_count\":30,\"resources_released\":true}]}"
+      },
+      {
+        "id": "row_04",
+        "timestamp": "2026-10-18T08:18:29.475951+00:00",
+        "timestamp_basis": "experiment_manifest_capture_completion_not_request_event_time",
+        "service": "component_001",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-executed-program-observations-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "MEASURED_OBSERVATION",
+        "message": "{\"trials\":[{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":4,\"distribution\":\"smooth\",\"max_observed_in_use\":1,\"phase\":\"smooth_negative_control\",\"repeat\":1,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":4,\"distribution\":\"smooth\",\"max_observed_in_use\":1,\"phase\":\"smooth_negative_control\",\"repeat\":2,\"request_count\":30,\"resources_released\":true},{\"acquired\":30,\"acquisition_timeouts\":0,\"capacity\":4,\"distribution\":\"smooth\",\"max_observed_in_use\":1,\"phase\":\"smooth_negative_control\",\"repeat\":3,\"request_count\":30,\"resources_released\":true}]}"
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

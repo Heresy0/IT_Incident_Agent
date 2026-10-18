@@ -1,0 +1,42 @@
+{
+  "schema_version": "rca-program-experiments-v1",
+  "started_at": "2026-10-18T08:18:25.254010+00:00",
+  "completed_at": "2026-10-18T08:18:29.475951+00:00",
+  "origin": "local_controlled_program_execution",
+  "human_verified": false,
+  "is_gold": false,
+  "human_review_status": "pending",
+  "model_calls": 0,
+  "business_application_imported": false,
+  "original_incident_reproduced": false,
+  "source_sha256": {
+    "D:\\code\\it_incident_agent\\evals\\rca_experiments.py": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+    "D:\\code\\it_incident_agent\\scripts\\reproduce_rca.py": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece"
+  },
+  "source_unchanged_during_run": true,
+  "python_version": "3.12.2 (tags/v3.12.2:6abddd9, Feb  6 2024, 21:26:36) [MSC v.1937 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "repeats": 3,
+  "cases": [
+    {
+      "case_id": "rca_candidate_001",
+      "path": "experiment_001.json",
+      "sha256": "b42961051dd76ff30e1bcd662cbda415912c95584cf64ae808743d08f4776681",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_candidate_019",
+      "path": "experiment_019.json",
+      "sha256": "39b7c6c21c1d521b6713400b4703d0cc549a6f5dc970b91f8aab3d682aa500a8",
+      "status": "passed"
+    },
+    {
+      "case_id": "rca_candidate_025",
+      "path": "experiment_025.json",
+      "sha256": "445e5e1f86e9c1c138f8d05d03ac9556af3e191aa5b62c5d2b148d69800e57b5",
+      "status": "passed"
+    }
+  ],
+  "status": "passed",
+  "interpretation": "Measured local-program execution evidence. Human causal adjudication and original-fixture validation remain pending."
+}

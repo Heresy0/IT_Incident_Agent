@@ -1,0 +1,575 @@
+{
+  "schema_version": "rca-integration-tasks-v1",
+  "tasks": [
+    {
+      "task_id": "legacy_001_wording_wording_v1",
+      "group_id": "legacy_001_wording",
+      "case_id": "rca_candidate_001",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v1",
+      "public_path": "../rca_v1/public/rca_candidate_001.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "legacy_001_wording_wording_v2",
+      "group_id": "legacy_001_wording",
+      "case_id": "rca_candidate_001",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v2",
+      "public_path": "../rca_v2/public/rca_candidate_001.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_001_refs_full_refs",
+      "group_id": "reproduced_001_refs",
+      "case_id": "rca_candidate_001",
+      "comparison_kind": "reference_ablation",
+      "condition": "full_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_001.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "在这组局部资源池实验中，同步突发30个任务、资源持有参数20ms、获取期限100ms时，容量4出现获取超时，容量40的前后对照未出现超时；平滑30请求/秒、容量4的对照未出现超时。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ],
+        [
+          "row_03",
+          "message"
+        ],
+        [
+          "row_04",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_001_refs_no_refs",
+      "group_id": "reproduced_001_refs",
+      "case_id": "rca_candidate_001",
+      "comparison_kind": "reference_ablation",
+      "condition": "no_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_001.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "在这组局部资源池实验中，同步突发30个任务、资源持有参数20ms、获取期限100ms时，容量4出现获取超时，容量40的前后对照未出现超时；平滑30请求/秒、容量4的对照未出现超时。",
+      "level": "mechanism",
+      "selectors": []
+    },
+    {
+      "task_id": "reproduced_001_refs_wrong_field",
+      "group_id": "reproduced_001_refs",
+      "case_id": "rca_candidate_001",
+      "comparison_kind": "reference_ablation",
+      "condition": "wrong_field",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_001.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "在这组局部资源池实验中，同步突发30个任务、资源持有参数20ms、获取期限100ms时，容量4出现获取超时，容量40的前后对照未出现超时；平滑30请求/秒、容量4的对照未出现超时。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "error_code"
+        ],
+        [
+          "row_02",
+          "error_code"
+        ],
+        [
+          "row_03",
+          "error_code"
+        ],
+        [
+          "row_04",
+          "error_code"
+        ]
+      ]
+    },
+    {
+      "task_id": "legacy_019_wording_wording_v1",
+      "group_id": "legacy_019_wording",
+      "case_id": "rca_candidate_019",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v1",
+      "public_path": "../rca_v1/public/rca_candidate_019.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "legacy_019_wording_wording_v2",
+      "group_id": "legacy_019_wording",
+      "case_id": "rca_candidate_019",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v2",
+      "public_path": "../rca_v2/public/rca_candidate_019.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_019_refs_full_refs",
+      "group_id": "reproduced_019_refs",
+      "case_id": "rca_candidate_019",
+      "comparison_kind": "reference_ablation",
+      "condition": "full_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_019.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "请求q31在配置的80ms期限内未取得本地互斥锁，且未发起网络调用；当前公开记录没有持锁者堆栈。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_019_refs_no_refs",
+      "group_id": "reproduced_019_refs",
+      "case_id": "rca_candidate_019",
+      "comparison_kind": "reference_ablation",
+      "condition": "no_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_019.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "请求q31在配置的80ms期限内未取得本地互斥锁，且未发起网络调用；当前公开记录没有持锁者堆栈。",
+      "level": "mechanism",
+      "selectors": []
+    },
+    {
+      "task_id": "reproduced_019_refs_wrong_field",
+      "group_id": "reproduced_019_refs",
+      "case_id": "rca_candidate_019",
+      "comparison_kind": "reference_ablation",
+      "condition": "wrong_field",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_019.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "resource"
+          }
+        }
+      ],
+      "statement": "请求q31在配置的80ms期限内未取得本地互斥锁，且未发起网络调用；当前公开记录没有持锁者堆栈。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "error_code"
+        ],
+        [
+          "row_02",
+          "error_code"
+        ]
+      ]
+    },
+    {
+      "task_id": "legacy_025_wording_wording_v1",
+      "group_id": "legacy_025_wording",
+      "case_id": "rca_candidate_025",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v1",
+      "public_path": "../rca_v1/public/rca_candidate_025.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00"
+          }
+        }
+      ],
+      "statement": "现有记录已证明远端数据库进程崩溃是所有失败请求的唯一根因。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "legacy_025_wording_wording_v2",
+      "group_id": "legacy_025_wording",
+      "case_id": "rca_candidate_025",
+      "comparison_kind": "wording_pair",
+      "condition": "wording_v2",
+      "public_path": "../rca_v2/public/rca_candidate_025.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "args": {
+            "start": "2026-10-18T06:00:00+00:00",
+            "end": "2026-10-18T06:20:00+00:00"
+          }
+        }
+      ],
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_025_refs_full_refs",
+      "group_id": "reproduced_025_refs",
+      "case_id": "rca_candidate_025",
+      "comparison_kind": "reference_ablation",
+      "condition": "full_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_025.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00"
+          }
+        }
+      ],
+      "statement": "请求q37收到HTTP502；当前公开记录未包含原始异常类型、下游状态和线路追踪，变更观测源未配置。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ]
+      ]
+    },
+    {
+      "task_id": "reproduced_025_refs_no_refs",
+      "group_id": "reproduced_025_refs",
+      "case_id": "rca_candidate_025",
+      "comparison_kind": "reference_ablation",
+      "condition": "no_refs",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_025.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00"
+          }
+        }
+      ],
+      "statement": "请求q37收到HTTP502；当前公开记录未包含原始异常类型、下游状态和线路追踪，变更观测源未配置。",
+      "level": "mechanism",
+      "selectors": []
+    },
+    {
+      "task_id": "reproduced_025_refs_wrong_field",
+      "group_id": "reproduced_025_refs",
+      "case_id": "rca_candidate_025",
+      "comparison_kind": "reference_ablation",
+      "condition": "wrong_field",
+      "public_path": "../rca_reproduced_v1/public/rca_candidate_025.json",
+      "source_queries": [
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "configuration"
+          }
+        },
+        {
+          "tool": "get_service_logs",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00",
+            "category": "dependency"
+          }
+        },
+        {
+          "tool": "get_recent_changes",
+          "args": {
+            "start": "2026-10-18T08:18:25.254010+00:00",
+            "end": "2026-10-18T08:18:30.475951+00:00"
+          }
+        }
+      ],
+      "statement": "请求q37收到HTTP502；当前公开记录未包含原始异常类型、下游状态和线路追踪，变更观测源未配置。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "error_code"
+        ],
+        [
+          "row_02",
+          "error_code"
+        ]
+      ]
+    }
+  ]
+}

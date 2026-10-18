@@ -1,0 +1,193 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "case_id": "rca_candidate_019",
+  "split": "candidate_acceptance",
+  "independence_group": "executed_template_executed_mutex_boundary",
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "holdout_sealed": false,
+  "identifiability": "mechanism_only",
+  "scope": {
+    "service": "component_019",
+    "time_window": {
+      "start": "2026-10-18T08:18:25.254010+00:00",
+      "end": "2026-10-18T08:18:30.475951+00:00"
+    },
+    "causal_level": "mechanism_only",
+    "target_boundary": "Local request failure within the declared observation window; no organizational why."
+  },
+  "causal_conditions": [
+    {
+      "condition_id": "condition_1",
+      "statement": "request=q31在本地互斥锁获取处到达80ms配置期限。",
+      "kind": "observed_mechanism"
+    }
+  ],
+  "causal_edges": [
+    {
+      "from": "condition_1",
+      "to": "observed_failure",
+      "mechanism": "本次可见观测支持本地互斥锁获取超时，不能区分私有执行轨迹中的不同持锁程序路径。"
+    }
+  ],
+  "reference_explanation": "本次可见观测支持本地互斥锁获取超时，不能区分私有执行轨迹中的不同持锁程序路径。",
+  "evidence_criteria": [
+    {
+      "criterion_id": "criterion_01",
+      "proposition": "本次可见观测支持本地互斥锁获取超时，不能区分私有执行轨迹中的不同持锁程序路径。",
+      "acceptable_observation_sets": [
+        [
+          "row_01",
+          "row_02"
+        ]
+      ],
+      "required": true,
+      "equivalent_fact_paths_allowed": true
+    }
+  ],
+  "boundaries": {
+    "must_preserve_unknown": [
+      "The holder operation, stack, release condition and reason for holding the mutex are withheld from the available observation."
+    ],
+    "forbidden_assertions": [
+      "A successful health probe proves every business route healthy.",
+      "Missing/unavailable source proves the remote process crashed.",
+      "Temporal correlation alone proves a unique root cause."
+    ]
+  },
+  "oracle_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "resource"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    }
+  ],
+  "sufficient_evidence_queries": [
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "dependency"
+      },
+      "expected_observation_ids": [
+        "row_02"
+      ],
+      "expected_error": null
+    },
+    {
+      "tool": "get_service_logs",
+      "args": {
+        "start": "2026-10-18T08:18:25.254010+00:00",
+        "end": "2026-10-18T08:18:30.475951+00:00",
+        "category": "resource"
+      },
+      "expected_observation_ids": [
+        "row_01"
+      ],
+      "expected_error": null
+    }
+  ],
+  "fixed_controls": [
+    {
+      "control_id": "control_01",
+      "statement": "request=q31在80ms配置期限到达时未取得本地互斥锁，并且该请求未发起出站调用。",
+      "level": "mechanism",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ],
+        [
+          "row_02",
+          "message"
+        ]
+      ],
+      "expected_relation": "supported"
+    },
+    {
+      "control_id": "control_02",
+      "statement": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+      "level": "trigger",
+      "selectors": [
+        [
+          "row_01",
+          "message"
+        ]
+      ],
+      "expected_relation": "insufficient"
+    }
+  ],
+  "provenance": {
+    "human_verified": false,
+    "is_gold": false,
+    "human_review_status": "pending",
+    "causal_confirmation_status": "not_confirmed",
+    "reproduction_evidence": [],
+    "reviewers": [],
+    "source_case_id": null,
+    "source_origin": "executed_local_program_observations",
+    "reference_basis": "Passed local-program measurements with raw execution and source snapshots; causal interpretation remains pending human review.",
+    "required_next_step": "Review the measured evidence, information boundary and causal interpretation; machine execution is not human gold.",
+    "notes": [
+      "Measured new local-program scenario; not a reproduction of the original authored v1 incident."
+    ]
+  },
+  "machine_evidence": {
+    "status": "executed_not_human_adjudicated",
+    "experiment_manifest": {
+      "path": "machine/manifest.json",
+      "sha256": "1842f1e9faa5bf89dd92b3634561bd837e47cab7c6025dc11e50aa3cf3e7a9f6"
+    },
+    "artifacts": [
+      {
+        "path": "machine/experiment_019.json",
+        "sha256": "39b7c6c21c1d521b6713400b4703d0cc549a6f5dc970b91f8aab3d682aa500a8",
+        "kind": "raw_execution"
+      },
+      {
+        "path": "machine/source/rca_experiments.py",
+        "sha256": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+        "kind": "executed_program_source"
+      },
+      {
+        "path": "machine/source/reproduce_rca.py",
+        "sha256": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece",
+        "kind": "executed_program_source"
+      }
+    ],
+    "case_parameters": {
+      "acquisition_timeout_ms": 80,
+      "holder_release": "after_waiter_returns"
+    },
+    "original_authored_world_confirmed": false,
+    "human_verified": false,
+    "is_gold": false,
+    "limitations": [
+      "Actual local mutex contention demonstrates the wait mechanism. Owner stack and operation are deliberately outside the public observation contract.",
+      "The two real owner paths produce the same available public observation. This constructive ambiguity supports only the mechanism boundary for this experiment.",
+      "The experimental80ms deadline differs from the authored2100ms row. No CPU12% value is measured or claimed.",
+      "Private traces reveal the experimental holder paths; sending them to the model would change the information boundary.",
+      "This does not establish what caused any original incident or authorize a human truth signature."
+    ]
+  }
+}

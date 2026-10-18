@@ -1,0 +1,1230 @@
+{
+  "schema_version": "rca-integration-validation-v1",
+  "created_at_utc": "2026-10-18T08:49:31.005591+00:00",
+  "scope": "evaluation_and_local_experiments_only",
+  "branch": "codex/autonomous-investigation-v2",
+  "starting_head": "68ff3f0ee515b65e3d0af9a08508aabdb6961611",
+  "source_preservation": {
+    "status": "passed",
+    "initial_freeze": {
+      "path": "output/rca-integration-study-20261018/freeze.json",
+      "sha256": "f6ee8473f9220fc7bb840ccbeaa19d4cb71d35881e074e61abe2d9f26f100cdb"
+    },
+    "application_files": 98,
+    "application_sha256": {
+      "app/app_main.py": "dc49ba7a6384951690636749561ea8643ea730a3a302a8a774f0e88982f97b89",
+      "app/agents/contracts.py": "a4cc9577141d3aec0817b7e92a0d071da9bdd7591139c2fdc6b6952ac0eb665d",
+      "app/agents/investigation.py": "3fe6d36f9b57dac06413cfdd633187e01edbd7f15b8616960abf55861005f090",
+      "app/agents/investigation_prompt.py": "614d242e151b6ade46f60b168c51cb9071cd36de752249776dbea3d688dda2bb",
+      "app/agents/models.py": "e6ca498a24ea8db6300831d649ec5fc63284ee65d13c6cde77be19a6812754d5",
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "app/agents/protocol.py": "2f7f50c0325303972f0fdb1a09bcc0010d710433f30f58fd666d90362b7bcd1a",
+      "app/agents/role_runner.py": "244213e6d762b2ea9974982b3d1f8d64718163cf58d0a7eb10b321b642089d14",
+      "app/agents/scripted.py": "a840fe8e7802ee94029fff84d428193a92cc15a03b0d57385fd33119c979d4ab",
+      "app/agents/scripted_investigation.py": "1b570cf7f9fba5927f6e22a31a489a7887e5b990a6c2d49f7bdc3a6ff30d35b7",
+      "app/agents/single.py": "f7b5e91f0b6bb690df83fddc4f410d920c83604a0995efa17e211abcbc1becbb",
+      "app/agents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/api/auth.py": "8f32624daa4e0aad0cf93d8a162250ae18486dcd874dc7c9c61c1a3a1b3517eb",
+      "app/api/health.py": "022750c290966788a90013a94d8cda4e446aa047b7cdb5e704559fd69afa723b",
+      "app/api/incidents.py": "7c8e60a7c90d093d7bedea35d0a1d5a4facec52fb02f59b3291d5c0249bb7387",
+      "app/api/repairs.py": "53ce29f9be25b4fbf4b2fe9ac385c08496d19ca4ede3c254a5d91246b97fcaa2",
+      "app/api/runbooks.py": "bf4565629151696c70ea360c77656afe21ee279e343b545fed560e84d53cd483",
+      "app/api/runs.py": "0ad8f4e3e93b18357d4e1b22d6d86408c40f1e1a79bf643e861bcc74814efdce",
+      "app/api/schemas.py": "ade553292e72fb40a633069592db9f4d9b640a1949bf0c787203c462edbc2719",
+      "app/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/config/incident.py": "c2762cbfae0194785c0cda0fd0a07208cf1e90763886ec9a0668b30a74b55424",
+      "app/config/settings.py": "a107b72b7d19f382fd265115a9126027755983adda1e3b76b249c9b118ac90d0",
+      "app/config/__init__.py": "acc23040200104b6d21843d5d364c16034003e3f81f20d396e8bf0a54f4efff5",
+      "app/evidence/completion.py": "22403333f49429bf584a2ea17f0bd240e273eb437ca68f1ac0bb57366fc5a935",
+      "app/evidence/contracts.py": "d5224281522ddfcdc278287090c86e5770ce0a7cee0d0cd60193ee3b318d836e",
+      "app/evidence/diagnosis.py": "d649932cad44183bcab48e7c33d5d471a0f77ca760b1fb87239f662c4646158f",
+      "app/evidence/model_view.py": "a194a50fd2be8fc06523809b926a133eb28eaf77d81edd81e2b6dacb04b870a8",
+      "app/evidence/observations.py": "a62375efc482d4097b03ee5b53f0723e70bc4612388ab802630787d170c9a552",
+      "app/evidence/ownership.py": "0c09349d5a63833ac8c48624901cf869cbd3d1d5e37318a70c793cb6aea1c667",
+      "app/evidence/render.py": "df822fcb01d1800f28c1a2850da4fb5307b3b04bfb0fac9204926c270e29b55f",
+      "app/evidence/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/incidents/contracts.py": "23a76d20db99ac217da25af072233d1b0904ae726d66fddf7f5ca7256e8905b6",
+      "app/incidents/support.py": "87386dfd624e568c77e73c789d793589924d24527e797493fd424b5587416a68",
+      "app/incidents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/knowledge/chunking.py": "44cda506b48b8049bf473a16fdc21898be2f94015158f48d1996a350ee694b44",
+      "app/knowledge/configuration.py": "6713d05f9ef0b5c1b0ec7079356d7c23717fc608dbdb112481049a89374919db",
+      "app/knowledge/database.py": "233677685cb6aa9f1a6acbcd1a3fd7f5d4d655d20258b04a1998f40c03e11878",
+      "app/knowledge/ingest.py": "6dcf0cc8f6a5bb12f7beca31dddb21de046e8403b7a450a3181a60fd0ec0d858",
+      "app/knowledge/retrieval.py": "7c4d70439ebadf3e26b393fa6c983ca6702f4fce8f6bf6352cdc43814a9decca",
+      "app/knowledge/__init__.py": "366b6c8192d3c6096cc412b1785aee445c10241ae96956b9c7453e6535ed86f1",
+      "app/observability/telemetry.py": "3d3c93592eb5693e82f66ff3e97973bb9f8abe00ef17e6ab576702e5b2ee17c3",
+      "app/observability/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/providers/bound.py": "83d0ba99a045f6f26a7d4de02f3626b67230cecbfb02cab316267dabd3f2fda6",
+      "app/providers/configuration.py": "5a9f05ababbfec85f2498c5e32890028954c96c02a75deb774250563af0d1ab4",
+      "app/providers/fixtures.py": "7a9f204c609cd4ad3690c6b9bdc93df3653e8d54649c93f166b0d949b9d8f5d8",
+      "app/providers/history.py": "8f425bb6476efa583936f1923bcb2791db3bc321747d1537cf0090a9ebf1db62",
+      "app/providers/http.py": "8d64b9c7f5e6a75ce46a8ec546aff75f41dcf9a05988a33014d66c1df3af8fb0",
+      "app/providers/logs.py": "60419cd2080f49c23522355dbf8bbc7f4f4fc7a90de416a8791a2654d69e0295",
+      "app/providers/registry.py": "80d3644bcdcfd0c865136950fb32eb6675a6aa5125ddecad50b020885cc76c4a",
+      "app/providers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/repairs/application.py": "1a959e439074524963faea0273b3727f931e1377610bcbe4f3f9460da08a0463",
+      "app/repairs/contracts.py": "fbb7715213113c8264ad96837b622c41029b556bce0c0b388e1e16d814aa4f06",
+      "app/repairs/executors.py": "c5bf15c0f9bc40bbb7e2ce32d2439ec64495325a9719411d09bbd7e8aad72837",
+      "app/repairs/service.py": "37bcf90d7d18dc2d2b24e550da48c3c48d03acff0670d7538817b24f8c28a936",
+      "app/repairs/verification.py": "fdf2a08c94a9d446cff8e51491d4422627dd994f4a112826a8240abefb8432b8",
+      "app/repairs/__init__.py": "e54368c62dc3fc7e08f6f52323b81d7133ccf169638d2d238c7d12c356667c0e",
+      "app/runtime/branch.py": "6df10425a1e379e36feca784c5ef7ffaff6eb043071d2cea448a360d413dac5b",
+      "app/runtime/context.py": "65663424f03cf80ab151871334f7ffa3d09a87ac07a942f78ec0e67380983579",
+      "app/runtime/version.py": "7d76206e4519464b93a0896f33ab5e6f8ebe883f4071deb0568f728a16590fbe",
+      "app/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/storage/incidents.py": "6281044a5953afd8dc711ca35ac6fd4150dee5417c3b66761b5efd5f8bcdba43",
+      "app/storage/repairs.py": "f395ee0db85d4a00e6ae97e4f27e873375bea5d5dfee5f1950007dfc8ef96164",
+      "app/storage/runs.py": "c52f0dfed710e5e0c595a4e5b0288c3bbc870e756cb993839c7d660bb3adf7f6",
+      "app/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/tools/executor.py": "6cb821aabb18007455ff420fe17d8009734e0e35e10636d63fb3a79a9bf5134a",
+      "app/tools/query_coverage.py": "60c028915c0178fe4e5cdb212c7a3cd117a363cfc226a63c75554107d0197f82",
+      "app/tools/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/workflow/collection.py": "563796917062cec0508719f189e62c5de4f1d914d87da50e8b78ff6f8ebaff74",
+      "app/workflow/coordinator.py": "952679ed9d6db8ebe9287a8e92b9729b762b685a53a01aab17383067cc312c11",
+      "app/workflow/dependencies.py": "ee12568397c7af578ba33c465687fab9016de75e52bcb00c5817f5115c27f7bc",
+      "app/workflow/diagnostic_audit.py": "69a766b2dd1bcaf6e79baab9d001f8c0a377c03483bb59da57a4bf22ea2e4e7a",
+      "app/workflow/diagnostic_pack.py": "f925a9db5c34173bcd5f29a66770f2a0bea0f83ec92b6950bbeb9cee2c54f71e",
+      "app/workflow/evidence_needs.py": "a72218faa39def4b8c55ab0c8a8478710391bd7b1d1c1e031d98f3bd6d8e802b",
+      "app/workflow/execution.py": "1adad90ccc11581367806c26756fc11525e694d5a9cb6eb230566b5d43061053",
+      "app/workflow/graph.py": "323bd082c685b35dc629065743cd1deb2a230a4718aa26497ab8abc0c5a73132",
+      "app/workflow/handoff.py": "7352499779dd9fae5d0369ea695ca8cf3508c791ac7c0e21c0a16e876d24047b",
+      "app/workflow/model_input.py": "1c9b529ce9b63879e74f6ecf988d32b31f668709868ff14403aaa5b5c5634b68",
+      "app/workflow/planning.py": "54d95bf63deaf08c94225fe0a24b0ba594aed899b3ad900260a86c60eef5f3bb",
+      "app/workflow/policy.py": "b189ba5a616336cb8c66a48b246f1531ceaf226b5c1ef4a02cc469efe6124353",
+      "app/workflow/reporting.py": "9db7b2f2861ffc5b4197fb46a6cea0aeab458c7233d0ef9af8054f43ac28f57f",
+      "app/workflow/review.py": "7bc77900af0ef1f2449efad1cde0ca975073c7bab232b61ab1d145e03daa934c",
+      "app/workflow/review_outcome.py": "e5fe836b96f70aa423765bdbdeb95e1e4ebca76e4b1a42771eb2099322f33342",
+      "app/workflow/review_protection.py": "3eb60cc9737e6f30dd911f939a8f51d7d0a8bcb4beb1ed4f155b0c115478f3a0",
+      "app/workflow/rollout.py": "29bd58a9f9136969b070c55055025ffc79b99549127b95d402822e01f1730c15",
+      "app/workflow/service.py": "72534949eb5888326ee9c5e43b376864817b6132c364a13d65b9e9e3250f68d7",
+      "app/workflow/state.py": "559f8a9c1a4d04777989e2c6cb706829e7335e37fae8c426a23fae3316b3ba21",
+      "app/workflow/task_checks.py": "871fada6aa216f8413d85e4a9a7e8ca63304bb7e693949aecfc0d300b3523f88",
+      "app/workflow/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "app/workflow/v2/challenge.py": "671c7f801a89fc332b8daf850c8ac256e5cc6a9296ea53e747d57666849a4114",
+      "app/workflow/v2/contracts.py": "5b4f7763e9dae52e9f440808b89d6beff888401fee15da87d05e4a03077ae452",
+      "app/workflow/v2/engine.py": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58",
+      "app/workflow/v2/outcome.py": "1612abb0b9d5b74de29393a8598ec749ac92fd83d867e3a22b24f307c2513719",
+      "app/workflow/v2/policy.py": "1a068872f518fede64e946d4c4fcd1e18e5442f07b87dbb773f599c280c73f61",
+      "app/workflow/v2/questions.py": "7925329374a980299d925e579bba404ea718bb7fde4f629d5dea4e325fae0650",
+      "app/workflow/v2/review.py": "09b7cd8f40375ca6c36eb38863bb33556dd7ba01b31b2efcf052c50b4e1d69b6",
+      "app/workflow/v2/rework.py": "2041bb3585d7efd6d3b01457ea4c7605347d5203d875c85f2f6c9a0e22c06f22",
+      "app/workflow/v2/scripted.py": "1f99a3e8ea52bb72aaa8cb39be4208cb9b21efbe913df236753416a3ccca5e4a",
+      "app/workflow/v2/__init__.py": "7f00a8608293dcfa57467b886b980b6e5ad4a3eb5f12a02981f24cd8d127c4a5"
+    },
+    "original_uncommitted_sha256": {
+      "app/agents/prompts.py": "14787a28ed4b180de8bd58a89fbab78adcfe45db39e7157a4d5e4f303f857a37",
+      "evals/multi-prompt-simplification-validation-20261017.json": "a432f710659c5a71a4b0014bf1da3c7889452bc60b7414ae91b5f048243ff197",
+      "tests/workflow/test_prompt_query_boundaries.py": "25caa76b3d7cf4a2cd8aa57224ae710e33bcd48da5df10efdd48a941de2c8e90"
+    },
+    "protected_configuration_sha256": {
+      ".env": "8561ac2f3834e2f4ce0b5b38fe965bd3d8b2b6a7d578febf56d6a4cd372a22c8",
+      "config.json": "fd71cdfed057bd06a472c90e79c84a61a13aa40f0670ec8c97c5417ca3033138"
+    },
+    "old_artifacts_unchanged": 144,
+    "business_or_default_budget_modified": false
+  },
+  "evaluation_source_sha256": {
+    "evals/closed_loop_cases.py": "0c266506027b1e95a0ccf747908277e7e95a62d8ed232fcc45ee7f0c4e812688",
+    "evals/frozen_version_cases.py": "77093e4dab682609854dfc0965b8e7b6a282a1f6fbb3f974976cec3848d161c1",
+    "evals/rca_cases.py": "8eadf688454f10dac680c162225c6a9c77c26555fc17234c4ea85c2467da1966",
+    "evals/rca_cases_v2.py": "b8779b99dea2cd49ba5424d57e8c3b4e9184f2a0fc5537ea3b18eecce0f0438d",
+    "evals/rca_contracts.py": "f85a606c34d79186b05c7054d0a58c5aea964d7b31618666b5c0b12b08b60087",
+    "evals/rca_experiments.py": "cd8367d23e29ff4606f2248b9f48f66bff8373c56240ed23d882d7a414f715da",
+    "evals/rca_reproduced_cases.py": "d2ed79c8e7119eb49f8772fd51e55c8c10e48917b77bdc3b0889145217b6c95d",
+    "evals/rca_scoring.py": "0b875b339d789dd6cb384595c1d423b4baee50434bf540b85154bdc2d54f4ec6",
+    "scripts/evaluate_autonomous.py": "fa1d3286a17a82ee96addd6e15e9ecae2ee1a797921a68aac7e2c92d19b7f56b",
+    "scripts/evaluate_budget_matrix.py": "059bec84eaeccf784428f007c4524a1b16d714f74af9d12b0fd2191e7aea86ee",
+    "scripts/evaluate_frozen_versions.py": "d08c57fad5c64296892ffa188cee7245cf58794de47ff761b2ae69437924aca6",
+    "scripts/evaluate_rca.py": "c04a26e2fbac7ed31a733ffe72fb2b46b5da874f0c94d9845262f2da01f1289b",
+    "scripts/evaluate_rca_integration.py": "b36107157e1cc386507cc778b61b6c2ced28c94aca3faf8ce70f1b1dbcf31504",
+    "scripts/prepare_rca_integration_tasks.py": "29868d1ea2c0272b336ee71010730c47a0fa79cc35f60a1ada023af06086d929",
+    "scripts/reproduce_rca.py": "b7ebc131573a4d78fa9eba1ab55bb14b67e834ed23deacedb1883b80c1f04ece",
+    "scripts/review_rca.py": "4744782dbf2a96f64ac50e834635aac5ecb9d1090d4cf2ab59b7f21b82692909",
+    "scripts/summarize_rca.py": "db2b687113943e70962ec0049fe62d7f4312b02ae35e5f772571f167d92a4cf3",
+    "scripts/summarize_rca_integration.py": "fef3e8ae398f42843dd23fb8b8d0caeff311bdacbf048790c528e382b51d7810",
+    "tests/evals/test_rca_cases.py": "ebd038f84e9cf8a3d64b63065737ae949a416821e6d6a91bd83a232786b53e6c",
+    "tests/evals/test_rca_cases_v2.py": "9c9421d561a52c35336867eb0d58eb8cd87b1b1b4ad36a93b67ad53d9cad06be",
+    "tests/evals/test_rca_contracts.py": "2bb8417f1d89bc1f3d0541d8f968c7f2676f14c443ae605b9103b13558745f88",
+    "tests/evals/test_rca_evaluation.py": "6e706f380f8b1ff219cd7347da04beb8eb2d80c7bc902c79f5d3892e093997a8",
+    "tests/evals/test_rca_experiments.py": "0e1afe6541ae2ddcf958130eab71cceb790ca6f7ac3b01e15db82e730a1d218f",
+    "tests/evals/test_rca_integration.py": "d44dba2a943a07708ea9b495837e7c14174f6af145c854e84177905d6f7613ac",
+    "tests/evals/test_rca_integration_tasks.py": "f7befbcf861c9983869a5a2e75507fc0adb9cedae8ccb830c1bdae9543fef4e2",
+    "tests/evals/test_rca_machine_artifacts.py": "7f8fc90c1c332f976326ee345a7750cc93c13d92030467126dbee1c3e13fd2c3",
+    "tests/evals/test_rca_pipeline.py": "06180e413547cc6c08a95669b3b4031041e1711b4f11d4f2004aed718f9ae09b",
+    "tests/evals/test_rca_reproduced_cases.py": "2f288f8d5c6f333aa1d95da3a4310ffb440eb6715deec6018c9f786fe444cd66",
+    "tests/evals/test_rca_review.py": "14d668bdaefc6d3f651105d792aa6293116017c4e131c0a645c49d09e4c2c7a1",
+    "tests/evals/test_rca_scoring.py": "74da6ecea56de47b4b7bd56b6809feb2022de5737dcccef740e6db91c66f4c58"
+  },
+  "question_revision": {
+    "v1_manifest": {
+      "path": "evals/datasets/rca_v1/manifest.json",
+      "sha256": "f4703534ed66cf352c79a5db90a099525873cbd94a83a28fe5044beb2784c482"
+    },
+    "v2_manifest": {
+      "path": "evals/datasets/rca_v2/manifest.json",
+      "sha256": "0622467b4f2651746a98276099b50a72d48a8082e21096d5ba0e9dc039888a28"
+    },
+    "unchanged_public_worlds": 38,
+    "unchanged_query_prefixes": 38,
+    "old_results_relabelled": false,
+    "atomic_control_02": "该故障观测时间窗内，远端数据库进程发生崩溃。",
+    "new_control_03": "separate_direct_counterevidence_control_not_in_paired_cost_denominator",
+    "candidate_relations_are_human_gold": false
+  },
+  "local_program_experiments": {
+    "manifest": {
+      "path": "output/rca-representative-experiments-20261018/manifest.json",
+      "sha256": "1842f1e9faa5bf89dd92b3634561bd837e47cab7c6025dc11e50aa3cf3e7a9f6"
+    },
+    "status": "passed",
+    "cases": [
+      {
+        "case_id": "rca_candidate_001",
+        "artifact": {
+          "path": "output/rca-representative-experiments-20261018/experiment_001.json",
+          "sha256": "b42961051dd76ff30e1bcd662cbda415912c95584cf64ae808743d08f4776681"
+        },
+        "repeats": 3,
+        "machine_checks": 15,
+        "parameters": {
+          "requests_per_window": 30,
+          "window_seconds": 1.0,
+          "resource_hold_ms": 20,
+          "acquisition_timeout_ms": 100,
+          "burst_width_ms": 0,
+          "pool_capacities": [
+            40,
+            4,
+            40
+          ],
+          "smooth_negative_control_capacity": 4
+        },
+        "limitations": [
+          "A local Python semaphore pool and measured sleep model resource occupancy; no real database or production service is exercised.",
+          "30 requests per one-second offered-load window is insufficient to characterize burstiness. Smooth load at 30/s and 20ms has mean occupancy about 0.6, below capacity4.",
+          "The burst arm releases all30 requests together and uses an explicit100ms acquisition timeout. These conditions were absent from rca_v1 and are new experimental parameters.",
+          "This evidence does not validate or rewrite the authored rca_v1 replay row, original timestamps, in_use/waiter counts, or SQL claims.",
+          "OS scheduling affects measured timing. Checks retain failures rather than rewriting observations or silently retrying."
+        ]
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "artifact": {
+          "path": "output/rca-representative-experiments-20261018/experiment_019.json",
+          "sha256": "39b7c6c21c1d521b6713400b4703d0cc549a6f5dc970b91f8aab3d682aa500a8"
+        },
+        "repeats": 3,
+        "machine_checks": 12,
+        "parameters": {
+          "acquisition_timeout_ms": 80,
+          "holder_release": "after_waiter_returns"
+        },
+        "limitations": [
+          "Actual local mutex contention demonstrates the wait mechanism. Owner stack and operation are deliberately outside the public observation contract.",
+          "The two real owner paths produce the same available public observation. This constructive ambiguity supports only the mechanism boundary for this experiment.",
+          "The experimental80ms deadline differs from the authored2100ms row. No CPU12% value is measured or claimed.",
+          "Private traces reveal the experimental holder paths; sending them to the model would change the information boundary.",
+          "This does not establish what caused any original incident or authorize a human truth signature."
+        ]
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "artifact": {
+          "path": "output/rca-representative-experiments-20261018/experiment_025.json",
+          "sha256": "445e5e1f86e9c1c138f8d05d03ac9556af3e191aa5b62c5d2b148d69800e57b5"
+        },
+        "repeats": 3,
+        "machine_checks": 9,
+        "parameters": {
+          "transport": "local_os_pipe",
+          "max_payload_bytes": 4096
+        },
+        "limitations": [
+          "Actual OS pipe byte streams and the stdlib HTTP parser execute two distinct upstream failures, then the same generic502 response. No TCP transport is claimed.",
+          "Only the configured public gateway projection is indistinguishable; private parser exceptions distinguish the causes and are withheld from the model.",
+          "This is an observational-equivalence counterexample within the minimal local gateway. It does not enumerate or prove all production gateway failure modes.",
+          "The source-unavailable flag is an experimental observability configuration, not a claim that a real external source was contacted.",
+          "No production network, remote dependency, DNS, TLS, database, or original incident is exercised."
+        ]
+      }
+    ],
+    "machine_checks": 36,
+    "reproduced_dataset": {
+      "path": "evals/datasets/rca_reproduced_v1/manifest.json",
+      "sha256": "126e6dd791be667ee486b47085f18c9d8533a70a8b6ba2157b7bbad066b2bac7"
+    },
+    "machine_attachments": 6,
+    "old_authored_incident_reproduced": false,
+    "production_experiment": false,
+    "human_verified": false,
+    "is_gold": false,
+    "note": "Actual Python resource pool, mutex, OS-pipe and HTTP-parser executions; new controlled local scenarios, not original incidents or a database deployment."
+  },
+  "automated_validation": {
+    "tests": 399,
+    "seconds": 106.137,
+    "status": "passed",
+    "log": {
+      "path": "output/rca-integration-study-20261018/evaluation-tests-final.log",
+      "sha256": "9d84e58b56933231143f6a326a031d27555e7f585b915d10a724d23e1df1b311"
+    },
+    "static_ai_review_not_gold": {
+      "path": "output/rca-integration-study-20261018/static-review.json",
+      "sha256": "2c7912ebd86daea0e453030da890c1d03050ae3b6e7018e2955ee72568cc81fa"
+    },
+    "git_index_new_dataset_byte_check": {
+      "path": "output/rca-integration-study-20261018/git-storage-check.json",
+      "sha256": "9d588f8e52ed4be1efe22bfb77c2acf875018977198167d69b4b0baeb86569c2"
+    },
+    "gitattributes": {
+      "path": ".gitattributes",
+      "sha256": "2f4f0f6733d0a400bd3a20ea3290970c2b6f77bea7f454067f2f73dda2b65869"
+    },
+    "legacy_git_storage_unchanged": true
+  },
+  "prespecified_comparison": {
+    "model": "qwen3.7-flash",
+    "settings": {
+      "temperature": 0,
+      "max_output_tokens": 2200,
+      "request_timeout": 30,
+      "max_retries": 0,
+      "response_format": "json_object"
+    },
+    "limits_per_run": {
+      "model_calls": 16,
+      "tool_calls": 8,
+      "web_calls": 12,
+      "seconds": 180,
+      "reserve_model_calls": 2,
+      "reserve_seconds": 15,
+      "input_chars": 48000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "native_plan": {
+      "path": "output/rca-integration-study-20261018/native-plan/plan.json",
+      "sha256": "784c798f78ef120b2a75abb31ac672607a568b366e4ea01bd753b4d1d3d672a3"
+    },
+    "diagnostic_plan": {
+      "path": "output/rca-integration-study-20261018/diagnostic-plan/plan.json",
+      "sha256": "a76ef43a2c92c3d1c44279254d65bae4ed6d858582347997ab8452f23b093463"
+    },
+    "native_repeats": 3,
+    "diagnostic_repeats": 3,
+    "scheduled_runs": 63,
+    "reference_conditions": [
+      "full_refs",
+      "no_refs",
+      "wrong_field"
+    ],
+    "wording_conditions": [
+      "wording_v1",
+      "wording_v2"
+    ],
+    "reviewer_can_read_all_acquired_evidence": true,
+    "no_refs_supported_is_not_automatically_wrong": true,
+    "worlds_of_new_experiments_not_paired_as_old_world_accuracy": true,
+    "old_single_run_results_used_only_as_context": true,
+    "cross_request_or_time_ablation": "not_applicable_no_registered_observation"
+  },
+  "live_accounting": {
+    "native": {
+      "bundle": {
+        "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/bundle.json",
+        "sha256": "d318f2a72199e56391ee6842bf18d95ce433a7234fa5dedc1da7f81010957e6b"
+      },
+      "ledger": {
+        "path": "output/rca-integration-study-20261018/native-ledger.json",
+        "sha256": "37a8f319ef6203b0562348559d447f7ab1d5f5d0fae49bad377a41e80f9f4d5f"
+      },
+      "planned_runs": 18,
+      "recorded_runs": 18,
+      "pending_runs": 0,
+      "charged_requests": 129,
+      "known_usage_calls": 129,
+      "unknown_usage_calls": 0,
+      "known_input_tokens": 394907,
+      "known_output_tokens": 21230,
+      "charged_input_tokens_known_or_upper_bound": 394907,
+      "charged_output_tokens_known_or_upper_bound": 21230,
+      "model_seconds": 327.92799999999625,
+      "pending_reservations": 0,
+      "persistence_errors": [],
+      "reconciliation": "exact_report_reservation_settlement_binding_passed",
+      "provider_error_codes": {},
+      "admission_closed": false,
+      "admission_close_reason": null,
+      "report_artifacts": [
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_ea1d682937078fb938d44901.json",
+          "sha256": "eb4a27492e395f93cc248e4f5a441d5866e961ca262639c432c1f9b143d3f672"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_236beea63405e953ee6a5781.json",
+          "sha256": "d7cfa979ae2bdbe961683819ee020ed07e5a697ae53fbe69e51ff3539ee7a78d"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_82509e6b96692e1f296ce918.json",
+          "sha256": "2cf97d63e5191e4610e95c044195ec8c3b357771b85e0ffb3fd99f7f25f3945d"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_d56fb37b15772a18141cee9b.json",
+          "sha256": "c5a00f8dc699dc6dd83485a0beb6e74c148913fc853172a587471a10a862057c"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_1492940c4c3957a9e2cd3d95.json",
+          "sha256": "911779e6659f32f5440ce36fdafc70d46716491f696fefdec02add03e3f4984d"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_e7c46f76acab55b12cc0b60b.json",
+          "sha256": "45a0ce93060b982c54a73d0c092c03a5bea587d918ea7ce0660a4d7d96e5fb1c"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_84a343281fdb5521a6272c99.json",
+          "sha256": "fe2d88bc3a82b7255f653d20cd5d346714b8557620f7ad8fb09b4707afac31ae"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_55edb43649569862bf1cbd32.json",
+          "sha256": "b2f4097d63a7e8448c0def5b5d493ec8bbd72b586ccd97562446be4280b8ad2f"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_004cbf0a09c48472c8119c50.json",
+          "sha256": "fd728dc4c51896959f934355c7ed272e8c88e665067888a463a6ae80dce2f5c9"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_87026a22ad27f1343dd80366.json",
+          "sha256": "9c05b982c50262670ed7b17e3487c07c38280da899488e79b2afcdb351a0e7b8"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_718bb3df9ee287a6350c1e4c.json",
+          "sha256": "29c7a0501ed758fa8cb4c032af39862b8426335dd56d7c46ca6a47c824136f0b"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_9193267b5d7291db15067772.json",
+          "sha256": "3bee77a1a6302e501f0ccb25c62007d74c689b48318a698872e55c13bd92247b"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_4ae11e83d2fcf3ec259c7ae6.json",
+          "sha256": "bccc45d4d286aae12900fd9351b577688dbbb49ad7a534d139bb251c5c0d95c3"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_bbc1416563f1f1d7b023d824.json",
+          "sha256": "b3e9384de1a29414584f3c9ce19685e576276bf0b53a1fa74bc5a1a19ecf9df0"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_d5298683c05195bcda0066b3.json",
+          "sha256": "80b034697600278d869376d58c7adc0229c6f484e40b4d6f5bbcc2eb2067d181"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_14307b1e6b47a57244ca24ee.json",
+          "sha256": "ef4a58cb41eda76fb302bfd3445b325182f9a4975063439dec4382048dccb48e"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_ed2b0b213fb4d9271597bdfc.json",
+          "sha256": "03e69525c40852835438a605c8ad75591d74cf5bb49de0213e430699d4caaba6"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/native/a1ec74c9-dc1b-4ae6-b2b0-00aed489ff46/RCA_47dd58b2633036d894c8898f.json",
+          "sha256": "83cb29efb0fbaef03b921fa67de7bc57b054a09ed2775e81ad873154634f9f3f"
+        }
+      ]
+    },
+    "diagnostic": {
+      "bundle": {
+        "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/bundle.json",
+        "sha256": "77a5aa08b78b6f03bd34a0463059c532c446d02275171db46167abf8b9810c93"
+      },
+      "ledger": {
+        "path": "output/rca-integration-study-20261018/diagnostic-ledger.json",
+        "sha256": "0b27d12ab824c0d3557acadda293a01b64075a507c58bc4eaef510f8f4807ac5"
+      },
+      "planned_runs": 45,
+      "recorded_runs": 45,
+      "pending_runs": 0,
+      "charged_requests": 80,
+      "known_usage_calls": 80,
+      "unknown_usage_calls": 0,
+      "known_input_tokens": 184243,
+      "known_output_tokens": 15376,
+      "charged_input_tokens_known_or_upper_bound": 184243,
+      "charged_output_tokens_known_or_upper_bound": 15376,
+      "model_seconds": 214.51200000000063,
+      "pending_reservations": 0,
+      "persistence_errors": [],
+      "reconciliation": "exact_report_reservation_settlement_binding_passed",
+      "provider_error_codes": {},
+      "admission_closed": false,
+      "admission_close_reason": null,
+      "report_artifacts": [
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_ef444f85c05faf1c06bed1d9.json",
+          "sha256": "711c79b8f50cf839b97eac6360e9956d8833ad3370b677c9bb1f857e52153ef3"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_f8d89ef912b9bc8d3a16305f.json",
+          "sha256": "4faf0ba48d7d6d23930875f935ea94b540589165a4d9abb08014312146992e1c"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_d79572715c8869f473f865fb.json",
+          "sha256": "94ce9532e84147f94ff70bdcb8761bbfeb676febb6f469f0ec70c5c9fd353349"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_44d11d2f695d1e843e270eb4.json",
+          "sha256": "51b6b7da5c7b40ba59963c731971a2f6bf718bc67d49c8d776487e167f0ebdca"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_f6e147d570cf15ef5a9edb3a.json",
+          "sha256": "70d6f5122d357cdad38ff23aa4dfd9e0510eb3c16c744e64ea9899d3169ed9b3"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_7ba58f122bf740a11b1b9554.json",
+          "sha256": "6ff56ff3e66abb8bfc9ab7547177c2c5091c248fc1de4a328fe7bc1c81b0476e"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_ea5cbdc9b332f4df4e49a5f3.json",
+          "sha256": "1ec872fbb5c738eca6eeb12c404e7607cd73a82f3c910c6dac1249e4c2f93336"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_99e6e8ce2cbb657440462096.json",
+          "sha256": "cbb0152818d276100477a5285cd21fc9cfd9e2bed6e6db08c024d9018698c6a0"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_c65a6a4e0a68cd37e4ba20dc.json",
+          "sha256": "61f4458c0a02d1b37b79ed078246be2b2555faa714c8d10bf48ee1ca426d5dc6"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_fa58978b303842ad426349d7.json",
+          "sha256": "6da3e0239756063f6f8c9d63eb92ed5ccc262e733720fdbd42925d8cc4609ff5"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_8a66883dd8b1a4fdf7e90fa9.json",
+          "sha256": "553a34b952578fdad9e1aa5b18eaee565039eb749a39550045c2c4da6de938ee"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_03e2bb3c40daa51f545915bd.json",
+          "sha256": "d5d9ddd726006e0cdb648781aded19b46a095f46fa206c5c32f4efd42566d8aa"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_990b934b44fff3f77db22193.json",
+          "sha256": "fb21d6c7e02479234b86fba8f5d2bf4292836a1e8fa68e9f3e4c6d0a62e48d00"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_6ad0de0c4fcb62bb49884dca.json",
+          "sha256": "356b34cfb18143d0859ab159bbc705f29ef9cff61bb8b9398355e253ed8a3b14"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_d81a54c644d4e1b2d351e11b.json",
+          "sha256": "bfe3de6621471a553f9a3aab4c4e6ee3cecd8103b8030729e857762276f92561"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_aaccc51933e3b79f5c929e68.json",
+          "sha256": "f3e89783ec6e7e0110a4cf797476a7938796ec2aa8bc8a6d3604c9ec04bff38d"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_597b2f61e04d33ce68f1fc4d.json",
+          "sha256": "7a7c343ef1c616a72dd42c5fcded1eed34a097ebdceac86133c2e87af09d5069"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_2e06602787b479c7109e70df.json",
+          "sha256": "97363ca49ad03754f76f197978d918ad15e30976af8d7b87fae4f86a30e86d4c"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_234c638896f96a9d66834016.json",
+          "sha256": "7276d0704187c4560daf7a37cf6e9ea75fc26d97dbd6fe38b1c79aa4d310d4bf"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_1e29aa4cd6a12bd02d7675d6.json",
+          "sha256": "f2aae1b1f6ccad0d9bc9ba821d53199d75f596c81107402140db3f4116c37ee9"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_98a3b08029c08f6cb1c3d987.json",
+          "sha256": "bef6dc83c2a121c45b33ed28c73063040a720ef4340c9f51ee4fc21c92f67155"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_accfff198991e2b7d946612d.json",
+          "sha256": "6bd0493f03154dfdd618d74a0875da15195044cd6ea42276c41420dcaea2a2db"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_c0a1547619489410d6fa4a12.json",
+          "sha256": "a7d9cbd123c4f2a0eea378ce7cd47a43241b53385176117cd1e7d77e4e3f0599"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_0218489463ad69da247e3025.json",
+          "sha256": "298de7674aad7b6d09fe403e33dad60f0cc50940af21f50684f8cef6298d7da2"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_90fd9e9cc8acb47289bb9c85.json",
+          "sha256": "c5b7ea1bac6381e2bb6507c70debb2a7bfb9727abf7feda0f7feadc1efaf6bd0"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_855e3cfaebc25579e5df001a.json",
+          "sha256": "9ef4ba76c0a99e1d6195d341857ffc59055826f42722c08d88db9c60e44bc7d6"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_bed4a4d8e09406ce9a584ae8.json",
+          "sha256": "55d103e3133457ed5cbba4495914acc1d9ba408a00a5e0b1dc55bb7d8dd8b7f8"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_1a45d023bad16aa8737e01e1.json",
+          "sha256": "4afe3877b00620dd1034949f12fa98e501c183b5054ce0391d20658e382aaa55"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_25bfa1ea1d9a4bc1b8235c5a.json",
+          "sha256": "e1bed4a04918c8afabdcc3b14244bd54806d1c086aee6b52ea4af8aef3965422"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_85a4a8a05b7cc57c98496764.json",
+          "sha256": "6f1d49c4c33f4406c5687f8ac91e3f3751e1f6b0e163c4cba3c05560e6dc6bee"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_975221f006c6ee3e1c1ecab3.json",
+          "sha256": "46929291ee7607cabdcfe79490369d745e31e20af12035923af20e39a0be1976"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_7e5f4d27072f94ed12f5dfd0.json",
+          "sha256": "0316864a1a1e31dc1d33ab23d2d289328cc3d0afac3c7340b4784cc3c82c4c29"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_3c3dc43b20b94a293fec5802.json",
+          "sha256": "0b5e9f383f4e0a71526b7e4fe6ca0d3c501c99b99fefdf073f679554a7fa5a99"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_e27a8de9c680ac49378aaeea.json",
+          "sha256": "e9475bcc84e259f80a345ec8af127ae32231a8ae2b268e4deb9254e560319e76"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_62379684d0653b8631b84e0c.json",
+          "sha256": "aa55ddf4031993d77cdf90593c9a5eab48f59ed9d2d708eaf74c950e4d80b9ef"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_3fb6c393e4bffaca90c3c83d.json",
+          "sha256": "6c07eea90b47a64904d79f6151c2974bd0b5e2e690e400bce2b25177a52dec5b"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_62b8515166a66abd0c782083.json",
+          "sha256": "32545db81af8df65a16abad43393f96738a87a1a53418a58a53efbd48ce87676"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_87d4b150969e74e72853327b.json",
+          "sha256": "532ece979a2ae825fcb3f638122dc95cf006581c1c3bb5761244f995ec8d081b"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_04403dfcc74159d7df586948.json",
+          "sha256": "198ab3130db78bd569532968bda166ae0547fece241866f702e164b2dd96d519"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_a9ba165e17970ed43f7760e9.json",
+          "sha256": "6f22c19411d26ddc8c3781caf896439315c2bf0e94e6b2a696b877dbce6a8fde"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_1bb21229549ea5a2f0f50ef9.json",
+          "sha256": "7366435872e55fbb053ada9b80c1f560c4b5fe105368d5f8deba625831e25693"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_b7f898918238fd8e7729d458.json",
+          "sha256": "7d07f4b86c0c9f0312571a8c5d91436b8644ad897e35ff7a9d5e918e3f3d1ead"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_8cf1703904fe9eea355723bd.json",
+          "sha256": "60f4f9ad784636d2d387c7bb2ced3b381a9c64661aacec97daf64d8fab9b76b8"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_639c6d3797724f447603b040.json",
+          "sha256": "19496d17fd7eb9beb58621f14c77e14337e20aa6e5528fcac8c6e0863ac76ca0"
+        },
+        {
+          "path": "output/rca-integration-study-20261018/diagnostic/108b4511-e058-46cc-9a4c-7e5588db4764/RCI_c8a05bc74db85bf4e51cb005.json",
+          "sha256": "8c08f6aff3869c700374887ea1b8be9d91aee9c08854a03f76446ef033a4b95d"
+        }
+      ]
+    },
+    "total_requests": 209,
+    "total_known_input_tokens": 579150,
+    "total_known_output_tokens": 36606,
+    "unknown_usage_calls": 0,
+    "rate_card": {
+      "path": "output/rca-integration-study-20261018/rate-card.json",
+      "sha256": "55d883936ea4c46c5ea9ff7b3e11ae1a270f914ba2dbfde4fa7315f351fc395e"
+    },
+    "estimated_cost": {
+      "currency": "CNY",
+      "estimated_total": 0.14511480000000002,
+      "known_usage_estimated_subtotal": 0.14511480000000002,
+      "unknown_usage_calls": 0,
+      "unpriced_calls": 0,
+      "is_actual_vendor_bill": false,
+      "status": "estimated",
+      "priced_calls": 209,
+      "input_tier_unmatched_calls": 0,
+      "source_url": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
+      "effective_date": "2026-10-18",
+      "pricing_scope": {
+        "provider": "aliyun_model_studio",
+        "region": "china_beijing",
+        "billing_mode": "online_realtime",
+        "basis": "published_non_cached_list_price",
+        "discounts_and_free_quota": "not_included"
+      },
+      "estimate_kind": "published_non_cached_list_price_not_actual_bill"
+    },
+    "worker_wall_seconds_by_stage": {
+      "e2e": {
+        "runs": 9,
+        "sum": 266.20200000000114,
+        "mean": 29.578000000000127
+      },
+      "fixed_review": {
+        "runs": 45,
+        "sum": 326.3770000000004,
+        "mean": 7.252822222222231
+      },
+      "sufficient_evidence": {
+        "runs": 9,
+        "sum": 107.79600000000028,
+        "mean": 11.977333333333364
+      }
+    },
+    "invoice_or_zero_cost_claim": false
+  },
+  "mechanical_and_native_observations": {
+    "summary": {
+      "path": "output/rca-integration-study-20261018/integration-summary.pending.json",
+      "sha256": "60d4319b4918757d957045d9044ffd0d9c1c891339d66740f904aed9d44b5727"
+    },
+    "fixed_same_evidence_pack_groups": 18,
+    "fixed_total_groups": 18,
+    "wording_native_relation_pairs": [
+      {
+        "group_id": "legacy_001_wording",
+        "repeat": 1,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v1": "contradicted",
+          "wording_v2": "insufficient"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_001_wording",
+        "repeat": 2,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v2": "insufficient",
+          "wording_v1": "contradicted"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_001_wording",
+        "repeat": 3,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v1": "contradicted",
+          "wording_v2": "insufficient"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "repeat": 1,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v2": "contradicted",
+          "wording_v1": "contradicted"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "repeat": 2,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v1": "contradicted",
+          "wording_v2": "contradicted"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "repeat": 3,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v2": "contradicted",
+          "wording_v1": "contradicted"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "repeat": 1,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v1": "contradicted",
+          "wording_v2": "insufficient"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "repeat": 2,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v2": "insufficient",
+          "wording_v1": "contradicted"
+        },
+        "semantic_accuracy": null
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "repeat": 3,
+        "same_evidence_pack": true,
+        "native_relations": {
+          "wording_v1": "contradicted",
+          "wording_v2": "insufficient"
+        },
+        "semantic_accuracy": null
+      }
+    ],
+    "reference_field_selection": {
+      "full_refs": {
+        "runs": 9,
+        "reviewer_selected_message_field_not_in_author_refs": 0,
+        "not_a_semantic_success_rate": true
+      },
+      "no_refs": {
+        "runs": 9,
+        "reviewer_selected_message_field_not_in_author_refs": 9,
+        "not_a_semantic_success_rate": true
+      },
+      "wrong_field": {
+        "runs": 9,
+        "reviewer_selected_message_field_not_in_author_refs": 9,
+        "not_a_semantic_success_rate": true
+      }
+    },
+    "reference025_wrong_field_phase_counts": {
+      "runs": 3,
+      "primary_supported": 3,
+      "final_partial_after_challenge": 3,
+      "semantic_accuracy": null
+    },
+    "native_relation_repeat_counts": [
+      {
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v1",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "contradicted": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "legacy_001_wording",
+        "condition": "wording_v2",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "insufficient": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v1",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "contradicted": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "legacy_019_wording",
+        "condition": "wording_v2",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "contradicted": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v1",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "contradicted": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "legacy_025_wording",
+        "condition": "wording_v2",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "insufficient": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "full_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "no_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_001_refs",
+        "condition": "wrong_field",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "full_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "no_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_019_refs",
+        "condition": "wrong_field",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "full_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "no_refs",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "supported": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      },
+      {
+        "group_id": "reproduced_025_refs",
+        "condition": "wrong_field",
+        "recorded_repeats": 3,
+        "planned_repeats": 3,
+        "native_relation_counts": {
+          "partial": 3
+        },
+        "all_repeats_same_native_relation": true,
+        "accuracy": null
+      }
+    ],
+    "native_e2e_vs_prefix_evidence_checks": [
+      {
+        "case_id": "rca_candidate_001",
+        "repeat": 1,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_001",
+        "repeat": 2,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_001",
+        "repeat": 3,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "repeat": 1,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "repeat": 2,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "repeat": 3,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "repeat": 1,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "repeat": 2,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "repeat": 3,
+        "system_id": "native_experiment",
+        "stages": [
+          "e2e",
+          "sufficient_evidence"
+        ],
+        "same_actual_evidence_content": true,
+        "same_query_quality_pack": false,
+        "left_only_acquired_sources": [],
+        "right_only_acquired_sources": [],
+        "semantic_evidence_utilization": null
+      }
+    ],
+    "interpretation": "Reference choices, same-input evidence and model verdicts are measured; semantic correctness is not automatically adjudicated."
+  },
+  "ai_nonblind_pre_review": {
+    "artifacts": [
+      {
+        "case_id": "rca_candidate_001",
+        "artifact": {
+          "path": "output/rca-integration-study-20261018/ai-native-001.json",
+          "sha256": "e9b23824a0997d38505504e92440552bcae73bfc6c9e3d323bf9bbc7b637dab0"
+        },
+        "reviewer_type": "ai",
+        "nonblind": true,
+        "human_verified": false,
+        "is_gold": false,
+        "formal_metrics": null
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "artifact": {
+          "path": "output/rca-integration-study-20261018/ai-native-019.json",
+          "sha256": "f2af18bc9dee051003a21f820a093870ad46659ba1382371118922a5c018c771"
+        },
+        "reviewer_type": "ai",
+        "nonblind": true,
+        "human_verified": false,
+        "is_gold": false,
+        "formal_metrics": null
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "artifact": {
+          "path": "output/rca-integration-study-20261018/ai-native-025.json",
+          "sha256": "5666cd626f3e74d08e68163509e8d3b93855dc7f51619c0b384ac2e4808277cf"
+        },
+        "reviewer_type": "ai",
+        "nonblind": true,
+        "human_verified": false,
+        "is_gold": false,
+        "formal_metrics": null
+      }
+    ],
+    "human_verified": false,
+    "is_gold": false,
+    "formal_metrics": null,
+    "semantic_error_rate": null,
+    "findings_pending_human_adjudication": [
+      {
+        "case_id": "rca_candidate_001",
+        "finding": "E2E repeat2 draft says26 failed although acquired row03 says6 timeouts; primary review supports the incorrect numerical claim. Revision conflates24 total successes with24 immediate acquisitions. Final tentative output is not counted as a confirmed wrong root.",
+        "layer": "evidence_integration_and_semantic_review",
+        "judgment_origin": "ai_nonblind"
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "finding": "All six bounded mutex mechanism conclusions align with the new local observations. Available no-outbound information need not be a separate claim to be used. Duplicate query decisions and missing discriminating owner-stack collection steps remain; mechanism correctness does not establish the hidden holder root.",
+        "layer": "investigation_depth",
+        "judgment_origin": "ai_nonblind"
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "finding": "All six share acquired contents. In sufficient-evidence repeats1 and3 primary review supports a compound scope claim then challenge marks the same version partial; unsupported causes remain pending. No run emits a read-only step discriminating the two hidden parser failures. Some source-unavailability prose and action boundaries require human review.",
+        "layer": "review_scope_and_discriminating_next_step",
+        "judgment_origin": "ai_nonblind"
+      },
+      {
+        "case_id": "rca_candidate_019",
+        "finding": "Legacy atomic remote-process-crash control remains contradicted in all three repeats. No outbound attempt for this request does not alone establish the remote process was healthy throughout the window; the remaining absence-versus-contradiction judgment requires human adjudication.",
+        "layer": "legacy_atomic_statement_review",
+        "judgment_origin": "ai_nonblind"
+      },
+      {
+        "case_id": "rca_candidate_025",
+        "finding": "In the wrong-field reference condition all three primary reviews support the claim and all three subsequent challenges lower it to partial. Challenges discount an explicit http_status502 observation inside JSON message as indirect or lacking independent raw evidence. This is a candidate overly strict challenge issue, not primary-review rejection or established semantic correctness.",
+        "layer": "fixed_claim_reference_challenge",
+        "judgment_origin": "ai_nonblind"
+      }
+    ],
+    "counterevidence_to_blanket_instability_claim": "All15 fixed-review condition cells repeat the same native relation three times. This does not establish semantic accuracy, but these ablations do not demonstrate random verdict instability.",
+    "normalization_discrepancy": {
+      "report_id": "RCA_82509e6b96692e1f296ce918",
+      "raw_recovered": true,
+      "normalized_failure": {
+        "stage": "review",
+        "category": "model_protocol",
+        "code": "string_too_short",
+        "recovered": false,
+        "terminal": false,
+        "recovery_known": false
+      },
+      "interpretation": "Raw native attempts confirm successful repair; normalized recovery is unknown/mis-mapped. Do not use structured_unrecovered from the frozen older normalizer as an unrecovered failure count for this report.",
+      "source_modified_during_live_comparison": false
+    }
+  },
+  "human_review": {
+    "status": "pending",
+    "human_verified": false,
+    "human_gold_cases": 0,
+    "formal_metrics": null,
+    "semantic_error_rate": null,
+    "independent_holdout_acceptance": null,
+    "source_experiments_are_not_human_signatures": true,
+    "native_review_directory": "output/rca-integration-study-20261018/native-review",
+    "native_pending_summary": {
+      "path": "output/rca-integration-study-20261018/native-summary.pending.json",
+      "sha256": "51b1e74769728dd951a9af61a9713ee7cca625585b99c15303ee9df42d431d66"
+    }
+  },
+  "limitations": [
+    "New experiments supply new, explicitly bounded public observations, so comparisons with old authored worlds are not before/after accuracy.",
+    "Three repeated calls per cell and three scenarios do not establish production reliability.",
+    "Native E2E and sufficient-evidence runs share acquired payload content but not identical full prompts or query-quality packs; they are not a single-factor prompt experiment.",
+    "Reference presence or a native supported verdict is not causal correctness.",
+    "New dataset Git index bytes are verified. Legacy rca_v1 Git text storage remains unchanged; its pre-existing checkout line-ending and byte-hash portability limitation is not repaired by this task.",
+    "Program checks verify executed local mechanisms and artifact consistency; hashes do not authenticate a human reviewer or establish real incident truth."
+  ],
+  "reproduction_argv": [
+    ".venv/Scripts/python.exe",
+    "scripts/reproduce_rca.py",
+    "--output",
+    "<new-empty-output-directory>",
+    "--repeats",
+    "3"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_021",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "One remote business route returns 401.",
+      "scope": {
+        "service": "component_021",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_021"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_021",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "dependency",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q33 remote /authorize returned401 diagnostic=audience_mismatch; received and expected audience values were not exported."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_021",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Local token contents and remote expected-audience config are outside the available observation set."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

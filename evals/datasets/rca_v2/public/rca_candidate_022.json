@@ -1,0 +1,77 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "world": {
+    "synthetic": true,
+    "ticket": {
+      "incident_id": "eval_observation_022",
+      "title": "Synthetic incident observation exercise",
+      "symptoms": "Local processing pauses despite spare host CPU.",
+      "scope": {
+        "service": "component_022",
+        "environment": "staging",
+        "service_version": "v7",
+        "start": "2026-10-18T06:00:00+00:00",
+        "end": "2026-10-18T06:20:00+00:00",
+        "allowed_dependencies": [
+          "peer_022"
+        ]
+      }
+    },
+    "metrics": [],
+    "logs": [
+      {
+        "id": "row_01",
+        "timestamp": "2026-10-18T06:05:00+00:00",
+        "service": "component_022",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "resource",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "request=q34 paused during cgroup throttled interval; throttled time=850ms of1s; host CPU=18%."
+      },
+      {
+        "id": "row_02",
+        "timestamp": "2026-10-18T06:06:00+00:00",
+        "service": "component_022",
+        "environment": "staging",
+        "visibility": "public_synthetic",
+        "data_version": "rca-authored-candidate-dataset-v1",
+        "category": "configuration",
+        "level": "INFO",
+        "error_code": "OBSERVATION",
+        "message": "Current workload CPU quota exists; historical quota, demand baseline and deployment changes are not exposed."
+      }
+    ],
+    "changes": [],
+    "owners": [],
+    "runbooks": [],
+    "incidents": []
+  },
+  "capability_metadata": {
+    "prometheus": {
+      "synthetic_world": true
+    },
+    "loki": {
+      "synthetic_world": true
+    },
+    "metrics": {},
+    "log_queries": {
+      "dependency": "synthetic_partition",
+      "configuration": "synthetic_partition",
+      "resource": "synthetic_partition"
+    },
+    "log_metadata": {
+      "dependency": {
+        "description": "Request outcomes, protocol boundary and route-specific probes."
+      },
+      "configuration": {
+        "description": "Recorded local configuration loading and validation."
+      },
+      "resource": {
+        "description": "Local resource, queue and acquisition observations."
+      }
+    }
+  }
+}

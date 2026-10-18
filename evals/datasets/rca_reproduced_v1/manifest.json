@@ -1,0 +1,67 @@
+{
+  "schema_version": "rca-evaluation-v1",
+  "dataset_version": "rca-executed-program-observations-v1",
+  "holdout_sealed": false,
+  "human_verified": false,
+  "is_gold": false,
+  "origin": "executed_synthetic_experiment",
+  "truth_status": "pending_human_review",
+  "formal_acceptance_enabled": false,
+  "calibration_cases": 0,
+  "candidate_cases": 3,
+  "intended_candidate_composition": {
+    "root_identifiable": 1,
+    "mechanism_only": 1,
+    "not_identifiable": 1
+  },
+  "independence_policy": "Three development mechanisms measured locally; repetitions are not independent incidents.",
+  "sealing_requirements": [
+    "Independent human review of measured causal scope and information boundaries",
+    "New, independently curated holdout cases before a production acceptance claim"
+  ],
+  "version_boundary": {
+    "original_dataset": "rca-authored-candidate-dataset-v1",
+    "original_cases_modified": false,
+    "original_worlds_confirmed": false,
+    "pool_new_parameters": "Explicit simultaneous burst and 100ms acquisition deadline; smooth30/s negative control retained.",
+    "comparison_limit": "Same case identifiers describe representative mechanism families; observation worlds and parameters differ from v1 and must not be pooled as exact paired reruns."
+  },
+  "cases": [
+    {
+      "case_id": "rca_candidate_001",
+      "split": "candidate_acceptance",
+      "scenario_family": "executed_burst_capacity",
+      "independence_group": "executed_template_executed_burst_capacity",
+      "public_path": "public/rca_candidate_001.json",
+      "public_sha256": "bd5774723237652709fabaeb237e80066f200fd2784c2a3343f598541f498c5e",
+      "truth_path": "private/rca_candidate_001.json",
+      "truth_sha256": "06c5fc55e13e76f9b7df444153e19115c5b71e63071a2d9bd43011f8e4a84e45",
+      "diagnostics_path": "diagnostics/rca_candidate_001.json",
+      "diagnostics_sha256": "6e92dcfa882b30df47bc0dd8eb8679fcd72e697ffaed0718a2ac00bcb781afa0"
+    },
+    {
+      "case_id": "rca_candidate_019",
+      "split": "candidate_acceptance",
+      "scenario_family": "executed_mutex_boundary",
+      "independence_group": "executed_template_executed_mutex_boundary",
+      "public_path": "public/rca_candidate_019.json",
+      "public_sha256": "233c4239091603541a6f127d6fd54b980f553c0ac87600ed71fa1408742aa2df",
+      "truth_path": "private/rca_candidate_019.json",
+      "truth_sha256": "9352436cca2bab5d7d09494016575521cfb7191f9f5a67037d7d2ce1df65510c",
+      "diagnostics_path": "diagnostics/rca_candidate_019.json",
+      "diagnostics_sha256": "9940115c66946b66d851cd66b5071c2a942b6bdb2afe7b35febabcf85b1ed7cd"
+    },
+    {
+      "case_id": "rca_candidate_025",
+      "split": "candidate_acceptance",
+      "scenario_family": "executed_gateway_boundary",
+      "independence_group": "executed_template_executed_gateway_boundary",
+      "public_path": "public/rca_candidate_025.json",
+      "public_sha256": "9ff348e0bd5b2e10ef4513751359b28afdb7b68618b4a005a93094da92b84993",
+      "truth_path": "private/rca_candidate_025.json",
+      "truth_sha256": "92af89c9918634bf5ab29717269e04ac4c650ae650cd3ac193677df665b89754",
+      "diagnostics_path": "diagnostics/rca_candidate_025.json",
+      "diagnostics_sha256": "b8b01ce69a4fde2d76757a171d37912397e67ea50ab61dba3fd73081a6e76c0e"
+    }
+  ]
+}

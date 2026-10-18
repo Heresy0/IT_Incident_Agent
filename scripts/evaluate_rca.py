@@ -54,6 +54,12 @@ def dataset_freeze(dataset):
         for kind in ('public', 'truth', 'diagnostics'):
             relative = case[kind + '_path']
             files[relative] = sha_file(manifest.parent / relative)
+    for relative, digest in dataset.get('bound_artifacts', {}).items():
+        if sha_file(manifest.parent / relative) != digest:
+            raise ValueError('Bound machine evidence changed')
+        if relative in files and files[relative] != digest:
+            raise ValueError('Machine evidence conflicts with a registered case file')
+        files[relative] = digest
     return {'manifest_path': str(manifest), 'fingerprint': dataset['fingerprint'],
             'files_sha256': files}
 
