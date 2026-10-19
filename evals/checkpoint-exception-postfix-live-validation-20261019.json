@@ -1,0 +1,263 @@
+{
+  "schema_version": "checkpoint-exception-postfix-live-acceptance-v1",
+  "date": "2026-10-19",
+  "verified_at_utc": "2026-10-19T14:50:22.126992+00:00",
+  "baseline_commit": "087e733939a92581dfc7e4c936d88dcc07567724",
+  "source_version": "b93b59035db0aaed",
+  "branch": "codex/graph-checkpoint-recovery",
+  "passed": true,
+  "checks": {
+    "existing_calls_preserved_exactly": true,
+    "only_this_run_added": true,
+    "explicit_total_extension": true,
+    "read_and_ui_replay_add_no_paid_calls": true,
+    "old_reports_and_sse_unchanged": true,
+    "frontend_assets_unchanged": true,
+    "old_other_ledgers_unchanged": true,
+    "same_flash_case_and_full_single_run_limits": true,
+    "fixed_source_and_checkpoint_mode": true,
+    "all_run_counts_reconcile": true,
+    "within_frozen_model_tool_time_limits": true,
+    "deadline_not_reset": true,
+    "all_responses_committed_once": true,
+    "all_usage_reconciles": true,
+    "one_rework_and_no_extra_allowance": true,
+    "changed_claim_reversion_and_fresh_review": true,
+    "review_evidence_versions_consistent": true,
+    "all_seven_stages_have_entry_and_done": true,
+    "call_span_identities_balanced": true,
+    "single_ordered_terminal_delivery": true,
+    "candidate_report_and_sse_match": true,
+    "incident_awaits_confirmation": true,
+    "no_execution_or_protocol_failures": true,
+    "no_business_or_protected_existing_tracked_file_changed": true,
+    "original_raw_acceptance_artifacts_unchanged": true
+  },
+  "http_acceptance_checks": 31,
+  "run": {
+    "run_id": "0a2f60c8-3f1f-4882-af11-9a3d5168a382",
+    "incident_id": "c2e989da-f3f0-4780-bc1e-de88a33498de",
+    "case_id": "case_001",
+    "status": "completed",
+    "review_status": "passed",
+    "termination_reason": "FINISHED",
+    "model_calls": 16,
+    "tool_calls": 5,
+    "input_tokens": 80632,
+    "output_tokens": 2631,
+    "duration_ms": 51933,
+    "event_count": 114,
+    "challenge_count": 2,
+    "rework_rounds": 1,
+    "rework_reasons": [
+      "REWORK_LIMIT_REACHED"
+    ],
+    "evidence_count": 10,
+    "report_sha256": "57d1a93a6abdbf783fcd4198865deac6886949026614a745fc9fc0b919c4c15a",
+    "native_run_sha256": "608647c44920f7e670c7fbbf809528f8940a82401baaec1d91d34652653636c6"
+  },
+  "limits": {
+    "seconds": 180.0,
+    "web_calls": 12,
+    "tool_calls": 8,
+    "input_chars": 48000,
+    "max_sources": 10,
+    "model_calls": 16,
+    "snippet_chars": 1800,
+    "reserve_seconds": 20,
+    "reserve_model_calls": 3
+  },
+  "model_calls_by_role": {
+    "investigation": 11,
+    "diagnosis": 1,
+    "reviewer": 2,
+    "challenger": 2
+  },
+  "model_calls_by_node": {
+    "investigate": 10,
+    "draft": 1,
+    "reviewer": 2,
+    "challenge": 2,
+    "revise": 1
+  },
+  "checkpoint": {
+    "recoveries": 0,
+    "stage_snapshots": 14,
+    "committed_operations": 21,
+    "semantic_rework_claims": 1,
+    "unknown_operations": 0
+  },
+  "rework_observations": {
+    "changed_ids": [
+      "C1"
+    ],
+    "before_versions": {
+      "C1": "8b50adb683e68d0c",
+      "C2": "7baff34e40e0a0cf"
+    },
+    "after_versions": {
+      "C1": "63bbd50127202bbc",
+      "C2": "7baff34e40e0a0cf"
+    },
+    "new_provider_reads": 0,
+    "queries_before": 5,
+    "queries_after": 5,
+    "query_reused_events_total": 4,
+    "interpretation": "Claim C1 was revised and reviewed again; no new evidence was acquired in rework. Do not score this as key-evidence acquisition success."
+  },
+  "ledger": {
+    "previous_calls": 63,
+    "new_calls": 16,
+    "total_calls": 79,
+    "previous_maximum": 71,
+    "maximum_calls": 87,
+    "remaining_calls": 8,
+    "old_calls_preserved_exactly": true,
+    "unknown_usage_calls": 0
+  },
+  "preservation": {
+    "old_reports_and_events": 10,
+    "protected_original_tracked_files_byte_unchanged": 1079,
+    "original_raw_acceptance_artifacts_rehashed": 86,
+    "declared_documentation_updates": [
+      "examples/checkpoint-recovery.md",
+      "examples/current-v2.md"
+    ],
+    "original_evaluation_evidence_preserved": true,
+    "new_model_calls": 16,
+    "business_code_changed": false
+  },
+  "historical_observation_only": {
+    "prior_run_id": "f04397d4-1f7b-456e-827d-5840f0eaacec",
+    "same_case_model_limits": true,
+    "prior_status": "partial",
+    "prior_reason": "REVIEW_NEEDS_INFORMATION",
+    "prior_duration_ms": 110735,
+    "causal_comparison_valid": false,
+    "reason": "Prior run included forced downtime/recovery and a different model response; one new uninterrupted run is execution acceptance, not an accuracy or speed experiment."
+  },
+  "judgment_source": "AI browser observation plus deterministic API/PostgreSQL/ledger checks",
+  "human_verified": false,
+  "root_cause_accuracy_scored": false,
+  "is_vendor_bill": false,
+  "limits_of_acceptance": [
+    "One real Flash run over synthetic case_001; no human semantic gold.",
+    "This run did not inject another fault or trigger recovery; exception reliability is covered by the preserved separate fault matrix.",
+    "completed/passed indicates execution and model review status, not proven root-cause accuracy.",
+    "Provider HTTP attempts and monetary charges are not fully known; report measured calls and tokens."
+  ],
+  "artifacts": [
+    {
+      "path": "output/checkpoint-exception-live-20261019/before.json",
+      "sha256": "f43b41f96b826b8bad3a988794c72836d0b6433abd558d8143f7f29ce710fdc5"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/after-extension-status.json",
+      "sha256": "b35314e48acd57073ac003777635e25deb8eab0ccba9eb9c490a87501a9c9171"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/new-run-identity.json",
+      "sha256": "d444a7a411e77fa981c39cceb84205f5951a734ed11720c34d3ed1060e5b71e9"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/checkpoint-exception-postfix-live/receipt.json",
+      "sha256": "f98b904f3c60fb2beda654230618660a5bf0be9c739212209f4a5178886a0728"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/checkpoint-exception-postfix-live/status.json",
+      "sha256": "d59feb2e84b2444b0fb6d5dd2a6ae6576c212599ce9d218869c3979c79e858a9"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/audit.py",
+      "sha256": "f158e1efc26c674e0bfa0636b68c3a7de143240b749212008fe270823c871ca9"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/before-server/model-ledger.json",
+      "sha256": "519da966e274508746e1184a771a5d92439682bc744eb02c6f21010fed65de8f"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/checkpoint-exception-postfix-live/runs/0a2f60c8-3f1f-4882-af11-9a3d5168a382.json",
+      "sha256": "9b6aaaf72c8fd3ec230f28ae4271b3224e010a3016a0b019d01c52b6a87b2736"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/checkpoint-exception-postfix-live/events/0a2f60c8-3f1f-4882-af11-9a3d5168a382.json",
+      "sha256": "24e0244ba05395fa68607c70cebfca332e3d9ba5db7c8144e05bee3d684e4dde"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/events.json",
+      "sha256": "9549415ffb772bb5b17c1fb612a2c965c8102d0c0e7edccc8776c7818bf70c9e"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/execution.json",
+      "sha256": "e21a79a0143b75bb977e85c1d2d2dea4d454831b48d3ccca770e03641d17d11a"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/incident.json",
+      "sha256": "f6d8b5a69f7fcace28f6c536de7586d711f1335b88696cc5e49d338860acdefe"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/ledger-after.json",
+      "sha256": "391a8709283bdeae94a5c2fbb7420ec176a481449ca8b93a22db21d79e5d9ad1"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/old-live-run.json",
+      "sha256": "a95916da4e17eff6b65ae30c8e890e05627eaf661b287e89a087a297c635dcaf"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/operations.json",
+      "sha256": "ed740571a6e4634a9cdfae964b1b378324757d776070a8d6a9fe5d1feae3c0f6"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/run.json",
+      "sha256": "6d33765deb28c8f54aa7ce2b21352225cb3b74f6e66133a52efd90adbad5e919"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/snapshots.json",
+      "sha256": "4e9484cdfc17a78f8d83de6bc123c9afb6303a667b1d0071d811041ccc8a3759"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/raw/status.json",
+      "sha256": "d2d53304ac8f2928ae03fcc6ce7acf8ee2e572109d66291d0e18bd439cc36ecf"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-after-replay.txt",
+      "sha256": "719c3d29235c4986bd41ce3255dd4d03a02d1d81cf0e17520fa62c43e836e4b1"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-before-create.txt",
+      "sha256": "b4feafa6ce6ac6a0af74d600d77be340728dcb16c350613c93709b7228d72c63"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-before-start.txt",
+      "sha256": "a2cc41aac11c7cdd285f73dc1d71b7e6ddf1b052f05114136d8e0d733df5e2d5"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-completed.txt",
+      "sha256": "bfea15e7e0e38584a76841d91659a92838759d1e96316968f306682ae4e66e45"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-running.txt",
+      "sha256": "20f1b14b2e47c133b759e73e75b8b8d0d0007d0321ac664ec120fe33caf49e5d"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-before-create.png",
+      "sha256": "a44e1bd8d190c9d1a72a705ae8324b2de5ebd8c960a37323ed9bb0d7c590ae9e"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-before-start.png",
+      "sha256": "543e5a0893732bffda8e9db184fa3dc5cd91e31f99f5da447dc5b492dd2c275f"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-report-viewport.png",
+      "sha256": "b278191d608532c0bdf43ce7ed8bdcdcde666a1c6014ccc9cc04e87cbd5d906d"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-report.png",
+      "sha256": "f3877cc27bd4cd244083dca5dea862f987dde2f065e51fe631d62fda2b826a26"
+    },
+    {
+      "path": "output/checkpoint-exception-live-20261019/ui-running.png",
+      "sha256": "028d1fa2ef49747ff8ac36946c26596b5d0334609a7b14b3342fbdb3b7a0e10a"
+    }
+  ]
+}

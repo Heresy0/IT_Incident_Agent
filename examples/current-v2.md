@@ -4,24 +4,24 @@
 
 首次阅读可先看[项目阅读导航](README.md)、[架构导览](architecture.md)和[评估口径](evaluation-guide.md)；按用途找命令见[脚本导航](../scripts/README.md)。本页保留本机环境和历史验收的具体状态。
 
-当前分支为 `codex/graph-checkpoint-recovery`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。图迁移已快进合入 GitHub `main`，提交为 `865329d`；接入前回滚点为 `rollback/pre-checkpoint-recovery-20261019`。本轮增加按运行开启的[检查点恢复](checkpoint-recovery.md)，原始根因评估、调用账本、提示词和默认预算保持不变。首次接入记录见[检查点验收](../evals/checkpoint-recovery-validation-20261019.json)，后续异常恢复修复与当前源码指纹见[补充验收](../evals/checkpoint-exception-recovery-validation-20261019.json)；此前图迁移边界见[迁移说明](langgraph-migration.md)。
+当前分支为 `codex/graph-checkpoint-recovery`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。图迁移已快进合入 GitHub `main`，提交为 `865329d`；接入前回滚点为 `rollback/pre-checkpoint-recovery-20261019`。本轮增加按运行开启的[检查点恢复](checkpoint-recovery.md)，保留原始根因评估和既有调用记录，提示词和默认预算保持不变。首次接入记录见[检查点验收](../evals/checkpoint-recovery-validation-20261019.json)，后续异常恢复修复与源码指纹见[补充验收](../evals/checkpoint-exception-recovery-validation-20261019.json)，修复后的实际前端执行见[真实 Flash 闭环验收](../evals/checkpoint-exception-postfix-live-validation-20261019.json)；此前图迁移边界见[迁移说明](langgraph-migration.md)。
 
 ## 运行入口与默认值
 
 | 入口 | 实际含义 |
 | --- | --- |
-| `scripts/demo_frontend_live_acceptance.py --serve --maximum-model-calls 71` | 本机现有账本的 8176 演示：真实 `qwen3.7-flash`，`autonomous_v2 / closed_loop`，启用 challenge 和最多一次语义返工 |
+| `scripts/demo_frontend_live_acceptance.py --serve --maximum-model-calls 87` | 本机现有账本的 8176 演示：真实 `qwen3.7-flash`，`autonomous_v2 / closed_loop`，启用 challenge 和最多一次语义返工 |
 | `WorkflowService`、普通后端与 `main.py` | 默认 `autonomous_v2 / closed_loop`；显式旧引擎配置报错，准入失败拒绝启动 |
 | `scripts/demo_frontend_acceptance.py` | 保存报告的回放与脚本控制验收；与真实演示共用 frontend_demo_support 的身份和环境校验 |
 | 归档中的 `scripts/demo_standard_flow.py` | 恢复完整旧版后免费排练；不计自主模型质量 |
 
 本机 8176 已在运行，前端是 `front/agent_front/dist/` 中的 Vue 构建产物，使用隔离 PostgreSQL。真实模型配合合成 fixture 观测，未连接生产故障或真实修复执行器。克隆代码不会自动恢复这些本地资源。
 
-普通后端通过 `INCIDENT_CHECKPOINT_MODE=postgres_v1` 为新运行开启恢复，默认 `off`。本机 8176 已显式开启，重启时需保留该进程环境变量；既有运行按接收时冻结的模式处理，历史报告不改写为检查点运行。本轮核验原 9 份报告保持不变，并新增一次真实 Flash 崩溃恢复验收。
+普通后端通过 `INCIDENT_CHECKPOINT_MODE=postgres_v1` 为新运行开启恢复，默认 `off`。本机 8176 已显式开启，重启时需保留该进程环境变量；既有运行按接收时冻结的模式处理，历史报告不改写为检查点运行。首次接入保留原 9 份报告并新增一次真实 Flash 崩溃恢复；异常恢复修复后又保留当时的 10 份报告及事件，新增一次从前端启动的真实闭环运行。
 
-演示配置由 [live 辅助脚本](../scripts/demo_frontend_live_acceptance.py)显式建立，不修改日常配置：每次运行固定最多 16 次模型、8 次工具、180 秒。记账文件为 `output/frontend-live-acceptance-20261018/server/model-ledger.json`。此前总上限由 32 增至 55，保留原有 23 次调用；退役后两次诊断使累计达到 47 次。本次在用户授权真实模型验收的范围内另加 16 次验收总额度，将上限增至 71，保留原 47 条调用并记录扩额原因；新增一次恢复验收实际使用 16 次，当前累计 63 次、剩余 8 次。单次预算和代码默认预算均未变化。
+演示配置由 [live 辅助脚本](../scripts/demo_frontend_live_acceptance.py)显式建立，不修改日常配置：每次运行固定最多 16 次模型、8 次工具、180 秒。记账文件为 `output/frontend-live-acceptance-20261018/server/model-ledger.json`。此前总上限由 32 增至 55，保留原有 23 次调用；退役后两次诊断使累计达到 47 次。首次检查点验收将总上限增至 71，新增 16 次恢复验收调用，累计 63 次。异常恢复修复后按用户授权将上限增至 87，原 63 条调用逐条保留并记录扩额原因；本次前端验收新增 16 次，当前累计 79 次、剩余 8 次。单次预算和代码默认预算均未变化。
 
-重启本机现有演示需沿用原数据库、原 output 目录及 `--maximum-model-calls 71`，并设置 `INCIDENT_CHECKPOINT_MODE=postgres_v1`。扩额前先停止旧服务，显式提供增加的上限与原因；账本记录旧上限、新上限、既有调用数和既有调用内容摘要。后续相同上限的重启不再次扩额，不允许静默重置或降低上限。默认新账本仍为 32 次；不要删除账本来重置额度。
+重启本机现有演示需沿用原数据库、原 output 目录及 `--maximum-model-calls 87`，并设置 `INCIDENT_CHECKPOINT_MODE=postgres_v1`。扩额前先停止旧服务，显式提供增加的上限与原因；账本记录旧上限、新上限、既有调用数和既有调用内容摘要。后续相同上限的重启不再次扩额，不允许静默重置或降低上限。默认新账本仍为 32 次；不要删除账本来重置额度。
 
 ## v2 代码怎样工作
 
@@ -45,13 +45,13 @@
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/check_frontend_live_acceptance.py `
-  --run-id 749a58b3-a2be-4102-a76f-cd87d0791646 `
-  --run-id a2634656-9003-41cf-8f18-1fea535e0756 `
-  --baseline output/frontend-live-acceptance-20261018/post-retirement-after/receipt.json `
+  --run-id 0a2f60c8-3f1f-4882-af11-9a3d5168a382 `
   --output output/frontend-live-acceptance-20261018/manual-readonly-check
 ```
 
 该脚本只 GET 现有健康状态、报告和 SSE，并读取账本；不新建工单或发起模型调用。服务端同时检查现有工单的当前准入配置，不创建运行。`--baseline` 绑定历史报告的原始源码与内容；新运行准入则必须匹配当前源码。输出目录应直接位于 `output/frontend-live-acceptance-20261018/` 下，以便找到相邻的 `server/` 与 `before/` 记录。不要删除账本来重置调用额度，也不要删除正在被服务使用的前端构建目录。
+
+最新修复后真实运行的源码指纹为 `b93b59035db0aaed`：case_001 从前端新建工单并启动，51.933 秒内使用 16 次模型、5 次工具，取得 10 条证据；两次逐项审阅、两次语义挑战和一轮返工后交付 `completed / passed / FINISHED`。返工改变 C1 版本并重新审阅，没有新增证据，保留原异议及信息缺口。HTTP 31 项检查及数据库／账本／保全检查通过，前端事件回放不增加调用。它验证执行与交付，不证明根因正确，也不能与包含主动停机的旧运行直接比较速度。原始记录见[本次验收](../evals/checkpoint-exception-postfix-live-validation-20261019.json)。
 
 退役后已用相同 Flash、案例和单次预算从前端新增两次真实运行，应用指纹为 `748b2a02ac1b54a3`：case_001 用 14 次模型、5 次工具、43.750 秒；case_003 用 10 次模型、6 次工具、27.828 秒。两次都完成取证、逐项审阅、语义挑战和报告交付，刷新页面重新登录后可回读，不增加调用；联合检查退役前后报告、历史记录、SSE 和账本的 76 项检查全部通过。
 
