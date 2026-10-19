@@ -235,6 +235,28 @@ class RecoveryStore:
             conn.execute("UPDATE run_operations SET status='unknown' WHERE run_id=%s AND stage=%s AND ordinal=%s AND status='reserved'", (self.run_id, stage, ordinal))
 
 
-def serializable_error(exc):
-    return {'code': getattr(exc, 'code', 'MODEL_ERROR'), 'provider': getattr(exc, 'provider', 'model'),
-            'retryable': bool(getattr(exc, 'retryable', False))}
+def serializable_error(exc, *, kind='model'):
+    from runtime.context import ExecutionError
+    from providers.fixtures import ProviderError
+    error_type = ('execution' if isinstance(exc, ExecutionError) else
+                  'provider' if isinstance(exc, ProviderError) else 'unexpected')
+    if error_type == 'unexpected':
+        # Record the caller's public fallback, never a vendor-specific code or
+        # exception message. Replay must enter that same generic error handler.
+        return {'error_type': error_type,
+            'code': 'MODEL_ERROR' if kind == 'model' else 'PROVIDER_UNAVAILABLE',
+            'provider': 'model' if kind == 'model' else 'provider', 'retryable': False}
+    return {'error_type': error_type, 'code': exc.code,
+        'provider': getattr(exc, 'provider', 'provider'), 'retryable': bool(exc.retryable)}
+
+
+def raise_saved_error(error):
+    if error.get('error_type') == 'execution':
+        from runtime.context import ExecutionError
+        raise ExecutionError(error['code'], error['provider'], error['retryable'])
+    if error.get('error_type') == 'provider':
+        from providers.fixtures import ProviderError
+        raise ProviderError(error['code'], error['retryable'])
+    if error.get('error_type') == 'unexpected':
+        raise RuntimeError('Previously committed external call failed')
+    raise RecoveryConflict('Unknown failure receipt type')

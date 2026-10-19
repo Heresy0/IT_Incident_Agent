@@ -57,4 +57,4 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m unittest tests.storage.test_v2_postgres tests.storage.test_runbook_pgvector tests.storage.test_checkpoint_recovery tests.storage.test_checkpoint_edges -v
+      - run: python -m unittest tests.storage.test_v2_postgres tests.storage.test_runbook_pgvector tests.storage.test_checkpoint_recovery tests.storage.test_checkpoint_edges tests.storage.test_checkpoint_exceptions -v

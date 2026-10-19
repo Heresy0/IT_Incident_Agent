@@ -8,11 +8,25 @@ No graph retries, extra agents, or model prompt changes are involved.
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
+from functools import wraps
 import time
 
 from langchain_core.messages import AIMessage
 from storage.recovery import (RecoveryInterrupted, RecoveryConflict, ResultUnknown,
-                              digest, request_digest, serializable_error)
+                              digest, request_digest, serializable_error, raise_saved_error)
+
+
+def pause_on_interruption(operation):
+    @wraps(operation)
+    def guarded(self, *args, **kwargs):
+        try:
+            return operation(self, *args, **kwargs)
+        except RecoveryInterrupted:
+            # A commit may have succeeded even when its acknowledgement/read
+            # failed. Unwinding must not append a contradictory business event.
+            self.interrupted = True
+            raise
+    return guarded
 
 
 class Journal:
@@ -23,6 +37,7 @@ class Journal:
         self.stage_name = None
         self.clocks, self.clock_cursor, self.operation_cursor, self.event_cursor = [], 0, 0, 0
         self.active = None
+        self.interrupted = False
         self.span_aliases = {}
         self.tool_timestamp = None
         self.run, self.state = None, None
@@ -48,7 +63,10 @@ class Journal:
         self.clock_cursor += 1
         return value
 
+    @pause_on_interruption
     def emit(self, event):
+        if self.interrupted:
+            return True  # Resume with a new Journal, reconstructing the tail.
         if event.get('type') == 'workflow_completed':
             return True  # Committed with the report and final SSE event.
         if self.stage_name is None:
@@ -74,7 +92,10 @@ class Journal:
             record_event(saved)
         return True
 
+    @pause_on_interruption
     def reserve(self, kind, terminal):
+        if self.interrupted:
+            raise RecoveryInterrupted('The current reconstruction attempt is paused')
         self.fault('before_reserve')
         before = dict(self.context.counts)
         self.context._reserve_memory(kind, terminal)
@@ -132,7 +153,10 @@ class Journal:
         self.context.blocked_providers = set(tail['blocked_providers'])
         self.context.stop_reason = tail['stop_reason']
 
+    @pause_on_interruption
     def response(self, callback, *, kind):
+        if self.interrupted:
+            raise RecoveryInterrupted('The current reconstruction attempt is paused')
         active, saved = self.active, self.active['saved']
         if saved:
             envelope = saved['response']
@@ -140,12 +164,7 @@ class Journal:
                 raise RecoveryConflict('Operation response envelope missing')
             self.restore_tail(envelope['tail'])
             if saved['status'] == 'failed':
-                error = saved['error']
-                if kind in {'tool', 'embedding'}:
-                    from providers.fixtures import ProviderError
-                    raise ProviderError(error['code'], error['retryable'])
-                from runtime.context import ExecutionError
-                raise ExecutionError(error['code'], error['provider'], error['retryable'])
+                raise_saved_error(saved['error'])
             value = envelope['value']
             settled = saved['settled_at']
         else:
@@ -156,7 +175,7 @@ class Journal:
                 raise
             except Exception as exc:
                 self.backend.settle(self.stage_name, active['ordinal'],
-                    response={'value': None, 'tail': self.tail()}, error=serializable_error(exc))
+                    response={'value': None, 'tail': self.tail()}, error=serializable_error(exc, kind=kind))
                 raise
             if kind == 'model':
                 message = result['messages'][-1]
