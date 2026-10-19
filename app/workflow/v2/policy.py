@@ -43,7 +43,7 @@ def remaining(context):
     with context.lock:
         return BudgetView(context.limits.model_calls - context.counts['model_calls'],
                           context.limits.tool_calls - context.counts['tool_calls'],
-                          context.limits.seconds - (time.monotonic() - context.started))
+                          context.limits.seconds - context.elapsed())
 
 
 def collection_reservation(context, *, phase='initial', enable_challenge=False,

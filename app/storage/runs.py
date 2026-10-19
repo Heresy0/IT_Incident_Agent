@@ -13,10 +13,18 @@ from incidents.support import interrupted_result, now
 
 class PostgresRunStore(PostgresIncidents, PostgresRepairs):
     def __init__(self, dsn):
+        self.dsn = dsn
         self.pool = ConnectionPool(dsn, min_size=1, max_size=4, timeout=5,
                                    kwargs={"row_factory": dict_row, "connect_timeout": 5, "options": "-c statement_timeout=10000"})
         self.pool.wait(timeout=8)
         with self.pool.connection() as conn:
+            # Serialize first-time migrations, then skip DDL entirely for an
+            # initialized schema. Re-running ALTER TABLE IF NOT EXISTS while a
+            # diagnosis holds row locks can deadlock even when no column changes.
+            conn.execute('SELECT pg_advisory_xact_lock(724196031)')
+            installed = conn.execute("SELECT to_regclass('incident_schema_versions') AS name").fetchone()['name']
+            if installed and conn.execute('SELECT 1 FROM incident_schema_versions WHERE version=3').fetchone():
+                return
             conn.execute("""CREATE TABLE IF NOT EXISTS research_runs (
                 run_id TEXT PRIMARY KEY, checkpoint_thread_id TEXT NOT NULL UNIQUE,
                 query TEXT NOT NULL, user_id TEXT NOT NULL, thread_id TEXT NOT NULL, tenant_id TEXT NOT NULL,
@@ -30,6 +38,24 @@ class PostgresRunStore(PostgresIncidents, PostgresRepairs):
                 PRIMARY KEY(run_id, seq))""")
             conn.execute((Path(__file__).parent / "migrations/001_incidents.sql").read_text(encoding="utf-8"))
             conn.execute((Path(__file__).parent / 'migrations/002_repairs.sql').read_text(encoding='utf-8'))
+            conn.execute((Path(__file__).parent / 'migrations/003_workflow_recovery.sql').read_text(encoding='utf-8'))
+
+    def setup_checkpoints(self):
+        import psycopg
+        from langgraph.checkpoint.postgres import PostgresSaver
+        with psycopg.connect(self.dsn, autocommit=True, row_factory=dict_row) as conn:
+            conn.execute('SELECT pg_advisory_lock(724196032)')
+            try:
+                installed = conn.execute("SELECT to_regclass('checkpoint_migrations') AS name").fetchone()['name']
+                row = conn.execute('SELECT MAX(v) AS version FROM checkpoint_migrations').fetchone() if installed else None
+                if row is None or row['version'] is None or row['version'] < len(PostgresSaver.MIGRATIONS) - 1:
+                    PostgresSaver(conn).setup()
+            finally:
+                conn.execute('SELECT pg_advisory_unlock(724196032)')
+
+    def recoverable(self):
+        with self.pool.connection() as conn:
+            return conn.execute("SELECT * FROM research_runs WHERE status='running' AND config #>> '{run_spec,recovery,mode}'='postgres_v1' ORDER BY created_at").fetchall()
 
     def create(self, run_id, request, config):
         with self.pool.connection() as conn:
@@ -50,12 +76,26 @@ class PostgresRunStore(PostgresIncidents, PostgresRepairs):
         with self.pool.connection() as conn:
             return self._append(conn, run_id, event)
 
-    def finish(self, run_id, result):
+    def finish(self, run_id, result, *, epoch=None):
         with self.pool.connection() as conn:
             # Finish state and the last client event commit together exactly once.
             row = conn.execute("SELECT status,config FROM research_runs WHERE run_id=%s FOR UPDATE", (run_id,)).fetchone()
             if not row or row["status"] != "running":
                 return False
+            if row['config'].get('run_spec', {}).get('recovery', {}).get('mode') == 'postgres_v1' and epoch is None:
+                from storage.recovery import RecoveryConflict
+                raise RecoveryConflict('A recoverable run requires its current execution fence')
+            if epoch is not None:
+                from storage.recovery import RecoveryStore, digest, RecoveryConflict
+                recovery = RecoveryStore(self, run_id, epoch)
+                execution = recovery.guard(conn)
+                if execution['candidate'] is None or digest(result) != execution['candidate_sha256']:
+                    raise RecoveryConflict('Only the prepared report may be delivered')
+                import time
+                event = self._append(conn, run_id, {'type': 'workflow_completed', 'role': 'workflow',
+                    'engine_id': result['engine_id'], 'status': result['status'],
+                    'reason': result['run_summary']['termination_reason'], 'trace_id': run_id, 'timestamp': time.time()})
+                result = {**result, 'events': [*result.get('events', []), event]}
             conn.execute("UPDATE research_runs SET status=%s,result=%s,finished_at=NOW() WHERE run_id=%s",
                          (result["status"], Jsonb(result), run_id))
             self._append(conn, run_id, {"type": "final", **result})
@@ -91,7 +131,7 @@ class PostgresRunStore(PostgresIncidents, PostgresRepairs):
     def fail_interrupted(self):
         # The application explicitly supports one backend process, no multi-worker deployment.
         with self.pool.connection() as conn:
-            rows = conn.execute("SELECT run_id,query,user_id,thread_id,tenant_id,config FROM research_runs WHERE status='running' FOR UPDATE").fetchall()
+            rows = conn.execute("SELECT run_id,query,user_id,thread_id,tenant_id,config FROM research_runs WHERE status='running' AND COALESCE(config #>> '{run_spec,recovery,mode}','off') <> 'postgres_v1' FOR UPDATE").fetchall()
             for row in rows:
                 result = interrupted_result(row)
                 conn.execute("UPDATE research_runs SET status='failed',result=%s,finished_at=NOW() WHERE run_id=%s", (Jsonb(result), row["run_id"]))

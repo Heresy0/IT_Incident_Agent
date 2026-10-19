@@ -20,12 +20,17 @@ def valid_vector(vector, dimension):
             and all(type(x) in (int, float) and math.isfinite(x) for x in vector))
 
 
-def embed(texts, config, *, query=False, transport=None):
+def embed(texts, config, *, query=False, transport=None, _durable=False):
     """One HTTP request, charged to the model budget, with reported token usage."""
     from providers.http import request_json
     if not os.getenv(config.embedding_api_key_env):
         raise ProviderError('PROVIDER_AUTH_MISSING')
     context = current()
+    if context and context.journal is not None and not _durable:
+        request = {'name': 'knowledge_embedding', 'model': config.embedding_model,
+                   'dimension': config.embedding_dimension, 'texts': texts, 'query': query}
+        with context.journal.operation('model', request):
+            return embed(texts, config, query=query, transport=transport, _durable=True)
     if context:
         if sum(map(len, texts)) > context.limits.input_chars:
             raise ExecutionError('BUDGET_EXCEEDED')
@@ -34,11 +39,13 @@ def embed(texts, config, *, query=False, transport=None):
         parameters = {'text_type': 'query' if query else 'document'}
         if config.embedding_model in {'text-embedding-v3', 'text-embedding-v4', 'qwen3.7-text-embedding'}:
             parameters['dimension'] = config.embedding_dimension
-        response = request_json(config.embedding_url, 'POST',
-            '/api/v1/services/embeddings/text-embedding/text-embedding',
-            bearer_env=config.embedding_api_key_env, transport=transport,
-            json_body={'model': config.embedding_model, 'input': {'texts': texts},
-                       'parameters': parameters})
+        def request():
+            return request_json(config.embedding_url, 'POST',
+                '/api/v1/services/embeddings/text-embedding/text-embedding',
+                bearer_env=config.embedding_api_key_env, transport=transport,
+                json_body={'model': config.embedding_model, 'input': {'texts': texts},
+                           'parameters': parameters})
+        response = context.journal.response(request, kind='embedding') if context and context.journal is not None else request()
         usage = response.get('usage') if isinstance(response, dict) else None
         tokens = usage.get('total_tokens') if isinstance(usage, dict) else None
         if context and type(tokens) is int and tokens >= 0:

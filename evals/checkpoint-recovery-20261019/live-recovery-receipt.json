@@ -1,0 +1,235 @@
+{
+  "run_id": "f04397d4-1f7b-456e-827d-5840f0eaacec",
+  "incident_id": "d71dbf24-4914-4b08-8762-abf2ecc5968a",
+  "case_id": "case_001",
+  "model": "qwen3.7-flash",
+  "status": "partial",
+  "review_status": "needs_information",
+  "models": 16,
+  "tools": 5,
+  "input_tokens": 81488,
+  "output_tokens": 3000,
+  "duration_ms": 110735,
+  "rework_rounds": 1,
+  "original_ledger_calls_preserved": 47,
+  "final_count": 1,
+  "report_sha256": "da5457907c89f0bb7988d6edd4d85e9e2e2b7c5386ba7d7499e12fb21e35f82e",
+  "semantic_accuracy_scored": false,
+  "human_verified": false,
+  "vendor_bill_verified": false,
+  "passed": true,
+  "source_version": "207bb9cfd1a433c6",
+  "epoch": 2,
+  "recoveries": 1,
+  "counts": {
+    "web_calls": 0,
+    "tool_calls": 5,
+    "model_calls": 16
+  },
+  "tokens": {
+    "known_calls": 16,
+    "input_tokens": 81488,
+    "output_tokens": 3000
+  },
+  "first_response_reused_without_resend": true,
+  "first_wire_request_occurrences": 1,
+  "first_response_sha256": "03b14e11d286e995ca46b8982861de39192f803aa0a54741cc7ef5912898b95d",
+  "limits": {
+    "seconds": 180.0,
+    "web_calls": 12,
+    "tool_calls": 8,
+    "input_chars": 48000,
+    "max_sources": 10,
+    "model_calls": 16,
+    "snippet_chars": 1800,
+    "reserve_seconds": 20,
+    "reserve_model_calls": 3
+  },
+  "deadline_seconds": 180,
+  "unknown_operations": 0,
+  "original_calls_preserved": 47,
+  "global_calls_after": 63,
+  "global_cap_after": 71,
+  "budget_extension": {
+    "authorized_at_utc": "2026-10-19T13:17:36.010876+00:00",
+    "previous_maximum_calls": 55,
+    "maximum_calls": 71,
+    "additional_calls": 16,
+    "preserved_calls": 47,
+    "preserved_calls_sha256": "de3b6bb33a04645a14e16f47e47af21d4b62b51dd461e4d7fe4623a8895696d6",
+    "reason": "current_user_authorized_checkpoint_recovery_acceptance_20261019; one case_001 live run; per-run 16/8/180 unchanged"
+  },
+  "protocol_failure_history": [],
+  "semantic_termination_reason": "REVIEW_NEEDS_INFORMATION",
+  "trace_caveat": "The first reconstructed span used a fresh end span ID in this original live run. Final code fixes aliasing and uses persisted duration; current-source process tests cover it. Original live events are retained unchanged; no second paid run after this metadata-only fix.",
+  "operation_receipts": [
+    {
+      "stage": "collect",
+      "ordinal": 1,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "e592f90f1560124d187be78fd8395faae60957e20bd9688c9ddaf24cc6769204",
+      "response_sha256": "03b14e11d286e995ca46b8982861de39192f803aa0a54741cc7ef5912898b95d"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 2,
+      "kind": "tool",
+      "status": "responded",
+      "request_sha256": "359aa1a4807b2fbe61bdc1e4b8671c7b2495ba419982f76601b1824fe3d0edc6",
+      "response_sha256": "7732e2978b22143cdd37b7006c0173f9056c29aed00d9f3781edf500215a3065"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 3,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "9ffb14d394481988cb891ad54c01f02d5788f41f8fee9e3a5fa4a5c606add824",
+      "response_sha256": "ec5ca34ff650c6470bc6a368af1313e8aad4da651e13fb361fefaeb979af0c3d"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 4,
+      "kind": "tool",
+      "status": "responded",
+      "request_sha256": "a385f6e241912d1302ff821a44419e9cf9ccc4d6b337438c1aa580704904dfd2",
+      "response_sha256": "1972090223db6b7d2e5014c23998b5252bd5b6929dd96e72ba3fcedb2cf6f145"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 5,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "855da4bbb7c68a2a60962a934fca8278b64129c4bbc73c02787ad6fbae4b47e5",
+      "response_sha256": "0612ab5601c45b73ba267a15589e17ef892a235ef74b3bca4d21b172659c900c"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 6,
+      "kind": "tool",
+      "status": "responded",
+      "request_sha256": "517d96a4105e0e57717c22f5675b5ddf97897477ab441a644259ae7cb106ffd4",
+      "response_sha256": "c8374eec4c9f8de90b3e096349d9c48a3278cd31ef4bf84a8783b890cd586ab4"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 7,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "c9a120c5ee346a5cbdca26a65574d4da47f65c972d15b0e91434406310cc4222",
+      "response_sha256": "52156c83906b756f566c89da67bbe6a2b5111c236f7ab193a05dacc3529ec92e"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 8,
+      "kind": "tool",
+      "status": "responded",
+      "request_sha256": "de108c7fc61e27bc6ceb551ef1cef78e8db31212c5e27508e4c03e7d18d6676a",
+      "response_sha256": "f248acc6e00c18a1dc88facc86b8a3db6e4da13af93475401855c26ad89e4cb2"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 9,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "a3aee41a9e513a6022f9a0a3e5a431b4906f6f622c9fe0d79d1c7102921b64cc",
+      "response_sha256": "ff29ff65faf1c48f9dfbecb1a693a7718de3e4b379be90ab74a74d73ee5349d5"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 10,
+      "kind": "tool",
+      "status": "responded",
+      "request_sha256": "cf0166883cfd4d10c2352ff3df3688b59eb87982d6bed2ddfc4d36ff766fad3c",
+      "response_sha256": "d64dbcc362a706812b5222f58b538092de8aaa8d29fa47d37e6a387a2589af74"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 11,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "a040137f7c0aed12b3028c8c8939126f5583b08ba77a9fba5340b07db22c9253",
+      "response_sha256": "bd6a8ccfc2a71ea3a07baf0d0f0342b152d0574025777e228efb6cd50521e811"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 12,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "94042937547ca71c8e81b9b3fcfa7755c1e2f33bed8ab1a4782449cd1cfa74a9",
+      "response_sha256": "591f85457642945717b2ebf5e525982fec858babe8d7b69ba03c0c9983120d4e"
+    },
+    {
+      "stage": "collect",
+      "ordinal": 13,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "fe9a612807e74f0ebbb634c5bd52c9e2b45c08640ecde9996ca9878965cf158d",
+      "response_sha256": "174bab09bb1b1198fadba270de58e571586c6311fe65cc61b52225440807ea4b"
+    },
+    {
+      "stage": "diagnose",
+      "ordinal": 1,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "57de1c8a59140e097a0a43d2bdd2d59bcd0c0432c9d06a48d667816e14684f1f",
+      "response_sha256": "5a5315c055ebb181a1e1d40febf90021c802a6ccfbb0be5e4b5d33f96ec3c27c"
+    },
+    {
+      "stage": "review",
+      "ordinal": 1,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "0a0c083966a6eb852b3d5e33087b050680e3d954731f23e96015c27b1bb56f4a",
+      "response_sha256": "de5d63fa9a8aa116dabb99a05fbbd927e6f6464df480e4b796d4d51f68f3f44a"
+    },
+    {
+      "stage": "challenge",
+      "ordinal": 1,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "8ab70cdd776d88723d768a1d927d2e374f0dfe604162f2eee600b72d73b4e36d",
+      "response_sha256": "5db4785d0f5e77c18c1667d15aa8ec0d27de48a3f61ebf27ee33a75c135bef74"
+    },
+    {
+      "stage": "rework",
+      "ordinal": 1,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "932f6d74717992100a162f091063ce68aac8c6a2c659011b7a2ddc8b204ff0fa",
+      "response_sha256": "71649a1ee7f37106eadd4cebe29cfea8b3746ef3966153a06665b60fb0337537"
+    },
+    {
+      "stage": "rework",
+      "ordinal": 2,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "38c752ffceb7ce9758c827db79199608b5228a54879c4a94229a69b07363e429",
+      "response_sha256": "771b921495dedda0130d08491710e296184c39bb6a0ac97ee727147da49b894c"
+    },
+    {
+      "stage": "rework",
+      "ordinal": 3,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "5b717d4cba4865a2c9b99367f3756b13e22bed570d4b107617e111760916f8b1",
+      "response_sha256": "df31d328eb50d36dffaf5ffdb4f9c78054d9a858c77b48017f243bbb266ecfbe"
+    },
+    {
+      "stage": "rework",
+      "ordinal": 4,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "0ca654f2be4aa431723b6efe30b6c8fd1eaa04dd4214544ce829d6b0dc0625bb",
+      "response_sha256": "7339d11a66119d90e2fe1b80b4ec51c7ffa751bbe9cedffa977749667bbdaff4"
+    },
+    {
+      "stage": "rework",
+      "ordinal": 5,
+      "kind": "model",
+      "status": "responded",
+      "request_sha256": "1430f432460f0c5a4283a4bd7a98b01e4f42a3f8e00c11df8421997515d01458",
+      "response_sha256": "9015e25c75d55b2deb881c8b39f82d10cc00ff07e4092d3cfcf16896aaa3ac27"
+    }
+  ]
+}

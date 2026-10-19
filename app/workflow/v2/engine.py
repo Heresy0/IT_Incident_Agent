@@ -74,7 +74,7 @@ def call_model(model, context, stage, prompt, payload, schema):
     finish = getattr(response, 'response_metadata', {}).get('finish_reason', 'unknown')
     context.emit({'type': 'model_output', 'role': stage, 'finish_reason': finish if finish in {'stop', 'length', 'tool_calls'} else 'unknown',
                   'output_chars': len(str(response.content)), 'tool_call_count': len(getattr(response, 'tool_calls', []))})
-    if time.monotonic() - context.started >= context.limits.seconds:
+    if context.elapsed() >= context.limits.seconds:
         raise ExecutionError('TIME_BUDGET_EXCEEDED')
     if finish == 'length':
         raise ExecutionError('OUTPUT_TRUNCATED')

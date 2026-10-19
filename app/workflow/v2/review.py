@@ -242,7 +242,7 @@ def review_draft(model, draft, executor, context, *, repairs=None, collection=No
             with activate(context):
                 attempts += 1
                 response = invoke_chat_model(model, messages, 'reviewer', terminal=True)
-            if time.monotonic() - context.started >= context.limits.seconds:
+            if context.elapsed() >= context.limits.seconds:
                 raise ExecutionError('TIME_BUDGET_EXCEEDED')
             metadata = getattr(response, 'response_metadata', {}) or {}
             finish_reason = metadata.get('finish_reason')
@@ -277,7 +277,7 @@ def review_draft(model, draft, executor, context, *, repairs=None, collection=No
         # No per-target repair allowances. Other v2 stages share this dictionary.
         if (not allow_correction or attempts >= 2 or repairs['repairs'] >= 1
                 or context.counts['model_calls'] >= context.limits.model_calls
-                or time.monotonic() - context.started >= context.limits.seconds
+                or context.elapsed() >= context.limits.seconds
                 or not context.claim_repair(repairs, reviewer=True)):
             break
         context.emit({'type': 'validation_repair', 'role': 'reviewer', 'schema_name': 'AtomicReview',

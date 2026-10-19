@@ -8,6 +8,7 @@
 | --- | --- |
 | 理解目录职责、四个模型角色和完整调用链 | [架构与代码导览](architecture.md) |
 | 核对 LangGraph 节点、迁移对照与回滚点 | [LangGraph 迁移说明](langgraph-migration.md) |
+| 核对图检查点、调用账本和中断恢复边界 | [检查点接入说明](checkpoint-recovery.md) |
 | 理解哪些指标能说明什么、成绩有哪些局限 | [评估阅读指南](evaluation-guide.md) |
 | 按问题、重构、收益和局限讲述项目 | [面试讲述简版](interview.md) |
 | 查看本机演示、预算、源码指纹和历史验收 | [当前 v2 导览](current-v2.md) |

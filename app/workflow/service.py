@@ -3,7 +3,7 @@ import logging
 import os
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
-from threading import BoundedSemaphore, Lock
+from threading import BoundedSemaphore, Lock, Event, Thread
 from typing import AsyncIterator
 from uuid import uuid4
 
@@ -21,7 +21,8 @@ class CapacityExceeded(RuntimeError):
 
 class WorkflowService:
     def __init__(self, config_path, *, store=None, config=None, max_concurrency=None, incident_model_factory=None,
-                 service_registry=None, repair_executors=None, incident_engine=None, incident_rollout=None):
+                 service_registry=None, repair_executors=None, incident_engine=None, incident_rollout=None,
+                 checkpoint_recovery=None):
         self.incident_engine = incident_engine or os.getenv('INCIDENT_ENGINE', 'autonomous_v2')
         if self.incident_engine != 'autonomous_v2':
             raise ValueError('Only autonomous_v2 is active; restore rollback/pre-legacy-retirement-20261018 for the retired engine.')
@@ -35,6 +36,12 @@ class WorkflowService:
         self.incident_rollout = (RolloutPolicy.parse(incident_rollout) if incident_rollout is not None
                                  else RolloutPolicy.from_environment())
         self._closed = False
+        mode = os.getenv('INCIDENT_CHECKPOINT_MODE', 'off')
+        if mode not in {'off', 'postgres_v1'}:
+            raise ValueError('INCIDENT_CHECKPOINT_MODE must be off or postgres_v1')
+        self.checkpoint_recovery = checkpoint_recovery if checkpoint_recovery is not None else mode == 'postgres_v1'
+        self._recovery_stop, self._recovery_thread = Event(), None
+        self._scheduled_lock, self._scheduled = Lock(), set()
         from providers.registry import ServiceRegistry
         self.services = service_registry if service_registry is not None else ServiceRegistry.from_environment()
         from repairs.service import RepairService
@@ -60,15 +67,26 @@ class WorkflowService:
                 self._base_config = IncidentConfig.from_file(self._config_path)
             if self._store is None:
                 self._store = PostgresRunStore(self._base_config.postgres_dsn)
+            if self.checkpoint_recovery and not isinstance(self._store, PostgresRunStore):
+                raise ValueError('Checkpoint recovery requires PostgreSQL; no in-memory fallback')
+            recovery = isinstance(self._store, PostgresRunStore) and (self.checkpoint_recovery or bool(self._store.recoverable()))
+            if recovery:
+                self._store.setup_checkpoints()
             count = self._store.fail_interrupted()
             self._store.recover_repairs()
             if count:
                 logger.warning("interrupted_runs_marked_failed | count=%d", count)
             self._store_started = True
+            if recovery:
+                self._recovery_thread = Thread(target=self._recover_loop, name='incident-recovery', daemon=True)
+                self._recovery_thread.start()
 
     def close(self):
         with self._admission_lock:
             self._closed = True
+        self._recovery_stop.set()
+        if self._recovery_thread:
+            self._recovery_thread.join(timeout=5)
         self._executor.shutdown(wait=True, cancel_futures=False)
         if self._store:
             self._store.close()
@@ -77,6 +95,12 @@ class WorkflowService:
         adapter = self._incident
         context = RunContext(run_id, limits=adapter.limits(request))
         try:
+            from workflow.recovery import enabled, execute
+            if enabled(request):
+                result = execute(self, run_id, request)
+                if result is not None:
+                    METRICS.finish_run(result['status'], result.get('run_summary', {}))
+                return
             events = self._store.events(run_id)
             def emit(event):
                 events.append(self._store.append(run_id, event))
@@ -91,15 +115,52 @@ class WorkflowService:
                 self._store.finish(run_id, result)
                 METRICS.finish_run(result["status"], result.get("run_summary", {}))
         except Exception as exc:
+            from workflow.recovery import enabled
+            if enabled(request):
+                logger.error('recoverable_run_paused | run_id=%s exception_type=%s', run_id, type(exc).__name__)
+                return
             logger.error("run_finish_storage_failed | run_id=%s exception_type=%s", run_id, type(exc).__name__)
             try:
                 self._store.finish(run_id, adapter.failure(request, context, "INTERNAL_ERROR"))
             except Exception:
                 logger.error("run_recovery_storage_failed | run_id=%s", run_id)
         finally:
+            with self._scheduled_lock:
+                self._scheduled.discard(run_id)
             with METRICS.lock:
                 METRICS.active -= 1
             self._capacity.release()
+
+    def _recover_loop(self):
+        from workflow.recovery import execution_request
+        while not self._recovery_stop.wait(2):
+            if self._closed:
+                return
+            try:
+                for row in self._store.recoverable():
+                    with self._scheduled_lock:
+                        if row['run_id'] in self._scheduled or self._closed:
+                            continue
+                        if not self._capacity.acquire(blocking=False):
+                            break
+                        self._scheduled.add(row['run_id'])
+                    active = False
+                    try:
+                        request = execution_request(row, self)
+                        with METRICS.lock:
+                            METRICS.active += 1
+                            active = True
+                        self._executor.submit(self._execute, row['run_id'], request)
+                    except Exception:
+                        if active:
+                            with METRICS.lock:
+                                METRICS.active -= 1
+                        with self._scheduled_lock:
+                            self._scheduled.discard(row['run_id'])
+                        self._capacity.release()
+                        raise
+            except Exception as exc:
+                logger.warning('recovery_scan_delayed | exception_type=%s', type(exc).__name__)
 
     def get_run(self, run_id, principal=None):
         self.start()
@@ -165,8 +226,12 @@ class WorkflowService:
                 with METRICS.lock:
                     METRICS.active += 1
                     active = True
+                with self._scheduled_lock:
+                    self._scheduled.add(run_id)
                 self._executor.submit(self._execute, run_id, request)
             except Exception:
+                with self._scheduled_lock:
+                    self._scheduled.discard(run_id)
                 if active:
                     with METRICS.lock:
                         METRICS.active -= 1

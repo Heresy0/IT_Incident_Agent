@@ -28,7 +28,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 .\.venv\Scripts\python.exe scripts/setup_demo_auth.py
 ```
 
-requirements.txt 为73个锁定的 IT 运行包，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。收尾使用现有独立环境完成验证，未强制卸载额外包或重新创建环境。
+requirements.txt 锁定 IT 运行依赖，包含 PostgreSQL 图检查点适配，不包含 Milvus、Redis 检查点或研究搜索依赖。requirements-incident.txt 是兼容入口。检查点默认关闭，启用与恢复边界见[检查点说明](examples/checkpoint-recovery.md)。未强制卸载额外包或重新创建环境。
 
 Python 构建配置 `pyproject.toml` 复用同一锁定依赖，只打包 `app/` 下的 IT 模块及数据库迁移。`.env.example` 为统一的 IT 配置模板，前端地址覆盖使用 `INCIDENT_API_TARGET`；未设置时按 `PORT` 自动连接。已有真实环境、身份与登记文件不会被模板覆盖。
 

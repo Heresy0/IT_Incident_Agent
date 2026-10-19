@@ -126,6 +126,7 @@ const reconnect = async () => {
     const response = await api(`runs/${runId.value}/events?after_seq=${after}`, { signal: streamController.signal })
     await readEvents<RunEvent & Partial<Result>>(response, event => {
       if (!alive || current !== generation) return
+      if (events.value.some(existing => existing.seq === event.seq)) return
       events.value.push(event)
       if (events.value.length > 300) events.value.shift()
       if (saved.value) { saved.value.seq = event.seq; save() }

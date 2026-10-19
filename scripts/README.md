@@ -1,6 +1,6 @@
 # 脚本导航
 
-本页按用途索引当前 35 个 Python 文件。脚本保留原路径，避免破坏互相导入、仓库根目录定位、测试和历史复现。项目入口见[根 README](../README.md)，架构见[代码导览](../examples/architecture.md)。
+本页按用途索引当前 36 个 Python 文件。脚本保留原路径，避免破坏互相导入、仓库根目录定位、测试和历史复现。项目入口见[根 README](../README.md)，架构见[代码导览](../examples/architecture.md)。
 
 ## 先运行哪些命令
 
@@ -34,6 +34,7 @@ $env:PYTHONPATH='app;.'
 | [register_service.py](register_service.py) | 生成服务登记模板、免费校验配置；登记的是能力和语义，不是故障决策树 |
 | [probe_registered_service.py](probe_registered_service.py) | 查询登记服务的实际观测，核对范围与证据；会连接登记的数据源 |
 | [probe_incident_tools.py](probe_incident_tools.py) | 本地协议、工具绑定与计数探针；使用替身，不发网络请求 |
+| [verify_checkpoint_equivalence.py](verify_checkpoint_equivalence.py) | 检查点关闭／开启的 42 组固定响应对照；仅允许隔离 `_test` 数据库，不调用真实模型 |
 | [ingest_runbooks.py](ingest_runbooks.py) | 准备或导入排障手册；执行导入会写知识库，并可能调用向量接口 |
 | [verify_runbook_rag.py](verify_runbook_rag.py) | pgvector 冒烟核验；默认计划，`--execute` 仅用于显式配置的隔离测试库 |
 | [verify_postgres.py](verify_postgres.py) | PostgreSQL 集成核验；`--start` 启动专用临时测试库，按脚本说明准备环境 |

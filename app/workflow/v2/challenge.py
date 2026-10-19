@@ -113,7 +113,7 @@ def challenge_supported(model, draft, review, executor, context, *, collection=N
             with activate(context):
                 audit['called'] = True
                 response = invoke_chat_model(model, messages, 'challenge', terminal=True)
-            if time.monotonic() - context.started >= context.limits.seconds:
+            if context.elapsed() >= context.limits.seconds:
                 raise ExecutionError('TIME_BUDGET_EXCEEDED')
             finish = (getattr(response, 'response_metadata', None) or {}).get('finish_reason')
             audit['finish_reason'] = finish

@@ -111,9 +111,11 @@ def claim_rework(context, state, *, needs_query=False):
             return False
         needed = 3 if needs_query else 2
         if (context.limits.model_calls - context.counts['model_calls'] < needed
-                or context.limits.seconds - (time.monotonic() - context.started)
+                or context.limits.seconds - context.elapsed()
                     <= max(1, context.limits.reserve_seconds)
                 or needs_query and context.counts['tool_calls'] >= context.limits.tool_calls):
+            return False
+        if context.journal is not None and not context.journal.claim('semantic_rework'):
             return False
         state['semantic_reworks'] = 1
     context.emit({'type': 'semantic_rework_claimed', 'role': 'workflow',

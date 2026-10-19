@@ -2,7 +2,9 @@
 
 基于 FastAPI、PostgreSQL 和 Vue 的故障辅助诊断项目。v2 使用受预算约束的自主调查循环，从工单出发查询指标、日志与变更，形成带证据引用的诊断，审阅后交付报告和人工核查项。当前由 LangGraph 编排 v2 各阶段，旧版诊断链路继续归档。
 
-本页是统一阅读入口。迁移分支 `codex/langgraph-orchestration` 的普通后端、CLI 和 CI 演示统一使用 **`autonomous_v2 / closed_loop`**。本机 8176 使用真实 Flash 和合成只读观测。旧版执行代码退出当前运行目录，完整源码与恢复方式见[旧版归档](archive/legacy/README.md)。准入未通过时明确拒绝启动，不再静默回退旧版。
+本页是统一阅读入口。当前分支 `codex/graph-checkpoint-recovery` 的普通后端、CLI 和 CI 演示统一使用 **`autonomous_v2 / closed_loop`**。本机 8176 使用真实 Flash 和合成只读观测。旧版执行代码退出当前运行目录，完整源码与恢复方式见[旧版归档](archive/legacy/README.md)。准入未通过时明确拒绝启动，不再静默回退旧版。
+
+图检查点恢复按运行显式启用，默认关闭；开启方式、预算与未知响应边界见[检查点接入说明](examples/checkpoint-recovery.md)。恢复不会增加 Agent、调用额度或返工轮数。
 
 ## 从这里阅读
 
@@ -10,6 +12,7 @@
 | --- | --- |
 | 按顺序阅读架构、评估和面试口径 | [项目阅读导航](examples/README.md) |
 | 核对图编排边界、行为对照和回滚方式 | [LangGraph 迁移说明](examples/langgraph-migration.md) |
+| 启用进程中断恢复、核对预算与幂等交付 | [检查点接入说明](examples/checkpoint-recovery.md) |
 | 按用途查找诊断、演示、接入与评估命令 | [脚本导航](scripts/README.md) |
 | 了解 v2 架构、当前演示和评估边界 | [当前 v2 导览](examples/current-v2.md) |
 | 核验剩余旧代码清理、兼容边界和回归结果 | [清理验收](evals/residual-cleanup-validation-20261019.json)、[原文件快照](archive/legacy/residual-20261019/README.md) |

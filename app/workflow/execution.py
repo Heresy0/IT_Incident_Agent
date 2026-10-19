@@ -71,6 +71,17 @@ class IncidentAdapter:
             run_spec['review_policy_version'] = REVIEW_POLICY_VERSION
             run_spec['challenge_policy_version'] = ('blind_scope_challenge_v1'
                 if decision['enable_challenge'] else 'not_enabled')
+        if getattr(self.service, 'checkpoint_recovery', False):
+            from storage.recovery import SCHEMA_VERSION
+            from importlib.metadata import version as distribution_version
+            run_spec['recovery'] = {'mode': 'postgres_v1', 'schema_version': SCHEMA_VERSION,
+                'unknown_response': 'stop_without_resend', 'deadline': 'wall_clock',
+                'dependencies': {name: distribution_version(name) for name in (
+                    'langgraph', 'langgraph-checkpoint', 'langgraph-checkpoint-postgres')}}
+            if incident and incident.get('demo_case_id'):
+                from providers.fixtures import FixtureProvider
+                from storage.recovery import digest
+                run_spec['recovery']['fixture_sha256'] = digest(FixtureProvider(incident['demo_case_id'], principal)._data)
         if incident and not incident.get('demo_case_id'):
             from providers.fixtures import ProviderError
             try:
@@ -152,6 +163,45 @@ class IncidentAdapter:
         result.update(task_type="incident", workflow="autonomous_v2", incident_id=snapshot['id'],
                       incident_snapshot=snapshot, memory_enabled=False)
         return result
+
+    def resume_error(self, request):
+        """Validate a persisted run without rebuilding a client or calling a model."""
+        from runtime.version import implementation_version
+        from workflow.v2.review import REVIEW_POLICY_VERSION
+        from storage.recovery import SCHEMA_VERSION
+        from providers.fixtures import ProviderError
+        from importlib.metadata import version as distribution_version
+        spec = request['run_spec']
+        if spec.get('source_version_full') != implementation_version():
+            return 'ENGINE_SOURCE_CHANGED'
+        if spec.get('review_policy_version') != REVIEW_POLICY_VERSION or spec['recovery']['schema_version'] != SCHEMA_VERSION:
+            return 'RECOVERY_POLICY_CHANGED'
+        dependencies = {name: distribution_version(name) for name in (
+            'langgraph', 'langgraph-checkpoint', 'langgraph-checkpoint-postgres')}
+        if spec['recovery'].get('dependencies') != dependencies:
+            return 'RECOVERY_DEPENDENCIES_CHANGED'
+        config = request.get('_model_config', self.service._base_config)
+        settings = {'model': config.model, 'base_url': getattr(config, 'base_url', ''),
+                    'extra_body': getattr(config, 'extra_body', {}), 'temperature': 0, 'max_tokens': 2200}
+        current = hashlib.sha256(json.dumps(settings, sort_keys=True).encode()).hexdigest()
+        if current != spec['model_settings_sha256']:
+            return 'MODEL_SETTINGS_CHANGED'
+        snapshot, principal = request['incident_snapshot'], self.principal(request)
+        registry = request.get('_provider_registry', self.service.services)
+        try:
+            if snapshot.get('demo_case_id'):
+                provider = BoundIncidentProvider(snapshot, principal, self.service._store)
+                provider.authorize(principal, provider.ticket().scope)
+                from storage.recovery import digest
+                if digest(provider.base._data) != spec['recovery'].get('fixture_sha256'):
+                    return 'RECOVERY_FIXTURE_CHANGED'
+            else:
+                binding = registry.resolve(snapshot, principal)
+                if binding.fingerprint != spec.get('provider_binding_sha256'):
+                    return 'PROVIDER_BINDING_CHANGED'
+        except ProviderError:
+            return 'RECOVERY_AUTHORIZATION_CHANGED'
+        return None
 
     def failure(self, request, context, code):
         return {"run_id": context.run_id, "task_type": "incident", "incident_id": request["incident_snapshot"]["id"],

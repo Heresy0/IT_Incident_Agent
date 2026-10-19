@@ -88,11 +88,17 @@ class RunContext:
         self.stop_reason = ""
         self.emit_callback = emit
         self.root_span = str(uuid4())
+        self.journal = None
+
+    def elapsed(self):
+        return self.journal.elapsed() if self.journal is not None else time.monotonic() - self.started
 
     def emit(self, event):
         event = {"run_id": self.run_id, "trace_id": self.run_id, "timestamp": time.time(), **event}
         # Persist first: clients only see committed events.
         with self.event_lock:
+            if self.journal is not None and self.journal.emit(event):
+                return
             if self.emit_callback:
                 self.emit_callback(event)
             record_event(event)
@@ -103,6 +109,8 @@ class RunContext:
             reviewed = state.get('reviewer_repairs', 0)
             used = reviewed if reviewer else state['repairs'] - reviewed
             if used >= 1:
+                return False
+            if self.journal is not None and not self.journal.claim('reviewer_repair' if reviewer else 'collection_repair'):
                 return False
             state['repairs'] += 1
             if reviewer:
@@ -116,9 +124,14 @@ class RunContext:
             self.tokens['known_calls'] += 1
 
     def reserve(self, kind, terminal=False):
+        if self.journal is not None:
+            return self.journal.reserve(kind, terminal)
+        return self._reserve_memory(kind, terminal)
+
+    def _reserve_memory(self, kind, terminal=False):
         rejected = []
         with self.lock:
-            elapsed = time.monotonic() - self.started
+            elapsed = self.elapsed()
             deadline = self.limits.seconds - (0 if terminal else self.limits.reserve_seconds)
             key = "model_calls" if kind == "model" else "tool_calls"
             cap = self.limits.model_calls if kind == "model" else self.limits.tool_calls
@@ -156,7 +169,7 @@ class RunContext:
         with self.lock:
             return {**self.counts, "token_usage": {**self.tokens, "status": "known" if self.tokens["known_calls"] == self.counts["model_calls"] else "partial_or_unknown"},
                     "provider_http_attempts": "unknown_for_model_and_embedding", "estimated_cost": None,
-                    "duration_ms": round((time.monotonic() - self.started) * 1000), "termination_reason": self.stop_reason,
+                    "duration_ms": round(self.elapsed() * 1000), "termination_reason": self.stop_reason,
                     "errors": list(self.errors), "limits": self.limits.__dict__}
 
     @contextmanager
@@ -192,6 +205,11 @@ def activate(context):
 
 def invoke_model(agent, messages, name, terminal=False):
     context = current()
+    if context and context.journal is not None and context.journal.active is None:
+        request = {'name': name, 'terminal': terminal,
+                   'messages': [{'type': message.type, 'content': message.content} for message in messages]}
+        with context.journal.operation('model', request):
+            return invoke_model(agent, messages, name, terminal)
     if context:
         actual = sum(len(str(m.content)) for m in messages)
         if actual > context.limits.input_chars:
@@ -201,7 +219,11 @@ def invoke_model(agent, messages, name, terminal=False):
             raise ExecutionError("BUDGET_EXCEEDED")
         context.reserve("model", terminal)
     def call():
-        result = agent.invoke({"messages": messages})
+        if context and context.journal is not None:
+            response = context.journal.response(lambda: agent.invoke({"messages": messages}), kind='model')
+            result = {'messages': [*messages, response]}
+        else:
+            result = agent.invoke({"messages": messages})
         if context:
             response = result["messages"][-1]
             usage = getattr(response, "usage_metadata", None) or getattr(response, "response_metadata", {}).get("token_usage")
@@ -217,6 +239,9 @@ def invoke_model(agent, messages, name, terminal=False):
     except ExecutionError:
         raise
     except Exception as exc:
+        from storage.recovery import RecoveryInterrupted
+        if isinstance(exc, RecoveryInterrupted):
+            raise
         raise ExecutionError("MODEL_ERROR", "model") from exc
 
 

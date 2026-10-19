@@ -158,12 +158,24 @@ def finalize_stage(state: GraphState, runtime: Runtime[RunDependencies]):
     return {'result': result}
 
 
-def build_graph():
-    graph = StateGraph(GraphState, context_schema=RunDependencies, output_schema=GraphOutput)
+class RecoveryGraphState(TypedDict, total=False):
+    snapshot: str
+    sha256: str
+
+
+def build_graph(checkpointer=False):
+    durable = checkpointer is not False
+    graph = StateGraph(RecoveryGraphState if durable else GraphState,
+        context_schema=RunDependencies, output_schema=RecoveryGraphState if durable else GraphOutput)
+    def guarded(name, operation):
+        def stage(state: RecoveryGraphState, runtime: Runtime[RunDependencies]):
+            journal = runtime.context.context.journal
+            return journal.stage(name, operation, journal.state, runtime.context)
+        return stage
     for name, operation in (('collect', collect_stage), ('diagnose', diagnose_stage),
             ('review', review_stage), ('challenge', challenge_stage), ('rework', rework_stage),
             ('publish', publish_stage), ('finalize', finalize_stage)):
-        graph.add_node(name, operation)
+        graph.add_node(name, guarded(name, operation) if durable else operation)
     graph.add_edge(START, 'collect')
     graph.add_edge('collect', 'diagnose')
     graph.add_edge('diagnose', 'review')
@@ -173,7 +185,7 @@ def build_graph():
     graph.add_edge('rework', 'publish')
     graph.add_edge('publish', 'finalize')
     graph.add_edge('finalize', END)
-    return graph.compile(checkpointer=False, name='incident_v2')
+    return graph.compile(checkpointer=checkpointer, name='incident_v2')
 
 
 GRAPH = build_graph()
@@ -203,6 +215,43 @@ def run_graph(model, provider, principal, *, context=None, limits=None, event_lo
                           enable_rework, enable_challenge, needs_challenge, reserve)
     initial = {'repairs': {'repairs': 0, 'reviewer_repairs': 0}, 'failures': [],
                'reworks': [], 'challenges': []}
+    if context.journal is not None:
+        from storage.checkpoints import FencedPostgresSaver
+        from storage.recovery import ResultUnknown, RecoveryConflict
+        from workflow.v2.snapshot import restore
+        journal = context.journal
+        journal.state, journal.run = initial, run
+        graph = build_graph(FencedPostgresSaver(journal.backend))
+        config = {'recursion_limit': 16, 'configurable': {'thread_id': context.run_id}}
+        checkpoint = graph.get_state(config)
+        try:
+            graph.invoke(None if checkpoint.created_at else {'snapshot': 'initial', 'sha256': ''},
+                         context=run, config=config, durability='sync')
+            completed = journal.backend.snapshot('finalize', 'done')
+            if completed is None:
+                raise RecoveryConflict('Graph finished without its final business snapshot')
+            journal.state = restore(completed, run)
+            return journal.state['result']
+        except ResultUnknown:
+            journal.stage_name = None
+            journal.authoritative_counts()
+            from workflow.v2.contracts import source_facts
+            from workflow.v2.review import ReviewBatch
+            state = journal.state
+            draft = state.get('draft') or Draft(facts=source_facts(executor), claims=[], next_steps=[], gaps=[])
+            draft = draft.model_copy(update={'facts': source_facts(executor),
+                'gaps': [*draft.gaps, '中断时存在结果未知的调用，已保留预算扣减；未自动重发。']})
+            reviews = state.get('reviews') or ReviewBatch()
+            state.update(draft=draft, reviews=reviews, stop='RECOVERY_RESULT_UNKNOWN',
+                decisions=state.get('decisions', 0), repairs=state.get('repairs', initial['repairs']),
+                failures=[*state.get('failures', []), {'stage': 'recovery', 'category': 'transport', 'code': 'RECOVERY_RESULT_UNKNOWN'}],
+                drafts=state.get('drafts', []), review_history=state.get('review_history', []),
+                first_pass=state.get('first_pass', {}))
+            state.update(publish_stage(state, type('RuntimeView', (), {'context': run})()))
+            state['result'].update(status='partial', business_result='needs_information')
+            state['result']['run_summary']['termination_reason'] = 'RECOVERY_RESULT_UNKNOWN'
+            state.update(finalize_stage(state, type('RuntimeView', (), {'context': run})()))
+            return state['result']
     # Graph steps bound orchestration only. Existing RunContext remains the sole
     # authority for model/tool/time limits, including calls inside stage loops.
     return GRAPH.invoke(initial, context=run, config={'recursion_limit': 16})['result']

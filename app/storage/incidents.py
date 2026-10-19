@@ -72,6 +72,9 @@ class PostgresIncidents:
                       "execution": execution, "incident_snapshot": snapshot, "memory_enabled": False}
             conn.execute("INSERT INTO research_runs(run_id,checkpoint_thread_id,query,user_id,thread_id,tenant_id,status,config) VALUES (%s,%s,%s,%s,%s,%s,'running',%s)",
                          (run_id, run_id, snapshot["symptoms"], principal.user_id, iid, principal.tenant_id, Jsonb(config)))
+            if config.get('run_spec', {}).get('recovery', {}).get('mode') == 'postgres_v1':
+                from storage.recovery import create_execution
+                create_execution(conn, run_id, config['run_spec'])
             conn.execute("UPDATE incidents SET latest_run_id=%s,business_status='investigating',updated_at=NOW() WHERE id=%s", (run_id, iid))
             self._append(conn, run_id, {"type": "status", "task_type": "incident", "incident_id": iid, "status": "running", "message": "诊断已接收"})
         return run_id, True, config

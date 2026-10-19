@@ -1,6 +1,7 @@
 import hashlib
 import json
 import time
+from contextlib import nullcontext
 from datetime import datetime, timezone
 from api.auth import Principal
 from runtime.context import ExecutionError, RunContext, activate
@@ -255,14 +256,18 @@ class ToolExecutor:
     def _query(self, name, args):
         for attempt in range(2):
             try:
-                self.context.reserve("tool")
-                with activate(self.context), self.context.span("tool", name):
-                    if name == 'get_service_metrics' and hasattr(self.provider, 'binding'):
-                        rows, truncated = self.provider.query(name, args, self.scope,
-                            max_metric_points=self.metric_point_limit(args))
-                    else:
-                        rows, truncated = self.provider.query(name, args, self.scope)
-                if time.monotonic() - self.context.started >= self.context.limits.seconds - self.context.limits.reserve_seconds:
+                journal = self.context.journal
+                request = {'name': name, 'args': args.model_dump(mode='json'), 'attempt': attempt}
+                with journal.operation('tool', request) if journal else nullcontext():
+                    self.context.reserve("tool")
+                    def read():
+                        if name == 'get_service_metrics' and hasattr(self.provider, 'binding'):
+                            return self.provider.query(name, args, self.scope,
+                                max_metric_points=self.metric_point_limit(args))
+                        return self.provider.query(name, args, self.scope)
+                    with activate(self.context), self.context.span("tool", name):
+                        rows, truncated = journal.response(read, kind='tool') if journal else read()
+                if self.context.elapsed() >= self.context.limits.seconds - self.context.limits.reserve_seconds:
                     return self.rejected("BUDGET_EXCEEDED")
                 items = []
                 for row in rows:
@@ -285,7 +290,10 @@ class ToolExecutor:
                     self.context.emit({"type": "retry", "provider": "incident_fixture", "name": name})
                     continue
                 return self.rejected(exc.code)
-            except Exception:
+            except Exception as exc:
+                from storage.recovery import RecoveryInterrupted
+                if isinstance(exc, RecoveryInterrupted):
+                    raise
                 return self.rejected("PROVIDER_UNAVAILABLE")
         return self.rejected("PROVIDER_UNAVAILABLE")
 
@@ -301,7 +309,9 @@ class ToolExecutor:
         return Evidence(evidence_id=eid,
                 kind="runbook" if name == "search_runbooks" else "past_incident" if name == "search_incidents" else "observation",
                 provider=self.provider.name, service=row["service"], environment=row["environment"],
-                observed_from=observed, observed_to=observed, retrieved_at=datetime.now(timezone.utc),
+                observed_from=observed, observed_to=observed,
+                retrieved_at=(self.context.journal.tool_timestamp if self.context.journal is not None
+                              and self.context.journal.tool_timestamp else datetime.now(timezone.utc)),
                 payload=row, excerpt=encoded, locator=locator, data_version=row["data_version"], hash=digest,
                 allowed_field_paths=paths, reference_options=[ReferenceOption(
                     reference_id="REF_" + hashlib.sha256(f"{eid}/{path}".encode()).hexdigest()[:24],

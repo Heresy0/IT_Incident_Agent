@@ -36,6 +36,7 @@ tiktoken==0.14.0
 langchain-text-splitters==1.0.0
 langgraph==1.0.3
 langgraph-checkpoint==3.0.1
+langgraph-checkpoint-postgres==3.0.5
 langgraph-prebuilt==1.0.4
 langgraph-sdk==0.2.9
 langsmith==0.4.43
