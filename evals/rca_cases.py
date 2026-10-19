@@ -415,7 +415,9 @@ def write_dataset(folder=None, *, replace_unfrozen_draft=False):
             subfolder = 'private' if label == 'truth' else label
             relative = subfolder + '/' + case['case_id'] + '.json'
             artifact = folder / relative
-            artifact.write_text(json.dumps(case[field], ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+            # v1 was frozen with CRLF; reproduction must retain those bytes on every OS.
+            artifact.write_text(json.dumps(case[field], ensure_ascii=False, indent=2) + '\n',
+                                encoding='utf-8', newline='\r\n')
             entry[label + '_path'], entry[label + '_sha256'] = relative, sha_file(artifact)
         entries.append(entry)
     manifest = {'schema_version': SCHEMA_VERSION, 'dataset_version': VERSION,
@@ -430,7 +432,8 @@ def write_dataset(folder=None, *, replace_unfrozen_draft=False):
             'No related calibration/development variant in the acceptance split',
             'Freeze new version before paid acceptance; any used-for-tuning case becomes development data'],
         'cases': entries}
-    (folder / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    (folder / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+                                        encoding='utf-8', newline='\r\n')
     return load_dataset(folder / 'manifest.json')
 
 
