@@ -1,0 +1,1138 @@
+{
+  "schema_version": "checkpoint-exception-recovery-validation-v1",
+  "date": "2026-10-19",
+  "branch": "codex/graph-checkpoint-recovery",
+  "baseline_commit": "e93ae6bb701f3c78fd50ebb5303a452e1ecbdf63",
+  "implementation_commit": "6030c64",
+  "baseline_source_version": "ac90cebc6e5c0f59",
+  "source_version": "b93b59035db0aaed",
+  "passed": true,
+  "changes": [
+    "Pause the current journal on recovery infrastructure errors; do not append business events while unwinding.",
+    "Persist execution/provider/unexpected failure categories; replay the same caller error and retry branch."
+  ],
+  "tests": {
+    "source_version": "b93b59035db0aaed",
+    "tests": 685,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "blocked": [],
+    "paid_model_calls": 0,
+    "passed": true,
+    "failed_tests": []
+  },
+  "fault_pairs": {
+    "scenarios": 15,
+    "before_equivalent": 4,
+    "after_equivalent": 15,
+    "real_postgres_disconnects": 10,
+    "failed_response_process_exits": 5,
+    "before_state_conflict_failures": 8,
+    "after_state_conflict_failures": 0,
+    "after_completed": 10,
+    "after_matching_partial": 5,
+    "controls_unchanged_across_versions": 8,
+    "budget_violations": 0,
+    "duplicate_final_events": 0,
+    "repeated_committed_calls": 0,
+    "second_rework_rounds": 0,
+    "case": "case_001",
+    "limits": {
+      "model_calls": 16,
+      "tool_calls": 8,
+      "seconds": 180
+    },
+    "model": "stateless fixed responses, not a real Flash call",
+    "rows": [
+      {
+        "scenario": "execution_timeout",
+        "stage": "collect",
+        "ordinal": 2,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "partial",
+        "after_status": "partial",
+        "before_reason": "TIMEOUT",
+        "after_reason": "TIMEOUT",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 3,
+          "model_calls": 9
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [],
+        "canonical_sha256": "584fafa879179f7c9c2368416ca181e86ed8daaa6da6c08538339aca6acf9dad",
+        "receipt_sha256": "34ba54c79b07ac95fca4bab3f9d9ac845138c70adaec5ed36d56620eb2b8dcca"
+      },
+      {
+        "scenario": "model_auth",
+        "stage": "review",
+        "ordinal": 1,
+        "before_matches_uninterrupted": true,
+        "after_matches_uninterrupted": true,
+        "before_status": "partial",
+        "after_status": "partial",
+        "before_reason": "AUTH_ERROR",
+        "after_reason": "AUTH_ERROR",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 4
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 4
+        },
+        "rework_rounds": 0,
+        "postgres_fault": [],
+        "canonical_sha256": "f6f0947e55d6ce7880fd6bce0042861e74baeb0620ef4f7c2d49b28232060a45",
+        "receipt_sha256": "0244d70e42073423b92261ad34bfa833f54006d058426520c0a42d0928a14618"
+      },
+      {
+        "scenario": "provider_timeout",
+        "stage": "collect",
+        "ordinal": 2,
+        "before_matches_uninterrupted": true,
+        "after_matches_uninterrupted": true,
+        "before_status": "partial",
+        "after_status": "partial",
+        "before_reason": "TIMEOUT",
+        "after_reason": "TIMEOUT",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 3,
+          "model_calls": 9
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 3,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [],
+        "canonical_sha256": "d1ef3b944bf32cc010c5e3b402fcae75666b8ea8a6e4f70bd58059d227efacae",
+        "receipt_sha256": "f5939de71bbd32b044901ca83ba4d813be485aefeb0567d6b64fd229bfa183ad"
+      },
+      {
+        "scenario": "raw_model",
+        "stage": "review",
+        "ordinal": 1,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "partial",
+        "after_status": "partial",
+        "before_reason": "unclassified_upstream_code",
+        "after_reason": "MODEL_ERROR",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 4
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 4
+        },
+        "rework_rounds": 0,
+        "postgres_fault": [],
+        "canonical_sha256": "8effb706f76cdbee5f45f24a00e47d052a51a03f0230b62593b53e76fed023b0",
+        "receipt_sha256": "102499557180276b13ce71e1c9d386271cc422614993acc30c583d80f9403e6f"
+      },
+      {
+        "scenario": "raw_provider",
+        "stage": "collect",
+        "ordinal": 2,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "partial",
+        "after_status": "partial",
+        "before_reason": "MODEL_ERROR",
+        "after_reason": "PROVIDER_UNAVAILABLE",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [],
+        "canonical_sha256": "b9882f254e783387399eac9d342623e078ffb20fddee71bb1a6112374eb80372",
+        "receipt_sha256": "e9b5667e41f879160856c8d429830d969e99183dd7479417691d6da215abba65"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "collect",
+        "ordinal": 1,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 0,
+          "model_calls": 1
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "276ecf51be8ee2b32d7fb961a0bed310751e70615f070004965403cf224b5af7"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "review",
+        "ordinal": 1,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 4
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "8dbfa4c8230db4d92f6853866670b892b7c44a1b4bf397f40555375f287c8af4"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "rework",
+        "ordinal": 4,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 7
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "3ff7562d8872914301f6d71103ae7794f4afaae1d808ec37e6c4e162919b7554"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "rework",
+        "ordinal": 5,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 8
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "167d6f263d8408307e3381c19f51494a46b28cef766bc048e307b52d378b1132"
+      },
+      {
+        "scenario": "pg_end_disconnect",
+        "stage": "collect",
+        "ordinal": 1,
+        "before_matches_uninterrupted": true,
+        "after_matches_uninterrupted": true,
+        "before_status": "completed",
+        "after_status": "completed",
+        "before_reason": "FINISHED",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_end_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "357f494eb516278eabd5b9b23126a454b72a93f2eb40078304fec01370a0f693"
+      },
+      {
+        "scenario": "pg_end_disconnect",
+        "stage": "rework",
+        "ordinal": 5,
+        "before_matches_uninterrupted": true,
+        "after_matches_uninterrupted": true,
+        "before_status": "completed",
+        "after_status": "completed",
+        "before_reason": "FINISHED",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_end_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "e51bdc036d85d24085871052ad9e6497ad44815c2a3543e41a13a88803001078"
+      },
+      {
+        "scenario": "pg_usage_disconnect",
+        "stage": "collect",
+        "ordinal": 1,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 0,
+          "model_calls": 1
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_usage_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "a85d3729997e2a9e93b7a3c1e081d342fb729ad6fe70d0e4fd5ab3e0f7b7188e"
+      },
+      {
+        "scenario": "pg_usage_disconnect",
+        "stage": "rework",
+        "ordinal": 5,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 8
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_usage_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "91d7094a8a1747625a5b943aead63a4a218681b7f6e23d3f24e768beccddec0f"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "collect",
+        "ordinal": 2,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 1,
+          "model_calls": 1
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "1dd0c048ce9de28ad3ab15d3d1b6720d6192d18b2614b9ced1c58924bf64f3fe"
+      },
+      {
+        "scenario": "pg_read_disconnect",
+        "stage": "rework",
+        "ordinal": 2,
+        "before_matches_uninterrupted": false,
+        "after_matches_uninterrupted": true,
+        "before_status": "failed",
+        "after_status": "completed",
+        "before_reason": "RECOVERY_STATE_CONFLICT",
+        "after_reason": "FINISHED",
+        "before_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 5
+        },
+        "after_counts": {
+          "web_calls": 0,
+          "tool_calls": 2,
+          "model_calls": 9
+        },
+        "rework_rounds": 1,
+        "postgres_fault": [
+          {
+            "fault": "pg_read_disconnect",
+            "driver_error": "AdminShutdown"
+          }
+        ],
+        "canonical_sha256": "0ec0038548c55863a0d37f2460d222b68f6a72fa19429379c573d552ae1a5856",
+        "receipt_sha256": "a13d7b695e55a3d9fc22f99de1250e46fff87353244bf84ecea0c0a48ad3dbcf"
+      }
+    ]
+  },
+  "normal_path_pairs": {
+    "passed": true,
+    "scenarios": 42,
+    "paid_model_calls": 0,
+    "before": {
+      "off": {
+        "mean_ms": 367.871,
+        "p95_ms": 486.169
+      },
+      "on": {
+        "mean_ms": 1513.56,
+        "p95_ms": 1791.799
+      }
+    },
+    "after": {
+      "off": {
+        "mean_ms": 349.869,
+        "p95_ms": 472.694
+      },
+      "on": {
+        "mean_ms": 1449.53,
+        "p95_ms": 1713.255
+      }
+    },
+    "rows": [
+      {
+        "scenario": "case_001-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "2abdc943ad8554e104e890a6ee671b13f6ba53a87a542b8b6a1678796989c708",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_001-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "da739725134346815bb0b0a5e62c58bf02818fc560a7b4ec2261ebd2ce974ec6",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_001-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "1841c142e5626073b941d3bb876f35bd90ad67c50dea5948031a210b05d3dd45",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_001-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "b6c0a3a5843412c88cbe85a8837fae5d7e0d1181803751a83cad498a82d09461",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_001-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "e7b4384acab4685d725380f4ee13acfa9d75a734008f8fe7aeeefd38e7d46095",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_001-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "cccda909bb9eb702c5bfc060a51eea2941c927ac464463873cdd7072f33634bb",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "5ab59bb4fb07265d8ee9593459562a12af6e0db279e2c520aa7bf7597066f683",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "60ddef9aea63200853e7e85d289afbc9f1f16b9162a1817506db7dd25692c70a",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "55d9a323ce3ae48205aa0a00efdfb5c748b288b7c0c17c1eecdbcb40fdd8ae1b",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "94eeb5f086358bb856d9966259cf229dfb2da05bd51afb7467e37312fa73628f",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "5931c82e16832c22092699be77d8e75bab2280af14ed87454a2242048d7ed0d3",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_002-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "e686a56c9b894d4deb964ec350cebfc857a39349d0df26a16c50047a1874f339",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "851eda9a68991ad6bf108f86d2f7e57f0e9096e8fae2ad6a23c58b03fc2e8423",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "91b647706f427de8194feec7e648e566a60e34cdc3944b914f21d824569882b1",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "bc8b864ed9456bc16443a5a8c7d41f6e1836477420f7d3d58f669a67cbf3e885",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "d84246471230d35bf73fcc17f5f1d31eb5fd130e9f811d889fe13c63cafe7965",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "e4a3c54126f857d0bf847f8a285aa437f872a8bd2e8a22f42e8214f9d1c6ddb1",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_003-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "21d50dbf48efb0c6fa5c721e3211bc25fe2306347099dbb75598de7c4148ad40",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "ce5843e1b4123843131a2689fd72adad087f946f85c2244758ff76259e02a8e7",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "5fa4af87cb1846bbd384d8362f45bf49e169a7e7709654472fd483348f20beda",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "4aff7a37e8466cecef23b0a6b0eb0b2b859356d46a54cb863a51baf0be6bf09a",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "c126efde49551032cd0f5d16f40d049455b92173021430ebadb1a147cf850d71",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "4a24dcfb07efe9ba71fdcdc47fd4ba7cd3a8af3e2a5cbb3e0547cf79ce339c54",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_004-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "3cfe07350d6b7d80354715ce45d635fedd608f7fd5bc185243d20fc98b590bc2",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "4ac6dc2b1c12d9b1f3fd8a0d5c50cc1acaf41a2b0f3c153f3797880fd9f0585a",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "a69a613f8d20587c1fb7bca45c15df1bb25d32a6f24eab6c73a5313fa56eb811",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "467b18c092bea9a25b7d5a237a7420f41e4759ab9fee93d0c7bee8a99cc695fd",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "633e8cd11b140b71d5ec18ad5f53e78b7874603e192f996bd5ce2ba404faeb10",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "4b970e03c510c0cf9627534022978ef5aa2b233f78271d0cdafc2cd78746430d",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_005-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "a9ac23cb87ae5c9e1b43578720eef2b58bbce9344326523c9b84e3ecf04b94ef",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b6-r0-c0",
+        "before_after_equal": true,
+        "sha256": "d3070a54a3fe681b97aea1d7608e07bd9743dfd303a47f16e8877ffc210ae0ed",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b6-r1-c0",
+        "before_after_equal": true,
+        "sha256": "d3f814f711b7d6200191f2efb46d28f2ef273a437c581e93b8efa5e430bffb7f",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b6-r1-c1",
+        "before_after_equal": true,
+        "sha256": "9057ac7b03c067b342b0f16ccf6462534e87326b7d456c13128abea659a2c91d",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b16-r0-c0",
+        "before_after_equal": true,
+        "sha256": "2550cb867179d27dc999263d4f9cb289bf2a2063eb19d7991d40d44961c8b415",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b16-r1-c0",
+        "before_after_equal": true,
+        "sha256": "890700245ab63f01e456e2fef55dbcc0fd74769f73586c5b55b99a8af5e7be52",
+        "models": 5,
+        "tools": 2
+      },
+      {
+        "scenario": "case_006-b16-r1-c1",
+        "before_after_equal": true,
+        "sha256": "f1a9ba00c9d9f33c4c851e8d54786fc3c59022a82997777c47e64797ebccf03c",
+        "models": 6,
+        "tools": 2
+      },
+      {
+        "scenario": "revision",
+        "before_after_equal": true,
+        "sha256": "c74a749969c656faade88cbfedf11b360aa3300e04cc6a4d3c1d3f555c5bc4af",
+        "models": 8,
+        "tools": 2
+      },
+      {
+        "scenario": "withdraw",
+        "before_after_equal": true,
+        "sha256": "cf9c3f8953a64c63142919b4b91dcc6fac620d35ea4ee058a5e461a33c3033cf",
+        "models": 8,
+        "tools": 2
+      },
+      {
+        "scenario": "malformed",
+        "before_after_equal": true,
+        "sha256": "f5c8b3c2155f67f7f66d5346c696ff20b4836a3538f39658ccd5f960e805f72f",
+        "models": 8,
+        "tools": 2
+      },
+      {
+        "scenario": "duplicate",
+        "before_after_equal": true,
+        "sha256": "7b5d82db706726a8dddffb642ef114a2aee3cf9ca759d1ecd57ef4444dd65442",
+        "models": 9,
+        "tools": 1
+      },
+      {
+        "scenario": "challenge",
+        "before_after_equal": true,
+        "sha256": "247d13f9af1152ea445ef48058eb9da8ac6fb1ffd6390cc723d4a53b2203cc85",
+        "models": 10,
+        "tools": 2
+      },
+      {
+        "scenario": "status-check",
+        "before_after_equal": true,
+        "sha256": "0c2df51f8dbf29b2f031ca6045de1071ae134a33bce24e3ceded38987d27bbbe",
+        "models": 4,
+        "tools": 2
+      }
+    ],
+    "scope": "Both versions run off/on in the same isolated PostgreSQL; fixed model outputs, no live model calls; logical time held at zero, actual DB deadline admission unchanged; concurrent regressions can affect local timing."
+  },
+  "runtime": {
+    "passed": true,
+    "phase": "after-deploy",
+    "source_version": "b93b59035db0aaed",
+    "health": {
+      "status": "ok",
+      "service": "it-incident-backend"
+    },
+    "old_reports_and_events_preserved": 10,
+    "incidents_unchanged": true,
+    "all_ledgers_byte_unchanged": true,
+    "served_assets": {
+      "/assets/index-DwhmfyqY.js": "3728d7fb9fcdd501b657c3d865a161bcc940c5ccc280fcc9242a4c2c968e83a5",
+      "/assets/index-Ds9xpvdz.css": "f837902621ce3776e5fe550fccb5913d2c69018f6f27f62d6af0ff14a879a3a6"
+    },
+    "frontend_files_byte_unchanged": true,
+    "engine": "autonomous_v2",
+    "variant": "closed_loop",
+    "checkpoint_mode": "postgres_v1",
+    "limits": {
+      "model_calls": 16,
+      "web_calls": 12,
+      "tool_calls": 8,
+      "seconds": 180.0,
+      "reserve_model_calls": 3,
+      "reserve_seconds": 20,
+      "input_chars": 48000,
+      "snippet_chars": 1800,
+      "max_sources": 10
+    },
+    "model_ledger": {
+      "admitted_calls": 63,
+      "maximum_calls": 71,
+      "remaining_calls": 8,
+      "known_usage_calls": 63,
+      "unknown_usage_calls": 0,
+      "input_tokens_known": 315487,
+      "output_tokens_known": 11770,
+      "model": "qwen3.7-flash",
+      "is_vendor_bill": false
+    },
+    "new_model_calls": 0
+  },
+  "implementation_ci": {
+    "passed": true,
+    "implementation_commit": "6030c64",
+    "run_id": 39267518001,
+    "jobs": [
+      {
+        "name": "control-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "postgres-integration",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "frontend",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "logs": [
+      {
+        "job": "control-tests",
+        "counts": [
+          "Ran 685 tests in 25.219s",
+          "OK (skipped=37)"
+        ]
+      },
+      {
+        "job": "postgres-integration",
+        "counts": [
+          "Ran 37 tests in 136.702s"
+        ]
+      }
+    ]
+  },
+  "preservation": {
+    "original_tracked_files_unchanged_except_declared_changes": 1073,
+    "evaluation_archive_fixture_files_unchanged": 827,
+    "all_three_ledgers_byte_unchanged": true,
+    "frontend_files_byte_unchanged": true,
+    "prompt_hashes_unchanged": 6,
+    "default_budget_and_context_module_byte_unchanged": true,
+    "model_role_factory_byte_unchanged": true,
+    "initial_uncommitted_changes": "",
+    "new_agents": 0,
+    "new_paid_calls": 0
+  },
+  "limits": [
+    "Fixed-response equivalence and recovery reliability, not root-cause accuracy.",
+    "Logical time is fixed for business comparisons; PostgreSQL retains the real wall-clock deadline gate.",
+    "Local latency includes concurrent free regressions; no production speed claim.",
+    "No new real Flash run; original model ledger and reports are unchanged.",
+    "Old pending runs remain subject to the existing source/version compatibility checks."
+  ],
+  "artifacts": [
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before.json",
+      "sha256": "31b784d0e5442e42b6b4c3e695ac2173e24916bde1883f6af8022b02e1c0bfd3"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/tests.json",
+      "sha256": "d0e8b3114eb17047073909976aff53192d6c59a4b2743231b98734572fcf8437"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/tests.log",
+      "sha256": "f40b809b100af23cdd5b0de1cced008dae68ac40a0db384cde0428f70edc34fa"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/tests.json",
+      "sha256": "4d4c71398a745215e239b122455746f49060c392b6880f595c497bd0771caf57"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/tests.log",
+      "sha256": "5efe076bff7c2ffc233e8e9fd6e04f6ce18802db870a925c5a9930940924deec"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/all/tests.json",
+      "sha256": "1071315a560ad59bcfa12aa00833d1ea79212a0bf57faa2db50fd23c85e396ff"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/all/tests.log",
+      "sha256": "f699c3a85f7af3af548fa07b3588aea1c5b64fb1a20c34faaa31456321213df6"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/paired-before-after.json",
+      "sha256": "805f37a03fb0ab6034637e3720659773fab4a834c06ee8e839861b260a626276"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/paired-before/summary.json",
+      "sha256": "ca60873002986cf7360692fea713aba67ed7b8ebf6e47ed370aa06fc4888dd1d"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/paired-after/summary.json",
+      "sha256": "7fd69df69b8db2c66aec86c85ec4c90db8870d8be1960cbf6ee0ca270d7ca43b"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/demo-before-deploy.json",
+      "sha256": "4fe4efc5d37539119e0462721f884e77f823c10a203bef63f58bd31254768bd9"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/demo-after-deploy.json",
+      "sha256": "1563ab582e67f169a6be20ac7d1908467c0a12c4687987d3f7fce7026ba6d7a6"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/ci-implementation.json",
+      "sha256": "5dc9344fdfece99a0dd0be64f1fd4874b8c053125b2749aca17ca447f2872cda"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/demo-server-before/preservation.json",
+      "sha256": "5f8a573037240e5903f85afbdbe6f25739e7d4817f1dff0dd77ffcd92bde61ef"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/368e6ff3-4ebd-49b6-9a60-fa433b981b1f-receipt.json",
+      "sha256": "517af92e49188387a28ba559d94edb11d16d608add4677926fa267cb96a5fcb3"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/3b896593-472e-45ff-a232-e1f83c07fd6a-receipt.json",
+      "sha256": "5804a0dd5f53b0b972a9169a473647ac1dabc05e95e2c5b9a46fea9500001cf1"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/3d300400-6f89-40c0-9527-71022a6e678a-receipt.json",
+      "sha256": "227ed6c6a2425348fc58649e93acf60cbf9d115158c36f7c1c2f482523ecc415"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/5e71c819-fe07-470d-ae26-13c5d8e185ea-receipt.json",
+      "sha256": "f649f54e9b6da78975f5859177f6600c64bcb39bf63fc731d1835a48b411d275"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/86f60d50-c917-4572-9577-6ae79ba678b4-receipt.json",
+      "sha256": "1cd12a068272d4653d122a2be1b15f1d5d3922d2082e89e39288e09fde1ab0d4"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/90f5e65e-43e9-4ddc-bbdb-26e3f4a4689a-receipt.json",
+      "sha256": "b433c5819a34899d2f82ebcb18913f91eba5d31cfeaeca66d2e9450ce5efc725"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/abafd7b9-e57e-4cd2-a477-8c477e121fe0-receipt.json",
+      "sha256": "d5b490dc80e39324571ff5d76c164ad9b5ab9c9f10b7c87c467466ae3774d3b9"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/ed3e7e52-2667-4ddf-bcd2-30129ae9f063-receipt.json",
+      "sha256": "e0e14ab33af5e86f91be4bf23bec64a8063009aad2a0ce56b5dd63bcb55195a2"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/f30f898c-1ce7-4da4-adab-fedecdffdbb8-receipt.json",
+      "sha256": "ed32bbbc77817ab21f686e7f191890c2aacaa8c218b7c3b5f2e04d921bdcab6e"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/d3f9c8bda2ef4e169f0a32ef232ec2c0/ff76e58a-2939-4ee9-be35-7c2010fa1eb8-receipt.json",
+      "sha256": "daa697d5dbd002ee7b43787a4d31af588c7ee8d4ddd5eb9e5ccbebf0d39484c3"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/992acb269d6149d4bf2bffe409b7b65e/1b318507-8218-47e0-81c9-22fd20b82176-receipt.json",
+      "sha256": "c073635612d97c9bdf46a224b96bbaaca046e73c67cd14d1ca541aa46049e6b8"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/992acb269d6149d4bf2bffe409b7b65e/c8ba9829-9f95-4f6f-9a63-4a3c7456a2f2-receipt.json",
+      "sha256": "8de8a200a9b30d94a04793084222598fa9890874d8e65b16623c706f4b6d9707"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/992acb269d6149d4bf2bffe409b7b65e/d53ce6af-b7f8-4120-91e8-5257f2262014-receipt.json",
+      "sha256": "257280482643cfe1fd12eb949411b56011bdd47b48b55e6ed88323903ea12e11"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/992acb269d6149d4bf2bffe409b7b65e/db438804-7fb7-4a18-896c-37eadd8b2d3a-receipt.json",
+      "sha256": "3a20f855cb101570cf412725a1b0d7f1cec2b20378c3f17c7aee7729757dd3da"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/992acb269d6149d4bf2bffe409b7b65e/f7998ca2-0e5a-4fb7-8aa7-f0e733858b3d-receipt.json",
+      "sha256": "2ad80737ef1a235e4ddcef77ff93c75d5af5bc921047a9e201715d7028c512af"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/3b8f5a6b97c549438c7325823e9503a3/6d58b46c-8d96-4946-9880-be0ee87884ae-receipt.json",
+      "sha256": "1e4b08afab78a50c78fb1547c86d4d22402ec6983875096e990c1a6dc97a068a"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/3b8f5a6b97c549438c7325823e9503a3/75ca19d0-b870-4cc8-bb67-06918b3fcc76-receipt.json",
+      "sha256": "f2b0738f97fc77f7c20c27f3c4617d2064b19dd02e31507f76bbc5ea432c2aa7"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/3b8f5a6b97c549438c7325823e9503a3/e0a1466b-623b-4de6-aea7-848cd0d90a16-receipt.json",
+      "sha256": "c6ab37cf7b6f8f8a40a8cedaf9a9d43d68e65278d456cf3c0faf4974803e4533"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/3b8f5a6b97c549438c7325823e9503a3/ed8ce6ac-bf5e-4f35-89a9-04e365be9697-receipt.json",
+      "sha256": "4cfae99e4fc28da74e77e01c65da6bbe498660de0d9ac542e3d5d03333ef4242"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/3b8f5a6b97c549438c7325823e9503a3/ff3e8e56-06f9-4dc5-a809-076fef84c007-receipt.json",
+      "sha256": "7e7d80cd6e9a890a6f347a7a9305e4686877b975f442694fdb25ec1acc36dc50"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/390ccf0c3b3943babafed4f5ed55cce1/32f0e9c5-7e4e-42a1-a688-a9e85ccc1cda-receipt.json",
+      "sha256": "bd243889195a7a39103dfe1b14486978af551e3201b1477b9c14c94b226e939c"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/390ccf0c3b3943babafed4f5ed55cce1/b58bf965-0998-47e8-a882-21031062a260-receipt.json",
+      "sha256": "f518ba3d86ecc998ef85862adfa813e8e320e5f778507ee3a5c4788634c3138d"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/before-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/390ccf0c3b3943babafed4f5ed55cce1/f524803e-2662-49ce-8a13-41e58d9e1379-receipt.json",
+      "sha256": "cb493dc31b36aa1337e6ce5cbc55a40055e4fe264d7350b851048b39ccea08f0"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/3c17c94b-81d9-4474-b340-59cfb3453a76-receipt.json",
+      "sha256": "7d4b19a495f1894a858cf586b2b6b2bae7d08026ff4267ace83fe902f954d2b6"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/5a065ed7-202f-40f9-8749-153dc6fbffd8-receipt.json",
+      "sha256": "f5939de71bbd32b044901ca83ba4d813be485aefeb0567d6b64fd229bfa183ad"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/63f40f30-847b-4cd8-b538-bd7397403a83-receipt.json",
+      "sha256": "71c963dffdcff452d12ab961848825e76bd0c9b708d0bba40701b4f460110271"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/71f01dea-a6ed-4c11-94fa-257f63052c60-receipt.json",
+      "sha256": "0244d70e42073423b92261ad34bfa833f54006d058426520c0a42d0928a14618"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/7e289313-6969-4421-9c71-e2d92e006d42-receipt.json",
+      "sha256": "30ded03cd1dc1dae7d38ebf664810ccabcf38dada18b49243dfc98aeb26cf950"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/80773601-471f-4716-bdb6-0ba81c228b11-receipt.json",
+      "sha256": "c091b2467d023f6d0db5a295a52c77fdd7ded45370577fa5bfe027358a18a01e"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/8b6cf29a-e786-4ad1-beaf-ec61bc50fbfa-receipt.json",
+      "sha256": "d617be7d83ee8519f4323c399f9a93216af681a268fa4ce5f2d6f87fcd1c26ad"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/cb9f58fd-1e40-4048-b3c3-c60b7a9f4166-receipt.json",
+      "sha256": "e9b5667e41f879160856c8d429830d969e99183dd7479417691d6da215abba65"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/cba0039f-6830-4efd-ae1b-c47dacaae6e0-receipt.json",
+      "sha256": "102499557180276b13ce71e1c9d386271cc422614993acc30c583d80f9403e6f"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_failed_receipts_preserve_uninterrupted_error_and_retry_semantics/99acb4f9b8634c378c2b6d2eaa084ca0/fa83e77b-d920-4f07-91a1-52af51df5f62-receipt.json",
+      "sha256": "34ba54c79b07ac95fca4bab3f9d9ac845138c70adaec5ed36d56620eb2b8dcca"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/f4f1460c80674201b6262c09e797491b/133563d5-4eaf-476b-8003-175c2b6b4376-receipt.json",
+      "sha256": "378a2a565425d540c1a7f6c76d14e79933d453d9894e98ba6e5825cb00bc78d1"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/f4f1460c80674201b6262c09e797491b/4268638a-dbac-40e6-8067-ef984ab02bb7-receipt.json",
+      "sha256": "8dbfa4c8230db4d92f6853866670b892b7c44a1b4bf397f40555375f287c8af4"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/f4f1460c80674201b6262c09e797491b/7bfae6d8-f059-4a07-9d51-1c0411e7f7d6-receipt.json",
+      "sha256": "276ecf51be8ee2b32d7fb961a0bed310751e70615f070004965403cf224b5af7"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/f4f1460c80674201b6262c09e797491b/9e9cee94-1291-47c1-9a02-c81193e503dc-receipt.json",
+      "sha256": "167d6f263d8408307e3381c19f51494a46b28cef766bc048e307b52d378b1132"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_model_response_survives_transient_postgres_receipt_read_failure/f4f1460c80674201b6262c09e797491b/dab711ce-7c2a-4eb0-b71b-cba90552a603-receipt.json",
+      "sha256": "3ff7562d8872914301f6d71103ae7794f4afaae1d808ec37e6c4e162919b7554"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/1f71cdd921a04b03b8406af9a8111736/0f2d505d-45fe-4811-b9cc-c41675e0e9f3-receipt.json",
+      "sha256": "357f494eb516278eabd5b9b23126a454b72a93f2eb40078304fec01370a0f693"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/1f71cdd921a04b03b8406af9a8111736/4d0cd4bf-be77-4f23-bb9e-7f5cc267a666-receipt.json",
+      "sha256": "e51bdc036d85d24085871052ad9e6497ad44815c2a3543e41a13a88803001078"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/1f71cdd921a04b03b8406af9a8111736/519dd3d7-f253-435d-89a9-947de23daff6-receipt.json",
+      "sha256": "91d7094a8a1747625a5b943aead63a4a218681b7f6e23d3f24e768beccddec0f"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/1f71cdd921a04b03b8406af9a8111736/986041e3-3308-4113-a9b9-f4754bc4c9c6-receipt.json",
+      "sha256": "711300c5d5923c3824ee588a50fb42ab9bbd1d6ac0e46d5a93da174688ef5897"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_post_commit_usage_and_end_events_resume_without_cursor_conflict/1f71cdd921a04b03b8406af9a8111736/c5ffae1a-c57b-4df2-9e3f-c37ef3681177-receipt.json",
+      "sha256": "a85d3729997e2a9e93b7a3c1e081d342fb729ad6fe70d0e4fd5ab3e0f7b7188e"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/1378728858ad4e749ca90162401f63d0/18f82b57-9926-41bc-97bc-720ce0b76140-receipt.json",
+      "sha256": "64e1337b62cb9ddf3d563cef3ef13b167486dd1f7ecd219df807e6156c53d666"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/1378728858ad4e749ca90162401f63d0/37f70159-cd22-45a7-812c-4e349e9f109d-receipt.json",
+      "sha256": "1dd0c048ce9de28ad3ab15d3d1b6720d6192d18b2614b9ced1c58924bf64f3fe"
+    },
+    {
+      "path": "output/checkpoint-exception-fix-20261019/after-fix/faults/test_tool_response_survives_transient_postgres_receipt_read_failure/1378728858ad4e749ca90162401f63d0/8f4ead26-1494-41f0-a778-9c4d3d76a6c5-receipt.json",
+      "sha256": "a13d7b695e55a3d9fc22f99de1250e46fff87353244bf84ecea0c0a48ad3dbcf"
+    }
+  ]
+}

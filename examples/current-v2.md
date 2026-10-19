@@ -4,7 +4,7 @@
 
 首次阅读可先看[项目阅读导航](README.md)、[架构导览](architecture.md)和[评估口径](evaluation-guide.md)；按用途找命令见[脚本导航](../scripts/README.md)。本页保留本机环境和历史验收的具体状态。
 
-当前分支为 `codex/graph-checkpoint-recovery`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。图迁移已快进合入 GitHub `main`，提交为 `865329d`；接入前回滚点为 `rollback/pre-checkpoint-recovery-20261019`。本轮增加按运行开启的[检查点恢复](checkpoint-recovery.md)，原始根因评估、调用账本、提示词和默认预算保持不变。当前源码指纹、故障注入与对照见[检查点验收](../evals/checkpoint-recovery-validation-20261019.json)；此前图迁移边界见[迁移说明](langgraph-migration.md)。
+当前分支为 `codex/graph-checkpoint-recovery`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。图迁移已快进合入 GitHub `main`，提交为 `865329d`；接入前回滚点为 `rollback/pre-checkpoint-recovery-20261019`。本轮增加按运行开启的[检查点恢复](checkpoint-recovery.md)，原始根因评估、调用账本、提示词和默认预算保持不变。首次接入记录见[检查点验收](../evals/checkpoint-recovery-validation-20261019.json)，后续异常恢复修复与当前源码指纹见[补充验收](../evals/checkpoint-exception-recovery-validation-20261019.json)；此前图迁移边界见[迁移说明](langgraph-migration.md)。
 
 ## 运行入口与默认值
 
