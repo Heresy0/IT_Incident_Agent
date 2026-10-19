@@ -1,0 +1,140 @@
+{
+  "schema_version": "repository-navigation-tidy-v1",
+  "date": "2026-10-19",
+  "source_commit_before": "4ea1d55050a8479a6fc988038084c4b3c7ec97b1",
+  "initial_worktree_clean": true,
+  "scope": "Add script navigation and portable architecture/evaluation/interview documentation; remove two unreferenced empty test package markers. Preserve runtime paths, original evidence and local documents.",
+  "added_navigation": [
+    "scripts/README.md",
+    "examples/README.md",
+    "examples/architecture.md",
+    "examples/evaluation-guide.md",
+    "examples/interview.md"
+  ],
+  "updated_entry_points": [
+    "README.md",
+    "examples/current-v2.md",
+    "evals/README.md"
+  ],
+  "removed_empty_packages": [
+    "tests/agents/__init__.py",
+    "tests/evidence/__init__.py"
+  ],
+  "preservation": {
+    "app_source_and_fingerprint_unchanged": true,
+    "source_version": "0d58da1f8b5285f4",
+    "all_existing_scripts_byte_unchanged": 35,
+    "original_evaluation_json_byte_unchanged": 383,
+    "fixtures_byte_unchanged": 44,
+    "historical_documents_and_archives_byte_unchanged": true,
+    "local_docs_byte_unchanged": 114,
+    "frontend_source_and_assets_unchanged": true,
+    "runtime_paths_unchanged": true,
+    "ledger_byte_unchanged": true
+  },
+  "validation": {
+    "navigation": {
+      "passed": true,
+      "documentation_files": 8,
+      "local_links_and_anchors_checked": 148,
+      "all_python_scripts_indexed_once": 35,
+      "local_docs_unchanged": 114,
+      "frontend_assets_unchanged": 4,
+      "existing_ledger_unchanged": true,
+      "runtime_and_original_evidence_unchanged": true,
+      "removed_empty_test_packages": [
+        "tests/agents/__init__.py",
+        "tests/evidence/__init__.py"
+      ]
+    },
+    "discovered_tests_before": 655,
+    "discovered_tests_after": 655,
+    "focused_regression": {
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "external_connection_attempts": 0,
+      "new_paid_calls": 0,
+      "controls": [
+        {
+          "case": "case_001",
+          "status": "completed",
+          "engine": "autonomous_v2",
+          "model": "scripted",
+          "new_paid_calls": 0
+        },
+        {
+          "case": "case_003",
+          "status": "completed",
+          "engine": "autonomous_v2",
+          "model": "scripted",
+          "new_paid_calls": 0
+        }
+      ],
+      "passed": true
+    },
+    "full_suite_rerun": false,
+    "full_suite_note": "No application or test logic was modified. The previous 655-test result remains a historical result; this tidy reran 80 focused tests and verified discovery of all 655.",
+    "fixture_cases_checked": 6,
+    "local_tool_protocol_probe": "passed; scripted model only; no network requests",
+    "runtime_readonly": {
+      "passed": true,
+      "origin": "http://127.0.0.1:8176",
+      "health": "ok",
+      "engine": "autonomous_v2",
+      "variant": "closed_loop",
+      "source_version_unchanged": "0d58da1f8b5285f4",
+      "admission_unchanged": true,
+      "enable_rework": true,
+      "enable_challenge": true,
+      "historical_incidents_unchanged": 9,
+      "reports_and_sse_unchanged": 9,
+      "served_homepage_unchanged": true,
+      "model_ledger": {
+        "admitted_calls": 47,
+        "maximum_calls": 55,
+        "remaining_calls": 8,
+        "known_usage_calls": 47,
+        "unknown_usage_calls": 0,
+        "input_tokens_known": 233999,
+        "output_tokens_known": 8770,
+        "model": "qwen3.7-flash",
+        "is_vendor_bill": false
+      },
+      "new_paid_model_calls": 0,
+      "new_real_model_runs": 0,
+      "browser_ui_retested": false
+    }
+  },
+  "new_real_model_runs": 0,
+  "new_paid_model_calls": 0,
+  "root_cause_quality_reevaluated": false,
+  "passed": true,
+  "artifacts": [
+    {
+      "path": "output/navigation-tidy-20261019/before.json",
+      "sha256": "1347700f39b96b97d307ac39a543ba75c40ffaa4076f36ec3f92396e71599109"
+    },
+    {
+      "path": "output/navigation-tidy-20261019/free-validation.json",
+      "sha256": "bba853e54462f35a1c38188be2007d5ae329fd88bf8ecad83068d40757f19938"
+    },
+    {
+      "path": "output/navigation-tidy-20261019/focused-tests.log",
+      "sha256": "f50b24952a3ea514f0fac7a5d007ea348eb31f9d56fc7aebf7147b2c6bdab27c"
+    },
+    {
+      "path": "output/navigation-tidy-20261019/navigation-check.json",
+      "sha256": "6e58293c585aff7e1006434b7fea0e4d310991eeb442bd2995a290239158962c"
+    },
+    {
+      "path": "output/navigation-tidy-20261019/runtime-readonly.json",
+      "sha256": "f859b4eebb74191b20a0f262349e443b9d1fe36aad832d33b5352a42c4c25ecf"
+    },
+    {
+      "path": "output/navigation-tidy-20261019/verify_navigation.py",
+      "sha256": "635f1770966922daa2cb71520056885b1fff7f38ce6a34ac18f2e84b072244ff"
+    }
+  ]
+}

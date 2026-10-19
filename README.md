@@ -8,12 +8,14 @@
 
 | 目的 | 入口 |
 | --- | --- |
+| 按顺序阅读架构、评估和面试口径 | [项目阅读导航](examples/README.md) |
+| 按用途查找诊断、演示、接入与评估命令 | [脚本导航](scripts/README.md) |
 | 了解 v2 架构、当前演示和评估边界 | [当前 v2 导览](examples/current-v2.md) |
 | 核验剩余旧代码清理、兼容边界和回归结果 | [清理验收](evals/residual-cleanup-validation-20261019.json)、[原文件快照](archive/legacy/residual-20261019/README.md) |
 | 核验真实前端取证、审阅、返工与报告交付 | [退役后真实验收](evals/frontend-post-retirement-validation-20261018.json)、[原始前端验收](evals/frontend-live-validation-20261018.json) |
 | 核验同模型、同案例、同预算的旧版／v2 对照 | [冻结版本配对验收](evals/frozen-version-validation-20261018.json) |
 | 核验跨案例根因定位、补证及剩余错误 | [跨案例评分](evals/rca-cross-case-scorecard-20261018.json)、[实验与证据来源](evals/rca-cross-case-validation-20261018.json) |
-| 阅读本地复盘与面试稿 | [本地文档索引](docs/README.md)（`docs/` 继续只保留在本机） |
+| 阅读可随仓库提供的面试稿 | [面试讲述简版](examples/interview.md)；本机扩展复盘索引为 `docs/README.md`，不随克隆提供 |
 | 配置普通本地开发环境 | [Windows 启动说明](README_LOCAL.md) |
 | 查找历史优化、失败记录和旧版流程 | [历史实验归档索引](archive/experiments/README.md) |
 | 查找已退役的研究系统源码 | [研究归档说明](archive/research/README.md) |
