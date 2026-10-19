@@ -54,14 +54,15 @@ def _load_experiments(manifest_path):
     names = set()
     for original_path, digest in manifest['source_sha256'].items():
         path = Path(original_path)
+        name = original_path.replace('\\', '/').rsplit('/', 1)[-1]
         # A copied evidence set is self-contained; prefer its source snapshot.
-        snapshot = manifest_path.parent / 'source' / path.name
+        snapshot = manifest_path.parent / 'source' / name
         source = snapshot if snapshot.is_file() else path
-        if path.name in names or not source.is_file() or sha_file(source) != digest:
+        if name in names or not source.is_file() or sha_file(source) != digest:
             raise ValueError('Executed program source hash mismatch')
-        names.add(path.name)
+        names.add(name)
         source_files.append({'path': source, 'original_path': original_path,
-                             'sha256': digest, 'relative_path': 'machine/source/' + path.name})
+                             'sha256': digest, 'relative_path': 'machine/source/' + name})
     if not source_files:
         raise ValueError('Executed program source snapshot is required')
     return manifest, experiments, source_files

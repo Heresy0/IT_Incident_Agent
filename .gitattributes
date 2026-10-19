@@ -104,6 +104,7 @@
 /evals/interview_consolidation/README.md -text
 
 # RCA manifests bind exact observation and executed-evidence bytes.
+/evals/datasets/rca_v1/** text eol=crlf
 /evals/datasets/rca_v2/**/*.json -text
 /evals/datasets/rca_reproduced_v1/** -text
 /evals/datasets/rca_integration_v1/**/*.json -text
