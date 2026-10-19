@@ -27,7 +27,7 @@
 
 ## 当前怎样编排
 
-当前 v2 使用显式 Python 控制流；原 LangGraph 诊断链路已归档。[API 适配器](../app/workflow/execution.py)按冻结的运行配置调用[调查引擎](../app/workflow/v2/engine.py)，普通后端与统一 CLI 默认使用 `autonomous_v2 / closed_loop`。
+当前 v2 使用 [LangGraph StateGraph](../app/workflow/v2/graph.py)管理阶段流转，节点复用既有 Python 业务操作；旧版诊断链路继续归档。[API 适配器](../app/workflow/execution.py)按冻结配置调用[调查引擎入口](../app/workflow/v2/engine.py)，普通后端与统一 CLI 默认使用 `autonomous_v2 / closed_loop`。迁移边界与对照见[迁移说明](langgraph-migration.md)。
 
 ```mermaid
 flowchart TD

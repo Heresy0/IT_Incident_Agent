@@ -4,6 +4,8 @@
 
 首次阅读可先看[项目阅读导航](README.md)、[架构导览](architecture.md)和[评估口径](evaluation-guide.md)；按用途找命令见[脚本导航](../scripts/README.md)。本页保留本机环境和历史验收的具体状态。
 
+当前迁移分支为 `codex/langgraph-orchestration`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。应用指纹为 `c884bd3f3cbbc45d`，8176 已沿用原数据库和账本重新绑定该源码。此前成果已合入 `main`，迁移前回滚点为 `rollback/pre-langgraph-migration-20261019`。本轮图迁移没有新增真实模型运行；42 组免费行为对照和验收边界见[迁移说明](langgraph-migration.md)与[验收记录](../evals/langgraph-migration-validation-20261019.json)。
+
 ## 运行入口与默认值
 
 | 入口 | 实际含义 |
@@ -23,7 +25,7 @@
 
 | 环节 | 职责与源码 |
 | --- | --- |
-| 自主调查 | [engine.py](../app/workflow/v2/engine.py) 中的单步循环选择查询或结束；程序验证权限、参数、去重和剩余预算 |
+| 自主调查 | [图编排](../app/workflow/v2/graph.py)调用 [engine.py](../app/workflow/v2/engine.py) 的自主循环选择查询或结束；程序验证权限、参数、去重和剩余预算 |
 | 证据与诊断 | [v2 模块](../app/workflow/v2/)生成可追溯的源事实和有限命题；局部契约失败只纠正失败条目 |
 | 逐项审阅 | [review.py](../app/workflow/v2/review.py)分别审阅事实性命题与人工核查建议，绑定条目及证据版本 |
 | 质疑与有界返工 | [engine.py](../app/workflow/v2/engine.py)按条件质疑已支持结论，必要时调查或修订后重新审阅；共用总预算，语义返工最多一次 |
@@ -33,7 +35,7 @@
 
 旧版 [Coordinator](../archive/legacy/app/workflow/coordinator.py)、单 Agent 基线和关联测试已归档，恢复完整旧版见[回滚说明](../archive/legacy/README.md)。v2 使用独立的 [schema 工具](../app/runtime/schema.py)和[证据引用工具](../app/evidence/references.py)，不再依赖旧版 Agent 或编排器。
 
-2026-10-19 已继续清理无调用者的任务分支、证据适配、日志补查和历史评估辅助；原文件快照见[剩余旧版归档](../archive/legacy/residual-20261019/README.md)。当前应用指纹为 `0d58da1f8b5285f4`，8176 已按新指纹重新绑定原闭环配置。655 项免费测试通过（含 PostgreSQL / pgvector）；9 个既有工单、报告、SSE 与首页内容哈希保持一致，原调用账本仍为 47/55。提示词、v2 引擎与审阅代码保持原字节；本轮未新增真实模型运行，历史报告继续绑定其原源码。详见[清理验收](../evals/residual-cleanup-validation-20261019.json)。
+2026-10-19 的剩余旧代码清理移除了无调用者的任务分支、证据适配、日志补查和历史评估辅助；原文件快照见[剩余旧版归档](../archive/legacy/residual-20261019/README.md)。该次清理后的应用指纹为 `0d58da1f8b5285f4`，655 项免费测试通过（含 PostgreSQL / pgvector）；9 个既有工单、报告、SSE 与首页内容哈希保持一致，账本为 47/55。该次清理保持提示词、v2 引擎与审阅代码原字节，未新增真实模型运行。以上属于图迁移前的验收时点，详见[清理验收](../evals/residual-cleanup-validation-20261019.json)。
 
 ## 只读核验现有演示
 

@@ -11,6 +11,7 @@
 | 模型替换或增加预算是否有效 | [角色模型对照](../evals/autonomous-role-validation-20261017.json)、[四组预算对照](../evals/budget-matrix-validation-20261018.json) | 按角色、预算及实验版本分别解释，不预设较强模型或更多调用一定改善 |
 | 前端能否发起诊断并交付报告 | [原始真实验收](../evals/frontend-live-validation-20261018.json)、[退役后真实验收](../evals/frontend-post-retirement-validation-20261018.json) | 真实 Flash 与合成观测；验证执行、存储及展示，不评分根因准确率 |
 | 清理是否损坏当前调用链和历史交付 | [剩余代码清理验收](../evals/residual-cleanup-validation-20261019.json) | 免费回归与历史报告只读核验，清理后未新增真实模型运行 |
+| 图编排迁移是否保持既有行为 | [LangGraph 迁移验收](../evals/langgraph-migration-validation-20261019.json) | 42 组免费固定轨迹、回归与历史交付核验，不产生新模型质量分数 |
 
 ## 重构收益怎样表达
 

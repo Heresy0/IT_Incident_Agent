@@ -13,7 +13,7 @@ from typing import Literal
 
 from evidence.model_view import evidence_view
 from providers.http import safe_text
-from runtime.context import ExecutionError, Limits, RunContext, activate, invoke_chat_model
+from runtime.context import ExecutionError, activate, invoke_chat_model
 from tools.executor import ToolExecutor
 from tools.query_coverage import complete_read, covers
 from workflow.task_checks import completion
@@ -379,75 +379,10 @@ def execute_review_rework(model, draft, reviews, executor, context, *, repairs=N
 
 def investigate(model, provider, principal, *, context=None, limits=None, event_log=None,
                 enable_rework=False, enable_challenge=True):
-    ticket = provider.ticket()
-    provider.authorize(principal, ticket.scope)
-    events = event_log if event_log is not None else []
-    if context is None:
-        def sink(event):
-            events.append({**event, 'seq': len(events) + 1})
-        context = RunContext(scope=ticket.scope, limits=limits or Limits.from_env(), emit=sink)
-    elif context.scope != ticket.scope or event_log is None:
-        raise ValueError('shared v2 context requires matching scope and event log')
-    executor = ToolExecutor(provider, principal, ticket.scope, context, role='single')
-    from workflow.v2.questions import InvestigationQuestions
-    questions = InvestigationQuestions(executor) if enable_rework else None
-    repairs = {'repairs': 0, 'reviewer_repairs': 0}
-    failures = []
-    # Quote only pending finalization. Rework is optional until a real objection
-    # exists; no speculative seven-call allocation is withheld from this read loop.
-    needs_challenge = enable_rework and enable_challenge and ticket.purpose != 'status_check'
-    reserve = collection_reservation(context, enable_challenge=needs_challenge) if enable_rework else None
-    if enable_rework and ticket.purpose == 'status_check':
-        reserve = 1  # Only source facts and their report, no semantic targets.
-    stop, decisions, _ = collect(model, executor, context, failures, repairs, reserve_models=reserve, questions=questions)
-    draft = make_draft(model, executor, context, failures, repairs, stop, questions=questions,
-                       reserve_after=1 + int(needs_challenge))
-    reviews = review_draft(model_for(model, 'reviewer'), draft, executor, context,
-                           repairs=repairs, collection=collection_view(executor),
-                           allow_correction=remaining(context).models > 1 + int(needs_challenge))
-    drafts = [{'revision': 1, 'draft': draft.model_dump(mode='json')}]
-    review_history = [{'revision': 1, 'review': reviews.model_dump(mode='json')}]
-    first_pass = {'draft': draft.model_dump(mode='json'), 'review': reviews.model_dump(mode='json'),
-                  'collection': deepcopy(collection_view(executor)),
-                  'evidence': [item.model_dump(mode='json') for item in executor.evidence.values()],
-                  'model_calls': context.counts['model_calls'], 'tool_calls': context.counts['tool_calls']}
-    reworks, challenges = [], []
-    if enable_rework and ticket.purpose != 'status_check':
-        if enable_challenge:
-            reviews, audit = run_challenge(model, draft, reviews, executor, context)
-            challenges.append(audit)
-            first_pass['challenged_review'] = reviews.model_dump(mode='json')
-        draft, reviews, audit = execute_review_rework(model, draft, reviews, executor, context,
-            repairs=repairs, enable_challenge=enable_challenge, questions=questions)
-        reworks.append(audit)
-        failures.extend(audit.get('failures', []))
-        decisions += audit.get('decisions', 0)
-        if audit.get('performed'):
-            drafts.append({'revision': 2, 'draft': draft.model_dump(mode='json')})
-            review_history.append({'revision': 2, 'review': reviews.model_dump(mode='json')})
-            challenges.extend(audit.get('challenges', []))
-    result = publish(draft, reviews, executor, context, failures, stop, events, ticket, decisions, repairs)
-    result.update(drafts=drafts, reviews=review_history, reworks=reworks, challenges=challenges,
-                  first_pass=first_pass,
-                  rework_rounds=sum(bool(row.get('performed')) for row in reworks),
-                  execution_variant='closed_loop' if enable_rework else 'single_pass')
-    if questions is not None:
-        result['investigation_questions'] = questions.snapshot(executor, draft, reviews)
-    history = [{'origin': 'execution', **error} for error in failures]
-    for record in review_history:
-        history.extend({'origin': 'review', 'revision': record['revision'], **error}
-                       for error in record['review'].get('errors', []))
-    for index, record in enumerate(challenges, 1):
-        history.extend({'origin': 'challenge', 'challenge_index': index, **error}
-                       for error in record.get('errors', []))
-    result['protocol_failure_history'] = history
-    result['semantic_review'].update(challenge_enabled=bool(enable_rework and enable_challenge),
-                                    challenge_policy_version='blind_scope_challenge_v1' if enable_rework and enable_challenge else None)
-    result['final'] = render_report(result)
-    context.emit({'type': 'workflow_completed', 'role': 'workflow', 'engine_id': ENGINE_ID,
-                  'status': result['status'], 'reason': result['run_summary']['termination_reason']})
-    result['events'] = list(events)
-    return result
+    """Run the existing v2 stages through the bounded LangGraph orchestrator."""
+    from workflow.v2.graph import run_graph
+    return run_graph(model, provider, principal, context=context, limits=limits, event_log=event_log,
+                     enable_rework=enable_rework, enable_challenge=enable_challenge)
 
 
 def publish(draft, reviews, executor, context, failures, stop, events, ticket, decisions, repairs):

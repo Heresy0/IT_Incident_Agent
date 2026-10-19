@@ -18,6 +18,8 @@
 
 各评估脚本的参数以 `--help` 为准。计划、脚本控制和正式真实调用使用不同入口；本轮清理未发起真实调用。历史质量数字仍属于当时的源码、数据、预算及裁决来源。
 
+当前迁移分支以 LangGraph 调度 v2 各阶段。42 组固定轨迹的等价性、回归及历史交付核验见[图编排迁移验收](langgraph-migration-validation-20261019.json)；这些工程检查不计入根因准确率，原始评估文件和成绩保持不变。
+
 ## 历史材料
 
 [独立合成集](independent/README.md)、[专项集](targeted/README.md)、[定向展示集](showcase_live/README.md)和工单修订集的原始数据、答案、冻结哈希及记录继续保留。它们对应的旧版比较器已退役；文档中的历史命令需要恢复完整旧版。剩余的 `provider.py` / `suite.py` 及失效的 `evaluate_showcase_live.py` 入口已移至[剩余旧版归档](../archive/legacy/residual-20261019/README.md)。

@@ -1,0 +1,570 @@
+{
+  "schema_version": "langgraph-stage-migration-validation-v1",
+  "date": "2026-10-19",
+  "repository": "Heresy0/IT_Incident_Agent",
+  "branch": "codex/langgraph-orchestration",
+  "stable_main_before_migration": "05c3014ddba6f2d35f0cb8f7599b5fd35217319a",
+  "baseline_merge": {
+    "method": "native_git_fast_forward",
+    "main_includes_existing_branch": true,
+    "ci_workflow_url": "https://github.com/Heresy0/IT_Incident_Agent/actions/runs/39214791499",
+    "checks": {
+      "control-tests": "success",
+      "frontend": "success",
+      "postgres-integration": "success"
+    },
+    "pull_request_created": false,
+    "reason": "GitHub connector lacks PR write permission; user-authorized native Git fast-forward used.",
+    "credential_extraction_executed": false
+  },
+  "rollback_tag": "rollback/pre-langgraph-migration-20261019",
+  "baseline_ci_compatibility_fixes": [
+    {
+      "commit": "273ae02",
+      "scope": "Preserve v1 CRLF checkout bytes and interpret Windows source basenames on POSIX."
+    },
+    {
+      "commit": "05c3014",
+      "scope": "Make v1 materialization explicitly reproduce its frozen CRLF bytes."
+    }
+  ],
+  "source_version_before": "0d58da1f8b5285f4",
+  "source_version_after": "c884bd3f3cbbc45d",
+  "orchestration": {
+    "framework": "langgraph",
+    "installed_version": "1.0.3",
+    "version": "langgraph_stages_v1",
+    "nodes": [
+      "collect",
+      "diagnose",
+      "review",
+      "challenge",
+      "rework",
+      "publish",
+      "finalize"
+    ],
+    "model_roles_unchanged": [
+      "investigation",
+      "diagnosis",
+      "reviewer",
+      "challenger"
+    ],
+    "graph_checkpointing": false,
+    "graph_node_retries": false,
+    "parallel_graph_branches": false,
+    "internal_collection_and_rework_loops_preserved": true,
+    "runtime_dependencies_separate_from_graph_state": true,
+    "budget_authority": "existing RunContext; graph step limit does not grant model/tool calls"
+  },
+  "preservation": {
+    "existing_app_files_changed": [
+      "app/workflow/v2/engine.py"
+    ],
+    "new_app_module": "app/workflow/v2/graph.py",
+    "unchanged_engine_operations": 13,
+    "engine_prompt_constants_unchanged": true,
+    "all_other_app_files_byte_unchanged": true,
+    "tool_and_native_evaluation_instrumentation_preserved": true,
+    "existing_scripts_byte_unchanged": true,
+    "original_evaluation_json_byte_unchanged": 383,
+    "fixtures_byte_unchanged": 44,
+    "old_archives_and_evaluation_evidence_unchanged": true,
+    "frontend_and_api_contracts_unchanged": true,
+    "original_model_ledger_byte_unchanged": true
+  },
+  "tests": {
+    "tests": 660,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failed_tests": [],
+    "external_connections_blocked": 0,
+    "paid_model_calls": 0,
+    "passed": true,
+    "new_graph_regressions": 5,
+    "postgres_and_pgvector_integration_tests": 19,
+    "fixture_check_cases": 6,
+    "cli_controls": {
+      "passed": true,
+      "rows": [
+        {
+          "case": "case_001",
+          "status": "completed",
+          "execution_mode": "scripted_control_only",
+          "paid_model_calls": 0
+        },
+        {
+          "case": "case_003",
+          "status": "completed",
+          "execution_mode": "scripted_control_only",
+          "paid_model_calls": 0
+        }
+      ]
+    },
+    "first_full_run_issue": "Native evaluation workers lost the engine.ToolExecutor observation hook.",
+    "resolution": "Retain engine.ToolExecutor and construct through that same factory; add regression and rerun full suite."
+  },
+  "equivalence": {
+    "passed": true,
+    "scenarios": 42,
+    "paid_calls": 0,
+    "model_type": "scripted models and injected fault doubles; no real provider calls",
+    "compared": [
+      "complete model inputs",
+      "tool queries and results",
+      "evidence and observation times",
+      "events and order",
+      "review and rework histories",
+      "call budgets",
+      "final report"
+    ],
+    "normalization": "Fixed clock and run IDs; omit random span IDs and source retrieval timestamps only; retain observation times, queries, model inputs, budgets, reviews, events and reports.",
+    "scenario_hashes": [
+      {
+        "scenario": "case_001-b6-r0-c0",
+        "sha256": "b541186102326745da1fe34fa55da6800564e6ee6e23e7b3c095d3c710a5385a",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_001-b6-r1-c0",
+        "sha256": "c62198ee5323aea4191d9c80f7d8f91d5f1915d7fa6b092ae813f47adfe8ac2b",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_001-b6-r1-c1",
+        "sha256": "438d4bcbe7d26b5ad7405919fafb52e24db3773258440ad1e59615d8ba9a6360",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_001-b16-r0-c0",
+        "sha256": "f87eaa853a895c03e4af9567e9dd4ccf4417e223e44439f13f78ab3bd40820ac",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_001-b16-r1-c0",
+        "sha256": "ce417def2f3111358651de828a84c17a9eb84b2fac880a3d12797e1d0515a6aa",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_001-b16-r1-c1",
+        "sha256": "8d8c937c9ee093e750bc7272e753ca98bb58434f6879ae4c184c5ece73e94e7e",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b6-r0-c0",
+        "sha256": "7fd7cf6dd571ad191c013e810cd90babd47db7bffec7b92635fedd980a51b39e",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b6-r1-c0",
+        "sha256": "00b85fb33f0dbab270e5445fb45715e77993be11c17c6abaad3ffa4ecb3a9514",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b6-r1-c1",
+        "sha256": "de413b4fb0ba03fcc1ff1f36ee5116dcd17dd7ed5a4e854ba87d734db16cd1d0",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b16-r0-c0",
+        "sha256": "ecf46aa70fcb4bd9ed6d9134a6b9c0a187b8142525f0585e316e48267a34a3b0",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b16-r1-c0",
+        "sha256": "5f5fd37b93808284072df98fee8ffc0d7eb5a7f9ed927ad9494eded01921383c",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_002-b16-r1-c1",
+        "sha256": "153dcdaa64660d5ecd1bb719cc3045f58cca387048446294cf3f6f9c09178ad6",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b6-r0-c0",
+        "sha256": "ee0d2c9fe487acefdc953d86bac736bbfe9ab3b30ce78b8a3d21bdcbc2a3e0b8",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b6-r1-c0",
+        "sha256": "5c40d4df65dab5e70c922d0281f40b0d09528bb456a724a610ad3106b4a4e2d5",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b6-r1-c1",
+        "sha256": "6d7371b475a280e24fe4865f141521e91d7ae5a81a7676540dde3efbbe3e8757",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b16-r0-c0",
+        "sha256": "af29d39647d8b17754c2e43378a5faa62eac9b871e057d3050a4ebd5c02c6102",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b16-r1-c0",
+        "sha256": "caf952d982e54f447c1548a0de52b00dc2935879b5e57b8bbc9d7c5687d79505",
+        "status": "completed",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_003-b16-r1-c1",
+        "sha256": "a4d79309025614a8b23327a135737d8cd5d2e4b59570c898377ccbff28c9e6c9",
+        "status": "completed",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b6-r0-c0",
+        "sha256": "c733726d6cb5c1a6c5c9d4442d32cf5c82d140dffc3026b0b187b8941c4633d3",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b6-r1-c0",
+        "sha256": "ffa11df879af47f33af8ad49e0b7c515e6b9e462836686463028ee0296495906",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b6-r1-c1",
+        "sha256": "4f828e3162934d0d36a2540a1a05b674af5266907664668f216fc5c3970cb4f0",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b16-r0-c0",
+        "sha256": "7191aba014fdc08fea308f7f27b6c9989d95359c385d3e65facf58e198c415cb",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b16-r1-c0",
+        "sha256": "487be01c2281be50df7d5db0b98b1b07661ba8c786b304b5b1a8c17c9e1bf5c6",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_004-b16-r1-c1",
+        "sha256": "ba645f6d573bc3690d3d800c5f3c27e4ed2f94b0b29965acd4d3c1011b57c444",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b6-r0-c0",
+        "sha256": "64b42f87338689797229388009259c27a2b9889707f05b7a8a2f115d447f4113",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b6-r1-c0",
+        "sha256": "58504c6bfa8731c59b4fb822690d1e4e3e2af7cfec60aa3623c608a3ecba68c9",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b6-r1-c1",
+        "sha256": "c7de3310232b163b53cedb5844c35573748576c2266ab014fafe150d7e874ab9",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b16-r0-c0",
+        "sha256": "4e6ca0e7e58376e5b8d1ab670c76e7e7472bdcd373488681695326c2fe8e64a6",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b16-r1-c0",
+        "sha256": "3657dadb50fa8f18c3050dc4af2debc14c64eed937edc229d2f3c2dd11cc6bd2",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_005-b16-r1-c1",
+        "sha256": "854ae2fd6794187c63d82e270ea201ad367e567a2ebbae36a512f3c9dafd2ff5",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b6-r0-c0",
+        "sha256": "d6f3c4f0e7b8a15b2c5b2005654d7b8b7b9cf5e42c0aca436a8ae77bc1de0411",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b6-r1-c0",
+        "sha256": "7d346d6bd9f8070a431c6435cb9949086d5fd32d8104611831f64dc61fbd8b63",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b6-r1-c1",
+        "sha256": "47297b2aded91163cacecb83443e6370832226a3a55fd2c38399b0eb13e225f0",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b16-r0-c0",
+        "sha256": "3c3a914d32b4213e6a37e7370ef57b7633a11cfefa458594c2ae28e9e0f68397",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b16-r1-c0",
+        "sha256": "cf5e4c2eaf5af2e5204059b4be52cd19e43f5dcfcfcaf42e5fb5331cb913b4e4",
+        "status": "partial",
+        "models": 5,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "case_006-b16-r1-c1",
+        "sha256": "84c9dada948ac72e7a538fc8b876f829d697f14eecc84a3d267f9a71ec422690",
+        "status": "partial",
+        "models": 6,
+        "tools": 2,
+        "reworks": 0
+      },
+      {
+        "scenario": "revision",
+        "sha256": "59fec2b448bbff4b5ef2353731586cfd8814c40777dcf086286da6e0db73f8a7",
+        "status": "completed",
+        "models": 8,
+        "tools": 2,
+        "reworks": 1
+      },
+      {
+        "scenario": "withdraw",
+        "sha256": "640938fd5b899d53eaae21c751e2afb98908bc6ac7bd5c4855793fdb2b4e86e6",
+        "status": "partial",
+        "models": 8,
+        "tools": 2,
+        "reworks": 1
+      },
+      {
+        "scenario": "malformed",
+        "sha256": "b6c756bdd42fde3397cf36d97857a0acb31222f22e92d43cd1cecb56346ab36e",
+        "status": "partial",
+        "models": 8,
+        "tools": 2,
+        "reworks": 1
+      },
+      {
+        "scenario": "duplicate",
+        "sha256": "64a3e8e14a8e1e634337e57d387139d15c578b1257a3472c4498a2db97240efa",
+        "status": "completed",
+        "models": 9,
+        "tools": 1,
+        "reworks": 1
+      },
+      {
+        "scenario": "challenge",
+        "sha256": "aea43f599ebfd0a828a381950628cb37ceee10588f1767f94effbd52433edf04",
+        "status": "completed",
+        "models": 10,
+        "tools": 2,
+        "reworks": 1
+      },
+      {
+        "scenario": "status-check",
+        "sha256": "a316466440632b1cfb7691f15689b59b26f47ccc68e6945191f762e72c7bd078",
+        "status": "completed",
+        "models": 4,
+        "tools": 2,
+        "reworks": 0
+      }
+    ]
+  },
+  "demo": {
+    "passed": true,
+    "source_version": "c884bd3f3cbbc45d",
+    "engine": "autonomous_v2",
+    "variant": "closed_loop",
+    "rework_and_challenge_enabled": true,
+    "historical_incidents_reports_and_sse_preserved": 9,
+    "frontend_assets_unchanged": 4,
+    "ledger_byte_unchanged": true,
+    "model_ledger": {
+      "admitted_calls": 47,
+      "maximum_calls": 55,
+      "remaining_calls": 8,
+      "known_usage_calls": 47,
+      "unknown_usage_calls": 0,
+      "input_tokens_known": 233999,
+      "output_tokens_known": 8770,
+      "model": "qwen3.7-flash",
+      "is_vendor_bill": false
+    },
+    "new_real_model_runs": 0,
+    "new_paid_model_calls": 0,
+    "fresh_browser_ui_retest": false,
+    "recent_history_http_checks": 45,
+    "earlier_history_http_checks": 46,
+    "historical_reports_keep_original_source_bindings": true
+  },
+  "limits": [
+    "No new real Flash run was executed after graph migration.",
+    "No root-cause accuracy, real-model latency or cost improvement is inferred from deterministic controls.",
+    "Internal collection/rework loops remain bounded Python operations inside stage nodes.",
+    "Checkpoint resume, graph-level retry and parallel execution are outside this migration."
+  ],
+  "passed": true,
+  "artifacts": [
+    {
+      "path": "output/langgraph-migration-20261019/before.json",
+      "sha256": "7fcc88fcf157a332eabd2e7020396a1602e7cbb0bf98b8bca025255952ff7ee5"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/before-engine.py",
+      "sha256": "9d874115b023b6774b85f20cb40e1dc33ab7621f0de485fae91cb579cbf72d58"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/probe_equivalence.py",
+      "sha256": "0e364ed54b222f8eb4360cc7885e0d49cc4534c85e6c1b9b727635114743e832"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/reference/summary.json",
+      "sha256": "c1c7a89ab2569eb994c65ea19294a13496485a5ed5b74f51449e3e53c73454cd"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/graph-final/summary.json",
+      "sha256": "444bbcdb04d091ede08d7e81fcc58c5b42c12faa482c591e87430fa64a9637e7"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/active-tests.json",
+      "sha256": "8f608477567e1a8c0b7f2febfcf34c01256cc5e751240e1b9daee1fd176397d2"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/active-tests.log",
+      "sha256": "a27decf35e79e5584c2e4d0500fdea8ce58748717c61faa47b0aa5006e5a7a2b"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/first-pass-tests.json",
+      "sha256": "c70c0a398a43015456a42e5b451bc2707235c234e393c2bdf87631642fa9ce24"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/first-pass-tests.log",
+      "sha256": "9bf762780dd7d2e8f8b97cb893c805c2b8d86384bd264ddec47f0124054a2ef9"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/runtime-readonly.json",
+      "sha256": "d231131f411864c6ff3d5b72901116ea8162b1d1f525e7ac679bbf46fa9e61aa"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/cli-controls.json",
+      "sha256": "9e86a579aed6fb60de6f974fc84cc3a81e3764f8789a66f7f212dc1e2afdd5e4"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/graph.mmd",
+      "sha256": "55575c0ee860f44375a86c17cd0d9c087b7f9223213d522c0aa750c913876041"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/langgraph-after/receipt.json",
+      "sha256": "99952e6909a012c82837109b0b7bab04b4bb9429e69c3359aa683570780e04ac"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/langgraph-after/status.json",
+      "sha256": "2c73a3e6d48bf5748f4f7c7d18742e4d3a6dea50778cd17bf407ddbb46f4c974"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/langgraph-old-history/receipt.json",
+      "sha256": "73880b544bafc9d8626f2c999c7ea54d67eec8a67157b3306e5c8bdb99293566"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/langgraph-old-history/status.json",
+      "sha256": "2c73a3e6d48bf5748f4f7c7d18742e4d3a6dea50778cd17bf407ddbb46f4c974"
+    },
+    {
+      "path": "output/langgraph-migration-20261019/documentation-check.json",
+      "sha256": "6d1ade884bab4e9436a167153d2120d2d121b0c6afec24f04ea4839ea12248b2"
+    }
+  ],
+  "documentation_check": {
+    "passed": true,
+    "documents": 9,
+    "links_and_anchors_checked": 163
+  }
+}
