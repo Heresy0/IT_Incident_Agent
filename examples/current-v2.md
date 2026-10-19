@@ -1,6 +1,6 @@
 # 当前 v2 导览
 
-状态日期：2026-10-18。本页说明当前分支的代码入口、已验收演示和评估材料；统一入口为[根 README](../README.md)。
+状态日期：2026-10-19。本页说明当前分支的代码入口、已验收演示和评估材料；统一入口为[根 README](../README.md)。
 
 ## 运行入口与默认值
 
@@ -31,6 +31,8 @@
 
 旧版 [Coordinator](../archive/legacy/app/workflow/coordinator.py)、单 Agent 基线和关联测试已归档，恢复完整旧版见[回滚说明](../archive/legacy/README.md)。v2 使用独立的 [schema 工具](../app/runtime/schema.py)和[证据引用工具](../app/evidence/references.py)，不再依赖旧版 Agent 或编排器。
 
+2026-10-19 已继续清理无调用者的任务分支、证据适配、日志补查和历史评估辅助；原文件快照见[剩余旧版归档](../archive/legacy/residual-20261019/README.md)。当前应用指纹为 `0d58da1f8b5285f4`，8176 已按新指纹重新绑定原闭环配置。655 项免费测试通过（含 PostgreSQL / pgvector）；9 个既有工单、报告、SSE 与首页内容哈希保持一致，原调用账本仍为 47/55。提示词、v2 引擎与审阅代码保持原字节；本轮未新增真实模型运行，历史报告继续绑定其原源码。详见[清理验收](../evals/residual-cleanup-validation-20261019.json)。
+
 ## 只读核验现有演示
 
 在 8176 已启动且本地验收记录仍存在时执行：
@@ -39,6 +41,7 @@
 .\.venv\Scripts\python.exe scripts/check_frontend_live_acceptance.py `
   --run-id 749a58b3-a2be-4102-a76f-cd87d0791646 `
   --run-id a2634656-9003-41cf-8f18-1fea535e0756 `
+  --baseline output/frontend-live-acceptance-20261018/post-retirement-after/receipt.json `
   --output output/frontend-live-acceptance-20261018/manual-readonly-check
 ```
 

@@ -1,21 +1,23 @@
-# IT 工单评估
+# 评估入口
 
-新增[离线分类统计](run-statistics.md)：按模型、执行模式、源码/数据版本与预算分组，分别统计协议错误、取证执行缺口、耗时、调用及显式价格下的Token费用。关键漏查、错误结论、无依据建议、复核误拦、有效交接和人工工时采用绑定原报告哈希的正式人类评价；未知为 null，脚本与助手评价不计业务质量。入口 `scripts/summarize_runs.py` 只读取已保存报告或bundle，不调用模型。
+当前运行代码为 `autonomous_v2 / closed_loop`；执行与交付、根因质量、历史版本比较分别核验。结果阅读入口为[当前 v2 导览](../examples/current-v2.md#评估分开阅读)。脚本控制、真实调用和 AI 裁决须分开统计；流程完成或内部审阅通过不代表根因正确。未知指标保留为 null。
 
-新增[定向真实模型展示集](showcase_live/README.md)，与原独立集、专项集和脚本演示分开：首批show_001/show_002及一次工单修订show_101共6条真实运行、47模型/16合成只读工具，所有结果保留。当前只取得独立复核拒绝不充分候选的片段，没有完整诊断质量优势。[结果分析](../examples/showcase/curated-live-analysis.md)记录完整边界。`scripts/compare_showcase_live.py`、`scripts/compare_showcase_revision.py`默认免费计划，`scripts/evaluate_showcase_live.py`只离线核验已保存报告。
+## 当前可用工具
 
-当前评估入口是 evals/incident，真值与 Agent 可见 fixtures/incident 分离。评分、结构检查和同预算单/多对照都不调用模型；真实运行必须通过脚本的显式 live 入口和预算。
+| 目的 | 入口 | 边界 |
+| --- | --- | --- |
+| 免费检查开发观测数据 | `python -m evals.incident.check_fixtures` | 不评分模型判断 |
+| v2 调查、审阅与闭环评估 | `scripts/evaluate_autonomous.py`、`scripts/evaluate_autonomous_closed_loop.py` | 按源码、输入阶段和预算分别统计 |
+| 跨机制根因定位评估 | `scripts/evaluate_rca.py`、`scripts/summarize_rca_cross_case.py` | 端到端与预置证据分开；金标与裁决来源必须如实登记 |
+| 证据整合与审阅对照 | `scripts/evaluate_rca_integration.py`、`scripts/summarize_rca_integration.py` | 使用固定任务和冻结源码 |
+| 同模型、案例、预算的旧版／v2 对照 | `scripts/evaluate_frozen_versions.py` | 旧版在独立冻结源码中执行；不从归档混装导入 |
+| 只读核验已有前端报告、SSE 和调用账本 | `scripts/check_frontend_live_acceptance.py` | 仅 GET；历史报告用 `--baseline` 绑定原始源码 |
+| 已保存报告分类统计 | `scripts/summarize_runs.py` | 不调用模型；详见[统计口径](run-statistics.md) |
 
-```powershell
-$env:PYTHONPATH='app'
-.\.venv\Scripts\python.exe -m evals.incident.check_fixtures
-.\.venv\Scripts\python.exe scripts/compare_incident.py --fake --output output/incident-comparison
-```
+各评估脚本的参数以 `--help` 为准。计划、脚本控制和正式真实调用使用不同入口；本轮清理未发起真实调用。历史质量数字仍属于当时的源码、数据、预算及裁决来源。
 
-公共报告读写辅助在 evals/common.py，应用指纹在 app/runtime/version.py；不再导入旧 evals.run。脚本模式始终 excluded_scripted，不计业务质量。历史失败、partial、人工待确认结果保留。
+## 历史材料
 
-旧研究评估代码在 archive/research/evals；evals/baselines、docs/evaluations 和旧验收报告仅为历史记录，不参与当前CI，也不是IT系统成绩。
+[独立合成集](independent/README.md)、[专项集](targeted/README.md)、[定向展示集](showcase_live/README.md)和工单修订集的原始数据、答案、冻结哈希及记录继续保留。它们对应的旧版比较器已退役；文档中的历史命令需要恢复完整旧版。剩余的 `provider.py` / `suite.py` 及失效的 `evaluate_showcase_live.py` 入口已移至[剩余旧版归档](../archive/legacy/residual-20261019/README.md)。
 
-新增[独立合成测试集](independent/README.md)：10个新事件，6例验证、4例默认保留。工单/观测与答案隔离、版本哈希冻结，统一按结论、证据推理、不确定性、建议与交接人工评分，允许不同合理取证路径。新入口 `scripts/compare_independent.py` 默认免费计划，`--check`离线预检，`--fake`只验证控制行为；真实调用需显式案例、预算和执行，单批最多2例。本次没有真实模型成绩，不改写旧评测。
-
-新增[多Agent专项能力测试集](targeted/README.md)：历史误导、范围冲突、区分性取证各两个不同事件，加两例普通对照；5例开发/普通、3例默认保留。复用现有单/多链路与执行器，完整保留假设状态、建议条件和待确认项评分，专项与普通结果分开，支持同版本有限批次离线汇总。`scripts/compare_targeted.py`默认免费计划；未进行付费验证，不预设多Agent胜出。
+所有历史实验的统一入口是[归档索引](../archive/experiments/README.md)。旧研究系统的评估代码在 `archive/research/evals/`；其分数不计入当前 IT 诊断系统成绩。原始失败、partial、待审核项和调用证据保持原路径，不因代码清理重写。

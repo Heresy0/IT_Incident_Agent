@@ -24,6 +24,46 @@ ARCHIVE = ROOT / 'archive/legacy'
 
 
 class RetirementTests(unittest.TestCase):
+    def test_residual_archive_preserves_original_bytes_and_removed_module_boundary(self):
+        archive = ARCHIVE / 'residual-20261019'
+        manifest = json.loads((archive / 'manifest.json').read_text(encoding='utf-8'))
+        for row in manifest['items']:
+            self.assertEqual(hashlib.sha256((archive / row['archive_path']).read_bytes()).hexdigest(), row['sha256'])
+            if row['action'] == 'archive_module':
+                self.assertFalse((ROOT / row['original_path']).exists(), row['original_path'])
+
+    def test_residual_cleanup_preserves_used_helpers_and_correction_allowances(self):
+        archive = ARCHIVE / 'residual-20261019'
+        for relative, names in (
+            ('app/evidence/model_view.py', ['substantive', 'evidence_view']),
+            ('app/evidence/ownership.py', ['observed_owner_team']),
+            ('app/evidence/observations.py', ['source_statement']),
+            ('app/workflow/task_checks.py', ['completion']),
+            ('app/tools/executor.py', ['execute', 'validate_args', 'schemas', 'capabilities',
+                                       'prepare_snapshot', 'register_snapshot']),
+            ('app/runtime/context.py', ['reserve', 'add_usage', 'error', 'summary', 'span', 'invoke_chat_model']),
+        ):
+            def functions(path):
+                return {n.name: ast.dump(n, include_attributes=False) for n in ast.walk(
+                    ast.parse(path.read_text(encoding='utf-8'))) if isinstance(n, ast.FunctionDef)}
+            before, after = functions(archive / relative), functions(ROOT / relative)
+            for name in names:
+                self.assertEqual(before[name], after[name], f'{relative}:{name}')
+        from runtime.context import RunContext
+        old = ast.parse((archive / 'app/runtime/context.py').read_text(encoding='utf-8'))
+        original = next(n for n in ast.walk(old) if isinstance(n, ast.FunctionDef) and n.name == 'claim_repair')
+        namespace = {}
+        exec(compile(ast.Module(body=[original], type_ignores=[]), '<original-correction>', 'exec'), namespace)
+        context = RunContext()
+        for repairs in range(5):
+            for reviewed in range(repairs + 1):
+                for reviewer in (False, True):
+                    before = {'repairs': repairs, 'reviewer_repairs': reviewed}
+                    after = dict(before)
+                    expected = namespace['claim_repair'](context, before, reviewer=reviewer)
+                    self.assertEqual(context.claim_repair(after, reviewer=reviewer), expected)
+                    self.assertEqual(after, before)
+
     def test_archive_preserves_every_original_file_byte(self):
         manifest = json.loads((ARCHIVE / 'manifest.json').read_text(encoding='utf-8'))
         for row in manifest['items']:
@@ -81,6 +121,8 @@ class RetirementTests(unittest.TestCase):
 
     def test_fresh_runtime_imports_work_with_all_retired_modules_blocked(self):
         manifest = json.loads((ARCHIVE / 'manifest.json').read_text(encoding='utf-8'))
+        residual = json.loads((ARCHIVE / 'residual-20261019/manifest.json').read_text(encoding='utf-8'))
+        manifest['items'].extend(row for row in residual['items'] if row['action'] == 'archive_module')
         retired = [row['original_path'][4:-3].replace('/', '.') for row in manifest['items']
                    if row['original_path'].startswith('app/')]
         code = f'''

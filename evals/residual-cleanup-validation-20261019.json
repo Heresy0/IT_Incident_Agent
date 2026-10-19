@@ -1,0 +1,170 @@
+{
+  "schema_version": "residual-cleanup-validation-v1",
+  "date": "2026-10-19",
+  "scope": "Remove or archive unused code without changing the active v2 diagnosis behavior; offline regression and read-only delivery checks only.",
+  "branch": "codex/autonomous-investigation-v2",
+  "source_commit_before": "c9be976e8fe207955a7fd502ace8af57564b9c09",
+  "initial_worktree_clean": true,
+  "source_version_before": "748b2a02ac1b54a3",
+  "source_version_after": "0d58da1f8b5285f4",
+  "app_fingerprint_changed_expected": true,
+  "cleanup": {
+    "archived_modules": [
+      "app/runtime/branch.py",
+      "scripts/evaluate_showcase_live.py",
+      "evals/independent/provider.py",
+      "evals/independent/suite.py",
+      "evals/targeted/provider.py",
+      "evals/targeted/suite.py",
+      "evals/showcase_live/provider.py",
+      "evals/showcase_live/suite.py",
+      "evals/showcase_revision/provider.py",
+      "evals/showcase_revision/suite.py"
+    ],
+    "trimmed_runtime_files": [
+      "app/runtime/context.py",
+      "app/tools/executor.py",
+      "app/evidence/model_view.py",
+      "app/evidence/ownership.py",
+      "app/evidence/observations.py",
+      "app/workflow/task_checks.py",
+      "app/workflow/service.py"
+    ],
+    "byte_exact_original_snapshots": 17,
+    "prior_retirement_snapshots_preserved": 136,
+    "rollback_commit": "c9be976e8fe207955a7fd502ace8af57564b9c09",
+    "archive_manifest": "archive/legacy/residual-20261019/manifest.json"
+  },
+  "preservation": {
+    "v2_python_files_byte_unchanged": 10,
+    "existing_evaluation_json_files_byte_unchanged": 382,
+    "fixture_files_byte_unchanged": 44,
+    "core_contracts_reference_helpers_and_model_builder_byte_unchanged": true,
+    "prompts_and_default_budgets_unchanged": true,
+    "existing_ledger_byte_unchanged": true,
+    "frontend_source_and_build_unchanged": true,
+    "incidents_reports_sse_and_served_homepage_unchanged": true,
+    "existing_incidents": 9,
+    "existing_reports_and_sse_streams": 9
+  },
+  "tests": {
+    "tests": 655,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failed_tests": [],
+    "external_connections_blocked": 0,
+    "paid_model_calls": 0,
+    "passed": true,
+    "focused_tests": 76,
+    "postgres_and_pgvector_integration_tests": 19,
+    "fixture_check_cases": 6,
+    "new_architecture_regressions": 2,
+    "correction_allowance_equivalence": "Original and current functions return identical results and states for all valid state combinations with 0..4 prior repairs."
+  },
+  "demo": {
+    "origin": "http://127.0.0.1:8176",
+    "engine_id": "autonomous_v2",
+    "execution_variant": "closed_loop",
+    "enable_rework": true,
+    "enable_challenge": true,
+    "model": "qwen3.7-flash",
+    "initial_server_and_database_state": "Stopped before cleanup; restored using existing isolated container, database and ledger.",
+    "read_only_check_counts": {
+      "recent_historical_runs": 45,
+      "earlier_historical_runs": 46
+    },
+    "existing_live_run_ids": [
+      "749a58b3-a2be-4102-a76f-cd87d0791646",
+      "a2634656-9003-41cf-8f18-1fea535e0756",
+      "c6b716dc-58a2-480e-a31c-a2d8e08b1bd3",
+      "83e2695d-0c63-41d2-88ab-db1b1c08b34b"
+    ],
+    "historical_reports_keep_original_source_binding": true,
+    "model_ledger": {
+      "admitted_calls": 47,
+      "maximum_calls": 55,
+      "remaining_calls": 8,
+      "known_usage_calls": 47,
+      "unknown_usage_calls": 0,
+      "input_tokens_known": 233999,
+      "output_tokens_known": 8770,
+      "model": "qwen3.7-flash",
+      "is_vendor_bill": false
+    },
+    "per_run_budget": {
+      "model_calls": 16,
+      "tool_calls": 8,
+      "seconds": 180.0
+    },
+    "new_real_model_runs_after_cleanup": 0,
+    "new_paid_model_calls": 0
+  },
+  "compatibility_retained": [
+    "Historical reports, run specs and database migrations",
+    "Research API aliases, request headers and environment fallbacks",
+    "ToolExecutor single/knowledge tool groups still in use",
+    "Fail-fast legacy-engine guard and old frozen-spec defaults",
+    "Dependencies required by isolated frozen legacy comparisons"
+  ],
+  "limits": [
+    "No fresh real-model diagnosis was executed on the cleaned source.",
+    "Execution, rework and publication paths were covered by free regression tests; historical real-model SSE was checked by GET.",
+    "This engineering cleanup does not measure or improve root-cause accuracy; no new human or AI quality adjudication was performed."
+  ],
+  "passed": true,
+  "artifacts": [
+    {
+      "path": "output/residual-cleanup-20261019/before.json",
+      "sha256": "38bcdd4ee49891188acc77a82be0c734c642cb9581f6f5a835c80739342e0fbc"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/before-http.json",
+      "sha256": "fa7556dc44fef6ad697de2186fccfb25cc586ce584ba46a19773de14091d2f33"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/after-http.json",
+      "sha256": "fa7556dc44fef6ad697de2186fccfb25cc586ce584ba46a19773de14091d2f33"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/active-tests.json",
+      "sha256": "562a9e2d0a1bc9e017eaa682dbbd97ee176c4e2609388ce20effc125dd8a2728"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/active-tests.log",
+      "sha256": "eda6821b6946a76ad904f74a9e546b44f68a49deaa004c4a13dc03f65c104bff"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/run_tests.py",
+      "sha256": "cbfa346f19e269339940044e902cc3307e9df47fd377230e4fa4971c31cc2804"
+    },
+    {
+      "path": "output/residual-cleanup-20261019/snapshot_http.py",
+      "sha256": "2e9e4c5e02a64311630eb6cc05a5e3c661048a0efad1b771d5f196fdddc5e9e7"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-before/receipt.json",
+      "sha256": "99952e6909a012c82837109b0b7bab04b4bb9429e69c3359aa683570780e04ac"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-before/status.json",
+      "sha256": "995e057408406e1a402557cb625a8d73e9e60a9ba4244d804e4fa0bd9f7efac8"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-after/receipt.json",
+      "sha256": "99952e6909a012c82837109b0b7bab04b4bb9429e69c3359aa683570780e04ac"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-after/status.json",
+      "sha256": "b4107e1f90a6fa4f6ba61ef9739e2234ee470456f50da22f7fac20b3e4db6ee1"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-old-history/receipt.json",
+      "sha256": "73880b544bafc9d8626f2c999c7ea54d67eec8a67157b3306e5c8bdb99293566"
+    },
+    {
+      "path": "output/frontend-live-acceptance-20261018/residual-cleanup-old-history/status.json",
+      "sha256": "b4107e1f90a6fa4f6ba61ef9739e2234ee470456f50da22f7fac20b3e4db6ee1"
+    }
+  ]
+}

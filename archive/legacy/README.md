@@ -1,5 +1,7 @@
 # 旧版诊断链路归档与恢复
 
+2026-10-19 进一步清理的共享模块残留与历史评估辅助见[剩余旧版归档](residual-20261019/README.md)。原退役清单与回滚材料继续保持不变。
+
 2026-10-18 退役前提交：`da288f60724848215dbcc49bc380aa047f0d914a`。固定标签：`rollback/pre-legacy-retirement-20261018`。
 
 当前运行入口统一为 `autonomous_v2 / closed_loop`。此目录保存旧版专属应用代码、脚本和测试的原始字节，逐文件 SHA256 见 [manifest.json](manifest.json)。归档不参与当前运行导入、打包或测试发现；不要把本目录加入当前服务的 `PYTHONPATH`。

@@ -130,3 +130,4 @@
 /scripts/check_frontend_live_acceptance.py -text
 /tests/evals/test_frontend_live_acceptance.py -text
 /evals/frontend-live-validation-*.json -text
+/archive/legacy/residual-20261019/** -text -whitespace

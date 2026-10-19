@@ -1,8 +1,5 @@
-"""Source-derived facts and observable collection gaps; no answers, model calls or gold."""
+"""Render source-derived facts without adding interpretations or model calls."""
 import json
-
-FACT_RENDERING = 'source_fields_v1'
-
 
 def source_statement(refs, evidence):
     parts = []
@@ -26,17 +23,3 @@ def source_statement(refs, evidence):
         parts.append(f"{label}={value} {ref.unit} @ {ref.observed_at.isoformat()}".strip())
     text = '; '.join(parts)
     return text if len(text) <= 500 else text[:475] + ' ... (see references)'
-
-
-def pool_control_gaps(evidence):
-    current = [e.payload for e in evidence.values() if e.kind == 'observation']
-    pressure = any(p.get('metric') in {'pool_usage', 'pool_wait'} or p.get('error_code') == 'POOL_ACQUIRE_TIMEOUT' for p in current)
-    return ['db_cpu'] if pressure and not any(p.get('metric') == 'db_cpu' for p in current) else []
-
-
-def gap_message(gaps):
-    return 'Unobserved controls: ' + ', '.join(gaps) + ('; DB ping is not a CPU measurement.' if 'db_cpu' in gaps else '.')
-
-
-def log_control_gaps(executor):
-    return sorted({f"logs:{row['category']}:WARN/INFO" for row in executor.log_gaps.values()})

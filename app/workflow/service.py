@@ -8,7 +8,7 @@ from typing import AsyncIterator
 from uuid import uuid4
 
 from config.incident import IncidentConfig
-from runtime.context import RunContext, Limits, ExecutionError, activate, register, unregister
+from runtime.context import RunContext, Limits, ExecutionError, activate
 from observability.telemetry import METRICS
 from storage.runs import PostgresRunStore
 
@@ -81,7 +81,6 @@ class WorkflowService:
             def emit(event):
                 events.append(self._store.append(run_id, event))
             context = RunContext(run_id, limits=adapter.limits(request), emit=emit, scope=adapter.scope(request))
-            register(context)
             with activate(context):
                 try:
                     result = adapter.execute(request, context, events)
@@ -98,7 +97,6 @@ class WorkflowService:
             except Exception:
                 logger.error("run_recovery_storage_failed | run_id=%s", run_id)
         finally:
-            unregister(run_id)
             with METRICS.lock:
                 METRICS.active -= 1
             self._capacity.release()

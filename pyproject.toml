@@ -1,7 +1,7 @@
 [project]
 name = "it-incident-agent"
 version = "0.1.0"
-description = "Budgeted IT incident diagnosis and approved remediation with LangGraph"
+description = "Budgeted autonomous IT incident diagnosis and approved remediation"
 requires-python = ">=3.12"
 dynamic = ["dependencies"]
 

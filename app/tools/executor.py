@@ -1,7 +1,6 @@
 import hashlib
 import json
 import time
-from copy import deepcopy
 from datetime import datetime, timezone
 from api.auth import Principal
 from runtime.context import ExecutionError, RunContext, activate
@@ -33,16 +32,6 @@ class ToolExecutor:
         self.evidence = {}
         self.references = {}
         self.last_query_profile = {}
-        self.log_gaps = {}
-        self.log_coverage = []
-
-    def fork(self, context):
-        """Prepare an isolated role ledger before concurrent collection begins."""
-        child = ToolExecutor(self.provider, self.principal, self.scope, context, role=self.role)
-        for field in ('seen', 'check_results', 'evidence', 'references', 'last_query_profile',
-                      'log_gaps', 'log_coverage'):
-            setattr(child, field, deepcopy(getattr(self, field)))
-        return child
 
     def capabilities(self, *, generic=False):
         """Public registration names only; never expose endpoint URLs or query templates."""
@@ -212,25 +201,6 @@ class ToolExecutor:
                     raise ExecutionError('METRIC_NOT_REGISTERED')
         return args
 
-    @staticmethod
-    def argument_errors(name, raw_args):
-        """Public fixed field names/types only; never echo rejected values or input."""
-        if name not in TOOL_ARGS:
-            return []
-        fields = TOOL_ARGS[name].model_json_schema().get('properties', {})
-        try:
-            TOOL_ARGS[name].model_validate_json(json.dumps(raw_args))
-        except ValidationError as exc:
-            return [{'path': '.'.join(str(part) if isinstance(part, int) or part in fields else '<unknown_field>'
-                         for part in error['loc']), 'type': error['type'],
-                     'expected': fields.get(error['loc'][0], {}) if error['loc'] else {},
-                     'instruction': 'category为必填类别，未过滤只省略level/error_code。' if error['loc'] == ('category',)
-                                    and name == 'get_service_logs' else '按此工具参数契约修正，不得改变授权范围。'}
-                    for error in exc.errors(include_input=False)][:5]
-        except (TypeError, ValueError):
-            return [{'path': 'args', 'type': 'invalid_json_arguments'}]
-        return []
-
     def metric_point_limit(self, args):
         # Plan sampling before the read, counting full snapshots and REF catalogs rather
         # than only compact model messages. Keep the existing 12,000-character boundary.
@@ -307,16 +277,6 @@ class ToolExecutor:
                     items.append(self.register_snapshot(item))
                 result = ToolResult(status="ok" if items else "empty", evidence=items, truncated=truncated,
                     sample_order="latest_first" if name == "get_service_metrics" else "source_order")
-                if name == 'get_service_logs' and not truncated:
-                    if args.level == 'ERROR' and result.status == 'empty':
-                        key = (args.category, args.start, args.end, args.error_code)
-                        if not any(self.covers_logs(coverage, args) for coverage in self.log_coverage):
-                            self.log_gaps[key] = args.model_dump(mode='json')
-                    elif args.level is None:
-                        self.log_coverage.append(args)
-                        self.log_gaps = {k: v for k, v in self.log_gaps.items() if not (
-                            args.category == k[0] and args.start <= k[1] and args.end >= k[2]
-                            and (args.error_code is None or args.error_code == k[3]))}
                 return result
             except ExecutionError as exc:
                 return self.rejected(exc.code)
@@ -328,12 +288,6 @@ class ToolExecutor:
             except Exception:
                 return self.rejected("PROVIDER_UNAVAILABLE")
         return self.rejected("PROVIDER_UNAVAILABLE")
-
-    @staticmethod
-    def covers_logs(coverage, query):
-        return (coverage.category == query.category and coverage.start <= query.start
-                and coverage.end >= query.end
-                and (coverage.error_code is None or coverage.error_code == query.error_code))
 
     def prepare_snapshot(self, name, row):
         encoded = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))

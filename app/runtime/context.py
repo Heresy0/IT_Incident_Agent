@@ -71,8 +71,6 @@ class Limits:
 
 _CURRENT = ContextVar("incident_runtime", default=None)
 _SPAN = ContextVar("incident_parent_span", default=None)
-_RUNS = {}
-_RUNS_LOCK = Lock()
 
 
 class RunContext:
@@ -87,7 +85,6 @@ class RunContext:
         self.tokens = {"input_tokens": 0, "output_tokens": 0, "known_calls": 0}
         self.errors = []
         self.blocked_providers = set()
-        self.seen_queries = set()
         self.stop_reason = ""
         self.emit_callback = emit
         self.root_span = str(uuid4())
@@ -100,34 +97,12 @@ class RunContext:
                 self.emit_callback(event)
             record_event(event)
 
-    def claim_repair(self, state, *, reviewer=False, review_stage=None, repair_role=None):
-        """One collection correction; optionally one per registered review stage.
-
-        Eligibility never adds model calls. Standalone/parallel collection
-        continue sharing one allowance; all calls use the original budget.
-        """
+    def claim_repair(self, state, *, reviewer=False):
+        """Allow one collection correction and one reviewer correction within the run budget."""
         with self.lock:
-            if repair_role is not None:
-                if repair_role not in {'supervisor', 'diagnosis', 'reviewer'} or review_stage is not None:
-                    raise ValueError('unregistered role correction')
-                roles = state.setdefault('role_repairs', {})
-                if roles.get(repair_role, 0) >= 1:
-                    return False
-                roles[repair_role] = roles.get(repair_role, 0) + 1
-                state['repairs'] += 1
-                if repair_role == 'reviewer':
-                    state['reviewer_repairs'] = state.get('reviewer_repairs', 0) + 1
-                return True
             reviewed = state.get('reviewer_repairs', 0)
             used = reviewed if reviewer else state['repairs'] - reviewed
-            if reviewer and review_stage is not None:
-                if review_stage not in {'ObservationReview', 'ReviewDecision'}:
-                    raise ValueError('unregistered review correction stage')
-                stages = state.setdefault('reviewer_stage_repairs', {})
-                if reviewed >= 2 or stages.get(review_stage, 0) >= 1:
-                    return False
-                stages[review_stage] = stages.get(review_stage, 0) + 1
-            elif used >= 1:
+            if used >= 1:
                 return False
             state['repairs'] += 1
             if reviewer:
@@ -168,23 +143,6 @@ class RunContext:
         if rejected:
             raise ExecutionError('BUDGET_EXCEEDED')
 
-    def can_research(self):
-        with self.lock:
-            allowed = (not self.stop_reason and time.monotonic() - self.started < self.limits.seconds - self.limits.reserve_seconds
-                    and self.counts["model_calls"] < self.limits.model_calls - self.limits.reserve_model_calls
-                    and self.counts["tool_calls"] < self.limits.tool_calls)
-            if not allowed and not self.stop_reason:
-                self.stop_reason = "BUDGET_EXCEEDED"
-            return allowed
-
-    def query_once(self, provider, query):
-        key = (provider, " ".join(query.split()).casefold())
-        with self.lock:
-            if key in self.seen_queries or provider in self.blocked_providers:
-                return False
-            self.seen_queries.add(key)
-            return True
-
     def error(self, exc, node=""):
         item = {**exc.as_dict(), "node": node}
         with self.lock:
@@ -219,21 +177,6 @@ class RunContext:
                        "parent_span_id": parent, "status": status, "duration_ms": round((time.monotonic() - start) * 1000)})
 
 
-def register(context):
-    with _RUNS_LOCK:
-        _RUNS[context.run_id] = context
-
-
-def unregister(run_id):
-    with _RUNS_LOCK:
-        _RUNS.pop(run_id, None)
-
-
-def lookup(run_id):
-    with _RUNS_LOCK:
-        return _RUNS.get(run_id)
-
-
 def current():
     return _CURRENT.get()
 
@@ -247,10 +190,10 @@ def activate(context):
         _CURRENT.reset(token)
 
 
-def invoke_model(agent, messages, name, terminal=False, system_prompt=None):
+def invoke_model(agent, messages, name, terminal=False):
     context = current()
     if context:
-        actual = sum(len(str(m.content)) for m in messages) + len(system_prompt or "")
+        actual = sum(len(str(m.content)) for m in messages)
         if actual > context.limits.input_chars:
             context.stop_reason = "BUDGET_EXCEEDED"
             context.emit({'type': 'budget_rejected', 'node': name, 'kind': 'model',
@@ -258,13 +201,7 @@ def invoke_model(agent, messages, name, terminal=False, system_prompt=None):
             raise ExecutionError("BUDGET_EXCEEDED")
         context.reserve("model", terminal)
     def call():
-        if system_prompt:
-            from langchain_core.messages import SystemMessage
-            raw = getattr(agent, "_harness_llm", None)
-            payload = [SystemMessage(content=system_prompt), *messages]
-            result = {"messages": [*messages, raw.invoke(payload)]} if raw else agent.invoke({"messages": payload})
-        else:
-            result = agent.invoke({"messages": messages})
+        result = agent.invoke({"messages": messages})
         if context:
             response = result["messages"][-1]
             usage = getattr(response, "usage_metadata", None) or getattr(response, "response_metadata", {}).get("token_usage")

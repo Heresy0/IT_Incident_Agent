@@ -9,6 +9,7 @@
 | 目的 | 入口 |
 | --- | --- |
 | 了解 v2 架构、当前演示和评估边界 | [当前 v2 导览](examples/current-v2.md) |
+| 核验剩余旧代码清理、兼容边界和回归结果 | [清理验收](evals/residual-cleanup-validation-20261019.json)、[原文件快照](archive/legacy/residual-20261019/README.md) |
 | 核验真实前端取证、审阅、返工与报告交付 | [退役后真实验收](evals/frontend-post-retirement-validation-20261018.json)、[原始前端验收](evals/frontend-live-validation-20261018.json) |
 | 核验同模型、同案例、同预算的旧版／v2 对照 | [冻结版本配对验收](evals/frozen-version-validation-20261018.json) |
 | 核验跨案例根因定位、补证及剩余错误 | [跨案例评分](evals/rca-cross-case-scorecard-20261018.json)、[实验与证据来源](evals/rca-cross-case-validation-20261018.json) |

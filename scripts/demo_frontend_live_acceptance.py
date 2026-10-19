@@ -247,7 +247,7 @@ def main(argv=None):
             raise ValueError('The demo model is frozen to Flash.')
         chat = build_model(api_key, MODEL, base_url=config.base_url, extra_body=config.extra_body)
         return {role: RecordedFlash(chat, ledger, role) for role in
-                ('supervisor', 'investigation', 'knowledge', 'diagnosis', 'reviewer', 'challenger')}
+                ('investigation', 'diagnosis', 'reviewer', 'challenger')}
 
     environment = {'INCIDENT_AUTH_FILE': str(auth), 'POSTGRES_DSN': dsn,
                    'INCIDENT_MAX_MODEL_CALLS': '16', 'INCIDENT_MAX_TOOL_CALLS': '8',

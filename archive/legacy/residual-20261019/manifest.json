@@ -1,0 +1,126 @@
+{
+  "schema_version": "residual-legacy-source-v1",
+  "source_commit": "c9be976e8fe207955a7fd502ace8af57564b9c09",
+  "restore_method": "Restore the complete source_commit in an isolated checkout; snapshots preserve original bytes.",
+  "items": [
+    {
+      "original_path": "app/runtime/branch.py",
+      "archive_path": "app/runtime/branch.py",
+      "sha256": "6df10425a1e379e36feca784c5ef7ffaff6eb043071d2cea448a360d413dac5b",
+      "bytes": 3214,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "app/runtime/context.py",
+      "archive_path": "app/runtime/context.py",
+      "sha256": "65663424f03cf80ab151871334f7ffa3d09a87ac07a942f78ec0e67380983579",
+      "bytes": 13622,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/tools/executor.py",
+      "archive_path": "app/tools/executor.py",
+      "sha256": "6cb821aabb18007455ff420fe17d8009734e0e35e10636d63fb3a79a9bf5134a",
+      "bytes": 26227,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/evidence/model_view.py",
+      "archive_path": "app/evidence/model_view.py",
+      "sha256": "a194a50fd2be8fc06523809b926a133eb28eaf77d81edd81e2b6dacb04b870a8",
+      "bytes": 3222,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/evidence/ownership.py",
+      "archive_path": "app/evidence/ownership.py",
+      "sha256": "0c09349d5a63833ac8c48624901cf869cbd3d1d5e37318a70c793cb6aea1c667",
+      "bytes": 3423,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/evidence/observations.py",
+      "archive_path": "app/evidence/observations.py",
+      "sha256": "a62375efc482d4097b03ee5b53f0723e70bc4612388ab802630787d170c9a552",
+      "bytes": 1959,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/workflow/task_checks.py",
+      "archive_path": "app/workflow/task_checks.py",
+      "sha256": "871fada6aa216f8413d85e4a9a7e8ca63304bb7e693949aecfc0d300b3523f88",
+      "bytes": 6338,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "app/workflow/service.py",
+      "archive_path": "app/workflow/service.py",
+      "sha256": "95d4ad20af741939b8b018b4d0311730689a66ac7afdea2521460408a93bb38b",
+      "bytes": 10844,
+      "action": "trim_unused_definitions"
+    },
+    {
+      "original_path": "scripts/evaluate_showcase_live.py",
+      "archive_path": "scripts/evaluate_showcase_live.py",
+      "sha256": "19a7d96422b8dc6ccc2fe2087fd48d51ad0db66a810d7ed54f9b99b25d43a24b",
+      "bytes": 1154,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/independent/provider.py",
+      "archive_path": "evals/independent/provider.py",
+      "sha256": "4f26b96763c61a659963fd61980dd66deaecfad5b8b4bd53e3781debdec6b807",
+      "bytes": 1327,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/independent/suite.py",
+      "archive_path": "evals/independent/suite.py",
+      "sha256": "6d2ef90d7a5a9df3e9e0fcb65fa3e49dd313e326f78a0efd0f0154f9a48998e2",
+      "bytes": 6229,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/targeted/provider.py",
+      "archive_path": "evals/targeted/provider.py",
+      "sha256": "0df0d2829c6adeeb43367717cb2a4566753ea99478b986c394ca25443c7e79c3",
+      "bytes": 360,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/targeted/suite.py",
+      "archive_path": "evals/targeted/suite.py",
+      "sha256": "c229836b2210a06912414de32206bd3001f69355a9126a0d1860d463e4287526",
+      "bytes": 969,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/showcase_live/provider.py",
+      "archive_path": "evals/showcase_live/provider.py",
+      "sha256": "a4ebc932fc8e4f2cd1083c8d4ab1754c1d5868a73d2bd89e51baf71042cd55b0",
+      "bytes": 367,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/showcase_live/suite.py",
+      "archive_path": "evals/showcase_live/suite.py",
+      "sha256": "2a50d6e9ceb83dae1ef6e5b5756f99a770b0ae524e890fb3c8560576920ed2d2",
+      "bytes": 981,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/showcase_revision/provider.py",
+      "archive_path": "evals/showcase_revision/provider.py",
+      "sha256": "9f761145eea21e6b710d98d78f63785c8b7188bde93e41b878fab5edb3f080c3",
+      "bytes": 398,
+      "action": "archive_module"
+    },
+    {
+      "original_path": "evals/showcase_revision/suite.py",
+      "archive_path": "evals/showcase_revision/suite.py",
+      "sha256": "d8d86425a968c57387c564d2ed5ce9d33b710b67a7cf6d52c5b1ed82b3ba426e",
+      "bytes": 1040,
+      "action": "archive_module"
+    }
+  ]
+}

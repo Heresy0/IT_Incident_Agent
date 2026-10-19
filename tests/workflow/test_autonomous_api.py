@@ -127,7 +127,6 @@ class AutonomousAPITests(unittest.TestCase):
         fn, args = submitted[0]
         request = args[1]
         frozen = deepcopy(request['run_spec'])
-        self.service.incident_engine = 'legacy'
         self.config.extra_body['test_setting'] = 'changed-after-admission'
         self.service._base_config = IncidentConfig(api_key='replacement-key', model='replacement-model')
         with patch.dict(os.environ, {'INCIDENT_MAX_SECONDS': '25', 'INCIDENT_MAX_MODEL_CALLS': '6'}):

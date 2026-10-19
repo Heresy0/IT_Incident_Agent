@@ -13,7 +13,7 @@ from providers.registry import ServiceBinding, ServiceRegistry
 from runtime.context import RunContext
 from tools.executor import ToolExecutor
 from tools.query_coverage import complete_read, read_state
-from workflow.task_checks import adds_information, completion
+from workflow.task_checks import completion
 
 
 class AutonomousCoverageTests(unittest.TestCase):
@@ -46,8 +46,6 @@ class AutonomousCoverageTests(unittest.TestCase):
                     self.executor.execute(self.broad['tool'], self.broad['args'])
                 self.assertEqual(completion([self.broad], self.executor)['checks'][0]['status'], variant)
                 self.assertEqual(completion([self.narrow], self.executor)['checks'][0]['status'], 'not_executed')
-                self.assertTrue(adds_information([self.narrow], self.executor))
-                self.assertFalse(adds_information([self.broad], self.executor))
                 result = self.executor.execute(self.narrow['tool'], self.narrow['args'])
                 self.assertNotEqual(result.status, 'error')
                 self.assertEqual(self.executor.context.counts['tool_calls'], 2)
@@ -59,7 +57,6 @@ class AutonomousCoverageTests(unittest.TestCase):
         self.assertEqual(state['checks'][0]['status'], 'empty')
         self.assertTrue(state['query_complete'])
         self.assertFalse(state['goal_verified'])
-        self.assertFalse(adds_information([self.narrow], self.executor))
 
     def test_quality_classification_is_independent_of_semantic_success(self):
         row = {'status': 'empty', 'truncated': False}
