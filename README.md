@@ -10,7 +10,7 @@
 
 | 目的 | 入口 |
 | --- | --- |
-| 按顺序阅读架构、评估和面试口径 | [项目阅读导航](examples/README.md) |
+| 按顺序阅读架构、运行方式和评估结果 | [项目阅读导航](examples/README.md) |
 | 核对图编排边界、行为对照和回滚方式 | [LangGraph 迁移说明](examples/langgraph-migration.md) |
 | 启用进程中断恢复、核对预算与幂等交付 | [检查点接入说明](examples/checkpoint-recovery.md) |
 | 按用途查找诊断、演示、接入与评估命令 | [脚本导航](scripts/README.md) |
@@ -19,7 +19,6 @@
 | 核验主分支部署、追加信息及真实前端交付 | [最新统一部署验收](evals/main-demo-unification-validation-20261020.json)；历史记录见[退役后真实验收](evals/frontend-post-retirement-validation-20261018.json)、[原始前端验收](evals/frontend-live-validation-20261018.json) |
 | 核验同模型、同案例、同预算的旧版／v2 对照 | [冻结版本配对验收](evals/frozen-version-validation-20261018.json) |
 | 核验跨案例根因定位、补证及剩余错误 | [跨案例评分](evals/rca-cross-case-scorecard-20261018.json)、[实验与证据来源](evals/rca-cross-case-validation-20261018.json) |
-| 阅读可随仓库提供的面试稿 | [面试讲述简版](examples/interview.md)；本机扩展复盘索引为 `docs/README.md`，不随克隆提供 |
 | 配置普通本地开发环境 | [Windows 启动说明](README_LOCAL.md) |
 | 查找历史优化、失败记录和旧版流程 | [历史实验归档索引](archive/experiments/README.md) |
 | 查找已退役的研究系统源码 | [研究归档说明](archive/research/README.md) |
