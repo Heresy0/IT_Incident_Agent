@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { readEvents } from './sse'
 import ReportView from './ReportView.vue'
 import RepairPanel from './RepairPanel.vue'
+import FollowupPanel from './FollowupPanel.vue'
 import type { RepairRecommendation } from './repairs'
 
 type Fields = { title: string; symptoms: string; service: string; environment: string; service_version: string;
@@ -12,6 +13,7 @@ type Incident = Fields & { id: string; revision: number; latest_run_id: string |
 type Demo = { case_id: string; synthetic: boolean; fields: Fields }
 type Service = { service: string; environment: string; service_version: string; metrics: { name: string; unit: string }[] }
 type Result = { run_id: string; status: string; business_result: string; review_status: string; final: string; execution_mode?: string;
+  followup?: { parent_run_id: string; submissions: { submitted_by: string; submitted_at: string; note: string; observations: { source_name: string; service: string; observed_at: string; content: string }[] }[] };
   run_summary: { model_calls?: number; tool_calls?: number; termination_reason?: string; duration_ms?: number };
   purpose?: 'diagnosis' | 'status_check';
   output?: { findings?: unknown[]; hypotheses?: unknown[]; recommended_actions?: RepairRecommendation[]; missing_information?: string[]; escalation_team?: string };
@@ -23,7 +25,7 @@ const props = defineProps<{ ready: boolean; tenantId: string; userId: string; ro
 const items = ref<Incident[]>([]), demos = ref<Demo[]>([]), services = ref<Service[]>([]), selected = ref<Incident | null>(null)
 const chosenService = ref(''), paidAuthorized = ref(false)
 const chosenDemo = ref(''), error = ref(''), notice = ref(''), busy = ref(false), connecting = ref(false)
-const repairBusy = ref(false)
+const repairBusy = ref(false), followupBusy = ref(false)
 const result = ref<Result | null>(null), runId = ref(''), runStatus = ref(''), events = ref<RunEvent[]>([])
 const offset = ref(0), mode = ref('scripted_control_only'), modelBudget = ref(12), toolBudget = ref(8)
 const cause = ref(''), resolution = ref(''), labels = ref(''), codes = ref('')
@@ -43,7 +45,7 @@ const statuses: Record<string, string> = { open: '待排查', investigating: '�
   running: '运行中', completed: '执行完成', partial: '有限结果', failed: '执行失败', diagnosis_available: '诊断可查看',
   needs_information: '需要补充信息', escalation_recommended: '建议升级', status_checked: '所列观测核查完成',
   passed: '模型复核通过', not_performed: '未复核' }
-const locked = computed(() => repairBusy.value || ['investigating', 'resolved'].includes(selected.value?.business_status || ''))
+const locked = computed(() => repairBusy.value || followupBusy.value || ['investigating', 'resolved'].includes(selected.value?.business_status || ''))
 const bindingKey = (row: { service: string; environment: string; service_version: string }) =>
   JSON.stringify([row.service, row.environment, row.service_version])
 const selectedBinding = computed(() => services.value.find(row => bindingKey(row) === chosenService.value))
@@ -87,7 +89,7 @@ const api = async (url: string, options: RequestInit = {}) => {
 }
 const jsonOptions = (method: string, body: unknown) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 const guarded = async (work: () => Promise<void>) => {
-  if (busy.value || repairBusy.value) return
+  if (busy.value || repairBusy.value || followupBusy.value) return
   busy.value = true; error.value = ''; notice.value = ''
   try { await work() } catch (e) { if (alive) error.value = e instanceof Error ? e.message : '操作失败' }
   finally { if (alive) busy.value = false }
@@ -202,6 +204,13 @@ const confirm = () => guarded(async () => {
   selected.value = await (await api(`incidents/${selected.value.id}`)).json()
   await refreshList(); notice.value = '已人工确认解决，经验可在当前身份和适用版本下检索'
 })
+const followupStarted = async () => {
+  if (!selected.value) return
+  try {
+    const row = await (await api(`incidents/${selected.value.id}`)).json()
+    if (alive) { await view(row); await refreshList(); notice.value = '已启动关联诊断，原报告可在诊断历史中查看' }
+  } catch (value) { if (alive) error.value = value instanceof Error ? value.message : '请读取结果，确认关联诊断状态' }
+}
 onMounted(() => {
   if (!props.ready) return
   void guarded(async () => {
@@ -293,8 +302,11 @@ onUnmounted(() => { alive = false; stopStream(); pageController.abort() })
           </details>
         </template>
       </section>
+      <FollowupPanel v-if="selected" :key="selected.id + '.followup'" :incident="selected" :result="result"
+        :disabled="busy || repairBusy" :storage-key="key + '.followup.' + selected.id" :fetcher="fetcher"
+        @busy="followupBusy = $event" @started="followupStarted" />
       <RepairPanel v-if="selected" :key="selected.id" :incident="selected" :result="result" :role="role"
-        :tenant-id="tenantId" :user-id="userId" :parent-busy="busy" :fetcher="fetcher" @busy="repairBusy = $event" />
+        :tenant-id="tenantId" :user-id="userId" :parent-busy="busy || followupBusy" :fetcher="fetcher" @busy="repairBusy = $event" />
       <section v-if="confirmable">
         <h3>人工确认解决</h3><p>请填写实际核实的原因及处理结果；确认后作为当前身份的历史经验供知识检索。</p>
         <label>已确认原因<textarea v-model="cause" maxlength="1000" /></label><label>实际处理与验证结果<textarea v-model="resolution" maxlength="2000" /></label>

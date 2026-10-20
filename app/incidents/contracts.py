@@ -45,6 +45,38 @@ class DiagnosisRequest(BaseModel):
         return self
 
 
+class SubmittedObservation(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    source_name: str = Field(min_length=1, max_length=120, strict=True)
+    service: str = Field(min_length=1, max_length=80, strict=True)
+    observed_at: datetime
+    content: str = Field(min_length=1, max_length=2000, strict=True)
+
+    @model_validator(mode='after')
+    def valid_source(self):
+        if self.observed_at.tzinfo is None or not self.source_name.strip() or not self.content.strip():
+            raise ValueError('A named source, nonblank content and timezone-aware observation time are required')
+        return self
+
+
+class FollowupInput(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    parent_run_id: str = Field(min_length=1, max_length=40)
+    revision: int = Field(ge=1)
+    note: str = Field(default='', max_length=2000)
+    observations: list[SubmittedObservation] = Field(default_factory=list, max_length=3)
+
+    @model_validator(mode='after')
+    def has_information(self):
+        if not self.note.strip() and not self.observations:
+            raise ValueError('Explain the disputed point or provide a sourced observation')
+        return self
+
+
+class FollowupDiagnosisRequest(DiagnosisRequest):
+    followup: FollowupInput
+
+
 class ResolutionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     request_key: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")

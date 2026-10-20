@@ -68,16 +68,39 @@ class PostgresIncidents:
             if row["business_status"] in {"investigating", "resolved"}:
                 raise IncidentError("INCIDENT_LOCKED")
             snapshot = public_incident(row)
+            followup = execution.get('followup')
+            parent = conn.execute('SELECT * FROM research_runs WHERE run_id=%s AND tenant_id=%s AND user_id=%s',
+                (followup['parent_run_id'], principal.tenant_id, principal.user_id)).fetchone() if followup else None
+            from incidents.followups import prepare_followup
+            snapshot, context = prepare_followup(snapshot, parent, execution, principal,
+                metadata.get('followup_allowed_services', ()))
+            metadata = {key: value for key, value in metadata.items() if key != 'followup_allowed_services'}
             config = {**metadata, "task_type": "incident", "incident_id": iid, "request_key": execution["request_key"],
                       "execution": execution, "incident_snapshot": snapshot, "memory_enabled": False}
+            if context is not None:
+                config['followup_context'] = context
             conn.execute("INSERT INTO research_runs(run_id,checkpoint_thread_id,query,user_id,thread_id,tenant_id,status,config) VALUES (%s,%s,%s,%s,%s,%s,'running',%s)",
                          (run_id, run_id, snapshot["symptoms"], principal.user_id, iid, principal.tenant_id, Jsonb(config)))
             if config.get('run_spec', {}).get('recovery', {}).get('mode') == 'postgres_v1':
                 from storage.recovery import create_execution
                 create_execution(conn, run_id, config['run_spec'])
-            conn.execute("UPDATE incidents SET latest_run_id=%s,business_status='investigating',updated_at=NOW() WHERE id=%s", (run_id, iid))
+            conn.execute("UPDATE incidents SET latest_run_id=%s,revision=%s,business_status='investigating',updated_at=NOW() WHERE id=%s", (run_id, snapshot['revision'], iid))
             self._append(conn, run_id, {"type": "status", "task_type": "incident", "incident_id": iid, "status": "running", "message": "诊断已接收"})
         return run_id, True, config
+
+    def list_diagnoses(self, iid, principal, offset=0, limit=20):
+        if self.get_incident(iid, principal) is None:
+            raise IncidentError('INCIDENT_NOT_FOUND', 404)
+        with self.pool.connection() as conn:
+            rows = conn.execute("""SELECT run_id,status,created_at,
+                config #> '{incident_snapshot,revision}' AS revision,
+                config #>> '{followup_context,parent_run_id}' AS parent_run_id,
+                config #> '{followup_context,round}' AS round,
+                result->'run_summary' AS summary FROM research_runs
+                WHERE tenant_id=%s AND user_id=%s AND config->>'incident_id'=%s
+                ORDER BY created_at DESC,run_id DESC""", (principal.tenant_id, principal.user_id, iid)).fetchall()
+        from incidents.followups import run_history
+        return run_history(rows, offset, limit)
 
     def confirm_incident(self, iid, payload, principal):
         with self.pool.connection() as conn:
@@ -163,12 +186,35 @@ class MemoryIncidents:
                 return old["run_id"], False, old["config"]
             if row["business_status"] in {"investigating", "resolved"}:
                 raise IncidentError("INCIDENT_LOCKED")
+            followup = execution.get('followup')
+            parent = self.get(followup['parent_run_id'], principal) if followup else None
+            from incidents.followups import prepare_followup
+            snapshot, context = prepare_followup(row, parent, execution, principal,
+                metadata.get('followup_allowed_services', ()))
+            metadata = {key: value for key, value in metadata.items() if key != 'followup_allowed_services'}
             cfg = {**metadata, "task_type": "incident", "incident_id": iid, "request_key": execution["request_key"],
-                   "execution": deepcopy(execution), "incident_snapshot": deepcopy(row), "memory_enabled": False}
+                   "execution": deepcopy(execution), "incident_snapshot": snapshot, "memory_enabled": False}
+            if context is not None:
+                cfg['followup_context'] = context
             self.create(run_id, {"query": row["symptoms"], "thread_id": iid, "tenant_id": principal.tenant_id, "user_id": principal.user_id}, cfg)
-            row.update(latest_run_id=run_id, business_status="investigating", updated_at=now())
+            row.update(latest_run_id=run_id, revision=snapshot['revision'], business_status="investigating", updated_at=now())
             self.append(run_id, {"type": "status", "task_type": "incident", "incident_id": iid, "status": "running", "message": "诊断已接收"})
             return run_id, True, cfg
+
+    def list_diagnoses(self, iid, principal, offset=0, limit=20):
+        with self.lock:
+            if self.get_incident(iid, principal) is None:
+                raise IncidentError('INCIDENT_NOT_FOUND', 404)
+            rows = [{'run_id': row['run_id'], 'status': row['status'], 'created_at': row['created_at'],
+                'revision': row['config']['incident_snapshot']['revision'],
+                'parent_run_id': row['config'].get('followup_context', {}).get('parent_run_id'),
+                'round': row['config'].get('followup_context', {}).get('round'),
+                'summary': (row.get('result') or {}).get('run_summary')}
+                for row in self.runs.values() if same_owner(row, principal)
+                and row.get('config', {}).get('incident_id') == iid]
+            rows.sort(key=lambda row: (row['created_at'], row['run_id']), reverse=True)
+            from incidents.followups import run_history
+            return run_history(rows, offset, limit)
 
     def confirm_incident(self, iid, payload, principal):
         with self.lock:

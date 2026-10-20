@@ -50,8 +50,27 @@ class RetirementTests(unittest.TestCase):
             # Checkpoint recovery intentionally wraps reservations and uses a
             # restored retrieval timestamp/elapsed clock. Compare the original
             # non-durable branches after removing only those explicit adapters;
-            # retain exact AST protection for every other helper/body.
+            # User-source adapters intentionally label unverified submissions.
+            # Strip only their exact source-type branches; retain the original
+            # non-user evidence view and exact protection for all other code.
             class WithoutRecoveryAdapters(ast.NodeTransformer):
+                def visit_If(self, node):
+                    for expression in ("item.payload.get('source_type') == 'user_submission'",
+                                       "payload.get('source_type') == 'user_submission'"):
+                        if ast.dump(node.test, include_attributes=False) == ast.dump(ast.parse(expression, mode='eval').body, include_attributes=False):
+                            return None
+                    return self.generic_visit(node)
+
+                def visit_FunctionDef(self, node):
+                    node = self.generic_visit(node)
+                    if (node.name == 'evidence_view' and len(node.body) == 2
+                            and isinstance(node.body[0], ast.Assign)
+                            and isinstance(node.body[0].value, ast.Dict)
+                            and isinstance(node.body[1], ast.Return)
+                            and isinstance(node.body[1].value, ast.Name) and node.body[1].value.id == 'view'):
+                        node.body = [ast.Return(value=node.body[0].value)]
+                    return node
+
                 def visit_Call(self, node):
                     if (isinstance(node.func, ast.Attribute) and node.func.attr == 'elapsed'
                             and isinstance(node.func.value, ast.Name) and node.func.value.id == 'self'):
@@ -66,7 +85,7 @@ class RetirementTests(unittest.TestCase):
             current = ast.parse((ROOT / relative).read_text(encoding='utf-8'))
             normalized = WithoutRecoveryAdapters().visit(current)
             normalized_functions = {node.name: node for node in ast.walk(normalized) if isinstance(node, ast.FunctionDef)}
-            for name in ('prepare_snapshot', 'summary'):
+            for name in ('prepare_snapshot', 'summary', 'evidence_view', 'source_statement'):
                 if name in names:
                     after[name] = ast.dump(normalized_functions[name], include_attributes=False)
             if 'reserve' in names:

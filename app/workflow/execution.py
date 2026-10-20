@@ -138,6 +138,8 @@ class IncidentAdapter:
             from providers.history import ProviderWithHistory
             provider = ProviderWithHistory(provider, self.service._store, self.principal(request))
             provider.repair_capabilities = self.service.repairs.capabilities(provider.binding)
+        if request.get('followup_context'):
+            provider.followup_context = request['followup_context']
         if mode == "scripted_control_only":
             if not snapshot.get('demo_case_id'):
                 result = self.failure(request, context, 'LIVE_DIAGNOSIS_REQUIRED')
@@ -162,6 +164,12 @@ class IncidentAdapter:
                       engine_id=engine, run_spec=request.get('run_spec', {}))
         result.update(task_type="incident", workflow="autonomous_v2", incident_id=snapshot['id'],
                       incident_snapshot=snapshot, memory_enabled=False)
+        if request.get('followup_context'):
+            result['followup'] = request['followup_context']
+            if any(submission['observations'] for submission in result['followup']['submissions']):
+                result['repair_eligible'] = False
+            from workflow.v2.engine import render_report
+            result['final'] = render_report(result)
         return result
 
     def resume_error(self, request):

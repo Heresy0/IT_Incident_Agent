@@ -2,6 +2,8 @@
 
 状态日期：2026-10-19。本页说明当前分支的代码入口、已验收演示和评估材料；统一入口为[根 README](../README.md)。
 
+2026-10-20：检查点分支已合入 GitHub `main`，`codex/report-followup` 在隔离目录增加[报告后追加信息与关联诊断](followup-diagnosis.md)。下述 8176 状态继续指已验收的检查点版本，新功能在独立的 8177 控制环境验证，原报告、评估证据和真实调用账本不迁移、不重置。
+
 首次阅读可先看[项目阅读导航](README.md)、[架构导览](architecture.md)和[评估口径](evaluation-guide.md)；按用途找命令见[脚本导航](../scripts/README.md)。本页保留本机环境和历史验收的具体状态。
 
 当前分支为 `codex/graph-checkpoint-recovery`，由 [LangGraph 图](../app/workflow/v2/graph.py)管理 v2 阶段。图迁移已快进合入 GitHub `main`，提交为 `865329d`；接入前回滚点为 `rollback/pre-checkpoint-recovery-20261019`。本轮增加按运行开启的[检查点恢复](checkpoint-recovery.md)，保留原始根因评估和既有调用记录，提示词和默认预算保持不变。首次接入记录见[检查点验收](../evals/checkpoint-recovery-validation-20261019.json)，后续异常恢复修复与源码指纹见[补充验收](../evals/checkpoint-exception-recovery-validation-20261019.json)，修复后的实际前端执行见[真实 Flash 闭环验收](../evals/checkpoint-exception-postfix-live-validation-20261019.json)；此前图迁移边界见[迁移说明](langgraph-migration.md)。

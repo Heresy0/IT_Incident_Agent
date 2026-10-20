@@ -206,6 +206,10 @@ def run_graph(model, provider, principal, *, context=None, limits=None, event_lo
     # Keep the native evaluation hook at engine.ToolExecutor: instrumentation
     # observes this same executor without changing its arguments or policies.
     executor = engine.ToolExecutor(provider, principal, ticket.scope, context, role='single')
+    if getattr(provider, 'followup_context', None):
+        from incidents.followups import submitted_rows
+        for row in submitted_rows(provider.followup_context, ticket.scope):
+            executor.register_snapshot(executor.prepare_snapshot('user_submission', row))
     questions = InvestigationQuestions(executor) if enable_rework else None
     needs_challenge = enable_rework and enable_challenge and ticket.purpose != 'status_check'
     reserve = collection_reservation(context, enable_challenge=needs_challenge) if enable_rework else None

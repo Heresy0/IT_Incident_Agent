@@ -121,7 +121,9 @@ def query(self, name, args, scope):
 try:
     with patch.object(BoundIncidentProvider, 'query', query):
         result = execute(service, run_id, execution_request(store.get(run_id), service))
-    print(json.dumps({'status': result['status'] if result else 'not_owned'}))
+    print(json.dumps({'status': result['status'] if result else 'not_owned',
+        'reason': result.get('run_summary', {}).get('termination_reason') if result else None,
+        'counts': {key: result.get('run_summary', {}).get(key) for key in ('model_calls', 'tool_calls')} if result else None}))
 except RecoveryInterrupted as exc:
     if not injected:
         raise

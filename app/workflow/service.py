@@ -211,6 +211,11 @@ class WorkflowService:
                 provider_registry = deepcopy(self.services)
                 metadata = self._incident.metadata(execution, incident=incident, principal=principal,
                                                    registry=provider_registry, config=model_config)
+                if execution.get('followup'):
+                    scope = self._incident.scope({'incident_snapshot': incident,
+                        'tenant_id': principal.tenant_id, 'user_id': principal.user_id,
+                        '_provider_registry': provider_registry})
+                    metadata['followup_allowed_services'] = [scope.service, *scope.allowed_dependencies]
                 if metadata['run_spec']['engine_id'] != 'autonomous_v2':
                     raise IncidentError('DIAGNOSIS_NOT_ADMITTED: ' + metadata['run_spec']['rollout']['reason'], status=409)
                 run_id, created, config = self._store.begin_diagnosis(iid, run_id, execution, principal, metadata)
@@ -221,6 +226,7 @@ class WorkflowService:
                     "query": config["incident_snapshot"]["symptoms"], "thread_id": iid,
                     "tenant_id": principal.tenant_id, "user_id": principal.user_id,
                     "run_spec": config.get('run_spec', {}),
+                    **({'followup_context': config['followup_context']} if 'followup_context' in config else {}),
                     # Credentials stay in process memory, never in the persisted/public run config.
                     "_model_config": model_config, "_provider_registry": provider_registry}
                 with METRICS.lock:
@@ -244,6 +250,15 @@ class WorkflowService:
                     self._capacity.release()
                 raise
             return run_id, False
+
+    def start_followup(self, iid, payload, principal):
+        from incidents.contracts import FollowupDiagnosisRequest
+        execution = FollowupDiagnosisRequest.model_validate(payload).model_dump(mode='json')
+        return self.start_diagnosis(iid, execution, principal)
+
+    def list_diagnoses(self, iid, principal, offset=0, limit=20):
+        self.get_incident(iid, principal)
+        return self._store.list_diagnoses(iid, principal, offset, limit)
 
     def confirm_incident(self, iid, payload, principal):
         from incidents.support import IncidentError

@@ -136,6 +136,8 @@ def collect(model, executor, context, failures, repairs, *, review_feedback=None
                    'capabilities': executor.capabilities(generic=True), 'tools': tools,
                    'observations': state, 'collection': collection_view(executor),
                    'feedback': feedback, 'review_feedback': review_feedback, 'budget': remaining(context).__dict__}
+        if getattr(executor.provider, 'followup_context', None):
+            payload['user_followup'] = executor.provider.followup_context
         if questions is not None:
             payload['investigation_questions'] = questions.context(executor)
         try:
@@ -240,6 +242,8 @@ def make_draft(model, executor, context, failures, repairs, stop, *, questions=N
     if can_finalize(context):
         payload = {'ticket': ticket.model_dump(mode='json', exclude={'scope': {'tenant_id', 'user_id'}}),
                    **draft_input(executor), 'collection': collection_view(executor), 'collection_stop': stop}
+        if getattr(executor.provider, 'followup_context', None):
+            payload['user_followup'] = executor.provider.followup_context
         if questions is not None:
             payload['investigation_questions'] = questions.context(executor)
         for attempt in range(2):
@@ -491,4 +495,14 @@ def render_report(result):
             for change in audit.get('revision_audit', []):
                 lines.append(f"- {change['target_id']}：{change['operation']}；修改后重新审阅，旧批准不继承。")
         lines.append('独立范围质疑同样是模型判断；补查、收窄或撤回均不代表已查明唯一根因。')
+    if result.get('followup'):
+        followup = result['followup']
+        lines.extend(['', '## 用户补充与关联诊断',
+            f"基于运行 {followup['parent_run_id']} 的第 {followup['round']} 次关联重诊；原报告保持不变。",
+            '用户说明与粘贴记录未经独立核验，不构成人工金标或审批；本轮结论已重新审阅。'])
+        for submission in followup['submissions']:
+            if submission['note']:
+                lines.append('- 用户说明：' + submission['note'])
+            for item in submission['observations']:
+                lines.append(f"- 用户提供记录：{item['source_name']}；服务 {item['service']}；观测时间 {item['observed_at']}。")
     return '\n'.join(lines) + '\n'

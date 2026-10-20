@@ -4,7 +4,7 @@ import logging
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from api.auth import Principal, get_current_principal
-from incidents.contracts import IncidentCreate, IncidentPatch, DiagnosisRequest, ResolutionRequest
+from incidents.contracts import IncidentCreate, IncidentPatch, DiagnosisRequest, ResolutionRequest, FollowupDiagnosisRequest
 from workflow.dependencies import WorkflowService, get_workflow_service
 from incidents.support import IncidentError
 from providers.bound import catalog
@@ -75,3 +75,19 @@ async def diagnose(incident_id: UUID, payload: DiagnosisRequest, service: Workfl
 async def resolve(incident_id: UUID, payload: ResolutionRequest, service: WorkflowService = Depends(get_workflow_service),
                   principal: Principal = Depends(get_current_principal)):
     return await call(service.confirm_incident, str(incident_id), payload.model_dump(), principal)
+
+
+@router.post('/incidents/{incident_id}/followups', status_code=202)
+async def followup(incident_id: UUID, payload: FollowupDiagnosisRequest,
+                   service: WorkflowService = Depends(get_workflow_service),
+                   principal: Principal = Depends(get_current_principal)):
+    run_id, replayed = await call(service.start_followup, str(incident_id), payload.model_dump(mode='json'), principal)
+    return {'run_id': run_id, 'incident_id': str(incident_id), 'replayed': replayed,
+        'result_url': f'/api/v1/runs/{run_id}', 'event_url': f'/api/v1/runs/{run_id}/events'}
+
+
+@router.get('/incidents/{incident_id}/diagnoses')
+async def history(incident_id: UUID, offset: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=100),
+                  service: WorkflowService = Depends(get_workflow_service),
+                  principal: Principal = Depends(get_current_principal)):
+    return await call(service.list_diagnoses, str(incident_id), principal, offset, limit)

@@ -15,6 +15,7 @@ def execution_request(row, service):
         'incident_snapshot': config['incident_snapshot'], 'query': row['query'],
         'thread_id': row['thread_id'], 'tenant_id': row['tenant_id'], 'user_id': row['user_id'],
         'run_spec': config['run_spec'], '_model_config': deepcopy(service._base_config),
+        **({'followup_context': config['followup_context']} if 'followup_context' in config else {}),
         '_provider_registry': deepcopy(service.services)}
 
 

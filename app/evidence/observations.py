@@ -20,6 +20,8 @@ def source_statement(refs, evidence):
         else:
             # Metadata cannot add an interpretation to substantive source fields.
             continue
+        if payload.get('source_type') == 'user_submission':
+            label = f"用户提供（未经独立核验，来源：{payload.get('source_name', '')}）{label}"
         parts.append(f"{label}={value} {ref.unit} @ {ref.observed_at.isoformat()}".strip())
     text = '; '.join(parts)
     return text if len(text) <= 500 else text[:475] + ' ... (see references)'

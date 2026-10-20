@@ -10,8 +10,11 @@ def substantive(path):
 
 
 def evidence_view(item):
-    return {'evidence_id': item.evidence_id, 'kind': item.kind, 'service': item.service,
+    view = {'evidence_id': item.evidence_id, 'kind': item.kind, 'service': item.service,
             'environment': item.environment, 'observed_at': item.observed_from.isoformat(),
             'data_version': item.data_version,
             'payload': {k: v for k, v in item.payload.items() if k in FIELDS},
             'reference_options': [o.model_dump() for o in item.reference_options if substantive(o.field_path)]}
+    if item.payload.get('source_type') == 'user_submission':
+        view['payload'].update({key: item.payload[key] for key in ('source_type', 'source_name', 'verification_status')})
+    return view
