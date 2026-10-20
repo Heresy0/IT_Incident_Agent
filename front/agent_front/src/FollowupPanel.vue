@@ -102,7 +102,7 @@ onUnmounted(() => { alive = false; generation++; emit('busy', false) })
     <h3>追加信息与关联诊断</h3>
     <p class="hint">补充新情况、指出反证或粘贴有来源的记录，重新调查并审阅。每轮单独确认预算，原报告保留。</p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
-    <details v-if="result?.followup"><summary>本轮采用的用户补充</summary>
+    <details v-if="result?.followup"><summary>本轮提交的用户补充</summary>
       <div v-for="item in result.followup.submissions" :key="item.submitted_at">
         <p>{{ item.submitted_by }} · {{ item.submitted_at }} · 未经独立核验</p><p>{{ item.note }}</p>
         <details v-for="row in item.observations" :key="row.source_name + row.observed_at"><summary>{{ row.source_name }} · {{ row.service }} · {{ row.observed_at }}</summary><pre>{{ row.content }}</pre></details>

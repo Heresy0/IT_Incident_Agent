@@ -3,6 +3,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import os
 import unittest
+from unittest.mock import patch
 from uuid import uuid4
 
 from incidents.support import IncidentError
@@ -98,3 +99,48 @@ class FollowupPostgresTests(unittest.TestCase):
             count = conn.execute('SELECT COUNT(*) AS total FROM run_operations WHERE run_id=%s', (rid,)).fetchone()['total']
         self.assertEqual(count, row['counts']['model_calls'] + row['counts']['tool_calls'])
         self.assertEqual(self.store.get_incident(self.incident['id'], self.owner)['revision'], 2)
+
+    def test_recovery_policy_failure_delivers_frozen_followup_once_without_model_calls(self):
+        parent = self.parent()
+        service = WorkflowService('unused', store=self.store, config=TestConfig(), max_concurrency=1,
+            checkpoint_recovery=True)
+        self.workflow_to_close = service
+        with patch.object(service._incident, 'resume_error', return_value='RECOVERY_POLICY_CHANGED'):
+            rid, _ = service.start_followup(self.incident['id'], self.followup_execution(parent), self.owner)
+            result = asyncio.run(asyncio.wait_for(service.wait_result(rid), timeout=25))
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['run_summary']['model_calls'], 0)
+        self.assertEqual(result['followup'], self.store.get(rid)['config']['followup_context'])
+        self.assertIn('本轮审阅未完成', result['final'])
+        finals = [event for event in self.store.events(rid) if event['type'] == 'final']
+        self.assertEqual(len(finals), 1)
+        self.assertEqual(finals[0]['followup'], result['followup'])
+
+    def test_prepared_followup_report_is_delivered_once_after_interruption(self):
+        parent = self.parent()
+        service = WorkflowService('unused', store=self.store, config=TestConfig(), max_concurrency=1,
+            checkpoint_recovery=True)
+        self.workflow_to_close = service
+        injected = []
+        def cut(point, journal):
+            if point == 'after_report_ready' and not injected:
+                injected.append(True)
+                raise RecoveryInterrupted('synthetic interruption after frozen report candidate')
+        self.store._recovery_fault = cut
+        rid, _ = service.start_followup(self.incident['id'], self.followup_execution(parent), self.owner)
+        result = asyncio.run(asyncio.wait_for(service.wait_result(rid), timeout=25))
+        self.assertTrue(injected)
+        # Prepared report metadata stays frozen; the durable execution row
+        # records the subsequent delivery recovery without rewriting the report.
+        self.assertEqual(result['recovery']['recoveries'], 0)
+        self.assertEqual(result['final'].count('## 用户补充与关联诊断'), 1)
+        finals = [event for event in self.store.events(rid) if event['type'] == 'final']
+        self.assertEqual(len(finals), 1)
+        self.assertEqual(finals[0]['final'], result['final'])
+        with self.store.pool.connection() as conn:
+            row = conn.execute('SELECT candidate,counts,recoveries FROM run_execution WHERE run_id=%s', (rid,)).fetchone()
+            operations = conn.execute('SELECT COUNT(*) AS total FROM run_operations WHERE run_id=%s', (rid,)).fetchone()['total']
+        self.assertEqual(row['candidate']['followup'], result['followup'])
+        self.assertEqual(row['recoveries'], 1)
+        self.assertEqual(row['candidate']['final'], result['final'])
+        self.assertEqual(operations, row['counts']['model_calls'] + row['counts']['tool_calls'])

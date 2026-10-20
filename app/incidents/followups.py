@@ -61,6 +61,25 @@ def submitted_rows(context, scope):
                 'data_version': 'user-' + fingerprint(submission)[:16]}
 
 
+def report_lines(context, review_status, source_basis=None):
+    review = {'passed': '本轮模型复核通过，不代表用户材料已独立核验。',
+              'needs_information': '本轮模型复核仍有未解决事项。'}.get(review_status,
+                  '本轮审阅未完成，不得视为已复核。')
+    lines = ['', '## 用户补充与关联诊断',
+        f"基于运行 {context['parent_run_id']} 的第 {context['round']} 次关联重诊；原报告保持不变。",
+        '用户说明与粘贴记录未经独立核验，不构成人工金标或审批；' + review]
+    if source_basis:
+        lines.append('仅基于用户材料，尚无独立当前观测；报告可查看，诊断仍待核验。'
+            if source_basis['status'] == 'user_only' else
+            '本轮同时包含用户材料与独立当前观测；存在独立观测不代表用户材料已被核验。')
+    for submission in context['submissions']:
+        if submission['note']:
+            lines.append('- 用户说明：' + submission['note'])
+        for item in submission['observations']:
+            lines.append(f"- 用户提供记录：{item['source_name']}；服务 {item['service']}；观测时间 {item['observed_at']}。")
+    return lines
+
+
 def run_history(rows, offset, limit):
     items = []
     totals = {'runs': len(rows), 'model_calls': 0, 'tool_calls': 0, 'input_tokens_known': 0,

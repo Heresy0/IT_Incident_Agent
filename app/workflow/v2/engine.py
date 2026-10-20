@@ -339,6 +339,8 @@ def execute_review_rework(model, draft, reviews, executor, context, *, repairs=N
         payload = {**draft_input(executor), 'draft': draft.model_dump(mode='json'),
                    'review_feedback': feedback, 'allowed_target_ids': feedback['allowed_target_ids'],
                    'investigation_questions': questions.context(executor)}
+        if getattr(executor.provider, 'followup_context', None):
+            payload['user_followup'] = executor.provider.followup_context
         response = call_model(model_for(model, 'investigation'), context, 'revise', REVISION_PROMPT,
                               payload, revision_schema(feedback['allowed_target_ids']))
         revision = parse_revision(response.content, draft, executor, feedback['allowed_target_ids'])
@@ -496,13 +498,6 @@ def render_report(result):
                 lines.append(f"- {change['target_id']}：{change['operation']}；修改后重新审阅，旧批准不继承。")
         lines.append('独立范围质疑同样是模型判断；补查、收窄或撤回均不代表已查明唯一根因。')
     if result.get('followup'):
-        followup = result['followup']
-        lines.extend(['', '## 用户补充与关联诊断',
-            f"基于运行 {followup['parent_run_id']} 的第 {followup['round']} 次关联重诊；原报告保持不变。",
-            '用户说明与粘贴记录未经独立核验，不构成人工金标或审批；本轮结论已重新审阅。'])
-        for submission in followup['submissions']:
-            if submission['note']:
-                lines.append('- 用户说明：' + submission['note'])
-            for item in submission['observations']:
-                lines.append(f"- 用户提供记录：{item['source_name']}；服务 {item['service']}；观测时间 {item['observed_at']}。")
+        from incidents.followups import report_lines
+        lines.extend(report_lines(result['followup'], result['review_status'], result.get('source_basis')))
     return '\n'.join(lines) + '\n'

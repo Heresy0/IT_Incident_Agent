@@ -129,10 +129,10 @@ class IncidentAdapter:
             provider = (BoundIncidentProvider(snapshot, self.principal(request), self.service._store)
                         if snapshot.get('demo_case_id') else registry.provider(snapshot, self.principal(request)))
         except ProviderError:
-            result = self.failure(request, context, "OBSERVATION_PROVIDER_UNAVAILABLE")
-            result.update(status="partial", business_result="needs_information",
-                final="当前工单尚未绑定真实观测 Provider。没有执行模型或制造观测，请接入日志/指标来源或人工补充证据。")
-            return result
+            return self.failure(request, context, "OBSERVATION_PROVIDER_UNAVAILABLE", status='partial',
+                final=("当前工单尚未绑定真实观测 Provider。没有执行模型或制造观测，请接入日志/指标来源后重新诊断；本轮提交内容已保留。"
+                    if request.get('followup_context') else
+                    "当前工单尚未绑定真实观测 Provider。没有执行模型或制造观测，请接入日志/指标来源或人工补充证据。"))
         mode = request["execution"]["execution_mode"]
         if not snapshot.get('demo_case_id'):
             from providers.history import ProviderWithHistory
@@ -142,10 +142,8 @@ class IncidentAdapter:
             provider.followup_context = request['followup_context']
         if mode == "scripted_control_only":
             if not snapshot.get('demo_case_id'):
-                result = self.failure(request, context, 'LIVE_DIAGNOSIS_REQUIRED')
-                result.update(status='partial', business_result='needs_information',
-                              final='真实数据源不能使用固定案例脚本诊断；请显式选择live并提供模型和工具预算。')
-                return result
+                return self.failure(request, context, 'LIVE_DIAGNOSIS_REQUIRED', status='partial',
+                    final='真实数据源不能使用固定案例脚本诊断；请显式选择live并提供模型和工具预算。')
             from workflow.v2.scripted import scripted_model
             models = scripted_model(provider)
         else:
@@ -164,12 +162,22 @@ class IncidentAdapter:
                       engine_id=engine, run_spec=request.get('run_spec', {}))
         result.update(task_type="incident", workflow="autonomous_v2", incident_id=snapshot['id'],
                       incident_snapshot=snapshot, memory_enabled=False)
-        if request.get('followup_context'):
-            result['followup'] = request['followup_context']
-            if any(submission['observations'] for submission in result['followup']['submissions']):
-                result['repair_eligible'] = False
+        return self.followup_result(request, result)
+
+    def followup_result(self, request, result):
+        followup = request.get('followup_context')
+        if not followup or result.get('followup') == followup:
+            return result
+        from copy import deepcopy
+        result = {**result, 'followup': deepcopy(followup)}
+        if any(submission['observations'] for submission in followup['submissions']):
+            result['repair_eligible'] = False
+        if 'output' in result:
             from workflow.v2.engine import render_report
             result['final'] = render_report(result)
+        else:
+            from incidents.followups import report_lines
+            result['final'] += '\n' + '\n'.join(report_lines(followup, result['review_status'])) + '\n'
         return result
 
     def resume_error(self, request):
@@ -211,11 +219,12 @@ class IncidentAdapter:
             return 'RECOVERY_AUTHORIZATION_CHANGED'
         return None
 
-    def failure(self, request, context, code):
-        return {"run_id": context.run_id, "task_type": "incident", "incident_id": request["incident_snapshot"]["id"],
+    def failure(self, request, context, code, *, status='failed', final=None):
+        result = {"run_id": context.run_id, "task_type": "incident", "incident_id": request["incident_snapshot"]["id"],
             "incident_snapshot": request["incident_snapshot"], "execution_mode": request["execution"]["execution_mode"],
-            "status": "failed", "business_result": "needs_information", "review_status": "not_performed",
+            "status": status, "business_result": "needs_information", "review_status": "not_performed",
             "engine_id": request.get('run_spec', {}).get('engine_id', 'autonomous_v2'), "repair_eligible": False,
             'run_spec': request.get('run_spec', {}),
-            "final": "诊断未完成，请查看运行记录并补充信息或重新诊断。", "memory_enabled": False,
+            "final": final or "诊断未完成，请查看运行记录并补充信息或重新诊断。", "memory_enabled": False,
             "run_summary": {**context.summary(), "termination_reason": code}, "evidence": [], "sources": []}
+        return self.followup_result(request, result)

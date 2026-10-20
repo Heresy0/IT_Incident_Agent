@@ -68,6 +68,12 @@ def classify_outcome(draft, reviews, executor, failures, collection_stop, ticket
                                   'truncated': bool(row.get('truncated')),
                                   'error_code': _error_code(row.get('error'))})
     facts_available = bool(draft.facts)
+    observations = [item for item in executor.evidence.values() if item.kind == 'observation']
+    user_count = sum(item.payload.get('source_type') == 'user_submission' for item in observations)
+    independent_count = sum(item.payload.get('source_type') != 'user_submission'
+        and item.locator.split('/')[0] in {'get_service_metrics', 'get_service_logs', 'get_recent_changes'}
+        for item in observations)
+    user_only = bool(user_count) and independent_count == 0
     status_check = ticket.purpose == 'status_check'
     blockers = []
     if failure_codes:
@@ -76,6 +82,8 @@ def classify_outcome(draft, reviews, executor, failures, collection_stop, ticket
         blockers.append('SOURCE_LIMITED')
     if not facts_available:
         blockers.append('NO_CURRENT_OBSERVATIONS')
+    if user_only:
+        blockers.append('USER_SOURCES_UNVERIFIED')
     if not status_check:
         if not all_reviewed:
             blockers.append('REVIEW_INCOMPLETE')
@@ -88,6 +96,8 @@ def classify_outcome(draft, reviews, executor, failures, collection_stop, ticket
         reason = 'SOURCE_UNAVAILABLE' if any(row['status'] == 'error' for row in source_limits) else 'SOURCE_TRUNCATED'
     elif not facts_available:
         reason = 'NO_CURRENT_OBSERVATIONS'
+    elif user_only:
+        reason = 'USER_SOURCES_UNVERIFIED'
     elif not status_check and not all_reviewed:
         reason = 'REVIEW_NEEDS_INFORMATION' if valid else 'REVIEW_NOT_PERFORMED'
     elif not status_check and not mechanisms:
@@ -103,7 +113,7 @@ def classify_outcome(draft, reviews, executor, failures, collection_stop, ticket
     else:
         investigation_status = 'unresolved'
     basis = ('observed_status' if status_check else 'model_reviewed_bounded_mechanism') if completed else None
-    return {
+    result = {
         'status': 'completed' if completed else 'partial',
         'business_result': ('status_checked' if status_check else 'diagnosis_available') if completed else 'needs_information',
         'review_status': review_status,
@@ -127,3 +137,11 @@ def classify_outcome(draft, reviews, executor, failures, collection_stop, ticket
             'causality_verified_by_program': False,
         },
     }
+    if user_count:
+        result['source_basis'] = {'status': 'user_only' if user_only else 'mixed_sources',
+            'user_observations': user_count, 'independent_observations': independent_count,
+            'user_sources_independently_verified': False}
+        if user_only:
+            result['diagnosis_readiness'].update(report_status='user_material_only',
+                meaning='报告可交付，但仅基于未经独立核验的用户材料，不代表已取得独立当前观测或确认根因。')
+    return result
