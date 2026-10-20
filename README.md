@@ -2,7 +2,7 @@
 
 基于 FastAPI、PostgreSQL 和 Vue 的故障辅助诊断项目。v2 使用受预算约束的自主调查循环，从工单出发查询指标、日志与变更，形成带证据引用的诊断，审阅后交付报告和人工核查项。当前由 LangGraph 编排 v2 各阶段，旧版诊断链路继续归档。
 
-本页是统一阅读入口。检查点成果已合入 `main`，当前开发分支 `codex/report-followup` 增加[报告后追加信息与关联诊断](examples/followup-diagnosis.md)。普通后端、CLI 和 CI 演示统一使用 **`autonomous_v2 / closed_loop`**。本机 8176 保留已验收的真实 Flash 版本，新前端在隔离的 8177 免费控制环境验收。旧版执行代码退出当前运行目录，完整源码与恢复方式见[旧版归档](archive/legacy/README.md)。准入未通过时明确拒绝启动，不再静默回退旧版。
+本页是统一阅读入口。检查点恢复及[报告后追加信息与关联诊断](examples/followup-diagnosis.md)均已合入 GitHub `main`。普通后端、CLI 和 CI 演示统一使用 **`autonomous_v2 / closed_loop`**；本机 8176 已更新到主分支的最新后端及 Vue 前端，显式开启检查点恢复。最新[部署与真实前端验收](evals/main-demo-unification-validation-20261020.json)分别说明已覆盖环节与本轮未自然触发的真实返工。旧版执行代码退出当前运行目录，完整源码与恢复方式见[旧版归档](archive/legacy/README.md)。准入未通过时明确拒绝启动，不再静默回退旧版。
 
 图检查点恢复按运行显式启用，默认关闭；开启方式、预算与未知响应边界见[检查点接入说明](examples/checkpoint-recovery.md)。恢复不会增加 Agent、调用额度或返工轮数。
 
@@ -16,7 +16,7 @@
 | 按用途查找诊断、演示、接入与评估命令 | [脚本导航](scripts/README.md) |
 | 了解 v2 架构、当前演示和评估边界 | [当前 v2 导览](examples/current-v2.md) |
 | 核验剩余旧代码清理、兼容边界和回归结果 | [清理验收](evals/residual-cleanup-validation-20261019.json)、[原文件快照](archive/legacy/residual-20261019/README.md) |
-| 核验真实前端取证、审阅、返工与报告交付 | [退役后真实验收](evals/frontend-post-retirement-validation-20261018.json)、[原始前端验收](evals/frontend-live-validation-20261018.json) |
+| 核验主分支部署、追加信息及真实前端交付 | [最新统一部署验收](evals/main-demo-unification-validation-20261020.json)；历史记录见[退役后真实验收](evals/frontend-post-retirement-validation-20261018.json)、[原始前端验收](evals/frontend-live-validation-20261018.json) |
 | 核验同模型、同案例、同预算的旧版／v2 对照 | [冻结版本配对验收](evals/frozen-version-validation-20261018.json) |
 | 核验跨案例根因定位、补证及剩余错误 | [跨案例评分](evals/rca-cross-case-scorecard-20261018.json)、[实验与证据来源](evals/rca-cross-case-validation-20261018.json) |
 | 阅读可随仓库提供的面试稿 | [面试讲述简版](examples/interview.md)；本机扩展复盘索引为 `docs/README.md`，不随克隆提供 |
